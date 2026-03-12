@@ -343,10 +343,16 @@ Deno.serve(async (req) => {
         });
       }
     } else {
-      // Fall back to simple token auth (for testing / legacy)
+      // Fall back to simple token auth or service-role (for testing / legacy)
       const linqToken = Deno.env.get("LINQ_API_TOKEN");
+      const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
       const authHeader = req.headers.get("x-linq-signature") || new URL(req.url).searchParams.get("token");
-      if (linqToken && authHeader !== linqToken) {
+      const bearerToken = req.headers.get("authorization")?.replace("Bearer ", "");
+
+      const isServiceRole = serviceRoleKey && bearerToken === serviceRoleKey;
+      const isTokenAuth = linqToken && authHeader === linqToken;
+
+      if (!isServiceRole && !isTokenAuth && linqToken) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), {
           status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
