@@ -20,7 +20,7 @@ const TagBrowser = ({ tagCounts, activeType, onSelect }: TagBrowserProps) => {
       <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-3">
         Signal Types
       </p>
-      <div className="grid grid-cols-3 md:grid-cols-6 gap-px bg-vanta-border">
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-px bg-vanta-border">
         {/* All */}
         <button
           onClick={() => onSelect("ALL")}

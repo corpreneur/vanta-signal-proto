@@ -130,6 +130,22 @@ const SignalEntryCard = ({ signal, onClick }: SignalEntryCardProps) => {
           {signal.summary}
         </p>
 
+        {/* Phone-specific tags */}
+        {signal.signalType === "PHONE_CALL" && signal.actionsTaken.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {signal.actionsTaken
+              .filter((a) => (PHONE_CALL_TAGS as readonly string[]).includes(a))
+              .map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-block px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] border border-vanta-accent-phone-border text-vanta-accent-phone bg-vanta-accent-phone-faint"
+                >
+                  {PHONE_TAG_LABELS[tag as keyof typeof PHONE_TAG_LABELS] || tag}
+                </span>
+              ))}
+          </div>
+        )
+
         {/* Inline actions row */}
         <div className="flex items-center gap-2 flex-wrap">
           <button
