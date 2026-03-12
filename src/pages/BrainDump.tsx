@@ -182,14 +182,19 @@ export default function BrainDump() {
             )}
           </>
         ) : (
-          <Input
-            value={linkUrl}
-            onChange={(e) => setLinkUrl(e.target.value)}
-            placeholder="Paste a ChatGPT share link, article URL, etc."
-            className="bg-vanta-bg-elevated border-vanta-border font-mono text-sm"
-            disabled={loading}
-            type="url"
-          />
+          <div className="space-y-2">
+            <Input
+              value={linkUrl}
+              onChange={(e) => setLinkUrl(e.target.value)}
+              placeholder="https://chatgpt.com/share/... or any article URL"
+              className="bg-vanta-bg-elevated border-vanta-border font-mono text-sm"
+              disabled={loading}
+              type="url"
+            />
+            <p className="font-mono text-[10px] text-muted-foreground leading-relaxed">
+              Paste a ChatGPT share link, blog post, article, or any web page. Firecrawl will extract the content and classify it as a signal.
+            </p>
+          </div>
         )}
 
         <div className="flex items-center justify-between">
