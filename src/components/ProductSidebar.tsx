@@ -46,13 +46,13 @@ const productItems = [
   { title: "Insight Engine", url: "/product/insight", icon: Lightbulb, color: "text-vanta-accent-teal" },
   { title: "Investment Intel", url: "/product/investment", icon: TrendingUp, color: "text-vanta-accent-amber" },
   { title: "Decision Capture", url: "/product/decision", icon: Gavel, color: "text-vanta-accent-violet" },
-  { title: "Context Layer", url: "/product/context", icon: FileText, color: "text-vanta-text-low" },
-  { title: "Noise Filter", url: "/product/noise", icon: Volume2, color: "text-vanta-text-muted" },
 ];
 
 const platformItems = [
   { title: "Signal Feed", url: "/signals", icon: BarChart3 },
   { title: "Relationship Graph", url: "/graph", icon: Network },
+  { title: "Context Layer", url: "/product/context", icon: FileText },
+  { title: "Noise Filter", url: "/product/noise", icon: Volume2 },
   { title: "Ontology", url: "/ontology", icon: Layers },
   { title: "Phone FMC", url: "/phone-fmc", icon: BookOpen },
 ];
