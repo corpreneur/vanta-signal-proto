@@ -9,6 +9,7 @@ const LINQ_API_URL = "https://api.linqapp.com/api/partner/v3/chats";
 interface SendRequest {
   to: string | string[];
   message: string;
+  chatId?: string; // If provided, sends to existing chat thread
 }
 
 /** Strip to E.164: remove spaces, dashes, parens — keep leading + */
@@ -23,17 +24,12 @@ Deno.serve(async (req) => {
 
   try {
     const linqApiKey = Deno.env.get("LINQ_PARTNER_API_KEY");
-    if (!linqApiKey) {
-      throw new Error("LINQ_PARTNER_API_KEY is not configured");
-    }
+    if (!linqApiKey) throw new Error("LINQ_PARTNER_API_KEY is not configured");
 
     const fromNumber = Deno.env.get("LINQ_FROM_NUMBER");
-    if (!fromNumber) {
-      throw new Error("LINQ_FROM_NUMBER is not configured");
-    }
+    if (!fromNumber) throw new Error("LINQ_FROM_NUMBER is not configured");
 
     const body: SendRequest = await req.json();
-    const recipients = (Array.isArray(body.to) ? body.to : [body.to]).map(toE164);
 
     if (!body.message || body.message.trim().length === 0) {
       return new Response(
@@ -42,27 +38,49 @@ Deno.serve(async (req) => {
       );
     }
 
-    if (recipients.length === 0) {
+    // If chatId provided, send to existing conversation thread
+    if (body.chatId) {
+      console.log("Sending to existing chat:", body.chatId);
+
+      const res = await fetch(`${LINQ_API_URL}/${body.chatId}/messages`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${linqApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: { parts: [{ type: "text", value: body.message.trim() }] },
+        }),
+      });
+
+      const responseText = await res.text();
+      if (!res.ok) {
+        console.error(`Linq chat send error [${res.status}]:`, responseText);
+        return new Response(
+          JSON.stringify({ error: `Linq API error`, status: res.status, detail: responseText }),
+          { status: res.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      let responseData;
+      try { responseData = JSON.parse(responseText); } catch { responseData = { raw: responseText }; }
+      return new Response(
+        JSON.stringify({ success: true, data: responseData }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // New chat: requires recipients
+    const recipients = (Array.isArray(body.to) ? body.to : [body.to]).map(toE164);
+
+    if (recipients.length === 0 || !recipients[0]) {
       return new Response(
         JSON.stringify({ error: "At least one recipient is required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const linqPayload = {
-      from: fromNumber,
-      to: recipients,
-      message: {
-        parts: [
-          {
-            type: "text",
-            value: body.message,
-          },
-        ],
-      },
-    };
-
-    console.log("Sending Linq message to:", recipients);
+    console.log("Sending new chat to:", recipients);
 
     const res = await fetch(LINQ_API_URL, {
       method: "POST",
@@ -70,13 +88,16 @@ Deno.serve(async (req) => {
         Authorization: `Bearer ${linqApiKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(linqPayload),
+      body: JSON.stringify({
+        from: fromNumber,
+        to: recipients,
+        message: { parts: [{ type: "text", value: body.message.trim() }] },
+      }),
     });
 
     const responseText = await res.text();
-
     if (!res.ok) {
-      console.error(`Linq API error [${res.status}]:`, responseText);
+      console.error(`Linq send error [${res.status}]:`, responseText);
       return new Response(
         JSON.stringify({ error: `Linq API error`, status: res.status, detail: responseText }),
         { status: res.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -84,20 +105,15 @@ Deno.serve(async (req) => {
     }
 
     let responseData;
-    try {
-      responseData = JSON.parse(responseText);
-    } catch {
-      responseData = { raw: responseText };
-    }
-
-    console.log("Linq message sent successfully:", responseData);
+    try { responseData = JSON.parse(responseText); } catch { responseData = { raw: responseText }; }
+    console.log("Message sent successfully:", responseData);
 
     return new Response(
       JSON.stringify({ success: true, data: responseData }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {
-    console.error("Send message error:", err);
+    console.error("Send error:", err);
     return new Response(
       JSON.stringify({ error: String(err) }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
