@@ -214,6 +214,12 @@ const Signals = () => {
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Filtered</p>
           <p className="font-display text-[24px] text-muted-foreground">{noiseSignals.length}</p>
         </div>
+        {overdueCount > 0 && (
+          <div>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Overdue</p>
+            <p className="font-display text-[24px] text-destructive">{overdueCount}</p>
+          </div>
+        )}
         <div>
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Pipeline</p>
           <div className="flex items-center gap-2">
