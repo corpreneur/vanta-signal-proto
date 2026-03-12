@@ -81,8 +81,8 @@ function CollapsibleNavGroup({ label, items, collapsed, currentPath, activeClass
   return (
     <Collapsible defaultOpen={hasActiveChild}>
       <SidebarGroup>
-        <CollapsibleTrigger className="flex items-center gap-1.5 w-full px-2 py-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted hover:text-foreground transition-colors group">
-          <ChevronRight className="h-3 w-3 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+        <CollapsibleTrigger className="flex items-center gap-1.5 w-full px-2 py-2 font-mono text-[10px] uppercase tracking-[0.15em] text-vanta-text-low hover:text-foreground transition-colors group">
+          <ChevronRight className="h-3.5 w-3.5 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
           {!collapsed && <span>{label}</span>}
         </CollapsibleTrigger>
         <CollapsibleContent>
@@ -93,10 +93,10 @@ function CollapsibleNavGroup({ label, items, collapsed, currentPath, activeClass
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={`${item.url}?skip-auth=1`}
-                      className="flex items-center gap-2 px-2 py-1.5 pl-6 font-mono text-[11px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
+                      className="flex items-center gap-2 px-2 py-2 pl-6 font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
                       activeClassName={activeClassName}
                     >
-                      <item.icon className="h-3.5 w-3.5 shrink-0" />
+                      <item.icon className="h-4 w-4 shrink-0" />
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
@@ -118,9 +118,9 @@ export function ProductSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="border-r border-vanta-border bg-vanta-bg">
-      <SidebarHeader className="px-3 py-4">
+      <SidebarHeader className="px-3 py-5">
         <a href="/?skip-auth=1" className="flex items-center gap-2">
-          <span className="font-sans text-[15px] font-extrabold tracking-[0.2em] uppercase text-foreground">
+          <span className="font-sans text-[17px] font-extrabold tracking-[0.2em] uppercase text-foreground">
             {collapsed ? "V" : "VANTA"}
           </span>
         </a>
@@ -128,7 +128,7 @@ export function ProductSidebar() {
 
       <SidebarContent>
         {/* Dashboard + Core */}
-        <SidebarGroup>
+        <SidebarGroup className="py-2 border-b border-vanta-border">
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
@@ -136,7 +136,7 @@ export function ProductSidebar() {
                   <NavLink
                     to="/?skip-auth=1"
                     end
-                    className="flex items-center gap-2 px-2 py-1.5 font-mono text-[11px] uppercase tracking-wider text-vanta-text-low hover:text-vanta-accent hover:bg-vanta-accent-faint transition-colors"
+                    className="flex items-center gap-2 px-2 py-2 font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-vanta-accent hover:bg-vanta-accent-faint transition-colors"
                     activeClassName="text-vanta-accent bg-vanta-accent-faint"
                   >
                     <LayoutDashboard className="h-4 w-4 shrink-0" />
@@ -149,10 +149,10 @@ export function ProductSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={`${item.url}?skip-auth=1`}
-                      className="flex items-center gap-2 px-2 py-1.5 font-mono text-[11px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
+                      className="flex items-center gap-2 px-2 py-2 font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
                       activeClassName="text-foreground bg-vanta-bg-elevated"
                     >
-                      <item.icon className="h-3.5 w-3.5 shrink-0" />
+                      <item.icon className="h-4 w-4 shrink-0" />
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
@@ -169,8 +169,8 @@ export function ProductSidebar() {
         {/* Cases */}
         <Collapsible defaultOpen={currentPath.startsWith("/case/")}>
           <SidebarGroup>
-            <CollapsibleTrigger className="flex items-center gap-1.5 w-full px-2 py-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted hover:text-foreground transition-colors group">
-              <ChevronRight className="h-3 w-3 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+            <CollapsibleTrigger className="flex items-center gap-1.5 w-full px-2 py-2 font-mono text-[10px] uppercase tracking-[0.15em] text-vanta-text-low hover:text-foreground transition-colors group">
+              <ChevronRight className="h-3.5 w-3.5 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
               {!collapsed && <span>Cases</span>}
             </CollapsibleTrigger>
             <CollapsibleContent>
@@ -181,10 +181,10 @@ export function ProductSidebar() {
                       <SidebarMenuButton asChild>
                         <NavLink
                           to={`/case/${c.id}?skip-auth=1`}
-                          className="flex items-center gap-2 px-2 py-1.5 pl-6 font-mono text-[11px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
+                          className="flex items-center gap-2 px-2 py-2 pl-6 font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
                           activeClassName="text-foreground bg-vanta-bg-elevated"
                         >
-                          <BookMarked className="h-3.5 w-3.5 shrink-0" />
+                          <BookMarked className="h-4 w-4 shrink-0" />
                           {!collapsed && <span className="truncate">{c.name}</span>}
                         </NavLink>
                       </SidebarMenuButton>
@@ -197,7 +197,7 @@ export function ProductSidebar() {
         </Collapsible>
       </SidebarContent>
 
-      <SidebarFooter className="px-3 py-3 space-y-2">
+      <SidebarFooter className="px-3 py-3 space-y-2 border-t border-vanta-border">
         <ThemeToggle />
         {!collapsed && (
           <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-vanta-text-muted">
