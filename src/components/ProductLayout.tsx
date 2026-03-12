@@ -1,7 +1,8 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { ProductSidebar } from "@/components/ProductSidebar";
 import { Menu } from "lucide-react";
 import { useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 interface ProductLayoutProps {
   children: React.ReactNode;
