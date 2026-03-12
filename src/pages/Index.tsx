@@ -145,10 +145,10 @@ const Index = () => {
             <Link
               key={ch.key}
               to={ch.href}
-              className={`flex flex-col items-center gap-2 py-5 px-3 bg-card hover:${ch.bg} transition-colors group`}
+              className="flex flex-col items-center gap-2 py-5 px-3 bg-card hover:bg-vanta-bg-elevated transition-colors group"
             >
-              <ch.icon className={`w-5 h-5 ${ch.color}`} />
-              <span className={`font-mono text-[10px] uppercase tracking-wider ${ch.color}`}>{ch.label}</span>
+              <ch.icon className={`w-5 h-5 ${ch.color} opacity-60`} />
+              <span className="font-mono text-[10px] uppercase tracking-wider text-vanta-text-low">{ch.label}</span>
               <span className="font-display text-[20px] text-foreground">{channelCounts[ch.key] || 0}</span>
               <span className="font-mono text-[8px] uppercase tracking-wider text-vanta-text-muted">signals</span>
             </Link>
