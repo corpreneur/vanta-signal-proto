@@ -96,7 +96,56 @@ serve(async (req) => {
   }
 
   try {
-    const { text } = await req.json();
+    const body = await req.json();
+    let { text } = body;
+    const { url } = body;
+
+    // If a URL is provided, scrape it via Firecrawl first
+    if (url && typeof url === "string" && url.trim().length > 0) {
+      const firecrawlKey = Deno.env.get("FIRECRAWL_API_KEY");
+      if (!firecrawlKey) {
+        return new Response(JSON.stringify({ error: "Firecrawl not configured" }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      let formattedUrl = url.trim();
+      if (!formattedUrl.startsWith("http://") && !formattedUrl.startsWith("https://")) {
+        formattedUrl = `https://${formattedUrl}`;
+      }
+
+      console.log("Scraping URL for brain-dump:", formattedUrl);
+      const scrapeRes = await fetch("https://api.firecrawl.dev/v1/scrape", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${firecrawlKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          url: formattedUrl,
+          formats: ["markdown"],
+          onlyMainContent: true,
+        }),
+      });
+
+      const scrapeData = await scrapeRes.json();
+      if (!scrapeRes.ok || !scrapeData.success) {
+        console.error("Firecrawl scrape failed:", scrapeData);
+        return new Response(JSON.stringify({ error: "Failed to scrape URL. It may be inaccessible." }), {
+          status: 422,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const scraped = scrapeData.data?.markdown || scrapeData.markdown || "";
+      const title = scrapeData.data?.metadata?.title || scrapeData.metadata?.title || "";
+      // Combine user text (if any) with scraped content
+      const prefix = text && text.trim() ? `${text.trim()}\n\n---\n\n` : "";
+      text = `${prefix}[Scraped from: ${formattedUrl}]${title ? ` — ${title}` : ""}\n\n${scraped}`;
+      console.log(`Scraped ${scraped.length} chars from ${formattedUrl}`);
+    }
+
     if (!text || typeof text !== "string" || text.trim().length === 0) {
       return new Response(JSON.stringify({ error: "Text is required" }), {
         status: 400,
@@ -104,11 +153,9 @@ serve(async (req) => {
       });
     }
 
+    // Truncate to 10k chars for classification
     if (text.length > 10000) {
-      return new Response(JSON.stringify({ error: "Text too long (max 10,000 characters)" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      text = text.substring(0, 10000);
     }
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");

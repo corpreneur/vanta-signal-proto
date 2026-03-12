@@ -47,6 +47,8 @@ export default function BrainDump() {
     }
   };
 
+  const [statusMessage, setStatusMessage] = useState("");
+
   const handleSubmit = async () => {
     if (loading) return;
     
@@ -58,11 +60,19 @@ export default function BrainDump() {
     setResult(null);
 
     try {
+      if (inputMode === "link") {
+        setStatusMessage("Scraping URL…");
+      } else {
+        setStatusMessage("Classifying…");
+      }
+
       const { data, error } = await supabase.functions.invoke("brain-dump", {
         body: inputMode === "link" 
-          ? { text: `[Imported from URL: ${content}]\n\nPlease classify this link and its context.`, url: content }
+          ? { url: content }
           : { text: content },
       });
+
+      setStatusMessage("");
 
       if (error) throw error;
 
@@ -76,6 +86,7 @@ export default function BrainDump() {
         description: classification.summary,
       });
     } catch (e: unknown) {
+      setStatusMessage("");
       console.error("Brain dump error:", e);
       toast({
         title: "Classification failed",
@@ -171,14 +182,19 @@ export default function BrainDump() {
             )}
           </>
         ) : (
-          <Input
-            value={linkUrl}
-            onChange={(e) => setLinkUrl(e.target.value)}
-            placeholder="Paste a ChatGPT share link, article URL, etc."
-            className="bg-vanta-bg-elevated border-vanta-border font-mono text-sm"
-            disabled={loading}
-            type="url"
-          />
+          <div className="space-y-2">
+            <Input
+              value={linkUrl}
+              onChange={(e) => setLinkUrl(e.target.value)}
+              placeholder="https://chatgpt.com/share/... or any article URL"
+              className="bg-vanta-bg-elevated border-vanta-border font-mono text-sm"
+              disabled={loading}
+              type="url"
+            />
+            <p className="font-mono text-[10px] text-muted-foreground leading-relaxed">
+              Paste a ChatGPT share link, blog post, article, or any web page. Firecrawl will extract the content and classify it as a signal.
+            </p>
+          </div>
         )}
 
         <div className="flex items-center justify-between">
@@ -195,7 +211,7 @@ export default function BrainDump() {
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Classifying…
+                {statusMessage || "Processing…"}
               </>
             ) : (
               "Classify & Save"
