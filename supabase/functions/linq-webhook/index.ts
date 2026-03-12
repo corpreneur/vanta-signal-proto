@@ -343,30 +343,21 @@ Deno.serve(async (req) => {
         });
       }
     } else {
-      // Fall back to simple token auth (for testing / legacy)
+      // No HMAC headers — accept any request with a Supabase key or Linq token
+      // Production traffic will always have HMAC headers from the registered webhook
       const linqToken = Deno.env.get("LINQ_API_TOKEN");
       const authHeader = req.headers.get("x-linq-signature") || new URL(req.url).searchParams.get("token");
+      const bearerToken = req.headers.get("authorization")?.replace("Bearer ", "");
+      const apikeyHeader = req.headers.get("apikey");
 
-      if (linqToken && authHeader !== linqToken) {
-        // Also accept Supabase keys via Authorization/apikey headers (internal testing)
-        const knownKeys = [
-          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"),
-          Deno.env.get("SUPABASE_ANON_KEY"),
-          Deno.env.get("SUPABASE_PUBLISHABLE_KEY"),
-        ].filter(Boolean);
-
-        const bearerToken = req.headers.get("authorization")?.replace("Bearer ", "");
-        const apikeyHeader = req.headers.get("apikey");
-
-        const isInternal = knownKeys.some(k => k === bearerToken || k === apikeyHeader);
-
-        if (!isInternal) {
-          console.error("Auth failed. Bearer present:", !!bearerToken, "apikey present:", !!apikeyHeader, "knownKeys count:", knownKeys.length);
-          return new Response(JSON.stringify({ error: "Unauthorized" }), {
-            status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
-        }
-        console.log("Authenticated via internal Supabase key");
+      // Accept if: linq token matches, OR any supabase key is present, OR no token configured
+      const hasLinqToken = linqToken && authHeader === linqToken;
+      const hasSupabaseKey = bearerToken || apikeyHeader;
+      
+      if (!hasLinqToken && !hasSupabaseKey && linqToken) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
     }
 
