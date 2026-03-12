@@ -117,9 +117,9 @@ export function ProductSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="border-r border-vanta-border bg-vanta-bg">
-      <SidebarHeader className="px-3 py-4">
+      <SidebarHeader className="px-3 py-5">
         <a href="/?skip-auth=1" className="flex items-center gap-2">
-          <span className="font-sans text-[15px] font-extrabold tracking-[0.2em] uppercase text-foreground">
+          <span className="font-sans text-[17px] font-extrabold tracking-[0.2em] uppercase text-foreground">
             {collapsed ? "V" : "VANTA"}
           </span>
         </a>
