@@ -47,6 +47,8 @@ export default function BrainDump() {
     }
   };
 
+  const [statusMessage, setStatusMessage] = useState("");
+
   const handleSubmit = async () => {
     if (loading) return;
     
@@ -58,11 +60,19 @@ export default function BrainDump() {
     setResult(null);
 
     try {
+      if (inputMode === "link") {
+        setStatusMessage("Scraping URL…");
+      } else {
+        setStatusMessage("Classifying…");
+      }
+
       const { data, error } = await supabase.functions.invoke("brain-dump", {
         body: inputMode === "link" 
-          ? { text: `[Imported from URL: ${content}]\n\nPlease classify this link and its context.`, url: content }
+          ? { url: content }
           : { text: content },
       });
+
+      setStatusMessage("");
 
       if (error) throw error;
 
