@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.gmail-poll]
 verify_jwt = false
+
+[functions.recall-webhook]
+verify_jwt = false
