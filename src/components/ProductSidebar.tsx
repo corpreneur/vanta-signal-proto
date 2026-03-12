@@ -16,6 +16,7 @@ import {
   LayoutDashboard,
   BookMarked,
   FileCode,
+  ChevronRight,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -26,7 +27,6 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -34,6 +34,11 @@ import {
   SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const channelItems = [
   { title: "iMessage", url: "/product/intro", icon: MessageSquare },
@@ -62,13 +67,54 @@ const platformItems = [
   { title: "Architecture", url: "/architecture", icon: FileCode },
 ];
 
+interface CollapsibleNavGroupProps {
+  label: string;
+  items: { title: string; url: string; icon: React.ElementType }[];
+  collapsed: boolean;
+  currentPath: string;
+  activeClassName?: string;
+}
+
+function CollapsibleNavGroup({ label, items, collapsed, currentPath, activeClassName = "text-foreground bg-vanta-bg-elevated" }: CollapsibleNavGroupProps) {
+  const hasActiveChild = items.some((item) => currentPath === item.url || currentPath.startsWith(item.url + "/"));
+
+  return (
+    <Collapsible defaultOpen={hasActiveChild}>
+      <SidebarGroup>
+        <CollapsibleTrigger className="flex items-center gap-1.5 w-full px-2 py-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted hover:text-foreground transition-colors group">
+          <ChevronRight className="h-3 w-3 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+          {!collapsed && <span>{label}</span>}
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to={`${item.url}?skip-auth=1`}
+                      className="flex items-center gap-2 px-2 py-1.5 pl-6 font-mono text-[11px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
+                      activeClassName={activeClassName}
+                    >
+                      <item.icon className="h-3.5 w-3.5 shrink-0" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </CollapsibleContent>
+      </SidebarGroup>
+    </Collapsible>
+  );
+}
+
 export function ProductSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
   const currentPath = location.pathname;
-
-  const isActive = (path: string) => currentPath === path;
 
   return (
     <Sidebar collapsible="icon" className="border-r border-vanta-border bg-vanta-bg">
@@ -116,105 +162,39 @@ export function ProductSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Channels */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted px-2 border-l-2 border-l-vanta-accent/25">
-            {collapsed ? "·" : "Channels"}
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {channelItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={`${item.url}?skip-auth=1`}
-                      className="flex items-center gap-2 px-2 py-1.5 font-mono text-[11px] uppercase tracking-wider text-vanta-text-mid hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
-                      activeClassName="text-vanta-accent bg-vanta-bg-elevated border-l-2 border-l-primary -ml-px"
-                    >
-                      <item.icon className="h-3.5 w-3.5 shrink-0" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        {/* Platform */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted px-2">
-            {collapsed ? "·" : "Platform"}
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {platformItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={`${item.url}?skip-auth=1`}
-                      className="flex items-center gap-2 px-2 py-1.5 font-mono text-[11px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
-                      activeClassName="text-foreground bg-vanta-bg-elevated"
-                    >
-                      <item.icon className="h-3.5 w-3.5 shrink-0" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        {/* Product */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted px-2">
-            {collapsed ? "·" : "Product Concepts"}
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {productItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={`${item.url}?skip-auth=1`}
-                      className="flex items-center gap-2 px-2 py-1.5 font-mono text-[11px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
-                      activeClassName="text-vanta-accent bg-vanta-bg-elevated border-l-2 border-l-primary -ml-px"
-                    >
-                      <item.icon className="h-3.5 w-3.5 shrink-0" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <CollapsibleNavGroup label="Channels" items={channelItems} collapsed={collapsed} currentPath={currentPath} />
+        <CollapsibleNavGroup label="Platform" items={platformItems} collapsed={collapsed} currentPath={currentPath} />
+        <CollapsibleNavGroup label="Product Concepts" items={productItems} collapsed={collapsed} currentPath={currentPath} />
 
         {/* Cases */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted px-2">
-            {collapsed ? "·" : "Cases"}
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {cases.map((c) => (
-                <SidebarMenuItem key={c.id}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={`/case/${c.id}?skip-auth=1`}
-                      className="flex items-center gap-2 px-2 py-1.5 font-mono text-[11px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
-                      activeClassName="text-foreground bg-vanta-bg-elevated"
-                    >
-                      <BookMarked className="h-3.5 w-3.5 shrink-0" />
-                      {!collapsed && <span className="truncate">{c.name}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <Collapsible defaultOpen={currentPath.startsWith("/case/")}>
+          <SidebarGroup>
+            <CollapsibleTrigger className="flex items-center gap-1.5 w-full px-2 py-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted hover:text-foreground transition-colors group">
+              <ChevronRight className="h-3 w-3 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+              {!collapsed && <span>Cases</span>}
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {cases.map((c) => (
+                    <SidebarMenuItem key={c.id}>
+                      <SidebarMenuButton asChild>
+                        <NavLink
+                          to={`/case/${c.id}?skip-auth=1`}
+                          className="flex items-center gap-2 px-2 py-1.5 pl-6 font-mono text-[11px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
+                          activeClassName="text-foreground bg-vanta-bg-elevated"
+                        >
+                          <BookMarked className="h-3.5 w-3.5 shrink-0" />
+                          {!collapsed && <span className="truncate">{c.name}</span>}
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </CollapsibleContent>
+          </SidebarGroup>
+        </Collapsible>
       </SidebarContent>
 
       <SidebarFooter className="px-3 py-3 space-y-2">
