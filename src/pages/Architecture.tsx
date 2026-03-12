@@ -124,10 +124,13 @@ export default function Architecture() {
         <p className="text-[13px] text-vanta-text-low mt-1">System-level documentation for the Vanta Signal intelligence pipeline.</p>
       </div>
 
-      <div className="flex gap-8">
-        <TOC active={active} />
+      {/* Mobile TOC — outside the flex so it spans full width */}
+      <MobileTOC active={active} />
 
-        <div className="flex-1 min-w-0 space-y-8">
+      <div className="flex gap-8">
+        <DesktopTOC active={active} />
+
+        <div className="flex-1 min-w-0 space-y-8 overflow-x-hidden">
 
           {/* ── 1. System Overview ──────────────────────────────────────── */}
           <section>
