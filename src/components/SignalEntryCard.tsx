@@ -40,6 +40,7 @@ const PRIORITY_STYLES: Record<string, string> = {
 interface SignalEntryCardProps {
   signal: Signal;
   onClick?: () => void;
+  showPromote?: boolean;
 }
 
 const SignalEntryCard = ({ signal, onClick }: SignalEntryCardProps) => {
