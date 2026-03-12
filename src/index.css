@@ -178,6 +178,22 @@
     --vanta-accent-phone: 340 82% 45%;
     --vanta-accent-phone-faint: 340 82% 45% / 0.08;
     --vanta-accent-phone-border: 340 82% 45% / 0.25;
+
+    /* Chunk Design System — semantic signal colors (light mode) */
+    --vanta-signal-red: 359 100% 50%;
+    --vanta-signal-red-faint: 359 100% 50% / 0.08;
+    --vanta-signal-red-border: 359 100% 50% / 0.2;
+    --vanta-signal-yellow: 46 99% 42%;
+    --vanta-signal-yellow-faint: 46 99% 42% / 0.08;
+    --vanta-signal-yellow-border: 46 99% 42% / 0.2;
+    --vanta-signal-blue: 210 100% 50%;
+    --vanta-signal-blue-faint: 210 100% 50% / 0.08;
+    --vanta-signal-blue-border: 210 100% 50% / 0.2;
+    --vanta-signal-green: 160 100% 30%;
+    --vanta-signal-green-faint: 160 100% 30% / 0.08;
+    --vanta-signal-green-border: 160 100% 30% / 0.2;
+
+    --vanta-grey: 0 0% 95%;
   }
 }
 
