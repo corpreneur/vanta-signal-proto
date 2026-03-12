@@ -62,17 +62,23 @@ const PreMeetingBriefCard = () => {
       if (error || !data) return [];
 
       // Fetch meeting details for each brief
-      const meetingIds = data.map((b: Record<string, unknown>) => b.meeting_id);
+      const meetingIds = data.map((b) => b.meeting_id);
       const { data: meetings } = await supabase
         .from("upcoming_meetings")
         .select("*")
         .in("id", meetingIds);
 
-      return data.map((b: Record<string, unknown>) => ({
-        ...b,
-        matched_signals: (b.matched_signals || []) as MatchedSignal[],
-        attendee_context: (b.attendee_context || {}) as Record<string, { signal_count: number; last_signal: string | null; signal_types: string[] }>,
-        meeting: meetings?.find((m: Record<string, unknown>) => m.id === b.meeting_id),
+      return data.map((b) => ({
+        id: b.id,
+        created_at: b.created_at,
+        meeting_id: b.meeting_id,
+        brief_text: b.brief_text,
+        matched_signals: (b.matched_signals || []) as unknown as MatchedSignal[],
+        attendee_context: (b.attendee_context || {}) as unknown as Record<string, { signal_count: number; last_signal: string | null; signal_types: string[] }>,
+        delivered_dashboard: b.delivered_dashboard,
+        delivered_linq: b.delivered_linq,
+        dismissed: b.dismissed,
+        meeting: meetings?.find((m) => m.id === b.meeting_id) as unknown as Brief["meeting"],
       })) as Brief[];
     },
     refetchInterval: 30_000,
