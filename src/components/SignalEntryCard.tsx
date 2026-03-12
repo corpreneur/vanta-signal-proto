@@ -156,10 +156,33 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
                 {signal.source}
               </span>
             ) : null}
+            {signal.riskLevel && (
+              <span
+                className={`inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border ${RISK_STYLES[signal.riskLevel]}`}
+              >
+                <Shield className="w-3 h-3" />
+                {signal.riskLevel}
+              </span>
+            )}
           </div>
-          <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-vanta-text-muted whitespace-nowrap">
-            {formatTimestamp(signal.capturedAt)}
-          </span>
+          <div className="flex items-center gap-2">
+            {signal.dueDate && (() => {
+              const { label, isOverdue } = formatDueDate(signal.dueDate);
+              return (
+                <span
+                  className={`inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.12em] ${
+                    isOverdue ? "text-destructive" : "text-vanta-text-muted"
+                  }`}
+                >
+                  <CalendarClock className="w-3 h-3" />
+                  {label}
+                </span>
+              );
+            })()}
+            <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-vanta-text-muted whitespace-nowrap">
+              {formatTimestamp(signal.capturedAt)}
+            </span>
+          </div>
         </div>
 
         {/* Sender */}
