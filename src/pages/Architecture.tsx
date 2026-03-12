@@ -49,47 +49,47 @@ function FlowStep({ n, label, detail }: { n: number; label: string; detail: stri
 
 // ─── TOC ────────────────────────────────────────────────────────────────────
 
-function TOC({ active }: { active: string }) {
+function DesktopTOC({ active }: { active: string }) {
   return (
-    <>
-      {/* Desktop sticky sidebar */}
-      <nav className="hidden lg:block sticky top-20 w-48 shrink-0 self-start">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-3">Contents</p>
-        <ul className="space-y-1">
-          {SECTIONS.map((s) => (
-            <li key={s.id}>
-              <a
-                href={`#${s.id}`}
-                className={`block font-mono text-[11px] px-2 py-1 rounded transition-colors ${
-                  active === s.id
-                    ? "text-vanta-accent bg-vanta-accent-faint"
-                    : "text-vanta-text-low hover:text-foreground"
-                }`}
-              >
-                {s.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-
-      {/* Mobile horizontal pills */}
-      <div className="lg:hidden sticky top-12 z-40 bg-background/95 backdrop-blur-md border-b border-vanta-border -mx-4 px-4 py-2 overflow-x-auto flex gap-2 no-scrollbar">
+    <nav className="hidden lg:block sticky top-20 w-48 shrink-0 self-start">
+      <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-3">Contents</p>
+      <ul className="space-y-1">
         {SECTIONS.map((s) => (
-          <a
-            key={s.id}
-            href={`#${s.id}`}
-            className={`shrink-0 font-mono text-[10px] uppercase tracking-wider px-3 py-1 rounded-full border transition-colors ${
-              active === s.id
-                ? "text-vanta-accent border-vanta-accent-border bg-vanta-accent-faint"
-                : "text-vanta-text-low border-vanta-border hover:text-foreground"
-            }`}
-          >
-            {s.label}
-          </a>
+          <li key={s.id}>
+            <a
+              href={`#${s.id}`}
+              className={`block font-mono text-[11px] px-2 py-1 rounded transition-colors ${
+                active === s.id
+                  ? "text-vanta-accent bg-vanta-accent-faint"
+                  : "text-vanta-text-low hover:text-foreground"
+              }`}
+            >
+              {s.label}
+            </a>
+          </li>
         ))}
-      </div>
-    </>
+      </ul>
+    </nav>
+  );
+}
+
+function MobileTOC({ active }: { active: string }) {
+  return (
+    <div className="lg:hidden sticky top-12 z-40 bg-background/95 backdrop-blur-md border-b border-vanta-border -mx-4 px-4 py-2 overflow-x-auto flex gap-2 no-scrollbar">
+      {SECTIONS.map((s) => (
+        <a
+          key={s.id}
+          href={`#${s.id}`}
+          className={`shrink-0 font-mono text-[10px] uppercase tracking-wider px-3 py-1 rounded-full border transition-colors ${
+            active === s.id
+              ? "text-vanta-accent border-vanta-accent-border bg-vanta-accent-faint"
+              : "text-vanta-text-low border-vanta-border hover:text-foreground"
+          }`}
+        >
+          {s.label}
+        </a>
+      ))}
+    </div>
   );
 }
 
@@ -124,10 +124,13 @@ export default function Architecture() {
         <p className="text-[13px] text-vanta-text-low mt-1">System-level documentation for the Vanta Signal intelligence pipeline.</p>
       </div>
 
-      <div className="flex gap-8">
-        <TOC active={active} />
+      {/* Mobile TOC — outside the flex so it spans full width */}
+      <MobileTOC active={active} />
 
-        <div className="flex-1 min-w-0 space-y-8">
+      <div className="flex gap-8">
+        <DesktopTOC active={active} />
+
+        <div className="flex-1 min-w-0 space-y-8 overflow-x-hidden">
 
           {/* ── 1. System Overview ──────────────────────────────────────── */}
           <section>
