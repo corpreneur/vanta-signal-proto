@@ -10,7 +10,10 @@ const Nav = ({ caseCount, onHamburgerClick, navOpen }: NavProps) => {
       <span className="font-sans text-[17px] font-extrabold tracking-[0.2em] uppercase text-foreground">
         VANTA
       </span>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
+        <a href="/ontology?skip-auth=1" className="hidden md:inline font-mono text-[10px] text-vanta-text-low uppercase tracking-wider hover:text-vanta-accent transition-colors">Ontology</a>
+        <a href="/phone-fmc?skip-auth=1" className="hidden md:inline font-mono text-[10px] text-vanta-text-low uppercase tracking-wider hover:text-vanta-accent transition-colors">Phone</a>
+        <a href="/signals?skip-auth=1" className="hidden md:inline font-mono text-[10px] text-vanta-text-low uppercase tracking-wider hover:text-vanta-accent transition-colors">Signals</a>
         <span className="font-mono text-[11px] text-primary px-2.5 py-1 bg-vanta-accent-bg border border-vanta-accent-border">
           {caseCount} Cases
         </span>
