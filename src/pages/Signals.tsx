@@ -5,7 +5,9 @@ import NavDrawer from "@/components/NavDrawer";
 import Overlay from "@/components/Overlay";
 import SignalFeed from "@/components/SignalFeed";
 import SignalFilters from "@/components/SignalFilters";
+import TagBrowser from "@/components/TagBrowser";
 import type { FilterState } from "@/components/SignalFilters";
+import type { SignalType } from "@/data/signals";
 import { cases } from "@/data/cases";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
@@ -38,6 +40,8 @@ const fetchSignals = async (): Promise<Signal[]> => {
     emailMetadata: (row as Record<string, unknown>).email_metadata as Signal["emailMetadata"] || null,
   }));
 };
+
+const SIGNAL_TYPES_ORDER: SignalType[] = ["INTRO", "INSIGHT", "INVESTMENT", "DECISION", "CONTEXT"];
 
 const Signals = () => {
   const [navOpen, setNavOpen] = useState(false);
@@ -87,6 +91,20 @@ const Signals = () => {
     [signals]
   );
 
+  // Tag counts for the browser
+  const tagCounts = useMemo(
+    () =>
+      SIGNAL_TYPES_ORDER.map((type) => ({
+        type,
+        count: signals.filter((s) => s.signalType === type).length,
+      })),
+    [signals]
+  );
+
+  const handleTagSelect = (type: SignalType | "ALL") => {
+    setFilters((prev) => ({ ...prev, type }));
+  };
+
   const toggleNav = () => {
     setNavOpen((prev) => {
       const next = !prev;
@@ -100,6 +118,9 @@ const Signals = () => {
     document.body.style.overflow = "";
   };
 
+  const highCount = sortedSignals.filter((s) => s.priority === "high").length;
+  const actionCount = sortedSignals.reduce((acc, s) => acc + s.actionsTaken.length, 0);
+
   return (
     <div className="min-h-screen bg-background">
       <Nav
@@ -108,32 +129,32 @@ const Signals = () => {
         navOpen={navOpen}
       />
 
-      <header className="px-5 pt-28 pb-10 md:px-10 max-w-[1200px] mx-auto">
+      <header className="px-5 pt-28 pb-8 md:px-10 max-w-[1200px] mx-auto">
         <div className="flex items-center gap-3 mb-2">
           <div
             className="w-2 h-2 bg-vanta-accent"
             style={{ animation: "pulse-dot 2s ease-in-out infinite" }}
           />
           <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-vanta-accent">
-            Live Signal Feed
+            Signal Log — Live
           </p>
         </div>
         <h1 className="font-display text-[28px] md:text-[36px] leading-[1.15] text-vanta-text mb-3">
-          Signal Detection
+          Captured Signals
         </h1>
         <p className="font-sans text-[13px] md:text-[14px] leading-[1.6] text-vanta-text-mid max-w-[640px]">
-          Real-time feed of captured signals from the automated detection
-          pipeline. Every message on the monitored number is evaluated, and when
-          a signal is detected, the orchestration pipeline fires without any
-          human trigger.
+          A curated feed of intellectual capital captured from real conversations.
+          Every message is evaluated through a two-stage AI pipeline — what
+          matters is extracted before it disappears into the scroll.
         </p>
       </header>
 
       <main className="px-5 pb-20 md:px-10 max-w-[1200px] mx-auto">
+        {/* Stats strip */}
         <div className="flex flex-wrap gap-6 mb-6 pb-6 border-b border-vanta-border">
           <div>
             <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">
-              Total Signals
+              Signals Captured
             </p>
             <p className="font-display text-[24px] text-vanta-text">
               {sortedSignals.length}
@@ -141,26 +162,23 @@ const Signals = () => {
           </div>
           <div>
             <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">
-              High Priority
+              High Strength
             </p>
             <p className="font-display text-[24px] text-vanta-accent">
-              {sortedSignals.filter((s) => s.priority === "high").length}
+              {highCount}
             </p>
           </div>
           <div>
             <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">
-              Actions Executed
+              Actions Fired
             </p>
             <p className="font-display text-[24px] text-vanta-text">
-              {sortedSignals.reduce(
-                (acc, s) => acc + s.actionsTaken.length,
-                0
-              )}
+              {actionCount}
             </p>
           </div>
           <div>
             <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">
-              Pipeline Status
+              Pipeline
             </p>
             <div className="flex items-center gap-2">
               <div
@@ -174,12 +192,21 @@ const Signals = () => {
           </div>
         </div>
 
+        {/* Tag Browser */}
+        <TagBrowser
+          tagCounts={tagCounts}
+          activeType={filters.type}
+          onSelect={handleTagSelect}
+        />
+
+        {/* Filters */}
         <SignalFilters
           filters={filters}
           onChange={setFilters}
           senders={senders}
         />
 
+        {/* Feed */}
         <SignalFeed signals={sortedSignals} filters={filters} />
       </main>
 
