@@ -1,0 +1,1 @@
+DELETE FROM public.signals WHERE id = '72d6041a-f0ee-471b-9b93-8e1f0eeb03e9';
