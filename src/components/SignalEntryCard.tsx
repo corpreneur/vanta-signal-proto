@@ -38,9 +38,9 @@ const PRIORITY_STYLES: Record<string, string> = {
 };
 
 const RISK_STYLES: Record<string, string> = {
-  critical: "text-destructive border-destructive bg-destructive/10",
-  high: "text-vanta-accent border-vanta-accent-border bg-vanta-accent-faint",
-  medium: "text-vanta-accent-amber border-vanta-accent-amber-border bg-vanta-accent-amber-faint",
+  critical: "text-vanta-signal-red border-vanta-signal-red-border bg-vanta-signal-red-faint",
+  high: "text-vanta-signal-red border-vanta-signal-red-border bg-vanta-signal-red-faint",
+  medium: "text-vanta-signal-yellow border-vanta-signal-yellow-border bg-vanta-signal-yellow-faint",
   low: "text-vanta-text-muted border-vanta-border bg-transparent",
 };
 
@@ -141,6 +141,11 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
             >
               {signal.priority}
             </span>
+            {signal.status === "Complete" && (
+              <span className="inline-block px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border border-vanta-signal-green-border text-vanta-signal-green bg-vanta-signal-green-faint">
+                ✓ Complete
+              </span>
+            )}
             {signal.source === "recall" ? (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border border-vanta-accent-zoom-border text-vanta-accent-zoom bg-vanta-accent-zoom-faint">
                 <Video className="w-3 h-3" />
