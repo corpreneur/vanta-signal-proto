@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 function formatTimestamp(iso: string): string {
   return new Date(iso).toLocaleString("en-US", {
@@ -27,12 +30,58 @@ interface SignalDetailDrawerProps {
 }
 
 const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) => {
+  const [replyOpen, setReplyOpen] = useState(false);
+  const [replyTo, setReplyTo] = useState("");
+  const [replyMessage, setReplyMessage] = useState("");
+  const [sending, setSending] = useState(false);
+
   if (!signal) return null;
 
   const colors = SIGNAL_TYPE_COLORS[signal.signalType];
 
+  // Extract phone number from rawPayload if available
+  const senderNumber =
+    (signal.rawPayload as Record<string, unknown>)?.from as string ||
+    (signal.rawPayload as Record<string, unknown>)?.sender as string ||
+    "";
+
+  const handleOpenReply = () => {
+    setReplyTo(senderNumber);
+    setReplyMessage("");
+    setReplyOpen(true);
+  };
+
+  const handleSend = async () => {
+    if (!replyTo.trim() || !replyMessage.trim()) {
+      toast.error("Recipient and message are required");
+      return;
+    }
+
+    setSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("linq-send", {
+        body: { to: replyTo.trim(), message: replyMessage.trim() },
+      });
+
+      if (error) throw error;
+
+      if (data?.success) {
+        toast.success("Message sent via Linq");
+        setReplyOpen(false);
+        setReplyMessage("");
+      } else {
+        toast.error(data?.error || "Failed to send message");
+      }
+    } catch (err) {
+      console.error("Send error:", err);
+      toast.error("Failed to send message");
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
-    <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
+    <Sheet open={open} onOpenChange={(v) => { if (!v) { setReplyOpen(false); onClose(); } }}>
       <SheetContent
         side="right"
         className="w-full sm:max-w-[520px] bg-background border-l border-vanta-border p-0 overflow-y-auto"
@@ -68,6 +117,61 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
         </SheetHeader>
 
         <div className="px-6 py-5 space-y-6">
+          {/* Reply / Compose */}
+          {!replyOpen ? (
+            <button
+              onClick={handleOpenReply}
+              className="w-full h-9 bg-primary text-primary-foreground font-mono text-[10px] uppercase tracking-[0.15em] hover:bg-primary/90 transition-colors"
+            >
+              Reply via Linq
+            </button>
+          ) : (
+            <section className="border border-vanta-accent-border bg-vanta-bg-elevated p-4 space-y-3">
+              <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent mb-1">
+                Compose Reply
+              </h3>
+              <div>
+                <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">
+                  To
+                </label>
+                <input
+                  type="text"
+                  value={replyTo}
+                  onChange={(e) => setReplyTo(e.target.value)}
+                  placeholder="+1234567890"
+                  className="w-full bg-background border border-vanta-border text-vanta-text-mid font-mono text-[11px] px-3 py-1.5 focus:outline-none focus:border-vanta-accent-border placeholder:text-vanta-text-muted"
+                />
+              </div>
+              <div>
+                <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">
+                  Message
+                </label>
+                <textarea
+                  value={replyMessage}
+                  onChange={(e) => setReplyMessage(e.target.value)}
+                  rows={4}
+                  placeholder="Type your message…"
+                  className="w-full bg-background border border-vanta-border text-vanta-text-mid font-mono text-[11px] px-3 py-2 leading-[1.5] focus:outline-none focus:border-vanta-accent-border placeholder:text-vanta-text-muted resize-none"
+                />
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSend}
+                  disabled={sending}
+                  className="flex-1 h-8 bg-primary text-primary-foreground font-mono text-[10px] uppercase tracking-[0.15em] hover:bg-primary/90 transition-colors disabled:opacity-50"
+                >
+                  {sending ? "Sending…" : "Send"}
+                </button>
+                <button
+                  onClick={() => setReplyOpen(false)}
+                  className="h-8 px-4 border border-vanta-border text-vanta-text-low font-mono text-[10px] uppercase tracking-[0.15em] hover:border-vanta-border-mid transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </section>
+          )}
+
           {/* AI Summary */}
           <section>
             <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-2">
