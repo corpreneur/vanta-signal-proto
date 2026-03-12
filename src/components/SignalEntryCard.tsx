@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, Copy, Check, CheckCircle } from "lucide-react";
+import { ChevronDown, Copy, Check, CheckCircle, Video } from "lucide-react";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
