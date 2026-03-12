@@ -96,7 +96,7 @@ export const cases: CaseData[] = [
         {
           sender: "William",
           direction: "out",
-          text: "Thx Steve. Kristina — Pleasure to e-meet you. Glad to connect at your convenience.",
+          text: "Thx Steve. Kristina, pleasure to e-meet you. Glad to connect at your convenience.",
         },
         {
           sender: "Kristina Windham",
