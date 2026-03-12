@@ -16,6 +16,14 @@ const SignalFeed = ({ signals, filters }: SignalFeedProps) => {
     if (filters.type !== "ALL" && s.signalType !== filters.type) return false;
     if (filters.sender !== "ALL" && s.sender !== filters.sender) return false;
     if (filters.priority !== "ALL" && s.priority !== filters.priority) return false;
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      const match =
+        s.sender.toLowerCase().includes(q) ||
+        s.summary.toLowerCase().includes(q) ||
+        s.sourceMessage.toLowerCase().includes(q);
+      if (!match) return false;
+    }
     return true;
   });
 

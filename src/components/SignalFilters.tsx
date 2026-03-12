@@ -102,6 +102,7 @@ const SignalFilters = ({ filters, onChange, senders }: SignalFiltersProps) => {
           ))}
         </select>
       </div>
+      </div>
     </div>
   );
 };
