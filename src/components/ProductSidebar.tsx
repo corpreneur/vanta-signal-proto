@@ -48,9 +48,12 @@ const productItems = [
   { title: "Decision Capture", url: "/product/decision", icon: Gavel, color: "text-vanta-accent-violet" },
 ];
 
-const platformItems = [
+const coreItems = [
   { title: "Signal Feed", url: "/signals", icon: BarChart3 },
   { title: "Relationship Graph", url: "/graph", icon: Network },
+];
+
+const platformItems = [
   { title: "Context Layer", url: "/product/context", icon: FileText },
   { title: "Noise Filter", url: "/product/noise", icon: Volume2 },
   { title: "Ontology", url: "/ontology", icon: Layers },
