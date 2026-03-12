@@ -38,9 +38,9 @@ const PRIORITY_STYLES: Record<string, string> = {
 };
 
 const RISK_STYLES: Record<string, string> = {
-  critical: "text-destructive border-destructive bg-destructive/10",
-  high: "text-vanta-accent border-vanta-accent-border bg-vanta-accent-faint",
-  medium: "text-vanta-accent-amber border-vanta-accent-amber-border bg-vanta-accent-amber-faint",
+  critical: "text-vanta-signal-red border-vanta-signal-red-border bg-vanta-signal-red-faint",
+  high: "text-vanta-signal-red border-vanta-signal-red-border bg-vanta-signal-red-faint",
+  medium: "text-vanta-signal-yellow border-vanta-signal-yellow-border bg-vanta-signal-yellow-faint",
   low: "text-vanta-text-muted border-vanta-border bg-transparent",
 };
 
