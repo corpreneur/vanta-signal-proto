@@ -1,11 +1,13 @@
-import { useState } from "react";
-import { PenLine, Loader2, ArrowRight } from "lucide-react";
+import { useState, useRef } from "react";
+import { PenLine, Loader2, ArrowRight, Mic, MicOff, Link2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { SIGNAL_TYPE_COLORS, type SignalType } from "@/data/signals";
+import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 
 const SIGNAL_TYPE_LABELS: Record<string, string> = {
   INTRO: "Introduction",
@@ -16,8 +18,12 @@ const SIGNAL_TYPE_LABELS: Record<string, string> = {
   NOISE: "Noise",
 };
 
+type InputMode = "text" | "link";
+
 export default function BrainDump() {
   const [text, setText] = useState("");
+  const [linkUrl, setLinkUrl] = useState("");
+  const [inputMode, setInputMode] = useState<InputMode>("text");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{
     signalType: string;
@@ -26,22 +32,44 @@ export default function BrainDump() {
   } | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { isListening, isSupported, startListening, stopListening, resetTranscript } = useSpeechRecognition();
+  const textBeforeVoiceRef = useRef("");
+
+  const handleVoiceToggle = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      textBeforeVoiceRef.current = text;
+      resetTranscript();
+      startListening((voiceText) => {
+        setText(textBeforeVoiceRef.current + (textBeforeVoiceRef.current ? "\n" : "") + voiceText);
+      });
+    }
+  };
 
   const handleSubmit = async () => {
-    if (!text.trim() || loading) return;
+    if (loading) return;
+    
+    const content = inputMode === "link" ? linkUrl.trim() : text.trim();
+    if (!content) return;
+
+    if (isListening) stopListening();
     setLoading(true);
     setResult(null);
 
     try {
       const { data, error } = await supabase.functions.invoke("brain-dump", {
-        body: { text: text.trim() },
+        body: inputMode === "link" 
+          ? { text: `[Imported from URL: ${content}]\n\nPlease classify this link and its context.`, url: content }
+          : { text: content },
       });
 
       if (error) throw error;
 
       const classification = data.classification;
       setResult(classification);
-      setText("");
+      if (inputMode === "text") setText("");
+      else setLinkUrl("");
 
       toast({
         title: `Classified as ${SIGNAL_TYPE_LABELS[classification.signalType] || classification.signalType}`,
@@ -79,23 +107,89 @@ export default function BrainDump() {
         </p>
       </div>
 
-      {/* Input */}
+      {/* Input mode tabs */}
+      <div className="flex gap-1.5">
+        <button
+          onClick={() => setInputMode("text")}
+          className={`font-mono text-[10px] uppercase tracking-[0.15em] px-3 py-1.5 rounded-full border transition-all duration-200 ${
+            inputMode === "text"
+              ? "bg-primary/10 border-primary text-primary"
+              : "bg-transparent border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
+          }`}
+        >
+          Text / Voice
+        </button>
+        <button
+          onClick={() => setInputMode("link")}
+          className={`font-mono text-[10px] uppercase tracking-[0.15em] px-3 py-1.5 rounded-full border transition-all duration-200 ${
+            inputMode === "link"
+              ? "bg-primary/10 border-primary text-primary"
+              : "bg-transparent border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
+          }`}
+        >
+          <Link2 className="h-3 w-3 inline mr-1" />
+          Paste Link
+        </button>
+      </div>
+
+      {/* Input area */}
       <div className="space-y-3">
-        <Textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Start typing or paste text here..."
-          className="min-h-[200px] bg-vanta-bg-elevated border-vanta-border font-mono text-sm text-foreground placeholder:text-muted-foreground resize-y"
-          disabled={loading}
-          maxLength={10000}
-        />
+        {inputMode === "text" ? (
+          <>
+            <div className="relative">
+              <Textarea
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder={isListening ? "Listening…" : "Start typing or paste text here..."}
+                className={`min-h-[200px] bg-vanta-bg-elevated border-vanta-border font-mono text-sm text-foreground placeholder:text-muted-foreground resize-y pr-12 ${
+                  isListening ? "border-primary/50 ring-1 ring-primary/20" : ""
+                }`}
+                disabled={loading}
+                maxLength={10000}
+              />
+              {/* Mic button */}
+              {isSupported && (
+                <button
+                  onClick={handleVoiceToggle}
+                  disabled={loading}
+                  className={`absolute top-3 right-3 p-2 rounded-md border transition-all duration-200 ${
+                    isListening
+                      ? "bg-red-500/15 border-red-500/30 text-red-400 animate-pulse"
+                      : "bg-vanta-bg-elevated border-vanta-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
+                  }`}
+                  title={isListening ? "Stop recording" : "Start voice input"}
+                >
+                  {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                </button>
+              )}
+            </div>
+            {isListening && (
+              <p className="font-mono text-[10px] uppercase tracking-wider text-red-400 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+                Recording — speak now
+              </p>
+            )}
+          </>
+        ) : (
+          <Input
+            value={linkUrl}
+            onChange={(e) => setLinkUrl(e.target.value)}
+            placeholder="Paste a ChatGPT share link, article URL, etc."
+            className="bg-vanta-bg-elevated border-vanta-border font-mono text-sm"
+            disabled={loading}
+            type="url"
+          />
+        )}
+
         <div className="flex items-center justify-between">
           <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
-            {text.length.toLocaleString()} / 10,000
+            {inputMode === "text"
+              ? `${text.length.toLocaleString()} / 10,000`
+              : linkUrl ? "URL ready" : "Paste a URL"}
           </span>
           <Button
             onClick={handleSubmit}
-            disabled={!text.trim() || loading}
+            disabled={(inputMode === "text" ? !text.trim() : !linkUrl.trim()) || loading}
             className="font-mono text-xs uppercase tracking-wider"
           >
             {loading ? (
