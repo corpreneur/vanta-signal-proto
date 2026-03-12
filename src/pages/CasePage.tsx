@@ -118,7 +118,7 @@ const CasePage = () => {
         {/* Tags */}
         <CaseTags tags={caseData.tags} />
       </article>
-    </ProductLayout>
+    </>
   );
 };
 
