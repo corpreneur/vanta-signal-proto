@@ -13,6 +13,7 @@ import Graph from "./pages/Graph";
 import PhoneFMC from "./pages/PhoneFMC";
 import Ontology from "./pages/Ontology";
 import ProductSignalPage from "./pages/ProductSignalPage";
+import Architecture from "./pages/Architecture";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const skipAuth = new URLSearchParams(window.location.search).get("skip-auth") === "1";
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/phone-fmc" element={<ProtectedRoute><ProductLayout><PhoneFMC /></ProductLayout></ProtectedRoute>} />
           <Route path="/ontology" element={<ProtectedRoute><ProductLayout><Ontology /></ProductLayout></ProtectedRoute>} />
           <Route path="/product/:signalType" element={<ProtectedRoute><ProductLayout><ProductSignalPage /></ProductLayout></ProtectedRoute>} />
+          <Route path="/architecture" element={<ProtectedRoute><ProductLayout><Architecture /></ProductLayout></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

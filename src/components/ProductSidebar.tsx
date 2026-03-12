@@ -15,6 +15,7 @@ import {
   Layers,
   LayoutDashboard,
   BookMarked,
+  FileCode,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -58,6 +59,7 @@ const platformItems = [
   { title: "Noise Filter", url: "/product/noise", icon: Volume2 },
   { title: "Ontology", url: "/ontology", icon: Layers },
   { title: "Phone FMC", url: "/phone-fmc", icon: BookOpen },
+  { title: "Architecture", url: "/architecture", icon: FileCode },
 ];
 
 export function ProductSidebar() {
