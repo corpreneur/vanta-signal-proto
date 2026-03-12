@@ -28,28 +28,48 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-5">
-      {/* Ambient glow */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/[0.03] blur-[120px]" />
-      </div>
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-5 overflow-hidden relative">
+      {/* Geometric circle — bold, off-center */}
+      <div
+        className="absolute w-[320px] h-[320px] sm:w-[500px] sm:h-[500px] rounded-full border border-foreground/[0.07] opacity-0"
+        style={{
+          top: "12%",
+          left: "50%",
+          transform: "translateX(-50%) scale(0.6)",
+          animation: "circle-in 1.4s cubic-bezier(0.16,1,0.3,1) 0.1s forwards",
+        }}
+      />
+      {/* Inner ring echo */}
+      <div
+        className="absolute w-[220px] h-[220px] sm:w-[340px] sm:h-[340px] rounded-full border border-foreground/[0.04] opacity-0"
+        style={{
+          top: "12%",
+          left: "50%",
+          transform: "translateX(-50%) scale(0.6)",
+          animation: "circle-in 1.6s cubic-bezier(0.16,1,0.3,1) 0.3s forwards",
+        }}
+      />
 
-      <div className="relative z-10 w-full max-w-[360px] opacity-0 animate-fade-up">
-        {/* Logo */}
-        <div className="mb-12 text-center">
-          <h1 className="font-display text-[42px] leading-none text-foreground tracking-tight">
+      <div className="relative z-10 w-full max-w-[360px] flex flex-col items-center">
+        {/* Brand moment */}
+        <div
+          className="mb-16 text-center opacity-0"
+          style={{ animation: "fadeUp 0.8s ease-out 0.4s forwards" }}
+        >
+          <h1 className="font-display text-[56px] sm:text-[64px] leading-none text-foreground tracking-tight">
             VANTA
           </h1>
-          <div className="flex items-center justify-center gap-2 mt-3">
-            <span className="w-1.5 h-1.5 bg-primary animate-pulse-dot" />
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-low">
-              Signal Intelligence
-            </span>
-          </div>
+          <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-vanta-text-low mt-4">
+            Less noise, more progress
+          </p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          className="w-full space-y-4 opacity-0"
+          style={{ animation: "fadeUp 0.7s ease-out 0.7s forwards" }}
+        >
           <div>
             <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-low mb-2">
               Username
@@ -91,7 +111,10 @@ const Login = () => {
           </button>
         </form>
 
-        <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-muted text-center mt-10">
+        <p
+          className="font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-muted text-center mt-12 opacity-0"
+          style={{ animation: "fadeUp 0.6s ease-out 1s forwards" }}
+        >
           Proprietary · Confidential
         </p>
       </div>
