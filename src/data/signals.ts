@@ -1,7 +1,7 @@
-export type SignalType = 'INTRO' | 'INSIGHT' | 'INVESTMENT' | 'DECISION' | 'CONTEXT' | 'NOISE' | 'MEETING';
+export type SignalType = 'INTRO' | 'INSIGHT' | 'INVESTMENT' | 'DECISION' | 'CONTEXT' | 'NOISE' | 'MEETING' | 'PHONE_CALL';
 export type SignalPriority = 'high' | 'medium' | 'low';
 export type SignalStatus = 'Captured' | 'In Progress' | 'Complete';
-export type SignalSource = 'linq' | 'gmail' | 'manual' | 'recall';
+export type SignalSource = 'linq' | 'gmail' | 'manual' | 'recall' | 'phone';
 
 export interface Signal {
   id: string;
