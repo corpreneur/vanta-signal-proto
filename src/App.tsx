@@ -11,6 +11,7 @@ import CasePage from "./pages/CasePage.tsx";
 import Graph from "./pages/Graph.tsx";
 import PhoneFMC from "./pages/PhoneFMC.tsx";
 import Ontology from "./pages/Ontology.tsx";
+import ProductSignalPage from "./pages/ProductSignalPage.tsx";
 import { Navigate } from "react-router-dom";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
