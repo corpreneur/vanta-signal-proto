@@ -14,7 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      signals: {
+        Row: {
+          actions_taken: string[]
+          captured_at: string
+          created_at: string
+          id: string
+          linq_message_id: string | null
+          priority: Database["public"]["Enums"]["signal_priority"]
+          raw_payload: Json | null
+          sender: string
+          signal_type: Database["public"]["Enums"]["signal_type"]
+          source_message: string
+          status: Database["public"]["Enums"]["signal_status"]
+          summary: string
+        }
+        Insert: {
+          actions_taken?: string[]
+          captured_at?: string
+          created_at?: string
+          id?: string
+          linq_message_id?: string | null
+          priority?: Database["public"]["Enums"]["signal_priority"]
+          raw_payload?: Json | null
+          sender: string
+          signal_type?: Database["public"]["Enums"]["signal_type"]
+          source_message: string
+          status?: Database["public"]["Enums"]["signal_status"]
+          summary: string
+        }
+        Update: {
+          actions_taken?: string[]
+          captured_at?: string
+          created_at?: string
+          id?: string
+          linq_message_id?: string | null
+          priority?: Database["public"]["Enums"]["signal_priority"]
+          raw_payload?: Json | null
+          sender?: string
+          signal_type?: Database["public"]["Enums"]["signal_type"]
+          source_message?: string
+          status?: Database["public"]["Enums"]["signal_status"]
+          summary?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +67,15 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      signal_priority: "high" | "medium" | "low"
+      signal_status: "Captured" | "In Progress" | "Complete"
+      signal_type:
+        | "INTRO"
+        | "INSIGHT"
+        | "INVESTMENT"
+        | "DECISION"
+        | "CONTEXT"
+        | "NOISE"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +202,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      signal_priority: ["high", "medium", "low"],
+      signal_status: ["Captured", "In Progress", "Complete"],
+      signal_type: [
+        "INTRO",
+        "INSIGHT",
+        "INVESTMENT",
+        "DECISION",
+        "CONTEXT",
+        "NOISE",
+      ],
+    },
   },
 } as const
