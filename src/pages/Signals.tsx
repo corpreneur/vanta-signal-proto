@@ -244,6 +244,15 @@ const Signals = () => {
           senders={senders}
         />
 
+        {/* Pre-Meeting Briefs */}
+        {briefs.length > 0 && (
+          <div className="mb-6">
+            {briefs.map((brief: any) => (
+              <PreMeetingBriefCard key={brief.id} brief={brief} />
+            ))}
+          </div>
+        )}
+
         {/* Feed */}
         <SignalFeed signals={sortedSignals} filters={filters} />
       </main>
