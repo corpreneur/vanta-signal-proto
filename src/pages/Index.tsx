@@ -98,8 +98,11 @@ const Index = () => {
 
   return (
     <div className="max-w-[960px] mx-auto px-5 py-10 md:px-10">
+      {/* Geometric background motif */}
+      <div className="absolute top-[-80px] right-[-120px] w-[400px] h-[400px] rounded-full border border-foreground/[0.04] pointer-events-none" />
+
       {/* Hero */}
-      <header className="mb-10">
+      <header className="mb-10 relative">
         <div className="flex items-center gap-2 mb-3">
           <span className="w-1.5 h-1.5 bg-primary animate-pulse-dot" />
           <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-low">
@@ -109,8 +112,8 @@ const Index = () => {
         <h1 className="font-display text-[clamp(32px,5vw,48px)] leading-[1.05] text-foreground mb-3">
           Vanta Command
         </h1>
-        <p className="font-sans text-[14px] text-vanta-text-mid max-w-[520px] leading-relaxed">
-          Real-time signal intelligence across every channel. Every conversation is a data point. Nothing is lost.
+        <p className="font-sans text-[15px] text-vanta-text-mid max-w-[520px] leading-relaxed">
+          So you can focus, decide, and move.
         </p>
       </header>
 
