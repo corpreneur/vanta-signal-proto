@@ -35,17 +35,17 @@ import {
 } from "@/components/ui/sidebar";
 
 const channelItems = [
-  { title: "iMessage", url: "/product/intro", icon: MessageSquare, color: "text-vanta-accent" },
-  { title: "Phone", url: "/product/phone-call", icon: Phone, color: "text-vanta-accent-phone" },
-  { title: "Zoom", url: "/product/meeting", icon: Video, color: "text-vanta-accent-zoom" },
-  { title: "Email", url: "/product/email", icon: Mail, color: "text-vanta-accent-teal" },
-  { title: "Calendar", url: "/product/calendar", icon: Calendar, color: "text-vanta-accent-amber" },
+  { title: "iMessage", url: "/product/intro", icon: MessageSquare },
+  { title: "Phone", url: "/product/phone-call", icon: Phone },
+  { title: "Zoom", url: "/product/meeting", icon: Video },
+  { title: "Email", url: "/product/email", icon: Mail },
+  { title: "Calendar", url: "/product/calendar", icon: Calendar },
 ];
 
 const productItems = [
-  { title: "Insight Engine", url: "/product/insight", icon: Lightbulb, color: "text-vanta-accent-teal" },
-  { title: "Investment Intel", url: "/product/investment", icon: TrendingUp, color: "text-vanta-accent-amber" },
-  { title: "Decision Capture", url: "/product/decision", icon: Gavel, color: "text-vanta-accent-violet" },
+  { title: "Insight Engine", url: "/product/insight", icon: Lightbulb },
+  { title: "Investment Intel", url: "/product/investment", icon: TrendingUp },
+  { title: "Decision Capture", url: "/product/decision", icon: Gavel },
 ];
 
 const coreItems = [
@@ -126,10 +126,10 @@ export function ProductSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={`${item.url}?skip-auth=1`}
-                      className="flex items-center gap-2 px-2 py-1.5 font-mono text-[11px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
-                      activeClassName="text-foreground bg-vanta-bg-elevated border-l-2 border-l-primary -ml-px"
+                      className="flex items-center gap-2 px-2 py-1.5 font-mono text-[11px] uppercase tracking-wider text-vanta-text-mid hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
+                      activeClassName="text-vanta-accent bg-vanta-bg-elevated border-l-2 border-l-primary -ml-px"
                     >
-                      <item.icon className={`h-3.5 w-3.5 shrink-0 ${item.color}`} />
+                      <item.icon className="h-3.5 w-3.5 shrink-0" />
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
@@ -177,9 +177,9 @@ export function ProductSidebar() {
                     <NavLink
                       to={`${item.url}?skip-auth=1`}
                       className="flex items-center gap-2 px-2 py-1.5 font-mono text-[11px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
-                      activeClassName="text-foreground bg-vanta-bg-elevated border-l-2 border-l-primary -ml-px"
+                      activeClassName="text-vanta-accent bg-vanta-bg-elevated border-l-2 border-l-primary -ml-px"
                     >
-                      <item.icon className={`h-3.5 w-3.5 shrink-0 ${item.color}`} />
+                      <item.icon className="h-3.5 w-3.5 shrink-0" />
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
