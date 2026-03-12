@@ -26,7 +26,7 @@ const CHANNELS: ChannelDef[] = [
     id: "phone", label: "Native Phone", icon: Phone,
     color: "text-vanta-accent-phone", colorBg: "bg-vanta-accent-phone-faint", colorBorder: "border-vanta-accent-phone-border",
     source: "phone",
-    capture: "Vanta MVNO — call audio intercepted at SIP level via ConnectX. Transcription via Whisper. Zero behavioral change.",
+    capture: "Vanta MVNO… call audio intercepted at SIP level via ConnectX. Transcription via Whisper. Zero behavioral change.",
     signalTypes: ["PHONE_CALL"],
     narrative: "The phone call is the highest-density, most systematically ignored communication channel. Vanta doesn't ask the user to change behavior — it owns the infrastructure.",
   },
