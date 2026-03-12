@@ -73,4 +73,20 @@ export const SIGNAL_TYPE_COLORS: Record<SignalType, { text: string; bg: string; 
     bg: 'bg-vanta-accent-zoom-faint',
     border: 'border-vanta-accent-zoom-border',
   },
+  PHONE_CALL: {
+    text: 'text-vanta-accent-phone',
+    bg: 'bg-vanta-accent-phone-faint',
+    border: 'border-vanta-accent-phone-border',
+  },
+};
+
+export const PHONE_CALL_TAGS = ['commitment', 'decision', 'open_question', 'relationship_signal', 'deal_signal'] as const;
+export type PhoneCallTag = typeof PHONE_CALL_TAGS[number];
+
+export const PHONE_TAG_LABELS: Record<PhoneCallTag, string> = {
+  commitment: 'Commitment',
+  decision: 'Decision',
+  open_question: 'Open Question',
+  relationship_signal: 'Relationship',
+  deal_signal: 'Deal Signal',
 };
