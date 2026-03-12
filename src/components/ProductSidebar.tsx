@@ -181,8 +181,8 @@ export function ProductSidebar() {
                       <SidebarMenuButton asChild>
                         <NavLink
                           to={`/case/${c.id}?skip-auth=1`}
-                          className="group/nav flex items-center gap-2 px-2 py-2 pl-6 font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5"
-                          activeClassName="text-foreground bg-vanta-bg-elevated"
+                          className="group/nav flex items-center gap-2 px-2 py-2 pl-6 border-l-2 border-transparent font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5"
+                          activeClassName="border-l-2 border-vanta-accent text-foreground bg-vanta-bg-elevated"
                         >
                           <BookMarked className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover/nav:scale-110" />
                           {!collapsed && <span className="truncate">{c.name}</span>}
