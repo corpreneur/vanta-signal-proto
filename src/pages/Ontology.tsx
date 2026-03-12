@@ -52,7 +52,7 @@ const CHANNELS: ChannelDef[] = [
     source: "calendar",
     capture: "Google Calendar sync — upcoming meetings trigger pre-meeting brief generation. Attendee lists matched against signal history.",
     signalTypes: ["MEETING"],
-    narrative: "The calendar is not a signal source — it's a signal trigger. When a meeting appears on the calendar, Vanta cross-references every attendee against the full signal history and generates a contextual brief.",
+    narrative: "The calendar is not a signal source… it's a signal trigger. When a meeting appears on the calendar, Vanta cross-references every attendee against the full signal history and generates a contextual brief.",
   },
 ];
 

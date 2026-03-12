@@ -147,7 +147,7 @@ const Signals = () => {
             style={{ animation: "pulse-dot 2s ease-in-out infinite" }}
           />
           <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-vanta-accent">
-            Signal Log — Live
+            Signal Log · Live
           </p>
         </div>
         <h1 className="font-display text-[28px] md:text-[36px] leading-[1.15] text-vanta-text mb-3">
