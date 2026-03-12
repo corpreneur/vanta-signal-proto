@@ -11,6 +11,7 @@ import CasePage from "./pages/CasePage.tsx";
 import Graph from "./pages/Graph.tsx";
 import PhoneFMC from "./pages/PhoneFMC.tsx";
 import Ontology from "./pages/Ontology.tsx";
+import ProductSignalPage from "./pages/ProductSignalPage.tsx";
 import { Navigate } from "react-router-dom";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/graph" element={<ProtectedRoute><Graph /></ProtectedRoute>} />
           <Route path="/phone-fmc" element={<ProtectedRoute><PhoneFMC /></ProtectedRoute>} />
           <Route path="/ontology" element={<ProtectedRoute><Ontology /></ProtectedRoute>} />
+          <Route path="/product/:signalType" element={<ProtectedRoute><ProductSignalPage /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
