@@ -37,11 +37,22 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   const [replyTo, setReplyTo] = useState("");
   const [replyMessage, setReplyMessage] = useState("");
   const [sending, setSending] = useState(false);
-  const [currentStatus, setCurrentStatus] = useState<SignalStatus>(signal.status);
+  const [currentStatus, setCurrentStatus] = useState<SignalStatus>("Captured");
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const queryClient = useQueryClient();
 
+  // Sync status when signal changes
+  const signalStatus = signal?.status;
+  useState(() => {
+    if (signalStatus) setCurrentStatus(signalStatus);
+  });
+
   if (!signal) return null;
+
+  // Update currentStatus when a different signal is opened
+  if (signal.status !== currentStatus && !updatingStatus) {
+    setCurrentStatus(signal.status);
+  }
 
   const colors = SIGNAL_TYPE_COLORS[signal.signalType];
 
