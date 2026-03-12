@@ -44,7 +44,7 @@ const CHANNELS: ChannelDef[] = [
     source: "gmail",
     capture: "Gmail API polling — authorized OAuth connection scans inbox for signal-bearing threads. Thread context preserved.",
     signalTypes: ["INTRO", "INSIGHT", "INVESTMENT", "CONTEXT"],
-    narrative: "Email is the workhorse — lower signal density than iMessage, but higher formality. Investment memos, partnership proposals, and formal introductions flow through email.",
+    narrative: "Email is the workhorse… lower signal density than iMessage, but higher formality. Investment memos, partnership proposals, and formal introductions flow through email.",
   },
   {
     id: "calendar", label: "Calendar", icon: Calendar,
