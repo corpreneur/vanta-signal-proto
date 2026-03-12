@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import type { Signal, SignalStatus } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
@@ -37,9 +37,14 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   const [replyTo, setReplyTo] = useState("");
   const [replyMessage, setReplyMessage] = useState("");
   const [sending, setSending] = useState(false);
-  const [currentStatus, setCurrentStatus] = useState<SignalStatus>(signal.status);
+  const [currentStatus, setCurrentStatus] = useState<SignalStatus>("Captured");
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const queryClient = useQueryClient();
+
+  // Sync status when signal changes
+  useEffect(() => {
+    if (signal?.status) setCurrentStatus(signal.status);
+  }, [signal?.id, signal?.status]);
 
   if (!signal) return null;
 
