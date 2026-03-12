@@ -77,31 +77,47 @@ export const cases: CaseData[] = [
     standaloneHref: "/case-01",
     heroQuote: {
       label: "The Intro",
-      text: "William pls meet Kristina Windham.. Kristina as discussed William is our Chief Business Intelligence Officer",
-      attr: "— Steve Stoute · United Masters · iMessage · 7:16 AM",
+      text: "William pls meet Kristina Windham.. Kristina as discussed William is our Chief Business Officer and my spirit animal",
+      attr: "— Steve Stoute · Vanta Founder · iMessage · 7:16 AM",
     },
     situation: [
-      "Steve makes the intro at 7:16am. William and Kristina exchange directly. She gives her availability. William triggers Vanta with a single forwarded thread.",
+      "Steve makes the intro at 7:16am — group thread, two sentences, no brief. William and Kristina exchange directly. She gives her availability and email. William triggers Vanta with a single forwarded thread.",
       "What follows is a full orchestration sequence — parsed thread, outreach email, bio research, meeting prep brief, and a persistent agent built from everything.",
     ],
     thread: {
       header: "Steve Stoute · iMessage · 7:16 AM",
       messages: [
         {
-          sender: "Steve Stoute · United Masters",
+          sender: "Steve Stoute · Vanta Founder",
           direction: "in",
-          text: "William pls meet Kristina Windham.. Kristina as discussed William is our Chief Business Intelligence Officer",
+          text: "William pls meet Kristina Windham.. Kristina as discussed William is our Chief Business Officer and my spirit animal. You guys should connect",
           timestamp: "7:16 AM",
-        },
-        {
-          sender: "Kristina Windham",
-          direction: "in",
-          text: "Hi William — great to connect. I'm available Thursday or Friday this week. Best,",
         },
         {
           sender: "William",
           direction: "out",
-          text: "Great to meet you Kristina — let's lock in Thursday. I'll get something over.",
+          text: "Thx Steve. Kristina — Pleasure to e-meet you. Glad to connect at your convenience.",
+        },
+        {
+          sender: "Kristina Windham",
+          direction: "in",
+          text: "Thanks for the introduction Steve. William will message you to land some time.",
+        },
+        {
+          sender: "Kristina Windham",
+          direction: "in",
+          text: "Hey thanks for connecting. Let me know when would be good for you. Thursday and Friday this week are pretty flexible for me if you're around then",
+          timestamp: "7:24 AM",
+        },
+        {
+          sender: "William",
+          direction: "out",
+          text: "Will make one work. What's best email for you?",
+        },
+        {
+          sender: "Kristina Windham",
+          direction: "in",
+          text: "Kristinamwindham@gmail.com",
         },
         {
           sender: "William → Vanta",
@@ -120,7 +136,7 @@ export const cases: CaseData[] = [
           {
             n: "01",
             title: "Thread Parsed. Outreach Email Sent.",
-            desc: "Context extracted. Email drafted from william@vantawireless.com with calendar availability and Steve's context woven in.",
+            desc: "Context extracted. Email drafted from william@vantawireless.com — \"Following up on Steve's introduction. Be great to connect live and learn more about your journey. You've assembled some pretty neat experiences so far.\" Calendar availability woven in: Thursday March 12, 2–4pm or Friday March 13, 10–11:30am.",
           },
           {
             n: "02",
@@ -143,20 +159,22 @@ export const cases: CaseData[] = [
         type: "bio",
         label: "Quick Bio — Kristina Windham",
         bioItems: [
-          { key: "Role", value: "Senior Vice President, Business Development & Partnerships" },
-          { key: "Company", value: "United Masters" },
-          { key: "Focus", value: "Strategic partnerships, brand integrations, and revenue growth across music and entertainment verticals" },
-          { key: "Background", value: "15+ years across media, entertainment, and digital platforms. Previously held senior roles in partnership strategy at major music and media companies." },
-          { key: "Signal", value: "Steve's direct intro suggests she's a decision-maker in a live deal or strategic initiative — not a casual connection." },
+          { key: "Headline", value: "Consultant · Business Development · Marketing Strategy · Forbes 30 Under 30" },
+          { key: "Most Recent", value: "Head of Business Development — Maximum Effort (Ryan Reynolds' production company, creative agency, and investment firm). Feb 2022 – Nov 2025 · 3 yrs 10 mos. New York." },
+          { key: "Prior Roles", value: "Director, Brand Partnerships — Artsy · Director, Business Development — Uber · Account Manager, West Coast — StockX · E-commerce Manager, Fashion — eBay" },
+          { key: "Education", value: "UCLA" },
+          { key: "Network", value: "500+ connections. 10 mutual connections including Tessa Flippin, Lybra Clemons." },
+          { key: "Brand Associations", value: "Milk Makeup · USA SailGP · Golden Goose" },
+          { key: "Signal", value: "Steve's direct intro suggests she's being evaluated for the partnerships and business development team — not a casual connection. Career arc shows consistent BD leadership across culture-forward companies (Maximum Effort, Artsy, Uber, StockX, eBay)." },
         ],
       },
       {
         type: "meeting-prep",
         label: "Meeting Prep — Thursday",
         prepItems: [
-          { n: "01", title: "Open with Steve's context.", desc: "Reference the intro naturally. She already knows the framing — don't re-pitch, build from it." },
-          { n: "02", title: "Probe: What does United Masters need from intelligence infrastructure?", desc: "She's in BD — find out where their data gaps are. Artist analytics? Brand partner matching? Revenue forecasting?" },
-          { n: "03", title: "Watch for: Decision velocity.", desc: "How fast does she move? Is she evaluating or already building? This tells you if it's a Q2 or Q4 conversation." },
+          { n: "01", title: "Open with Steve's context.", desc: "Reference the intro naturally. She already knows the framing — don't re-pitch, build from it. Steve called you his spirit animal — the tone is warm." },
+          { n: "02", title: "Probe: What does she want to build next?", desc: "She left Maximum Effort after nearly 4 years. Find out what she's optimizing for — scale, equity, category, autonomy. This tells you how to frame the Vanta opportunity." },
+          { n: "03", title: "Watch for: Culture-forward instinct.", desc: "Her arc is eBay → StockX → Uber → Artsy → Maximum Effort. Every move was toward more culturally embedded brands. Does Vanta fit that trajectory for her?" },
         ],
       },
       {
