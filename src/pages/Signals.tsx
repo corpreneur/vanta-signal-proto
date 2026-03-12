@@ -32,8 +32,10 @@ const fetchSignals = async (): Promise<Signal[]> => {
     capturedAt: row.captured_at,
     actionsTaken: row.actions_taken || [],
     status: row.status,
+    source: (row as Record<string, unknown>).source as Signal["source"] || "linq",
     rawPayload: row.raw_payload as Record<string, unknown> | null,
     linqMessageId: row.linq_message_id,
+    emailMetadata: (row as Record<string, unknown>).email_metadata as Signal["emailMetadata"] || null,
   }));
 };
 
