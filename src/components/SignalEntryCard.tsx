@@ -185,6 +185,17 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
             </button>
           )}
 
+          {showPromote && (
+            <button
+              onClick={handlePromote}
+              disabled={promoting}
+              className="flex items-center gap-1.5 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-accent border border-vanta-accent-border hover:bg-vanta-accent-faint transition-colors disabled:opacity-50"
+            >
+              <ArrowUpFromLine className="w-3 h-3" />
+              {promoting ? "Promoting…" : "Promote"}
+            </button>
+          )}
+
           <button
             onClick={handleExpand}
             className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent transition-colors ml-auto"
