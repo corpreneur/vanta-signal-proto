@@ -100,7 +100,7 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-11 bg-primary text-primary-foreground font-mono text-[11px] uppercase tracking-[0.15em] hover:bg-primary/90 transition-colors disabled:opacity-50 mt-2"
+            className="w-full h-11 bg-muted text-foreground font-mono text-[11px] uppercase tracking-[0.15em] hover:bg-muted-foreground/20 transition-colors disabled:opacity-50 mt-2"
           >
             {loading ? "Authenticating…" : "Access Platform"}
           </button>
