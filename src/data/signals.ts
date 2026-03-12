@@ -57,4 +57,9 @@ export const SIGNAL_TYPE_COLORS: Record<SignalType, { text: string; bg: string; 
     bg: 'bg-vanta-bg-elevated',
     border: 'border-vanta-border',
   },
+  MEETING: {
+    text: 'text-vanta-accent-zoom',
+    bg: 'bg-vanta-accent-zoom-faint',
+    border: 'border-vanta-accent-zoom-border',
+  },
 };
