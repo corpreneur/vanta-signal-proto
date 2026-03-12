@@ -86,6 +86,7 @@ export default function BrainDump() {
         description: classification.summary,
       });
     } catch (e: unknown) {
+      setStatusMessage("");
       console.error("Brain dump error:", e);
       toast({
         title: "Classification failed",
