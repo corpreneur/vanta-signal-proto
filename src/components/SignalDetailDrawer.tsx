@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import type { Signal, SignalStatus } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
