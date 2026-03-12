@@ -1,6 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { ProductSidebar } from "@/components/ProductSidebar";
-import { PanelLeft } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
 interface ProductLayoutProps {
