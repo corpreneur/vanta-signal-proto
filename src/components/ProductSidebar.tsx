@@ -168,7 +168,7 @@ export function ProductSidebar() {
         {/* Cases */}
         <Collapsible defaultOpen={currentPath.startsWith("/case/")}>
           <SidebarGroup>
-            <CollapsibleTrigger className="flex items-center gap-1.5 w-full px-2 py-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted hover:text-foreground transition-colors group">
+            <CollapsibleTrigger className="flex items-center gap-1.5 w-full px-2 py-2 font-mono text-[10px] uppercase tracking-[0.15em] text-vanta-text-low hover:text-foreground transition-colors group">
               <ChevronRight className="h-3 w-3 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
               {!collapsed && <span>Cases</span>}
             </CollapsibleTrigger>
