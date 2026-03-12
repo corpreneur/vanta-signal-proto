@@ -289,6 +289,20 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
             </div>
           )}
 
+          {/* Call pointer */}
+          {signal.callPointer && (
+            <div>
+              <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-2">
+                Call Pointer
+              </h4>
+              <div className="flex items-center gap-1.5">
+                <Pointer className="w-3 h-3 text-vanta-text-low" />
+                <p className="font-mono text-[11px] leading-[1.6] text-vanta-text-low">
+                  {signal.callPointer}
+                </p>
+              </div>
+            </div>
+
           {/* Source context */}
           <div className="flex items-center gap-4">
             <div>

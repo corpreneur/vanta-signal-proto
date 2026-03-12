@@ -67,7 +67,7 @@ Also assign:
                 dueDate: { type: ["string", "null"], description: "ISO date YYYY-MM-DD or null" },
                 callPointer: { type: ["string", "null"], description: "Brief follow-up reference or null" },
               },
-              required: ["signalType", "priority", "summary", "actionsTaken"],
+              required: ["signalType", "priority", "summary", "actionsTaken", "riskLevel", "dueDate", "callPointer"],
               additionalProperties: false,
             },
           },
