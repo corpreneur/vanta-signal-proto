@@ -46,13 +46,13 @@ const productItems = [
   { title: "Insight Engine", url: "/product/insight", icon: Lightbulb, color: "text-vanta-accent-teal" },
   { title: "Investment Intel", url: "/product/investment", icon: TrendingUp, color: "text-vanta-accent-amber" },
   { title: "Decision Capture", url: "/product/decision", icon: Gavel, color: "text-vanta-accent-violet" },
-  { title: "Context Layer", url: "/product/context", icon: FileText, color: "text-vanta-text-low" },
-  { title: "Noise Filter", url: "/product/noise", icon: Volume2, color: "text-vanta-text-muted" },
 ];
 
 const platformItems = [
   { title: "Signal Feed", url: "/signals", icon: BarChart3 },
   { title: "Relationship Graph", url: "/graph", icon: Network },
+  { title: "Context Layer", url: "/product/context", icon: FileText },
+  { title: "Noise Filter", url: "/product/noise", icon: Volume2 },
   { title: "Ontology", url: "/ontology", icon: Layers },
   { title: "Phone FMC", url: "/phone-fmc", icon: BookOpen },
 ];
@@ -122,31 +122,6 @@ export function ProductSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Product */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted px-2">
-            {collapsed ? "·" : "Product"}
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {productItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={`${item.url}?skip-auth=1`}
-                      className="flex items-center gap-2 px-2 py-1.5 font-mono text-[11px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
-                      activeClassName="text-foreground bg-vanta-bg-elevated border-l-2 border-l-primary -ml-px"
-                    >
-                      <item.icon className={`h-3.5 w-3.5 shrink-0 ${item.color}`} />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
         {/* Platform */}
         <SidebarGroup>
           <SidebarGroupLabel className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted px-2">
@@ -163,6 +138,31 @@ export function ProductSidebar() {
                       activeClassName="text-foreground bg-vanta-bg-elevated"
                     >
                       <item.icon className="h-3.5 w-3.5 shrink-0" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Product */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted px-2">
+            {collapsed ? "·" : "Product"}
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {productItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to={`${item.url}?skip-auth=1`}
+                      className="flex items-center gap-2 px-2 py-1.5 font-mono text-[11px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
+                      activeClassName="text-foreground bg-vanta-bg-elevated border-l-2 border-l-primary -ml-px"
+                    >
+                      <item.icon className={`h-3.5 w-3.5 shrink-0 ${item.color}`} />
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>

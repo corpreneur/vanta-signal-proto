@@ -21,8 +21,8 @@ const BREADCRUMB_MAP: Record<string, string> = {
   "/product/insight": "Product · Insight Engine",
   "/product/investment": "Product · Investment Intel",
   "/product/decision": "Product · Decision Capture",
-  "/product/context": "Product · Context Layer",
-  "/product/noise": "Product · Noise Filter",
+  "/product/context": "Platform · Context Layer",
+  "/product/noise": "Platform · Noise Filter",
 };
 
 export default function ProductLayout({ children }: ProductLayoutProps) {
