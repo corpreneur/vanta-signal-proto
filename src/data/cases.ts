@@ -157,7 +157,7 @@ export const cases: CaseData[] = [
       },
       {
         type: "bio",
-        label: "Quick Bio — Kristina Windham",
+        label: "Quick Bio… Kristina Windham",
         bioItems: [
           { key: "Headline", value: "Consultant · Business Development · Marketing Strategy · Forbes 30 Under 30" },
           { key: "Current Role", value: "Head of Business Development… Maximum Effort (Ryan Reynolds' production company, creative agency, and investment firm). Feb 2022 – Present. New York." },
