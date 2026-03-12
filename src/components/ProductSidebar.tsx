@@ -118,7 +118,7 @@ export function ProductSidebar() {
 
         {/* Channels */}
         <SidebarGroup>
-          <SidebarGroupLabel className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted px-2">
+          <SidebarGroupLabel className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted px-2 border-l-2 border-l-vanta-accent/25">
             {collapsed ? "·" : "Channels"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
