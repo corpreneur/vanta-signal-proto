@@ -119,10 +119,27 @@ const Signals = () => {
   }, [queryClient]);
 
   // Split signals into feed (non-noise) and filtered (noise)
-  const feedSignals = useMemo(
-    () => [...signals].filter((s) => s.signalType !== "NOISE").sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()),
-    [signals]
-  );
+  const feedSignals = useMemo(() => {
+    let items = signals.filter((s) => s.signalType !== "NOISE");
+
+    // Overdue filter
+    if (showOverdueOnly) {
+      const today = new Date().toISOString().split("T")[0];
+      items = items.filter((s) => s.dueDate && s.dueDate < today && s.status !== "Complete");
+    }
+
+    // Sort
+    if (sortMode === "due_date") {
+      return items.sort((a, b) => {
+        // Signals with due dates first, then by date ascending (soonest first)
+        if (!a.dueDate && !b.dueDate) return new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime();
+        if (!a.dueDate) return 1;
+        if (!b.dueDate) return -1;
+        return a.dueDate.localeCompare(b.dueDate);
+      });
+    }
+    return items.sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime());
+  }, [signals, sortMode, showOverdueOnly]);
 
   const noiseSignals = useMemo(
     () => [...signals].filter((s) => s.signalType === "NOISE").sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()),
@@ -130,6 +147,11 @@ const Signals = () => {
   );
 
   const activeSignals = activeTab === "feed" ? feedSignals : noiseSignals;
+
+  const overdueCount = useMemo(() => {
+    const today = new Date().toISOString().split("T")[0];
+    return signals.filter((s) => s.signalType !== "NOISE" && s.dueDate && s.dueDate < today && s.status !== "Complete").length;
+  }, [signals]);
 
   const senders = useMemo(
     () => [...new Set(activeSignals.map((s) => s.sender))].sort(),
