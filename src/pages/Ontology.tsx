@@ -50,7 +50,7 @@ const CHANNELS: ChannelDef[] = [
     id: "calendar", label: "Calendar", icon: Calendar,
     color: "text-vanta-accent-amber", colorBg: "bg-vanta-accent-amber-faint", colorBorder: "border-vanta-accent-amber-border",
     source: "calendar",
-    capture: "Google Calendar sync — upcoming meetings trigger pre-meeting brief generation. Attendee lists matched against signal history.",
+    capture: "Google Calendar sync… upcoming meetings trigger pre-meeting brief generation. Attendee lists matched against signal history.",
     signalTypes: ["MEETING"],
     narrative: "The calendar is not a signal source… it's a signal trigger. When a meeting appears on the calendar, Vanta cross-references every attendee against the full signal history and generates a contextual brief.",
   },
