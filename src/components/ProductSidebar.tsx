@@ -11,10 +11,12 @@ import {
   Network,
   BookOpen,
   Layers,
-  Home,
+  LayoutDashboard,
+  BookMarked,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
+import { cases } from "@/data/cases";
 import {
   Sidebar,
   SidebarContent,
@@ -54,7 +56,6 @@ export function ProductSidebar() {
   const currentPath = location.pathname;
 
   const isActive = (path: string) => currentPath === path;
-  const productOpen = productItems.some((i) => isActive(i.url)) || currentPath.startsWith("/product");
 
   return (
     <Sidebar collapsible="icon" className="border-r border-vanta-border bg-vanta-bg">
@@ -67,7 +68,7 @@ export function ProductSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Home */}
+        {/* Dashboard */}
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -79,8 +80,8 @@ export function ProductSidebar() {
                     className="flex items-center gap-2 px-2 py-1.5 font-mono text-[11px] uppercase tracking-wider text-vanta-text-low hover:text-vanta-accent hover:bg-vanta-accent-faint transition-colors"
                     activeClassName="text-vanta-accent bg-vanta-accent-faint"
                   >
-                    <Home className="h-4 w-4 shrink-0" />
-                    {!collapsed && <span>Home</span>}
+                    <LayoutDashboard className="h-4 w-4 shrink-0" />
+                    {!collapsed && <span>Dashboard</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -130,6 +131,31 @@ export function ProductSidebar() {
                     >
                       <item.icon className="h-3.5 w-3.5 shrink-0" />
                       {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Cases */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted px-2">
+            {collapsed ? "·" : "Cases"}
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {cases.map((c) => (
+                <SidebarMenuItem key={c.id}>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to={`/case-${c.id}?skip-auth=1`}
+                      className="flex items-center gap-2 px-2 py-1.5 font-mono text-[11px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
+                      activeClassName="text-foreground bg-vanta-bg-elevated"
+                    >
+                      <BookMarked className="h-3.5 w-3.5 shrink-0" />
+                      {!collapsed && <span className="truncate">{c.name}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
