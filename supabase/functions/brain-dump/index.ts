@@ -14,6 +14,9 @@ interface Classification {
   priority: string;
   summary: string;
   actionsTaken: string[];
+  riskLevel: string | null;
+  dueDate: string | null;
+  callPointer: string | null;
 }
 
 async function classifySignal(text: string, apiKey: string): Promise<Classification> {
