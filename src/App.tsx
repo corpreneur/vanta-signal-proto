@@ -7,6 +7,7 @@ import Index from "./pages/Index.tsx";
 import Login from "./pages/Login.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Signals from "./pages/Signals.tsx";
+import CasePage from "./pages/CasePage.tsx";
 import { Navigate } from "react-router-dom";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
