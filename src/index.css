@@ -105,23 +105,24 @@
   }
 
   .light {
-    --background: 0 0% 98%;
-    --foreground: 0 0% 9%;
+    /* Chunk spec: #F2F2F2 background, #FFFFFF cards, #000000 text */
+    --background: 0 0% 94.9%;
+    --foreground: 0 0% 0%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
+    --card-foreground: 0 0% 0%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
+    --popover-foreground: 0 0% 0%;
 
     --primary: 79 95% 38%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 95%;
-    --secondary-foreground: 0 0% 9%;
+    --secondary: 0 0% 90%;
+    --secondary-foreground: 0 0% 0%;
 
-    --muted: 0 0% 95%;
-    --muted-foreground: 0 0% 40%;
+    --muted: 0 0% 90%;
+    --muted-foreground: 0 0% 35%;
 
     --accent: 79 95% 38%;
     --accent-foreground: 0 0% 100%;
@@ -129,34 +130,34 @@
     --destructive: 0 84.2% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 0% / 0.1;
-    --input: 0 0% 0% / 0.1;
+    --border: 0 0% 0% / 0.12;
+    --input: 0 0% 0% / 0.12;
     --ring: 79 95% 38%;
 
-    --sidebar-background: 0 0% 97%;
-    --sidebar-foreground: 0 0% 9%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 0%;
     --sidebar-primary: 79 95% 38%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 93%;
-    --sidebar-accent-foreground: 0 0% 9%;
-    --sidebar-border: 0 0% 0% / 0.08;
+    --sidebar-accent: 0 0% 94.9%;
+    --sidebar-accent-foreground: 0 0% 0%;
+    --sidebar-border: 0 0% 0% / 0.1;
     --sidebar-ring: 79 95% 38%;
 
-    /* Vanta custom tokens - light */
-    --vanta-bg: 0 0% 97%;
+    /* Vanta custom tokens - light (Chunk spec) */
+    --vanta-bg: 0 0% 94.9%;
     --vanta-bg-elevated: 0 0% 100%;
-    --vanta-text: 0 0% 9%;
-    --vanta-text-mid: 0 0% 9% / 0.65;
-    --vanta-text-low: 0 0% 9% / 0.45;
-    --vanta-text-muted: 0 0% 9% / 0.3;
+    --vanta-text: 0 0% 0%;
+    --vanta-text-mid: 0 0% 0% / 0.65;
+    --vanta-text-low: 0 0% 0% / 0.45;
+    --vanta-text-muted: 0 0% 0% / 0.3;
     --vanta-accent: 79 95% 38%;
     --vanta-accent-bg: 79 95% 38% / 0.08;
     --vanta-accent-border: 79 95% 38% / 0.25;
     --vanta-accent-faint: 79 95% 38% / 0.06;
-    --vanta-border: 0 0% 0% / 0.1;
+    --vanta-border: 0 0% 0% / 0.12;
     --vanta-border-mid: 0 0% 0% / 0.06;
     --vanta-bubble-in: 0 0% 0% / 0.04;
-    --vanta-bubble-in-border: 0 0% 0% / 0.08;
+    --vanta-bubble-in-border: 0 0% 0% / 0.1;
     --vanta-bubble-out: 79 95% 38% / 0.1;
     --vanta-bubble-out-border: 79 95% 38% / 0.2;
 
