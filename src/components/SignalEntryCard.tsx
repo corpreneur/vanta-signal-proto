@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { ChevronDown, Copy, Check, CheckCircle, Video } from "lucide-react";
+import { ChevronDown, Copy, Check, CheckCircle, Video, Phone } from "lucide-react";
 import type { Signal } from "@/data/signals";
-import { SIGNAL_TYPE_COLORS } from "@/data/signals";
+import { SIGNAL_TYPE_COLORS, PHONE_CALL_TAGS, PHONE_TAG_LABELS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -104,6 +104,11 @@ const SignalEntryCard = ({ signal, onClick }: SignalEntryCardProps) => {
                 <Video className="w-3 h-3" />
                 Zoom
               </span>
+            ) : signal.source === "phone" || signal.signalType === "PHONE_CALL" ? (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border border-vanta-accent-phone-border text-vanta-accent-phone bg-vanta-accent-phone-faint">
+                <Phone className="w-3 h-3" />
+                Phone
+              </span>
             ) : signal.source !== "linq" ? (
               <span className="inline-block px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border border-vanta-border text-vanta-text-muted">
                 {signal.source}
@@ -124,6 +129,22 @@ const SignalEntryCard = ({ signal, onClick }: SignalEntryCardProps) => {
         <p className="font-sans text-[14px] leading-[1.6] text-vanta-text mb-3">
           {signal.summary}
         </p>
+
+        {/* Phone-specific tags */}
+        {signal.signalType === "PHONE_CALL" && signal.actionsTaken.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {signal.actionsTaken
+              .filter((a) => (PHONE_CALL_TAGS as readonly string[]).includes(a))
+              .map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-block px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] border border-vanta-accent-phone-border text-vanta-accent-phone bg-vanta-accent-phone-faint"
+                >
+                  {PHONE_TAG_LABELS[tag as keyof typeof PHONE_TAG_LABELS] || tag}
+                </span>
+              ))}
+          </div>
+        )}
 
         {/* Inline actions row */}
         <div className="flex items-center gap-2 flex-wrap">

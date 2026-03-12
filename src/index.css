@@ -76,6 +76,11 @@
     --vanta-accent-zoom: 210 100% 59%;
     --vanta-accent-zoom-faint: 210 100% 59% / 0.06;
     --vanta-accent-zoom-border: 210 100% 59% / 0.2;
+
+    /* Phone Call Intelligence */
+    --vanta-accent-phone: 340 82% 60%;
+    --vanta-accent-phone-faint: 340 82% 60% / 0.06;
+    --vanta-accent-phone-border: 340 82% 60% / 0.2;
   }
 }
 

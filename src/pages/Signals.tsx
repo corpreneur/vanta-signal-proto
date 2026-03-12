@@ -43,7 +43,7 @@ const fetchSignals = async (): Promise<Signal[]> => {
   }));
 };
 
-const SIGNAL_TYPES_ORDER: SignalType[] = ["INTRO", "INSIGHT", "INVESTMENT", "DECISION", "CONTEXT", "MEETING"];
+const SIGNAL_TYPES_ORDER: SignalType[] = ["INTRO", "INSIGHT", "INVESTMENT", "DECISION", "CONTEXT", "MEETING", "PHONE_CALL"];
 
 const Signals = () => {
   const [navOpen, setNavOpen] = useState(false);
