@@ -1,12 +1,12 @@
 import { useParams, Navigate } from "react-router-dom";
 import { cases } from "@/data/cases";
-import Nav from "@/components/Nav";
 import CaseThread from "@/components/case-parts/CaseThread";
 import CaseSteps from "@/components/case-parts/CaseSteps";
 import CaseQuote from "@/components/case-parts/CaseQuote";
 import CaseCallout from "@/components/case-parts/CaseCallout";
 import CaseTags from "@/components/case-parts/CaseTags";
 import SignalArchitecture from "@/components/SignalArchitecture";
+import ProductLayout from "@/components/ProductLayout";
 
 const CasePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,8 +15,7 @@ const CasePage = () => {
   if (!caseData) return <Navigate to="/" replace />;
 
   return (
-    <div className="min-h-screen bg-background">
-      <Nav caseCount={cases.length} onHamburgerClick={() => {}} navOpen={false} />
+    <ProductLayout>
 
       <article className="max-w-[720px] mx-auto px-5 py-12 md:px-10 md:py-20">
         {/* Header */}
@@ -120,13 +119,7 @@ const CasePage = () => {
         {/* Tags */}
         <CaseTags tags={caseData.tags} />
       </article>
-
-      <footer className="border-t border-vanta-border px-5 py-8 md:px-10">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted text-center">
-          © 2026 Vanta Wireless. All rights reserved.
-        </p>
-      </footer>
-    </div>
+    </ProductLayout>
   );
 };
 
