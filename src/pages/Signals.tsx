@@ -194,6 +194,9 @@ const Signals = () => {
           </div>
         </div>
 
+        {/* Pre-Meeting Briefs */}
+        <PreMeetingBriefCard />
+
         {/* Tag Browser */}
         <TagBrowser
           tagCounts={tagCounts}
