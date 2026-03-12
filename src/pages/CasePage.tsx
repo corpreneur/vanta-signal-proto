@@ -14,8 +14,7 @@ const CasePage = () => {
 
   if (!caseData) return <Navigate to="/" replace />;
 
-  return (
-    <ProductLayout>
+    <>
 
       <article className="max-w-[720px] mx-auto px-5 py-12 md:px-10 md:py-20">
         {/* Header */}
