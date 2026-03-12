@@ -42,7 +42,7 @@ const CHANNELS: ChannelDef[] = [
     id: "email", label: "Email", icon: Mail,
     color: "text-vanta-accent-teal", colorBg: "bg-vanta-accent-teal-faint", colorBorder: "border-vanta-accent-teal-border",
     source: "gmail",
-    capture: "Gmail API polling — authorized OAuth connection scans inbox for signal-bearing threads. Thread context preserved.",
+    capture: "Gmail API polling… authorized OAuth connection scans inbox for signal-bearing threads. Thread context preserved.",
     signalTypes: ["INTRO", "INSIGHT", "INVESTMENT", "CONTEXT"],
     narrative: "Email is the workhorse… lower signal density than iMessage, but higher formality. Investment memos, partnership proposals, and formal introductions flow through email.",
   },
