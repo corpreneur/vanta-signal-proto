@@ -196,7 +196,7 @@ export function ProductSidebar() {
         </Collapsible>
       </SidebarContent>
 
-      <SidebarFooter className="px-3 py-3 space-y-2">
+      <SidebarFooter className="px-3 py-3 space-y-2 border-t border-vanta-border">
         <ThemeToggle />
         {!collapsed && (
           <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-vanta-text-muted">
