@@ -167,7 +167,7 @@ export function ProductSidebar() {
         {/* Product */}
         <SidebarGroup>
           <SidebarGroupLabel className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted px-2">
-            {collapsed ? "·" : "Product"}
+            {collapsed ? "·" : "Product Concepts"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
