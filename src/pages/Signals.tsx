@@ -1,18 +1,38 @@
-import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useMemo, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Nav from "@/components/Nav";
 import NavDrawer from "@/components/NavDrawer";
 import Overlay from "@/components/Overlay";
 import SignalFeed from "@/components/SignalFeed";
 import SignalFilters from "@/components/SignalFilters";
 import type { FilterState } from "@/components/SignalFilters";
-import { mockSignals } from "@/data/mockSignals";
 import { cases } from "@/data/cases";
+import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
 
-// Mock fetch — will be replaced with real Notion API call
 const fetchSignals = async (): Promise<Signal[]> => {
-  return [...mockSignals];
+  const { data, error } = await supabase
+    .from("signals")
+    .select("*")
+    .order("captured_at", { ascending: false })
+    .limit(200);
+
+  if (error) {
+    console.error("Error fetching signals:", error);
+    return [];
+  }
+
+  return (data || []).map((row) => ({
+    id: row.id,
+    signalType: row.signal_type,
+    sender: row.sender,
+    summary: row.summary,
+    sourceMessage: row.source_message,
+    priority: row.priority,
+    capturedAt: row.captured_at,
+    actionsTaken: row.actions_taken || [],
+    status: row.status,
+  }));
 };
 
 const Signals = () => {
@@ -22,6 +42,7 @@ const Signals = () => {
     sender: "ALL",
     priority: "ALL",
   });
+  const queryClient = useQueryClient();
 
   const { data: signals = [] } = useQuery({
     queryKey: ["signals"],
@@ -29,13 +50,29 @@ const Signals = () => {
     refetchInterval: 60_000,
   });
 
-  // Derive unique senders from the signal data
+  // Realtime subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel("signals-realtime")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "signals" },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["signals"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
   const senders = useMemo(
     () => [...new Set(signals.map((s) => s.sender))].sort(),
     [signals]
   );
 
-  // Sort signals reverse-chronologically
   const sortedSignals = useMemo(
     () =>
       [...signals].sort(
@@ -66,7 +103,6 @@ const Signals = () => {
         navOpen={navOpen}
       />
 
-      {/* Page header */}
       <header className="px-5 pt-28 pb-10 md:px-10 max-w-[1200px] mx-auto">
         <div className="flex items-center gap-3 mb-2">
           <div
@@ -88,9 +124,7 @@ const Signals = () => {
         </p>
       </header>
 
-      {/* Feed section */}
       <main className="px-5 pb-20 md:px-10 max-w-[1200px] mx-auto">
-        {/* Stats bar */}
         <div className="flex flex-wrap gap-6 mb-6 pb-6 border-b border-vanta-border">
           <div>
             <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">
