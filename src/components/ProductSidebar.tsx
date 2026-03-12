@@ -127,7 +127,7 @@ export function ProductSidebar() {
 
       <SidebarContent>
         {/* Dashboard + Core */}
-        <SidebarGroup>
+        <SidebarGroup className="py-2 border-b border-vanta-border">
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
