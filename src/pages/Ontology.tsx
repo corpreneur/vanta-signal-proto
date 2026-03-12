@@ -156,7 +156,7 @@ const Ontology = () => {
       <section className="mb-14">
         <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-low mb-4">Universal Processing Pipeline</p>
         <p className="font-sans text-[13px] text-vanta-text-mid leading-relaxed mb-6 italic">
-          Every signal — regardless of channel — passes through the same four-stage pipeline.
+          Every signal, regardless of channel, passes through the same four-stage pipeline.
         </p>
         <div className="border border-vanta-border">
           {PIPELINE_STAGES.map((stage, i) => (
