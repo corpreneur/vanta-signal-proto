@@ -37,6 +37,30 @@ const PRIORITY_STYLES: Record<string, string> = {
   low: "text-vanta-text-muted border-vanta-border bg-transparent",
 };
 
+const RISK_STYLES: Record<string, string> = {
+  critical: "text-destructive border-destructive bg-destructive/10",
+  high: "text-vanta-accent border-vanta-accent-border bg-vanta-accent-faint",
+  medium: "text-vanta-accent-amber border-vanta-accent-amber-border bg-vanta-accent-amber-faint",
+  low: "text-vanta-text-muted border-vanta-border bg-transparent",
+};
+
+function formatDueDate(dateStr: string): { label: string; isOverdue: boolean } {
+  const due = new Date(dateStr + "T00:00:00");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const diffMs = due.getTime() - today.getTime();
+  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 0) return { label: `${Math.abs(diffDays)}d overdue`, isOverdue: true };
+  if (diffDays === 0) return { label: "Due today", isOverdue: true };
+  if (diffDays === 1) return { label: "Due tomorrow", isOverdue: false };
+  if (diffDays <= 7) return { label: `Due in ${diffDays}d`, isOverdue: false };
+  return {
+    label: due.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+    isOverdue: false,
+  };
+}
+
 interface SignalEntryCardProps {
   signal: Signal;
   onClick?: () => void;
