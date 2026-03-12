@@ -141,6 +141,11 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
             >
               {signal.priority}
             </span>
+            {signal.status === "Complete" && (
+              <span className="inline-block px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border border-vanta-signal-green-border text-vanta-signal-green bg-vanta-signal-green-faint">
+                ✓ Complete
+              </span>
+            )}
             {signal.source === "recall" ? (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border border-vanta-accent-zoom-border text-vanta-accent-zoom bg-vanta-accent-zoom-faint">
                 <Video className="w-3 h-3" />
