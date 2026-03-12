@@ -104,6 +104,11 @@ const SignalEntryCard = ({ signal, onClick }: SignalEntryCardProps) => {
                 <Video className="w-3 h-3" />
                 Zoom
               </span>
+            ) : signal.source === "phone" || signal.signalType === "PHONE_CALL" ? (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border border-vanta-accent-phone-border text-vanta-accent-phone bg-vanta-accent-phone-faint">
+                <Phone className="w-3 h-3" />
+                Phone
+              </span>
             ) : signal.source !== "linq" ? (
               <span className="inline-block px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border border-vanta-border text-vanta-text-muted">
                 {signal.source}
