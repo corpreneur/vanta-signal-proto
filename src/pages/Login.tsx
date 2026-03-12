@@ -105,6 +105,14 @@ const Login = () => {
             {loading ? "Authenticating…" : "Access Platform"}
           </button>
         </form>
+
+        <p
+          className="font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-muted text-center mt-8 opacity-0"
+          style={{ animation: "fadeUp 0.6s ease-out 1.1s forwards" }}
+        >
+          Proprietary · Confidential
+        </p>
+      </div>
     </div>
   );
 };
