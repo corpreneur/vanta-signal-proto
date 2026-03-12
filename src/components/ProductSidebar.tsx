@@ -200,6 +200,20 @@ export function ProductSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="px-3 py-3 space-y-2 border-t border-vanta-border">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <NavLink
+                to="/releases?skip-auth=1"
+                className="group/nav flex items-center gap-2 px-2 py-2 border-l-2 border-transparent font-mono text-[11px] uppercase tracking-wider text-vanta-text-muted hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200"
+                activeClassName="border-l-2 border-vanta-accent text-foreground bg-vanta-bg-elevated"
+              >
+                <FileText className="h-3.5 w-3.5 shrink-0" />
+                {!collapsed && <span>Release Notes</span>}
+              </NavLink>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
         <ThemeToggle />
         {!collapsed && (
           <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-vanta-text-muted">
