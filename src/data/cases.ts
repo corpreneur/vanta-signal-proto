@@ -170,7 +170,7 @@ export const cases: CaseData[] = [
       },
       {
         type: "meeting-prep",
-        label: "Meeting Prep — Thursday",
+        label: "Meeting Prep… Thursday",
         prepItems: [
           { n: "01", title: "Open with Steve's context.", desc: "Reference the intro naturally. She already knows the framing… don't re-pitch, build from it. Steve called you his spirit animal… the tone is warm." },
           { n: "02", title: "Probe: What does she want to build next?", desc: "She left Maximum Effort after nearly 4 years. Find out what she's optimizing for… scale, equity, category, autonomy. This tells you how to frame the Vanta opportunity." },
