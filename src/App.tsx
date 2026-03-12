@@ -37,6 +37,7 @@ const App = () => (
           <Route path="/graph" element={<ProtectedRoute><Graph /></ProtectedRoute>} />
           <Route path="/phone-fmc" element={<ProtectedRoute><PhoneFMC /></ProtectedRoute>} />
           <Route path="/ontology" element={<ProtectedRoute><Ontology /></ProtectedRoute>} />
+          <Route path="/product/:signalType" element={<ProtectedRoute><ProductSignalPage /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
