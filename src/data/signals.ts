@@ -48,19 +48,19 @@ export const SIGNAL_TYPE_COLORS: Record<SignalType, { text: string; bg: string; 
     border: 'border-vanta-accent-border',
   },
   INSIGHT: {
-    text: 'text-vanta-accent-teal',
-    bg: 'bg-vanta-accent-teal-faint',
-    border: 'border-vanta-accent-teal-border',
+    text: 'text-vanta-signal-blue',
+    bg: 'bg-vanta-signal-blue-faint',
+    border: 'border-vanta-signal-blue-border',
   },
   INVESTMENT: {
-    text: 'text-vanta-accent-amber',
-    bg: 'bg-vanta-accent-amber-faint',
-    border: 'border-vanta-accent-amber-border',
+    text: 'text-vanta-signal-yellow',
+    bg: 'bg-vanta-signal-yellow-faint',
+    border: 'border-vanta-signal-yellow-border',
   },
   DECISION: {
-    text: 'text-vanta-accent-violet',
-    bg: 'bg-vanta-accent-violet-faint',
-    border: 'border-vanta-accent-violet-border',
+    text: 'text-vanta-signal-yellow',
+    bg: 'bg-vanta-signal-yellow-faint',
+    border: 'border-vanta-signal-yellow-border',
   },
   CONTEXT: {
     text: 'text-vanta-text-low',
@@ -73,9 +73,9 @@ export const SIGNAL_TYPE_COLORS: Record<SignalType, { text: string; bg: string; 
     border: 'border-vanta-border',
   },
   MEETING: {
-    text: 'text-vanta-accent-zoom',
-    bg: 'bg-vanta-accent-zoom-faint',
-    border: 'border-vanta-accent-zoom-border',
+    text: 'text-vanta-signal-blue',
+    bg: 'bg-vanta-signal-blue-faint',
+    border: 'border-vanta-signal-blue-border',
   },
   PHONE_CALL: {
     text: 'text-vanta-accent-phone',
