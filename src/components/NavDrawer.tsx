@@ -45,12 +45,6 @@ const NavDrawer = ({ cases, open, onClose, onOpenCase }: NavDrawerProps) => {
                   {c.name}
                 </p>
               </button>
-              <a
-                href={c.standaloneHref}
-                className="inline-block font-sans text-[11px] text-vanta-text-low hover:text-foreground pb-4 transition-colors"
-              >
-                Full Page ↗
-              </a>
             </li>
           ))}
         </ul>
