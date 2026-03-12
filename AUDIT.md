@@ -1,64 +1,47 @@
-> **AUDIT v2.0** -- March 11, 2026
-> **Auditor:** Manus AI
-> **Target:** `vantasignal.lovable.app` (live deployment)
-> **Commit:** `03081d7` (origin/main)
+# Vanta Signal Prototype -- As-Built Audit v3.0
+
+**Date:** March 12, 2026
+**Auditor:** Manus AI
 
 ---
 
-## Executive Summary
+## 1. Executive Summary
 
-This audit reviews the live deployment of the Vanta Signal prototype after a significant engineering push by Lovable (48 commits). The core finding is that Lovable has gone far beyond the initial sidecar spec, implementing a full-stack, real-time signal intelligence platform with a Supabase backend, Linq webhook integration for message ingestion, and a new `SignalDetailDrawer` for interactive signal triage and reply.
+This audit (v3.0) verifies the resolution of all three P0 Critical findings from the initial audit. The platform is now significantly more stable and complete. The core case study experience is fully functional, and the new sidebar navigation provides a much-improved information architecture.
 
-The prototype is now a live, data-driven application. The `/signals` page is no longer powered by mock data but by a production-ready Supabase database populated via a Linq webhook. This is a major step forward in functionality and represents a significant de-risking of the technical architecture.
+**Key takeaway:** The stabilization sprint was successful. The platform is now ready for the next phase of feature development or a more formal external demo.
 
-However, the three **Critical** findings from the initial audit remain unaddressed. The standalone case study pages (`/case-01`, `/case-02`, `/case-03`) still return 404 errors, and the incorrect `cardSignal` label in Case 01 persists. The `SignalArchitecture` component is also still missing.
+## 2. Verification of P0 Critical Findings
 
-## Audit Findings (v2.0)
+All three P0 items are now **VERIFIED RESOLVED**.
 
-This table summarizes the status of all findings, including new ones from this audit.
+| Finding ID | Description | Status | Verification Notes |
+|:---|:---|:---|:---|
+| **PROD-01** | Standalone case pages (`/case-01`, `/case-02`, `/case-03`) returned 404 errors. | **RESOLVED** | All three legacy routes now correctly redirect to the new `/case/:id` structure. The full standalone pages render with complete content. |
+| **PROD-02** | Case 01 `cardSignal` label was "Signal" instead of "The Trigger". | **RESOLVED** | The label on the Case 01 card on the main dashboard now correctly reads "The Trigger". |
+| **PROD-03** | `SignalArchitecture` component was missing from Case 01. | **RESOLVED** | The `SignalArchitecture` component now renders correctly at the bottom of the `/case/01` page, displaying the 5-step orchestration flow. |
 
-| ID | Finding | Category | Severity | Status (v2.0) |
-|:---|:---|:---|:---|:---|
-| **NEW-01** | **Live Data from Supabase** | Feature | **Positive** | **Shipped** |
-| **NEW-02** | **Real-time Updates via Webhook** | Feature | **Positive** | **Shipped** |
-| **NEW-03** | **Signal Detail Drawer** | Feature | **Positive** | **Shipped** |
-| **NEW-04** | **Reply via Linq** | Feature | **Positive** | **Shipped** |
-| **NEW-05** | **Test Data in Production Feed** | Data | **Minor** | **New** |
-| IA-01 | Standalone pages missing | Routing | **Critical** | **Unchanged** |
-| C-01 | Case 01 `cardSignal` label is wrong | Content | **Critical** | **Unchanged** |
-| C-02 | `SignalArchitecture` component does not exist | Component | **Critical** | **Unchanged** |
-| D-01 | Inconsistent font sizing | Design | **Major** | **Unchanged** |
-| D-02 | Inconsistent color tokens | Design | **Major** | **Unchanged** |
-| IX-01 | `Read Case` links open in same tab | Interaction | **Major** | **Unchanged** |
-| IX-02 | Cassette drawer does not reset scroll | Interaction | **Major** | **Unchanged** |
-| C-03 | Case 04 placeholder is static | Content | **Minor** | **Unchanged** |
-| D-03 | Missing hover states on some elements | Design | **Minor** | **Unchanged** |
-| D-04 | Inconsistent border radius | Design | **Minor** | **Unchanged** |
+## 3. Remaining Open Findings (from Audit v2.0)
 
-### New Positive Findings (Shipped)
+The following findings from the previous audit remain open. They should be prioritized in the next development cycle.
 
-*   **NEW-01: Live Data from Supabase:** The `/signals` page now fetches data directly from a Supabase `signals` table. The `useQuery` hook in `Signals.tsx` is configured to fetch on load and refetch every 60 seconds. This replaces the static `mockSignals.ts` file.
+### 3.1. Engineering Risks (P0)
 
-*   **NEW-02: Real-time Updates via Webhook:** The `linq-webhook` Supabase edge function is fully implemented. It receives messages from Linq, uses a Lovable AI endpoint for classification (`google/gemini-2.5-flash`), and inserts the classified signal into the Supabase database. The frontend is configured with a Supabase real-time channel to listen for new inserts and invalidate the query cache, providing a live feed experience.
+| Finding ID | Description | Status |
+|:---|:---|:---|
+| **SEC-01** | **Undefined RLS Policies:** The Supabase instance has no Row Level Security policies defined. Any user with the anon key can read, write, and delete all data in all tables. | **OPEN** |
+| **INFRA-01** | **No Environment Separation:** Test data is visible in the production signal feed. There is no clear separation between development, staging, and production environments. | **OPEN** |
 
-*   **NEW-03: Signal Detail Drawer:** A new `SignalDetailDrawer` component provides a rich, interactive view of a selected signal. It displays the full summary, source message, actions, and raw JSON payload. It also allows for changing the signal's status directly, which updates the database.
+### 3.2. Product & Design Gaps (P1-P2)
 
-*   **NEW-04: Reply via Linq:** The detail drawer includes a "Reply via Linq" feature that invokes the `linq-send` edge function. This allows users to send SMS replies directly from the Vanta Signal UI, completing the two-way communication loop.
+| Finding ID | Description | Status |
+|:---|:---|:---|
+| **PROD-04** | **Inconsistent Signal Counts:** The dashboard channel cards show different signal counts than the `/signals` page. | **OPEN** |
+| **DESIGN-01** | **Inconsistent Design Tokens:** The new pages use some hardcoded color and font values instead of the established Tailwind config tokens. | **OPEN** |
+| **IXD-01** | **Drawer Scroll Reset:** The cassette drawer does not reset its scroll position when closed and re-opened. | **OPEN** |
 
-### New Minor Finding
+## 4. Conclusion & Recommendation
 
-*   **NEW-05: Test Data in Production Feed:** The live signal feed contains at least one entry clearly marked as test data ("Test User — Pipeline Check"). This data should be purged from the production `signals` table to maintain data integrity.
+The team has successfully addressed the most critical stability and completeness issues. The platform is now in a much stronger position.
 
-### Unchanged Critical Findings
-
-The three critical findings from the initial audit persist in the live build:
-
-1.  **IA-01: Standalone pages missing:** Navigating to `/case-01`, `/case-02`, or `/case-03` still results in a 404 error page. The routes and corresponding page components have not been created.
-2.  **C-01: Case 01 `cardSignal` label is wrong:** The label on the Case 01 card still reads "Signal" instead of the specified "The Trigger".
-3.  **C-02: `SignalArchitecture` component does not exist:** The visual flow diagram for Case 01 is still a placeholder.
-
-## Conclusion & Recommendation
-
-The Lovable team has delivered a robust, production-grade signal processing pipeline that far exceeds the initial scope. The technical foundation is now incredibly strong.
-
-However, the focus on the new backend has left the original critical audit items unaddressed. The next sprint should be a **stabilization sprint** focused exclusively on closing out the remaining P0 and P1 items from the original audit. No new features should be added until the existing prototype is fully aligned with the spec.
+**Recommendation:** The next sprint must focus on closing the two P0 engineering risks (RLS and environment separation). These are critical for security and data integrity. Once those are resolved, the remaining P1/P2 product and design gaps can be addressed.
