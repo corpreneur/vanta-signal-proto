@@ -85,7 +85,7 @@ const Ontology = () => {
         Every Channel Is a Sensor
       </h1>
       <p className="font-sans text-[14px] text-vanta-text-mid leading-relaxed mb-12 max-w-xl">
-        Vanta treats every communication channel as a signal source — not a feature to integrate, but infrastructure to own.
+        Vanta treats every communication channel as a signal source… not a feature to integrate, but infrastructure to own.
       </p>
 
       {/* Product Concept Narrative */}
