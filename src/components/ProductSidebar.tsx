@@ -17,6 +17,7 @@ import {
   BookMarked,
   FileCode,
   ChevronRight,
+  PenLine,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -56,6 +57,7 @@ const productItems = [
 
 const coreItems = [
   { title: "Signal Feed", url: "/signals", icon: BarChart3 },
+  { title: "Brain Dump", url: "/brain-dump", icon: PenLine },
   { title: "Relationship Graph", url: "/graph", icon: Network },
 ];
 

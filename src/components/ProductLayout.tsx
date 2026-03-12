@@ -25,6 +25,7 @@ const BREADCRUMB_MAP: Record<string, string> = {
   "/product/context": "Platform · Context Layer",
   "/product/noise": "Platform · Noise Filter",
   "/architecture": "Platform · Architecture",
+  "/brain-dump": "Brain Dump",
 };
 
 function HamburgerTrigger({ breadcrumb }: { breadcrumb: string }) {

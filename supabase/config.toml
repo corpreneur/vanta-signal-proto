@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.phone-call-webhook]
 verify_jwt = false
+
+[functions.brain-dump]
+verify_jwt = false
