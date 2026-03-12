@@ -6,7 +6,6 @@ import Overlay from "@/components/Overlay";
 import SignalFeed from "@/components/SignalFeed";
 import SignalFilters from "@/components/SignalFilters";
 import TagBrowser from "@/components/TagBrowser";
-import PreMeetingBriefCard from "@/components/PreMeetingBriefCard";
 import type { FilterState } from "@/components/SignalFilters";
 import type { SignalType } from "@/data/signals";
 import { cases } from "@/data/cases";
@@ -193,9 +192,6 @@ const Signals = () => {
             </div>
           </div>
         </div>
-
-        {/* Pre-Meeting Briefs */}
-        <PreMeetingBriefCard />
 
         {/* Tag Browser */}
         <TagBrowser
