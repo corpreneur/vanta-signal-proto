@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.linq-register-webhook]
 verify_jwt = false
+
+[functions.gmail-poll]
+verify_jwt = false

@@ -1,6 +1,7 @@
 export type SignalType = 'INTRO' | 'INSIGHT' | 'INVESTMENT' | 'DECISION' | 'CONTEXT' | 'NOISE';
 export type SignalPriority = 'high' | 'medium' | 'low';
 export type SignalStatus = 'Captured' | 'In Progress' | 'Complete';
+export type SignalSource = 'linq' | 'gmail' | 'manual';
 
 export interface Signal {
   id: string;
@@ -12,8 +13,17 @@ export interface Signal {
   capturedAt: string; // ISO 8601
   actionsTaken: string[];
   status: SignalStatus;
+  source: SignalSource;
   rawPayload?: Record<string, unknown> | null;
   linqMessageId?: string | null;
+  emailMetadata?: {
+    subject?: string;
+    from?: string;
+    to?: string;
+    cc?: string;
+    thread_id?: string;
+    date?: string;
+  } | null;
 }
 
 export const SIGNAL_TYPE_COLORS: Record<SignalType, { text: string; bg: string; border: string }> = {

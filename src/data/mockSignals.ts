@@ -13,6 +13,7 @@ export const mockSignals: Signal[] = [
     capturedAt: '2026-03-11T07:16:00Z',
     actionsTaken: ['BIO_RESEARCH', 'MEETING_PREP', 'EMAIL_DRAFT', 'AGENT_BUILD'],
     status: 'Complete',
+    source: 'linq',
   },
   {
     id: 'sig_002',
@@ -26,6 +27,7 @@ export const mockSignals: Signal[] = [
     capturedAt: '2026-03-10T23:41:00Z',
     actionsTaken: ['FRAMEWORK_EXTRACT', 'NOTION_LOG'],
     status: 'Complete',
+    source: 'linq',
   },
   {
     id: 'sig_003',
@@ -39,6 +41,7 @@ export const mockSignals: Signal[] = [
     capturedAt: '2026-03-10T21:03:00Z',
     actionsTaken: ['THESIS_ANALYSIS', 'NOTION_LOG'],
     status: 'Complete',
+    source: 'linq',
   },
   {
     id: 'sig_004',
@@ -52,6 +55,7 @@ export const mockSignals: Signal[] = [
     capturedAt: '2026-03-10T20:47:00Z',
     actionsTaken: ['NOTION_LOG'],
     status: 'Captured',
+    source: 'linq',
   },
   {
     id: 'sig_005',
@@ -65,6 +69,7 @@ export const mockSignals: Signal[] = [
     capturedAt: '2026-03-09T14:22:00Z',
     actionsTaken: ['BIO_RESEARCH', 'MEETING_PREP', 'EMAIL_DRAFT', 'AGENT_BUILD'],
     status: 'Complete',
+    source: 'linq',
   },
   {
     id: 'sig_006',
@@ -78,6 +83,7 @@ export const mockSignals: Signal[] = [
     capturedAt: '2026-03-09T08:15:00Z',
     actionsTaken: ['NOTION_LOG'],
     status: 'Complete',
+    source: 'linq',
   },
   {
     id: 'sig_007',
@@ -91,6 +97,7 @@ export const mockSignals: Signal[] = [
     capturedAt: '2026-03-08T16:30:00Z',
     actionsTaken: ['THESIS_ANALYSIS', 'NOTION_LOG'],
     status: 'In Progress',
+    source: 'linq',
   },
   {
     id: 'sig_008',
@@ -104,5 +111,6 @@ export const mockSignals: Signal[] = [
     capturedAt: '2026-03-08T11:05:00Z',
     actionsTaken: ['FRAMEWORK_EXTRACT', 'NOTION_LOG'],
     status: 'Complete',
+    source: 'linq',
   },
 ];
