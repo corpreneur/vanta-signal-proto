@@ -19,12 +19,14 @@ export type Database = {
           actions_taken: string[]
           captured_at: string
           created_at: string
+          email_metadata: Json | null
           id: string
           linq_message_id: string | null
           priority: Database["public"]["Enums"]["signal_priority"]
           raw_payload: Json | null
           sender: string
           signal_type: Database["public"]["Enums"]["signal_type"]
+          source: Database["public"]["Enums"]["signal_source"]
           source_message: string
           status: Database["public"]["Enums"]["signal_status"]
           summary: string
@@ -33,12 +35,14 @@ export type Database = {
           actions_taken?: string[]
           captured_at?: string
           created_at?: string
+          email_metadata?: Json | null
           id?: string
           linq_message_id?: string | null
           priority?: Database["public"]["Enums"]["signal_priority"]
           raw_payload?: Json | null
           sender: string
           signal_type?: Database["public"]["Enums"]["signal_type"]
+          source?: Database["public"]["Enums"]["signal_source"]
           source_message: string
           status?: Database["public"]["Enums"]["signal_status"]
           summary: string
@@ -47,12 +51,14 @@ export type Database = {
           actions_taken?: string[]
           captured_at?: string
           created_at?: string
+          email_metadata?: Json | null
           id?: string
           linq_message_id?: string | null
           priority?: Database["public"]["Enums"]["signal_priority"]
           raw_payload?: Json | null
           sender?: string
           signal_type?: Database["public"]["Enums"]["signal_type"]
+          source?: Database["public"]["Enums"]["signal_source"]
           source_message?: string
           status?: Database["public"]["Enums"]["signal_status"]
           summary?: string
@@ -68,6 +74,7 @@ export type Database = {
     }
     Enums: {
       signal_priority: "high" | "medium" | "low"
+      signal_source: "linq" | "gmail" | "manual"
       signal_status: "Captured" | "In Progress" | "Complete"
       signal_type:
         | "INTRO"
@@ -204,6 +211,7 @@ export const Constants = {
   public: {
     Enums: {
       signal_priority: ["high", "medium", "low"],
+      signal_source: ["linq", "gmail", "manual"],
       signal_status: ["Captured", "In Progress", "Complete"],
       signal_type: [
         "INTRO",
