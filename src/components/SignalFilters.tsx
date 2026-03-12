@@ -26,7 +26,21 @@ const PRIORITIES: (SignalPriority | "ALL")[] = ["ALL", "high", "medium", "low"];
 
 const SignalFilters = ({ filters, onChange, senders }: SignalFiltersProps) => {
   return (
-    <div className="flex flex-wrap gap-3 mb-6">
+    <div className="space-y-4 mb-6">
+      {/* Search */}
+      <div className="flex flex-col gap-1">
+        <label className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted">
+          Search
+        </label>
+        <input
+          type="text"
+          value={filters.search}
+          onChange={(e) => onChange({ ...filters, search: e.target.value })}
+          placeholder="Filter by keyword…"
+          className="bg-vanta-bg-elevated border border-vanta-border text-vanta-text-mid font-mono text-[11px] px-3 py-1.5 focus:outline-none focus:border-vanta-accent-border w-full max-w-[480px] placeholder:text-vanta-text-muted"
+        />
+      </div>
+      <div className="flex flex-wrap gap-3">
       {/* Signal Type */}
       <div className="flex flex-col gap-1">
         <label className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted">
