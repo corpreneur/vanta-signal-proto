@@ -34,7 +34,7 @@ const PhoneFMC = () => {
           Almost none of it is captured. Notes are partial. Memory degrades. Follow-through is inconsistent.
         </p>
         <p className="font-sans text-[14px] text-foreground leading-relaxed font-medium">
-          The conventional answer is an app — but apps require behavioral change, create friction, and are forgotten under pressure. The right answer is infrastructure that captures at the network level, requiring zero behavioral change from the user.
+          The conventional answer is an app… but apps require behavioral change, create friction, and are forgotten under pressure. The right answer is infrastructure that captures at the network level, requiring zero behavioral change from the user.
         </p>
       </section>
 
@@ -47,7 +47,7 @@ const PhoneFMC = () => {
         <div className="border border-vanta-border space-y-0">
           {[
             { n: "01", icon: Phone, label: "Onboarding", desc: "User provisioned a Vanta eSIM via ConnectX. Number registered as a native endpoint on Vanta's network." },
-            { n: "02", icon: Radio, label: "Call Placed or Received", desc: "User calls from their native iPhone or Android dialer — no Vanta app involved. The call transits Vanta's network." },
+            { n: "02", icon: Radio, label: "Call Placed or Received", desc: "User calls from their native iPhone or Android dialer… no Vanta app involved. The call transits Vanta's network." },
             { n: "03", icon: Layers, label: "CDR Generated", desc: "ConnectX records the call event: parties, duration, timestamp. This is the trigger for signal processing." },
             { n: "04", icon: Zap, label: "Audio Capture + Transcription", desc: "Call audio routed through Vanta's recording layer at SIP level. Transcript generated via Whisper." },
             { n: "05", icon: GitBranch, label: "Signal Detection", desc: "Transcript passed through two-stage pipeline: Haiku triage → Sonnet detection. Signal extracted, tagged, scored." },
@@ -71,14 +71,14 @@ const PhoneFMC = () => {
       <section className="mb-12">
         <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-low mb-4">Phone-Specific Signal Taxonomy</p>
         <p className="font-sans text-[13px] text-vanta-text-mid leading-relaxed mb-5">
-          The existing signal taxonomy is extended with five phone-specific types that surface uniquely in call context — they do not appear naturally in text or meeting transcripts.
+          The existing signal taxonomy is extended with five phone-specific types that surface uniquely in call context… they do not appear naturally in text or meeting transcripts.
         </p>
         <div className="grid grid-cols-1 gap-px bg-vanta-border border border-vanta-border">
           {[
-            { tag: "commitment", def: "A promise made or received during the call — explicit or implied" },
+            { tag: "commitment", def: "A promise made or received during the call… explicit or implied" },
             { tag: "decision", def: "A choice made or agreed upon during the conversation" },
             { tag: "open_question", def: "An unresolved question that requires follow-up" },
-            { tag: "relationship_signal", def: "A data point about the nature or health of this relationship — tone, access, trust level, urgency" },
+            { tag: "relationship_signal", def: "A data point about the nature or health of this relationship… tone, access, trust level, urgency" },
             { tag: "deal_signal", def: "Language, terms, or indicators relevant to a commercial outcome" },
           ].map((item) => (
             <div key={item.tag} className="flex items-start gap-3 p-4 bg-card">
@@ -109,7 +109,7 @@ const PhoneFMC = () => {
         </div>
       </section>
 
-      {/* The Moat — Relationship Graph */}
+      {/* The Moat, Relationship Graph */}
       <section className="mb-12">
         <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-low mb-4">Second-Order Effect: The Relationship Graph</p>
         <div className="border-l-2 border-vanta-accent-phone pl-5 mb-5">
@@ -139,7 +139,7 @@ const PhoneFMC = () => {
           <div>
             <p className="font-sans text-[14px] text-foreground font-bold mb-2">Infrastructure Is the Moat</p>
             <p className="font-sans text-[13px] text-vanta-text-mid leading-relaxed">
-              Vanta doesn't integrate with telephony infrastructure — it owns it. The combination of an operational MVNO and Amdocs ConnectX as the BSS/OSS foundation changes the nature of this product entirely. That distinction is the moat.
+              Vanta doesn't integrate with telephony infrastructure… it owns it. The combination of an operational MVNO and Amdocs ConnectX as the BSS/OSS foundation changes the nature of this product entirely. That distinction is the moat.
             </p>
           </div>
         </div>

@@ -18,17 +18,17 @@ const CHANNELS: ChannelDef[] = [
     id: "imessage", label: "iMessage", icon: MessageSquare,
     color: "text-vanta-accent", colorBg: "bg-vanta-accent-faint", colorBorder: "border-vanta-accent-border",
     source: "linq",
-    capture: "Linq relay — messages forwarded through Vanta's iMessage bridge. No app install required on contacts.",
+    capture: "Linq relay… messages forwarded through Vanta's iMessage bridge. No app install required on contacts.",
     signalTypes: ["INTRO", "INSIGHT", "INVESTMENT", "DECISION", "CONTEXT"],
-    narrative: "iMessage is the primary channel for high-trust communication among creative entrepreneurs. Intros happen here. Deals close here. The signal density per message is the highest of any channel — but without capture, it disappears into a thread.",
+    narrative: "iMessage is the primary channel for high-trust communication among creative entrepreneurs. Intros happen here. Deals close here. The signal density per message is the highest of any channel… but without capture, it disappears into a thread.",
   },
   {
     id: "phone", label: "Native Phone", icon: Phone,
     color: "text-vanta-accent-phone", colorBg: "bg-vanta-accent-phone-faint", colorBorder: "border-vanta-accent-phone-border",
     source: "phone",
-    capture: "Vanta MVNO — call audio intercepted at SIP level via ConnectX. Transcription via Whisper. Zero behavioral change.",
+    capture: "Vanta MVNO… call audio intercepted at SIP level via ConnectX. Transcription via Whisper. Zero behavioral change.",
     signalTypes: ["PHONE_CALL"],
-    narrative: "The phone call is the highest-density, most systematically ignored communication channel. Vanta doesn't ask the user to change behavior — it owns the infrastructure.",
+    narrative: "The phone call is the highest-density, most systematically ignored communication channel. Vanta doesn't ask the user to change behavior… it owns the infrastructure.",
   },
   {
     id: "zoom", label: "Zoom Meetings", icon: Video,
@@ -42,17 +42,17 @@ const CHANNELS: ChannelDef[] = [
     id: "email", label: "Email", icon: Mail,
     color: "text-vanta-accent-teal", colorBg: "bg-vanta-accent-teal-faint", colorBorder: "border-vanta-accent-teal-border",
     source: "gmail",
-    capture: "Gmail API polling — authorized OAuth connection scans inbox for signal-bearing threads. Thread context preserved.",
+    capture: "Gmail API polling… authorized OAuth connection scans inbox for signal-bearing threads. Thread context preserved.",
     signalTypes: ["INTRO", "INSIGHT", "INVESTMENT", "CONTEXT"],
-    narrative: "Email is the workhorse — lower signal density than iMessage, but higher formality. Investment memos, partnership proposals, and formal introductions flow through email.",
+    narrative: "Email is the workhorse… lower signal density than iMessage, but higher formality. Investment memos, partnership proposals, and formal introductions flow through email.",
   },
   {
     id: "calendar", label: "Calendar", icon: Calendar,
     color: "text-vanta-accent-amber", colorBg: "bg-vanta-accent-amber-faint", colorBorder: "border-vanta-accent-amber-border",
     source: "calendar",
-    capture: "Google Calendar sync — upcoming meetings trigger pre-meeting brief generation. Attendee lists matched against signal history.",
+    capture: "Google Calendar sync… upcoming meetings trigger pre-meeting brief generation. Attendee lists matched against signal history.",
     signalTypes: ["MEETING"],
-    narrative: "The calendar is not a signal source — it's a signal trigger. When a meeting appears on the calendar, Vanta cross-references every attendee against the full signal history and generates a contextual brief.",
+    narrative: "The calendar is not a signal source… it's a signal trigger. When a meeting appears on the calendar, Vanta cross-references every attendee against the full signal history and generates a contextual brief.",
   },
 ];
 
@@ -85,7 +85,7 @@ const Ontology = () => {
         Every Channel Is a Sensor
       </h1>
       <p className="font-sans text-[14px] text-vanta-text-mid leading-relaxed mb-12 max-w-xl">
-        Vanta treats every communication channel as a signal source — not a feature to integrate, but infrastructure to own.
+        Vanta treats every communication channel as a signal source… not a feature to integrate, but infrastructure to own.
       </p>
 
       {/* Product Concept Narrative */}
@@ -93,7 +93,7 @@ const Ontology = () => {
         <div className="border-l-2 border-primary pl-5 mb-8">
           <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-primary mb-2">Product Concept</p>
           <p className="font-display text-[18px] italic text-foreground leading-relaxed mb-3">
-            "The creative entrepreneur's day produces more signal than any system captures. Not because the tools are bad — because the architecture is wrong."
+            "The creative entrepreneur's day produces more signal than any system captures. Not because the tools are bad… because the architecture is wrong."
           </p>
           <p className="font-sans text-[13px] text-vanta-text-mid leading-relaxed">
             Conventional products sit on top of channels and ask the user to change behavior. Vanta sits underneath them. When you own the iMessage relay, the SIM card, the meeting bot, and the email connection, capture becomes invisible.
@@ -156,7 +156,7 @@ const Ontology = () => {
       <section className="mb-14">
         <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-low mb-4">Universal Processing Pipeline</p>
         <p className="font-sans text-[13px] text-vanta-text-mid leading-relaxed mb-6 italic">
-          Every signal — regardless of channel — passes through the same four-stage pipeline.
+          Every signal, regardless of channel, passes through the same four-stage pipeline.
         </p>
         <div className="border border-vanta-border">
           {PIPELINE_STAGES.map((stage, i) => (
@@ -189,7 +189,7 @@ const Ontology = () => {
             Most intelligence products are features bolted onto someone else's infrastructure. Vanta's advantage is that the capture layer, the classification layer, and the delivery layer are all first-party.
           </p>
           <p className="font-sans text-[13px] text-vanta-text-mid leading-relaxed">
-            Five channels. One pipeline. Every signal classified, scored, and actionable — before the user opens the app.
+            Five channels. One pipeline. Every signal classified, scored, and actionable… before the user opens the app.
           </p>
         </div>
       </section>

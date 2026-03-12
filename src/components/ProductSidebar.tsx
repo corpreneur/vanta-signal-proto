@@ -89,7 +89,7 @@ export function ProductSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Product — Signal Types */}
+        {/* Product, Signal Types */}
         <SidebarGroup>
           <SidebarGroupLabel className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted px-2">
             {collapsed ? "·" : "Product"}

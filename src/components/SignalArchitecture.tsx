@@ -54,7 +54,7 @@ const SignalArchitecture = () => {
         {/* Caption */}
         <div className="pt-5">
           <p className="font-sans text-[12px] text-vanta-text-mid leading-relaxed italic">
-            Every introduction becomes an orchestrated sequence — from raw signal to persistent agent — before you open the thread.
+            Every introduction becomes an orchestrated sequence… from raw signal to persistent agent… before you open the thread.
           </p>
         </div>
       </div>

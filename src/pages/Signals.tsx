@@ -147,7 +147,7 @@ const Signals = () => {
             style={{ animation: "pulse-dot 2s ease-in-out infinite" }}
           />
           <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-vanta-accent">
-            Signal Log — Live
+            Signal Log · Live
           </p>
         </div>
         <h1 className="font-display text-[28px] md:text-[36px] leading-[1.15] text-vanta-text mb-3">
@@ -155,7 +155,7 @@ const Signals = () => {
         </h1>
         <p className="font-sans text-[13px] md:text-[14px] leading-[1.6] text-vanta-text-mid max-w-[640px]">
           A curated feed of intellectual capital captured from real conversations.
-          Every message is evaluated through a two-stage AI pipeline — what
+          Every message is evaluated through a two-stage AI pipeline… what
           matters is extracted before it disappears into the scroll.
         </p>
       </header>

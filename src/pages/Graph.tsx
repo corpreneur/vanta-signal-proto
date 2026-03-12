@@ -43,7 +43,7 @@ export default function Graph() {
           Relationship Graph
         </h1>
         <p className="text-vanta-text-low text-xs font-mono mt-2 max-w-xl">
-          Contact map derived from signal history — node size reflects signal density, orbit distance reflects frequency, ring color reflects recency.
+          Contact map derived from signal history… node size reflects signal density, orbit distance reflects frequency, ring color reflects recency.
         </p>
       </header>
 

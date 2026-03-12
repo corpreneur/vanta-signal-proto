@@ -113,7 +113,7 @@ export default function RelationshipGraph({ signals }: RelationshipGraphProps) {
         </span>
       </div>
 
-      {/* Graph grid — orbital layout */}
+      {/* Graph grid, orbital layout */}
       <div className="relative w-full min-h-[420px]">
         {/* Center hub */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 border border-vanta-accent-border bg-vanta-accent-faint flex items-center justify-center z-10">
@@ -168,7 +168,7 @@ export default function RelationshipGraph({ signals }: RelationshipGraphProps) {
                 </span>
               </div>
 
-              {/* Label — visible on hover */}
+              {/* Label, visible on hover */}
               <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-14 left-1/2 -translate-x-1/2 bg-vanta-bg-elevated border border-vanta-border px-2.5 py-1.5 whitespace-nowrap z-30 min-w-[140px]">
                 <p className="text-vanta-text text-[11px] font-mono font-semibold truncate">{node.name}</p>
                 <p className="text-vanta-text-low text-[9px] font-mono">
