@@ -94,6 +94,7 @@ function CollapsibleNavGroup({ label, items, collapsed, currentPath, activeClass
                     <NavLink
                       to={`${item.url}?skip-auth=1`}
                       className="flex items-center gap-2 px-2 py-2 pl-6 font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
+                      activeClassName={activeClassName}
                     >
                       <item.icon className="h-4 w-4 shrink-0" />
                       {!collapsed && <span>{item.title}</span>}
