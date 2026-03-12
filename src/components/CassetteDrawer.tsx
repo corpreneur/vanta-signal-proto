@@ -14,10 +14,19 @@ interface CassetteDrawerProps {
 
 const CassetteDrawer = ({ caseData, onClose }: CassetteDrawerProps) => {
   const open = caseData !== null;
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Reset scroll to top when case changes
+  useEffect(() => {
+    if (open && scrollRef.current) {
+      scrollRef.current.scrollTop = 0;
+    }
+  }, [caseData, open]);
 
   return (
     <div
-      className={`fixed top-0 right-0 z-50 h-full w-full max-w-[520px] bg-background border-l border-vanta-border overflow-y-auto transition-transform duration-[400ms] ease-drawer ${
+      ref={scrollRef}
+      className={`fixed top-0 right-0 z-50 h-full w-full max-w-[540px] bg-background border-l border-vanta-border overflow-y-auto transition-transform duration-[400ms] ease-drawer ${
         open ? "translate-x-0" : "translate-x-full"
       }`}
     >
