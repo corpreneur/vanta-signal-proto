@@ -11,6 +11,11 @@ interface SendRequest {
   message: string;
 }
 
+/** Strip to E.164: remove spaces, dashes, parens — keep leading + */
+function toE164(phone: string): string {
+  return phone.replace(/[\s\-().]/g, "");
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -28,7 +33,7 @@ Deno.serve(async (req) => {
     }
 
     const body: SendRequest = await req.json();
-    const recipients = Array.isArray(body.to) ? body.to : [body.to];
+    const recipients = (Array.isArray(body.to) ? body.to : [body.to]).map(toE164);
 
     if (!body.message || body.message.trim().length === 0) {
       return new Response(
