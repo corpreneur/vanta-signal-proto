@@ -133,6 +133,9 @@ serve(async (req) => {
         summary: classification.summary,
         actions_taken: classification.actionsTaken,
         status: "Captured",
+        risk_level: classification.riskLevel || null,
+        due_date: classification.dueDate || null,
+        call_pointer: classification.callPointer || null,
       })
       .select()
       .single();
