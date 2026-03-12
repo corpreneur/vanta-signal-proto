@@ -122,31 +122,6 @@ export function ProductSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Product */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted px-2">
-            {collapsed ? "·" : "Product"}
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {productItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={`${item.url}?skip-auth=1`}
-                      className="flex items-center gap-2 px-2 py-1.5 font-mono text-[11px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
-                      activeClassName="text-foreground bg-vanta-bg-elevated border-l-2 border-l-primary -ml-px"
-                    >
-                      <item.icon className={`h-3.5 w-3.5 shrink-0 ${item.color}`} />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
         {/* Platform */}
         <SidebarGroup>
           <SidebarGroupLabel className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted px-2">
@@ -163,6 +138,31 @@ export function ProductSidebar() {
                       activeClassName="text-foreground bg-vanta-bg-elevated"
                     >
                       <item.icon className="h-3.5 w-3.5 shrink-0" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Product */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted px-2">
+            {collapsed ? "·" : "Product"}
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {productItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to={`${item.url}?skip-auth=1`}
+                      className="flex items-center gap-2 px-2 py-1.5 font-mono text-[11px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
+                      activeClassName="text-foreground bg-vanta-bg-elevated border-l-2 border-l-primary -ml-px"
+                    >
+                      <item.icon className={`h-3.5 w-3.5 shrink-0 ${item.color}`} />
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
