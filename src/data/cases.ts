@@ -160,7 +160,7 @@ export const cases: CaseData[] = [
         label: "Quick Bio — Kristina Windham",
         bioItems: [
           { key: "Headline", value: "Consultant · Business Development · Marketing Strategy · Forbes 30 Under 30" },
-          { key: "Most Recent", value: "Head of Business Development — Maximum Effort (Ryan Reynolds' production company, creative agency, and investment firm). Feb 2022 – Nov 2025 · 3 yrs 10 mos. New York." },
+          { key: "Current Role", value: "Head of Business Development — Maximum Effort (Ryan Reynolds' production company, creative agency, and investment firm). Feb 2022 – Present. New York." },
           { key: "Prior Roles", value: "Director, Brand Partnerships — Artsy · Director, Business Development — Uber · Account Manager, West Coast — StockX · E-commerce Manager, Fashion — eBay" },
           { key: "Education", value: "UCLA" },
           { key: "Network", value: "500+ connections. 10 mutual connections including Tessa Flippin, Lybra Clemons." },
