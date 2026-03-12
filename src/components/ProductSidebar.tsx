@@ -17,6 +17,7 @@ import {
   BookMarked,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useLocation } from "react-router-dom";
 import { cases } from "@/data/cases";
 import {
@@ -197,7 +198,8 @@ export function ProductSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="px-3 py-3">
+      <SidebarFooter className="px-3 py-3 space-y-2">
+        <ThemeToggle />
         {!collapsed && (
           <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-vanta-text-muted">
             © 2026 Vanta Wireless

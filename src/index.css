@@ -82,6 +82,82 @@
     --vanta-accent-phone-faint: 340 82% 60% / 0.06;
     --vanta-accent-phone-border: 340 82% 60% / 0.2;
   }
+
+  .light {
+    --background: 0 0% 98%;
+    --foreground: 0 0% 9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 9%;
+
+    --primary: 79 95% 38%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 0 0% 9%;
+
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 40%;
+
+    --accent: 79 95% 38%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 0% / 0.1;
+    --input: 0 0% 0% / 0.1;
+    --ring: 79 95% 38%;
+
+    --sidebar-background: 0 0% 97%;
+    --sidebar-foreground: 0 0% 9%;
+    --sidebar-primary: 79 95% 38%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 93%;
+    --sidebar-accent-foreground: 0 0% 9%;
+    --sidebar-border: 0 0% 0% / 0.08;
+    --sidebar-ring: 79 95% 38%;
+
+    /* Vanta custom tokens - light */
+    --vanta-bg: 0 0% 97%;
+    --vanta-bg-elevated: 0 0% 100%;
+    --vanta-text: 0 0% 9%;
+    --vanta-text-mid: 0 0% 9% / 0.65;
+    --vanta-text-low: 0 0% 9% / 0.45;
+    --vanta-text-muted: 0 0% 9% / 0.3;
+    --vanta-accent: 79 95% 38%;
+    --vanta-accent-bg: 79 95% 38% / 0.08;
+    --vanta-accent-border: 79 95% 38% / 0.25;
+    --vanta-accent-faint: 79 95% 38% / 0.06;
+    --vanta-border: 0 0% 0% / 0.1;
+    --vanta-border-mid: 0 0% 0% / 0.06;
+    --vanta-bubble-in: 0 0% 0% / 0.04;
+    --vanta-bubble-in-border: 0 0% 0% / 0.08;
+    --vanta-bubble-out: 79 95% 38% / 0.1;
+    --vanta-bubble-out-border: 79 95% 38% / 0.2;
+
+    /* Signal type accent colors - darker for light bg */
+    --vanta-accent-teal: 162 89% 32%;
+    --vanta-accent-teal-faint: 162 89% 32% / 0.08;
+    --vanta-accent-teal-border: 162 89% 32% / 0.25;
+    --vanta-accent-amber: 43 89% 38%;
+    --vanta-accent-amber-faint: 43 89% 38% / 0.08;
+    --vanta-accent-amber-border: 43 89% 38% / 0.25;
+    --vanta-accent-violet: 276 89% 45%;
+    --vanta-accent-violet-faint: 276 89% 45% / 0.08;
+    --vanta-accent-violet-border: 276 89% 45% / 0.25;
+
+    --vanta-accent-zoom: 210 100% 42%;
+    --vanta-accent-zoom-faint: 210 100% 42% / 0.08;
+    --vanta-accent-zoom-border: 210 100% 42% / 0.25;
+
+    --vanta-accent-phone: 340 82% 45%;
+    --vanta-accent-phone-faint: 340 82% 45% / 0.08;
+    --vanta-accent-phone-border: 340 82% 45% / 0.25;
+  }
 }
 
 @layer base {
