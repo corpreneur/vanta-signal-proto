@@ -144,7 +144,7 @@ const SignalEntryCard = ({ signal, onClick }: SignalEntryCardProps) => {
                 </span>
               ))}
           </div>
-        )
+        )}
 
         {/* Inline actions row */}
         <div className="flex items-center gap-2 flex-wrap">
