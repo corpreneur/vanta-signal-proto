@@ -6,6 +6,7 @@ import Overlay from "@/components/Overlay";
 import SignalFeed from "@/components/SignalFeed";
 import SignalFilters from "@/components/SignalFilters";
 import TagBrowser from "@/components/TagBrowser";
+import PreMeetingBriefCard from "@/components/PreMeetingBriefCard";
 import type { FilterState } from "@/components/SignalFilters";
 import type { SignalType } from "@/data/signals";
 import { cases } from "@/data/cases";
@@ -60,6 +61,35 @@ const Signals = () => {
     refetchInterval: 60_000,
   });
 
+  // Fetch active pre-meeting briefs
+  const { data: briefs = [] } = useQuery({
+    queryKey: ["pre-meeting-briefs"],
+    queryFn: async () => {
+      const { data: briefRows } = await supabase
+        .from("pre_meeting_briefs")
+        .select("*, upcoming_meetings(title, starts_at)")
+        .eq("dismissed", false)
+        .order("created_at", { ascending: false })
+        .limit(10);
+
+      return (briefRows || []).map((row: Record<string, unknown>) => {
+        const meeting = row.upcoming_meetings as Record<string, unknown> | null;
+        return {
+          id: row.id as string,
+          meeting_id: row.meeting_id as string,
+          brief_text: row.brief_text as string,
+          matched_signals: row.matched_signals as unknown[],
+          attendee_context: row.attendee_context as Record<string, unknown>,
+          created_at: row.created_at as string,
+          dismissed: row.dismissed as boolean,
+          meeting_title: meeting?.title as string | undefined,
+          meeting_starts_at: meeting?.starts_at as string | undefined,
+        };
+      });
+    },
+    refetchInterval: 30_000,
+  });
+
   // Realtime subscription
   useEffect(() => {
     const channel = supabase
@@ -69,6 +99,13 @@ const Signals = () => {
         { event: "INSERT", schema: "public", table: "signals" },
         () => {
           queryClient.invalidateQueries({ queryKey: ["signals"] });
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "pre_meeting_briefs" },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["pre-meeting-briefs"] });
         }
       )
       .subscribe();
@@ -206,6 +243,15 @@ const Signals = () => {
           onChange={setFilters}
           senders={senders}
         />
+
+        {/* Pre-Meeting Briefs */}
+        {briefs.length > 0 && (
+          <div className="mb-6">
+            {briefs.map((brief: any) => (
+              <PreMeetingBriefCard key={brief.id} brief={brief} />
+            ))}
+          </div>
+        )}
 
         {/* Feed */}
         <SignalFeed signals={sortedSignals} filters={filters} />
