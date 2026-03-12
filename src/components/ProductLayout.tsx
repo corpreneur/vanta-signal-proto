@@ -26,7 +26,7 @@ const BREADCRUMB_MAP: Record<string, string> = {
 export default function ProductLayout({ children }: ProductLayoutProps) {
   const location = useLocation();
   const path = location.pathname;
-  const breadcrumb = BREADCRUMB_MAP[path] || (path.startsWith("/case-") ? `Cases · ${path.replace("/case-", "Case ")}` : "Vanta");
+  const breadcrumb = BREADCRUMB_MAP[path] || (path.startsWith("/case/") ? `Cases · Case ${path.replace("/case/", "")}` : "Vanta");
 
   return (
     <SidebarProvider>
