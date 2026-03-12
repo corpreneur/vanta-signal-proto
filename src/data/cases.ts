@@ -65,7 +65,7 @@ export interface CaseData {
 
 export const cases: CaseData[] = [
   {
-    num: "Use Case — 01",
+    num: "Use Case · 01",
     id: "01",
     name: "Signal to Noise",
     cat: "Signal Intelligence · Agentic Orchestration",
