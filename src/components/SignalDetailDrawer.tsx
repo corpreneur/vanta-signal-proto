@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import type { Signal } from "@/data/signals";
+import type { Signal, SignalStatus } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+
+const STATUSES: SignalStatus[] = ["Captured", "In Progress", "Complete"];
 
 function formatTimestamp(iso: string): string {
   return new Date(iso).toLocaleString("en-US", {
