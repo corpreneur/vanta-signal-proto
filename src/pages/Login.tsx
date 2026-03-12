@@ -100,44 +100,11 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-11 bg-muted text-foreground font-mono text-[11px] uppercase tracking-[0.15em] hover:bg-muted-foreground/20 transition-colors disabled:opacity-50 mt-2"
+            className="w-full h-11 bg-stone-300 text-stone-900 font-mono text-[11px] uppercase tracking-[0.15em] hover:bg-stone-200 transition-colors disabled:opacity-50 mt-2"
           >
             {loading ? "Authenticating…" : "Access Platform"}
           </button>
         </form>
-
-        {/* COLOR SAMPLER — temporary */}
-        <div
-          className="w-full mt-6 space-y-2 opacity-0"
-          style={{ animation: "fadeUp 0.5s ease-out 1.2s forwards" }}
-        >
-          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted text-center mb-3">
-            Pick a button color ↓
-          </p>
-          {[
-            { label: "White", bg: "bg-white", text: "text-black" },
-            { label: "Warm Amber", bg: "bg-amber-600", text: "text-white" },
-            { label: "Slate Blue", bg: "bg-slate-500", text: "text-white" },
-            { label: "Dusty Rose", bg: "bg-rose-400/80", text: "text-white" },
-            { label: "Copper", bg: "bg-orange-700", text: "text-white" },
-            { label: "Soft Cream", bg: "bg-stone-300", text: "text-stone-900" },
-          ].map((opt) => (
-            <div
-              key={opt.label}
-              className={`w-full h-11 ${opt.bg} ${opt.text} font-mono text-[11px] uppercase tracking-[0.15em] flex items-center justify-center`}
-            >
-              {opt.label}
-            </div>
-          ))}
-        </div>
-
-        <p
-          className="font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-muted text-center mt-8 opacity-0"
-          style={{ animation: "fadeUp 0.6s ease-out 1.1s forwards" }}
-        >
-          Proprietary · Confidential
-        </p>
-      </div>
     </div>
   );
 };
