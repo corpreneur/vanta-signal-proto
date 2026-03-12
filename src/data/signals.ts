@@ -12,6 +12,8 @@ export interface Signal {
   capturedAt: string; // ISO 8601
   actionsTaken: string[];
   status: SignalStatus;
+  rawPayload?: Record<string, unknown> | null;
+  linqMessageId?: string | null;
 }
 
 export const SIGNAL_TYPE_COLORS: Record<SignalType, { text: string; bg: string; border: string }> = {
