@@ -17,6 +17,7 @@ import {
   BookMarked,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useLocation } from "react-router-dom";
 import { cases } from "@/data/cases";
 import {
