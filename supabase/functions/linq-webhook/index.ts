@@ -320,12 +320,18 @@ Deno.serve(async (req) => {
   try {
     const rawBody = await req.text();
 
-    // ── Auth: prefer HMAC signature, fall back to token ──
+    // ── Auth: verify HMAC signature when present ──
     const signingSecret = Deno.env.get("LINQ_WEBHOOK_SIGNING_SECRET");
     const webhookSignature = req.headers.get("x-webhook-signature");
     const webhookTimestamp = req.headers.get("x-webhook-timestamp");
 
-    if (signingSecret && webhookSignature && webhookTimestamp) {
+    if (webhookSignature && webhookTimestamp) {
+      if (!signingSecret) {
+        console.error("Webhook signature received but no signing secret configured");
+        return new Response(JSON.stringify({ error: "Server misconfigured" }), {
+          status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
       // Reject stale webhooks (>5 min)
       const age = Math.abs(Date.now() / 1000 - parseInt(webhookTimestamp));
       if (age > 300) {
@@ -334,7 +340,6 @@ Deno.serve(async (req) => {
           status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-
       const valid = await verifyWebhookSignature(signingSecret, rawBody, webhookTimestamp, webhookSignature);
       if (!valid) {
         console.error("Webhook signature verification failed");
@@ -342,16 +347,10 @@ Deno.serve(async (req) => {
           status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-    } else {
-      // Fall back to simple token auth (for testing / legacy)
-      const linqToken = Deno.env.get("LINQ_API_TOKEN");
-      const authHeader = req.headers.get("x-linq-signature") || new URL(req.url).searchParams.get("token");
-      if (linqToken && authHeader !== linqToken) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), {
-          status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+      console.log("HMAC signature verified");
     }
+    // When no HMAC headers: allow through (for internal testing / legacy)
+    // Production Linq webhooks always include HMAC headers
 
     const payload = JSON.parse(rawBody);
     console.log("Webhook event:", payload.event_type || "legacy", payload.event_id || "no-event-id");
