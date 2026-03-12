@@ -219,7 +219,7 @@ Deno.serve(async (req) => {
         summary: classification.summary,
         actions_taken: actionsTaken,
         status: "Captured",
-        source: "manual", // using 'manual' until 'phone' source is added to enum
+        source: "phone",
         meeting_id: callId,
         raw_payload: payload,
         captured_at: startedAt,
