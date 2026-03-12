@@ -14,7 +14,8 @@ interface SendRequest {
 
 /** Strip to E.164: remove spaces, dashes, parens — keep leading + */
 function toE164(phone: string): string {
-  return phone.replace(/[\s\-().]/g, "");
+  const digits = phone.replace(/[^\d]/g, "");
+  return digits.startsWith("1") && digits.length === 11 ? `+${digits}` : `+1${digits}`;
 }
 
 Deno.serve(async (req) => {
