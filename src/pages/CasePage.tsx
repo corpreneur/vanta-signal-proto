@@ -121,5 +121,6 @@ const CasePage = () => {
     </>
   );
 };
+};
 
 export default CasePage;
