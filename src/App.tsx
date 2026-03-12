@@ -1,18 +1,18 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Index from "./pages/Index.tsx";
-import Login from "./pages/Login.tsx";
-import NotFound from "./pages/NotFound.tsx";
-import Signals from "./pages/Signals.tsx";
-import CasePage from "./pages/CasePage.tsx";
-import Graph from "./pages/Graph.tsx";
-import PhoneFMC from "./pages/PhoneFMC.tsx";
-import Ontology from "./pages/Ontology.tsx";
-import ProductSignalPage from "./pages/ProductSignalPage.tsx";
-import { Navigate } from "react-router-dom";
+import ProductLayout from "@/components/ProductLayout";
+import Index from "./pages/Index";
+import Login from "./pages/Login";
+import NotFound from "./pages/NotFound";
+import Signals from "./pages/Signals";
+import CasePage from "./pages/CasePage";
+import Graph from "./pages/Graph";
+import PhoneFMC from "./pages/PhoneFMC";
+import Ontology from "./pages/Ontology";
+import ProductSignalPage from "./pages/ProductSignalPage";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const skipAuth = new URLSearchParams(window.location.search).get("skip-auth") === "1";
@@ -31,13 +31,13 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-          <Route path="/signals" element={<ProtectedRoute><Signals /></ProtectedRoute>} />
-          <Route path="/case-:id" element={<ProtectedRoute><CasePage /></ProtectedRoute>} />
-          <Route path="/graph" element={<ProtectedRoute><Graph /></ProtectedRoute>} />
-          <Route path="/phone-fmc" element={<ProtectedRoute><PhoneFMC /></ProtectedRoute>} />
-          <Route path="/ontology" element={<ProtectedRoute><Ontology /></ProtectedRoute>} />
-          <Route path="/product/:signalType" element={<ProtectedRoute><ProductSignalPage /></ProtectedRoute>} />
+          <Route path="/" element={<ProtectedRoute><ProductLayout><Index /></ProductLayout></ProtectedRoute>} />
+          <Route path="/signals" element={<ProtectedRoute><ProductLayout><Signals /></ProductLayout></ProtectedRoute>} />
+          <Route path="/case-:id" element={<ProtectedRoute><ProductLayout><CasePage /></ProductLayout></ProtectedRoute>} />
+          <Route path="/graph" element={<ProtectedRoute><ProductLayout><Graph /></ProductLayout></ProtectedRoute>} />
+          <Route path="/phone-fmc" element={<ProtectedRoute><ProductLayout><PhoneFMC /></ProductLayout></ProtectedRoute>} />
+          <Route path="/ontology" element={<ProtectedRoute><ProductLayout><Ontology /></ProductLayout></ProtectedRoute>} />
+          <Route path="/product/:signalType" element={<ProtectedRoute><ProductLayout><ProductSignalPage /></ProductLayout></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

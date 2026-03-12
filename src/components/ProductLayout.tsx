@@ -1,12 +1,33 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { ProductSidebar } from "@/components/ProductSidebar";
 import { PanelLeft } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 interface ProductLayoutProps {
   children: React.ReactNode;
 }
 
+const BREADCRUMB_MAP: Record<string, string> = {
+  "/": "Dashboard",
+  "/signals": "Platform · Signal Feed",
+  "/graph": "Platform · Relationship Graph",
+  "/ontology": "Platform · Ontology",
+  "/phone-fmc": "Platform · Phone FMC",
+  "/product/intro": "Product · iMessage",
+  "/product/insight": "Product · Insight Engine",
+  "/product/investment": "Product · Investment Intel",
+  "/product/decision": "Product · Decision Capture",
+  "/product/context": "Product · Context Layer",
+  "/product/meeting": "Product · Zoom Meetings",
+  "/product/phone-call": "Product · Native Phone",
+  "/product/noise": "Product · Noise Filter",
+};
+
 export default function ProductLayout({ children }: ProductLayoutProps) {
+  const location = useLocation();
+  const path = location.pathname;
+  const breadcrumb = BREADCRUMB_MAP[path] || (path.startsWith("/case-") ? `Cases · ${path.replace("/case-", "Case ")}` : "Vanta");
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-vanta-bg">
@@ -17,7 +38,7 @@ export default function ProductLayout({ children }: ProductLayoutProps) {
               <PanelLeft className="h-4 w-4" />
             </SidebarTrigger>
             <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-vanta-text-muted">
-              Vanta Product
+              {breadcrumb}
             </span>
           </header>
           <main className="flex-1">

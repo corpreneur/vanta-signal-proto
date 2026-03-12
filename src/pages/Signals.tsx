@@ -1,15 +1,11 @@
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import Nav from "@/components/Nav";
-import NavDrawer from "@/components/NavDrawer";
-import Overlay from "@/components/Overlay";
 import SignalFeed from "@/components/SignalFeed";
 import SignalFilters from "@/components/SignalFilters";
 import TagBrowser from "@/components/TagBrowser";
 import PreMeetingBriefCard from "@/components/PreMeetingBriefCard";
 import type { FilterState } from "@/components/SignalFilters";
 import type { SignalType } from "@/data/signals";
-import { cases } from "@/data/cases";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
 
@@ -46,7 +42,6 @@ const fetchSignals = async (): Promise<Signal[]> => {
 const SIGNAL_TYPES_ORDER: SignalType[] = ["INTRO", "INSIGHT", "INVESTMENT", "DECISION", "CONTEXT", "MEETING", "PHONE_CALL"];
 
 const Signals = () => {
-  const [navOpen, setNavOpen] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     type: "ALL",
     sender: "ALL",
@@ -61,7 +56,6 @@ const Signals = () => {
     refetchInterval: 60_000,
   });
 
-  // Fetch active pre-meeting briefs
   const { data: briefs = [] } = useQuery({
     queryKey: ["pre-meeting-briefs"],
     queryFn: async () => {
@@ -90,7 +84,6 @@ const Signals = () => {
     refetchInterval: 30_000,
   });
 
-  // Realtime subscription
   useEffect(() => {
     const channel = supabase
       .channel("signals-realtime")
@@ -129,7 +122,6 @@ const Signals = () => {
     [signals]
   );
 
-  // Tag counts for the browser
   const tagCounts = useMemo(
     () =>
       SIGNAL_TYPES_ORDER.map((type) => ({
@@ -143,31 +135,12 @@ const Signals = () => {
     setFilters((prev) => ({ ...prev, type }));
   };
 
-  const toggleNav = () => {
-    setNavOpen((prev) => {
-      const next = !prev;
-      document.body.style.overflow = next ? "hidden" : "";
-      return next;
-    });
-  };
-
-  const closeNav = () => {
-    setNavOpen(false);
-    document.body.style.overflow = "";
-  };
-
   const highCount = sortedSignals.filter((s) => s.priority === "high").length;
   const actionCount = sortedSignals.reduce((acc, s) => acc + s.actionsTaken.length, 0);
 
   return (
-    <div className="min-h-screen bg-background">
-      <Nav
-        caseCount={cases.length}
-        onHamburgerClick={toggleNav}
-        navOpen={navOpen}
-      />
-
-      <header className="px-5 pt-28 pb-8 md:px-10 max-w-[1200px] mx-auto">
+    <div className="max-w-[960px] mx-auto px-5 py-10 md:px-10">
+      <header className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <div
             className="w-2 h-2 bg-vanta-accent"
@@ -187,90 +160,41 @@ const Signals = () => {
         </p>
       </header>
 
-      <main className="px-5 pb-20 md:px-10 max-w-[1200px] mx-auto">
-        {/* Stats strip */}
-        <div className="flex flex-wrap gap-6 mb-6 pb-6 border-b border-vanta-border">
-          <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">
-              Signals Captured
-            </p>
-            <p className="font-display text-[24px] text-vanta-text">
-              {sortedSignals.length}
-            </p>
-          </div>
-          <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">
-              High Strength
-            </p>
-            <p className="font-display text-[24px] text-vanta-accent">
-              {highCount}
-            </p>
-          </div>
-          <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">
-              Actions Fired
-            </p>
-            <p className="font-display text-[24px] text-vanta-text">
-              {actionCount}
-            </p>
-          </div>
-          <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">
-              Pipeline
-            </p>
-            <div className="flex items-center gap-2">
-              <div
-                className="w-1.5 h-1.5 bg-vanta-accent"
-                style={{ animation: "pulse-dot 2s ease-in-out infinite" }}
-              />
-              <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-vanta-accent">
-                Active
-              </p>
-            </div>
+      {/* Stats strip */}
+      <div className="flex flex-wrap gap-6 mb-6 pb-6 border-b border-vanta-border">
+        <div>
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Signals Captured</p>
+          <p className="font-display text-[24px] text-vanta-text">{sortedSignals.length}</p>
+        </div>
+        <div>
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">High Strength</p>
+          <p className="font-display text-[24px] text-vanta-accent">{highCount}</p>
+        </div>
+        <div>
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Actions Fired</p>
+          <p className="font-display text-[24px] text-vanta-text">{actionCount}</p>
+        </div>
+        <div>
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Pipeline</p>
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-vanta-accent" style={{ animation: "pulse-dot 2s ease-in-out infinite" }} />
+            <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-vanta-accent">Active</p>
           </div>
         </div>
+      </div>
 
-        {/* Tag Browser */}
-        <TagBrowser
-          tagCounts={tagCounts}
-          activeType={filters.type}
-          onSelect={handleTagSelect}
-        />
+      <TagBrowser tagCounts={tagCounts} activeType={filters.type} onSelect={handleTagSelect} />
+      <SignalFilters filters={filters} onChange={setFilters} senders={senders} />
 
-        {/* Filters */}
-        <SignalFilters
-          filters={filters}
-          onChange={setFilters}
-          senders={senders}
-        />
+      {briefs.length > 0 && (
+        <div className="mb-6">
+          {briefs.map((brief: any) => (
+            <PreMeetingBriefCard key={brief.id} brief={brief} />
+          ))}
+        </div>
+      )}
 
-        {/* Pre-Meeting Briefs */}
-        {briefs.length > 0 && (
-          <div className="mb-6">
-            {briefs.map((brief: any) => (
-              <PreMeetingBriefCard key={brief.id} brief={brief} />
-            ))}
-          </div>
-        )}
-
-        {/* Feed */}
-        <SignalFeed signals={sortedSignals} filters={filters} />
-      </main>
-
-      <Overlay visible={navOpen} onClick={closeNav} />
-
-      <NavDrawer
-        cases={cases}
-        open={navOpen}
-        onClose={closeNav}
-        onOpenCase={() => {}}
-      />
-
-      <footer className="border-t border-vanta-border px-5 py-8 md:px-10">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted text-center">
-          &copy; 2026 Vanta Wireless. All rights reserved.
-        </p>
-      </footer>
+      <SignalFeed signals={sortedSignals} filters={filters} />
     </div>
   );
 };
