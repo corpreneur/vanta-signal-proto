@@ -71,6 +71,11 @@
     --vanta-accent-violet: 276 89% 63%;
     --vanta-accent-violet-faint: 276 89% 63% / 0.06;
     --vanta-accent-violet-border: 276 89% 63% / 0.2;
+
+    /* Zoom Meeting Intelligence */
+    --vanta-accent-zoom: 210 100% 59%;
+    --vanta-accent-zoom-faint: 210 100% 59% / 0.06;
+    --vanta-accent-zoom-border: 210 100% 59% / 0.2;
   }
 }
 

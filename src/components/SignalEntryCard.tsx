@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, Copy, Check, CheckCircle } from "lucide-react";
+import { ChevronDown, Copy, Check, CheckCircle, Video } from "lucide-react";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
@@ -99,11 +99,16 @@ const SignalEntryCard = ({ signal, onClick }: SignalEntryCardProps) => {
             >
               {signal.priority}
             </span>
-            {signal.source !== "linq" && (
+            {signal.source === "recall" ? (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border border-vanta-accent-zoom-border text-vanta-accent-zoom bg-vanta-accent-zoom-faint">
+                <Video className="w-3 h-3" />
+                Zoom
+              </span>
+            ) : signal.source !== "linq" ? (
               <span className="inline-block px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border border-vanta-border text-vanta-text-muted">
                 {signal.source}
               </span>
-            )}
+            ) : null}
           </div>
           <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-vanta-text-muted whitespace-nowrap">
             {formatTimestamp(signal.capturedAt)}

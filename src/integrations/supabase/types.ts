@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      meeting_artifacts: {
+        Row: {
+          attendees: Json | null
+          created_at: string
+          id: string
+          recording_url: string | null
+          signal_id: string
+          summary_text: string | null
+          transcript_json: Json | null
+        }
+        Insert: {
+          attendees?: Json | null
+          created_at?: string
+          id?: string
+          recording_url?: string | null
+          signal_id: string
+          summary_text?: string | null
+          transcript_json?: Json | null
+        }
+        Update: {
+          attendees?: Json | null
+          created_at?: string
+          id?: string
+          recording_url?: string | null
+          signal_id?: string
+          summary_text?: string | null
+          transcript_json?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_artifacts_signal_id_fkey"
+            columns: ["signal_id"]
+            isOneToOne: false
+            referencedRelation: "signals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       signals: {
         Row: {
           actions_taken: string[]
@@ -22,6 +60,7 @@ export type Database = {
           email_metadata: Json | null
           id: string
           linq_message_id: string | null
+          meeting_id: string | null
           priority: Database["public"]["Enums"]["signal_priority"]
           raw_payload: Json | null
           sender: string
@@ -38,6 +77,7 @@ export type Database = {
           email_metadata?: Json | null
           id?: string
           linq_message_id?: string | null
+          meeting_id?: string | null
           priority?: Database["public"]["Enums"]["signal_priority"]
           raw_payload?: Json | null
           sender: string
@@ -54,6 +94,7 @@ export type Database = {
           email_metadata?: Json | null
           id?: string
           linq_message_id?: string | null
+          meeting_id?: string | null
           priority?: Database["public"]["Enums"]["signal_priority"]
           raw_payload?: Json | null
           sender?: string
@@ -74,7 +115,7 @@ export type Database = {
     }
     Enums: {
       signal_priority: "high" | "medium" | "low"
-      signal_source: "linq" | "gmail" | "manual"
+      signal_source: "linq" | "gmail" | "manual" | "recall"
       signal_status: "Captured" | "In Progress" | "Complete"
       signal_type:
         | "INTRO"
@@ -83,6 +124,7 @@ export type Database = {
         | "DECISION"
         | "CONTEXT"
         | "NOISE"
+        | "MEETING"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -211,7 +253,7 @@ export const Constants = {
   public: {
     Enums: {
       signal_priority: ["high", "medium", "low"],
-      signal_source: ["linq", "gmail", "manual"],
+      signal_source: ["linq", "gmail", "manual", "recall"],
       signal_status: ["Captured", "In Progress", "Complete"],
       signal_type: [
         "INTRO",
@@ -220,6 +262,7 @@ export const Constants = {
         "DECISION",
         "CONTEXT",
         "NOISE",
+        "MEETING",
       ],
     },
   },

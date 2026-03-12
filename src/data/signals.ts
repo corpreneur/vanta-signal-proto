@@ -1,7 +1,7 @@
-export type SignalType = 'INTRO' | 'INSIGHT' | 'INVESTMENT' | 'DECISION' | 'CONTEXT' | 'NOISE';
+export type SignalType = 'INTRO' | 'INSIGHT' | 'INVESTMENT' | 'DECISION' | 'CONTEXT' | 'NOISE' | 'MEETING';
 export type SignalPriority = 'high' | 'medium' | 'low';
 export type SignalStatus = 'Captured' | 'In Progress' | 'Complete';
-export type SignalSource = 'linq' | 'gmail' | 'manual';
+export type SignalSource = 'linq' | 'gmail' | 'manual' | 'recall';
 
 export interface Signal {
   id: string;
@@ -24,6 +24,17 @@ export interface Signal {
     thread_id?: string;
     date?: string;
   } | null;
+  meetingId?: string | null;
+}
+
+export interface MeetingArtifact {
+  id: string;
+  signalId: string;
+  createdAt: string;
+  transcriptJson?: Record<string, unknown>[] | null;
+  summaryText?: string | null;
+  recordingUrl?: string | null;
+  attendees?: Record<string, unknown>[] | null;
 }
 
 export const SIGNAL_TYPE_COLORS: Record<SignalType, { text: string; bg: string; border: string }> = {
@@ -56,5 +67,10 @@ export const SIGNAL_TYPE_COLORS: Record<SignalType, { text: string; bg: string; 
     text: 'text-vanta-text-muted',
     bg: 'bg-vanta-bg-elevated',
     border: 'border-vanta-border',
+  },
+  MEETING: {
+    text: 'text-vanta-accent-zoom',
+    bg: 'bg-vanta-accent-zoom-faint',
+    border: 'border-vanta-accent-zoom-border',
   },
 };

@@ -38,10 +38,11 @@ const fetchSignals = async (): Promise<Signal[]> => {
     rawPayload: row.raw_payload as Record<string, unknown> | null,
     linqMessageId: row.linq_message_id,
     emailMetadata: (row as Record<string, unknown>).email_metadata as Signal["emailMetadata"] || null,
+    meetingId: (row as Record<string, unknown>).meeting_id as string | null,
   }));
 };
 
-const SIGNAL_TYPES_ORDER: SignalType[] = ["INTRO", "INSIGHT", "INVESTMENT", "DECISION", "CONTEXT"];
+const SIGNAL_TYPES_ORDER: SignalType[] = ["INTRO", "INSIGHT", "INVESTMENT", "DECISION", "CONTEXT", "MEETING"];
 
 const Signals = () => {
   const [navOpen, setNavOpen] = useState(false);
