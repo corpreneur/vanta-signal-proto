@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
     }
 
     const body: SendRequest = await req.json();
-    const recipients = Array.isArray(body.to) ? body.to : [body.to];
+    const recipients = (Array.isArray(body.to) ? body.to : [body.to]).map(toE164);
 
     if (!body.message || body.message.trim().length === 0) {
       return new Response(
