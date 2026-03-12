@@ -268,6 +268,35 @@ const Signals = () => {
           <TagBrowser tagCounts={tagCounts} activeType={filters.type} onSelect={handleTagSelect} />
           <SignalFilters filters={filters} onChange={setFilters} senders={senders} />
 
+          {/* Sort & due date controls */}
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <button
+              onClick={() => setSortMode(sortMode === "captured" ? "due_date" : "captured")}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.15em] border transition-colors ${
+                sortMode === "due_date"
+                  ? "border-vanta-accent text-vanta-accent bg-vanta-accent-faint"
+                  : "border-vanta-border text-vanta-text-low hover:border-vanta-accent-border hover:text-vanta-accent"
+              }`}
+            >
+              <ArrowUpDown className="w-3 h-3" />
+              {sortMode === "due_date" ? "Sort: Due Date" : "Sort: Recent"}
+            </button>
+
+            {overdueCount > 0 && (
+              <button
+                onClick={() => setShowOverdueOnly(!showOverdueOnly)}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.15em] border transition-colors ${
+                  showOverdueOnly
+                    ? "border-destructive text-destructive bg-destructive/10"
+                    : "border-vanta-border text-vanta-text-low hover:border-destructive hover:text-destructive"
+                }`}
+              >
+                <AlertTriangle className="w-3 h-3" />
+                Overdue Only ({overdueCount})
+              </button>
+            )}
+          </div>
+
           {briefs.length > 0 && (
             <div className="mb-6">
               {briefs.map((brief: any) => (
