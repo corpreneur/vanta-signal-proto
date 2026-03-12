@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.recall-webhook]
 verify_jwt = false
+
+[functions.pre-meeting-brief]
+verify_jwt = false
