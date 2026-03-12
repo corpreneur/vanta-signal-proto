@@ -155,7 +155,7 @@ const Signals = () => {
         </h1>
         <p className="font-sans text-[13px] md:text-[14px] leading-[1.6] text-vanta-text-mid max-w-[640px]">
           A curated feed of intellectual capital captured from real conversations.
-          Every message is evaluated through a two-stage AI pipeline — what
+          Every message is evaluated through a two-stage AI pipeline… what
           matters is extracted before it disappears into the scroll.
         </p>
       </header>

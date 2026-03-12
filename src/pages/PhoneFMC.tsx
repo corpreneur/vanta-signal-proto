@@ -109,7 +109,7 @@ const PhoneFMC = () => {
         </div>
       </section>
 
-      {/* The Moat — Relationship Graph */}
+      {/* The Moat, Relationship Graph */}
       <section className="mb-12">
         <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-low mb-4">Second-Order Effect: The Relationship Graph</p>
         <div className="border-l-2 border-vanta-accent-phone pl-5 mb-5">
