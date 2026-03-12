@@ -50,8 +50,6 @@ const SignalFeed = ({ signals, filters, showPromote }: SignalFeedProps) => {
             key={signal.id}
             signal={signal}
             onClick={() => setSelectedSignal(signal)}
-            showPromote={showPromote}
-          />
           />
         ))}
       </div>
