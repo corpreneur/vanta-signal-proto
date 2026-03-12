@@ -28,7 +28,7 @@ const CHANNELS: ChannelDef[] = [
     source: "phone",
     capture: "Vanta MVNO… call audio intercepted at SIP level via ConnectX. Transcription via Whisper. Zero behavioral change.",
     signalTypes: ["PHONE_CALL"],
-    narrative: "The phone call is the highest-density, most systematically ignored communication channel. Vanta doesn't ask the user to change behavior — it owns the infrastructure.",
+    narrative: "The phone call is the highest-density, most systematically ignored communication channel. Vanta doesn't ask the user to change behavior… it owns the infrastructure.",
   },
   {
     id: "zoom", label: "Zoom Meetings", icon: Video,
