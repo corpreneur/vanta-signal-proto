@@ -9,6 +9,8 @@ import NotFound from "./pages/NotFound.tsx";
 import Signals from "./pages/Signals.tsx";
 import CasePage from "./pages/CasePage.tsx";
 import Graph from "./pages/Graph.tsx";
+import PhoneFMC from "./pages/PhoneFMC.tsx";
+import Ontology from "./pages/Ontology.tsx";
 import { Navigate } from "react-router-dom";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -32,6 +34,8 @@ const App = () => (
           <Route path="/signals" element={<ProtectedRoute><Signals /></ProtectedRoute>} />
           <Route path="/case-:id" element={<ProtectedRoute><CasePage /></ProtectedRoute>} />
           <Route path="/graph" element={<ProtectedRoute><Graph /></ProtectedRoute>} />
+          <Route path="/phone-fmc" element={<ProtectedRoute><PhoneFMC /></ProtectedRoute>} />
+          <Route path="/ontology" element={<ProtectedRoute><Ontology /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
