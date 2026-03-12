@@ -36,14 +36,20 @@ const fetchSignals = async (): Promise<Signal[]> => {
 };
 
 export default function Graph() {
-  const [navOpen, setNavOpen] = useState(false);
   const { data: signals = [], isLoading } = useQuery({ queryKey: ["signals-graph"], queryFn: fetchSignals });
 
   return (
     <div className="min-h-screen bg-vanta-bg text-vanta-text">
-      <Nav onToggleNav={() => setNavOpen((o) => !o)} />
+      <nav className="sticky top-0 z-50 flex items-center justify-between px-5 py-5 md:px-10 bg-background/95 backdrop-blur-md border-b border-vanta-border">
+        <a href="/" className="font-sans text-[17px] font-extrabold tracking-[0.2em] uppercase text-foreground">
+          VANTA
+        </a>
+        <a href="/signals?skip-auth=1" className="font-mono text-[11px] text-primary px-2.5 py-1 bg-vanta-accent-bg border border-vanta-accent-border hover:bg-vanta-accent-faint transition-colors">
+          ← Signals
+        </a>
+      </nav>
 
-      <main className="max-w-4xl mx-auto px-4 pt-24 pb-16">
+      <main className="max-w-4xl mx-auto px-4 pt-12 pb-16">
         <header className="mb-8">
           <h1 className="font-display text-2xl md:text-3xl text-foreground tracking-tight">
             Relationship Graph
@@ -61,9 +67,6 @@ export default function Graph() {
           <RelationshipGraph signals={signals} />
         )}
       </main>
-
-      <Overlay visible={navOpen} onClick={() => setNavOpen(false)} />
-      <NavDrawer open={navOpen} onClose={() => setNavOpen(false)} />
     </div>
   );
 }
