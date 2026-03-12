@@ -4,6 +4,7 @@ export interface FilterState {
   type: SignalType | "ALL";
   sender: string;
   priority: SignalPriority | "ALL";
+  search: string;
 }
 
 interface SignalFiltersProps {
