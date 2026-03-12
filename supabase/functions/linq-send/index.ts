@@ -11,6 +11,11 @@ interface SendRequest {
   message: string;
 }
 
+/** Strip to E.164: remove spaces, dashes, parens — keep leading + */
+function toE164(phone: string): string {
+  return phone.replace(/[\s\-().]/g, "");
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
