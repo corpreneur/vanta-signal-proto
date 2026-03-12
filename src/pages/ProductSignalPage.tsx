@@ -1,5 +1,5 @@
 import { useParams, Navigate } from "react-router-dom";
-import { MessageSquare, Lightbulb, TrendingUp, Gavel, FileText, Video, Phone, Volume2 } from "lucide-react";
+import { MessageSquare, Lightbulb, TrendingUp, Gavel, FileText, Video, Phone, Volume2, Mail, Calendar } from "lucide-react";
 import type { SignalType } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 
