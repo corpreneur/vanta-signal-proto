@@ -310,6 +310,5 @@ export default function ProductSignalPage() {
           ))}
         </div>
       </div>
-    </ProductLayout>
   );
 }
