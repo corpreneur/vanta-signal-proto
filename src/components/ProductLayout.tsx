@@ -13,13 +13,15 @@ const BREADCRUMB_MAP: Record<string, string> = {
   "/graph": "Platform · Relationship Graph",
   "/ontology": "Platform · Ontology",
   "/phone-fmc": "Platform · Phone FMC",
-  "/product/intro": "Product · iMessage",
+  "/product/intro": "Channel · iMessage",
+  "/product/phone-call": "Channel · Phone",
+  "/product/meeting": "Channel · Zoom",
+  "/product/email": "Channel · Email",
+  "/product/calendar": "Channel · Calendar",
   "/product/insight": "Product · Insight Engine",
   "/product/investment": "Product · Investment Intel",
   "/product/decision": "Product · Decision Capture",
   "/product/context": "Product · Context Layer",
-  "/product/meeting": "Product · Zoom Meetings",
-  "/product/phone-call": "Product · Native Phone",
   "/product/noise": "Product · Noise Filter",
 };
 
