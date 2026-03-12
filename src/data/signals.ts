@@ -24,6 +24,17 @@ export interface Signal {
     thread_id?: string;
     date?: string;
   } | null;
+  meetingId?: string | null;
+}
+
+export interface MeetingArtifact {
+  id: string;
+  signalId: string;
+  createdAt: string;
+  transcriptJson?: Record<string, unknown>[] | null;
+  summaryText?: string | null;
+  recordingUrl?: string | null;
+  attendees?: Record<string, unknown>[] | null;
 }
 
 export const SIGNAL_TYPE_COLORS: Record<SignalType, { text: string; bg: string; border: string }> = {

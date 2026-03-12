@@ -88,6 +88,9 @@ export default {
           "accent-violet": "hsl(var(--vanta-accent-violet))",
           "accent-violet-faint": "hsl(var(--vanta-accent-violet-faint))",
           "accent-violet-border": "hsl(var(--vanta-accent-violet-border))",
+          "accent-zoom": "hsl(var(--vanta-accent-zoom))",
+          "accent-zoom-faint": "hsl(var(--vanta-accent-zoom-faint))",
+          "accent-zoom-border": "hsl(var(--vanta-accent-zoom-border))",
         },
       },
       borderRadius: {
