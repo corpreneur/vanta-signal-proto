@@ -13,6 +13,7 @@ export const mockSignals: Signal[] = [
     capturedAt: '2026-03-11T07:16:00Z',
     actionsTaken: ['BIO_RESEARCH', 'MEETING_PREP', 'EMAIL_DRAFT', 'AGENT_BUILD'],
     status: 'Complete',
+    source: 'linq',
   },
   {
     id: 'sig_002',
