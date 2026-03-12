@@ -52,6 +52,50 @@ export type Database = {
           },
         ]
       }
+      pre_meeting_briefs: {
+        Row: {
+          attendee_context: Json
+          brief_text: string
+          created_at: string
+          delivered_dashboard: boolean
+          delivered_linq: boolean
+          dismissed: boolean
+          id: string
+          matched_signals: Json
+          meeting_id: string
+        }
+        Insert: {
+          attendee_context?: Json
+          brief_text: string
+          created_at?: string
+          delivered_dashboard?: boolean
+          delivered_linq?: boolean
+          dismissed?: boolean
+          id?: string
+          matched_signals?: Json
+          meeting_id: string
+        }
+        Update: {
+          attendee_context?: Json
+          brief_text?: string
+          created_at?: string
+          delivered_dashboard?: boolean
+          delivered_linq?: boolean
+          dismissed?: boolean
+          id?: string
+          matched_signals?: Json
+          meeting_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pre_meeting_briefs_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "upcoming_meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       signals: {
         Row: {
           actions_taken: string[]
@@ -103,6 +147,42 @@ export type Database = {
           source_message?: string
           status?: Database["public"]["Enums"]["signal_status"]
           summary?: string
+        }
+        Relationships: []
+      }
+      upcoming_meetings: {
+        Row: {
+          attendees: Json
+          briefed: boolean
+          calendar_event_id: string | null
+          created_at: string
+          ends_at: string | null
+          id: string
+          starts_at: string
+          title: string
+          zoom_meeting_id: string | null
+        }
+        Insert: {
+          attendees?: Json
+          briefed?: boolean
+          calendar_event_id?: string | null
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          starts_at: string
+          title: string
+          zoom_meeting_id?: string | null
+        }
+        Update: {
+          attendees?: Json
+          briefed?: boolean
+          calendar_event_id?: string | null
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          starts_at?: string
+          title?: string
+          zoom_meeting_id?: string | null
         }
         Relationships: []
       }
