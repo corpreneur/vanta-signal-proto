@@ -27,8 +27,9 @@ Deno.serve(async (req) => {
     const linqApiKey = Deno.env.get("LINQ_PARTNER_API_KEY");
     if (!linqApiKey) throw new Error("LINQ_PARTNER_API_KEY is not configured");
 
-    const fromNumber = Deno.env.get("LINQ_FROM_NUMBER");
-    if (!fromNumber) throw new Error("LINQ_FROM_NUMBER is not configured");
+    const rawFromNumber = Deno.env.get("LINQ_FROM_NUMBER");
+    if (!rawFromNumber) throw new Error("LINQ_FROM_NUMBER is not configured");
+    const fromNumber = toE164(rawFromNumber);
 
     const body: SendRequest = await req.json();
 
