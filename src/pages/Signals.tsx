@@ -32,6 +32,8 @@ const fetchSignals = async (): Promise<Signal[]> => {
     capturedAt: row.captured_at,
     actionsTaken: row.actions_taken || [],
     status: row.status,
+    rawPayload: row.raw_payload as Record<string, unknown> | null,
+    linqMessageId: row.linq_message_id,
   }));
 };
 

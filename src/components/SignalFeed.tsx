@@ -1,6 +1,8 @@
+import { useState } from "react";
 import type { Signal } from "@/data/signals";
 import type { FilterState } from "@/components/SignalFilters";
 import SignalEntryCard from "@/components/SignalEntryCard";
+import SignalDetailDrawer from "@/components/SignalDetailDrawer";
 
 interface SignalFeedProps {
   signals: Signal[];
@@ -8,6 +10,8 @@ interface SignalFeedProps {
 }
 
 const SignalFeed = ({ signals, filters }: SignalFeedProps) => {
+  const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
+
   const filtered = signals.filter((s) => {
     if (filters.type !== "ALL" && s.signalType !== filters.type) return false;
     if (filters.sender !== "ALL" && s.sender !== filters.sender) return false;
@@ -30,11 +34,23 @@ const SignalFeed = ({ signals, filters }: SignalFeedProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-px">
-      {filtered.map((signal) => (
-        <SignalEntryCard key={signal.id} signal={signal} />
-      ))}
-    </div>
+    <>
+      <div className="flex flex-col gap-px">
+        {filtered.map((signal) => (
+          <SignalEntryCard
+            key={signal.id}
+            signal={signal}
+            onClick={() => setSelectedSignal(signal)}
+          />
+        ))}
+      </div>
+
+      <SignalDetailDrawer
+        signal={selectedSignal}
+        open={!!selectedSignal}
+        onClose={() => setSelectedSignal(null)}
+      />
+    </>
   );
 };
 

@@ -28,13 +28,17 @@ function formatAction(action: string): string {
 
 interface SignalEntryCardProps {
   signal: Signal;
+  onClick?: () => void;
 }
 
-const SignalEntryCard = ({ signal }: SignalEntryCardProps) => {
+const SignalEntryCard = ({ signal, onClick }: SignalEntryCardProps) => {
   const colors = SIGNAL_TYPE_COLORS[signal.signalType];
 
   return (
-    <div className="border border-vanta-border bg-vanta-bg-elevated p-5 md:p-6 transition-colors hover:border-vanta-border-mid">
+    <div
+      className="border border-vanta-border bg-vanta-bg-elevated p-5 md:p-6 transition-colors hover:border-vanta-border-mid cursor-pointer"
+      onClick={onClick}
+    >
       {/* Header row: badge + timestamp */}
       <div className="flex items-start justify-between gap-4 mb-3">
         <div className="flex items-center gap-3">
