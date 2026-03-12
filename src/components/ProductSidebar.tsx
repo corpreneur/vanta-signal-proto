@@ -79,7 +79,7 @@ export function ProductSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Dashboard */}
+        {/* Dashboard + Core */}
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -96,6 +96,20 @@ export function ProductSidebar() {
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              {coreItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to={`${item.url}?skip-auth=1`}
+                      className="flex items-center gap-2 px-2 py-1.5 font-mono text-[11px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
+                      activeClassName="text-foreground bg-vanta-bg-elevated"
+                    >
+                      <item.icon className="h-3.5 w-3.5 shrink-0" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
