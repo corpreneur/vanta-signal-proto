@@ -1,4 +1,10 @@
 project_id = "fwmrhpayssaiuhqzzeig"
 
+[functions.linq-webhook]
+verify_jwt = false
+
+[functions.linq-send]
+verify_jwt = false
+
 [functions.linq-register-webhook]
 verify_jwt = false
