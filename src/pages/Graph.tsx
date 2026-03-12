@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import RelationshipGraph from "@/components/RelationshipGraph";
-import RelationshipGraph from "@/components/RelationshipGraph";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
 
