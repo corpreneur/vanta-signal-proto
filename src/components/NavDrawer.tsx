@@ -1,4 +1,5 @@
 import type { CaseData } from "@/data/cases";
+import { useNavigate } from "react-router-dom";
 
 interface NavDrawerProps {
   cases: CaseData[];
@@ -8,6 +9,7 @@ interface NavDrawerProps {
 }
 
 const NavDrawer = ({ cases, open, onClose, onOpenCase }: NavDrawerProps) => {
+  const navigate = useNavigate();
   return (
     <div
       className={`fixed top-0 right-0 z-50 h-full w-full max-w-[360px] bg-background border-l border-vanta-border overflow-y-auto transition-transform duration-[400ms] ease-drawer ${
@@ -29,6 +31,36 @@ const NavDrawer = ({ cases, open, onClose, onOpenCase }: NavDrawerProps) => {
           >
             ×
           </button>
+        </div>
+
+        {/* Signal Feed link */}
+        <div className="mb-8 border-b border-vanta-border pb-4">
+          <button
+            onClick={() => { navigate('/signals'); onClose(); }}
+            className="w-full text-left group"
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <div
+                className="w-1.5 h-1.5 bg-vanta-accent"
+                style={{ animation: 'pulse-dot 2s ease-in-out infinite' }}
+              />
+              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent">
+                Live
+              </span>
+            </div>
+            <p className="font-display text-[20px] text-foreground group-hover:text-primary transition-colors">
+              Signal Feed
+            </p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.12em] text-vanta-text-low mt-1">
+              Auto Signal Detection Pipeline
+            </p>
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2 mb-4">
+          <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-low">
+            Use Cases
+          </span>
         </div>
 
         <ul className="space-y-1">

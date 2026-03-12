@@ -60,6 +60,17 @@
     --vanta-bubble-in-border: 0 0% 100% / 0.07;
     --vanta-bubble-out: 79 95% 64% / 0.09;
     --vanta-bubble-out-border: 79 95% 64% / 0.18;
+
+    /* Signal type accent colors */
+    --vanta-accent-teal: 162 89% 63%;
+    --vanta-accent-teal-faint: 162 89% 63% / 0.06;
+    --vanta-accent-teal-border: 162 89% 63% / 0.2;
+    --vanta-accent-amber: 43 89% 63%;
+    --vanta-accent-amber-faint: 43 89% 63% / 0.06;
+    --vanta-accent-amber-border: 43 89% 63% / 0.2;
+    --vanta-accent-violet: 276 89% 63%;
+    --vanta-accent-violet-faint: 276 89% 63% / 0.06;
+    --vanta-accent-violet-border: 276 89% 63% / 0.2;
   }
 }
 
