@@ -7,6 +7,7 @@ import SignalDetailDrawer from "@/components/SignalDetailDrawer";
 interface SignalFeedProps {
   signals: Signal[];
   filters: FilterState;
+  showPromote?: boolean;
 }
 
 const SignalFeed = ({ signals, filters }: SignalFeedProps) => {
