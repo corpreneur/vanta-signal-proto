@@ -126,10 +126,10 @@ export function ProductSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={`${item.url}?skip-auth=1`}
-                      className="flex items-center gap-2 px-2 py-1.5 font-mono text-[11px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
-                      activeClassName="text-foreground bg-vanta-bg-elevated border-l-2 border-l-primary -ml-px"
+                      className="flex items-center gap-2 px-2 py-1.5 font-mono text-[11px] uppercase tracking-wider text-vanta-text-mid hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
+                      activeClassName="text-vanta-accent bg-vanta-bg-elevated border-l-2 border-l-primary -ml-px"
                     >
-                      <item.icon className={`h-3.5 w-3.5 shrink-0 ${item.color}`} />
+                      <item.icon className="h-3.5 w-3.5 shrink-0" />
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
