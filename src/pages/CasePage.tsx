@@ -119,13 +119,7 @@ const CasePage = () => {
         {/* Tags */}
         <CaseTags tags={caseData.tags} />
       </article>
-
-      <footer className="border-t border-vanta-border px-5 py-8 md:px-10">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted text-center">
-          © 2026 Vanta Wireless. All rights reserved.
-        </p>
-      </footer>
-    </div>
+    </ProductLayout>
   );
 };
 
