@@ -43,7 +43,7 @@ interface SignalEntryCardProps {
   showPromote?: boolean;
 }
 
-const SignalEntryCard = ({ signal, onClick }: SignalEntryCardProps) => {
+const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps) => {
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
   const [markingReviewed, setMarkingReviewed] = useState(false);
