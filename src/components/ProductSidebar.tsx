@@ -82,7 +82,7 @@ function CollapsibleNavGroup({ label, items, collapsed, currentPath, activeClass
     <Collapsible defaultOpen={hasActiveChild}>
       <SidebarGroup>
         <CollapsibleTrigger className="flex items-center gap-1.5 w-full px-2 py-2 font-mono text-[10px] uppercase tracking-[0.15em] text-vanta-text-low hover:text-foreground transition-colors group">
-          <ChevronRight className="h-3 w-3 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+          <ChevronRight className="h-3.5 w-3.5 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
           {!collapsed && <span>{label}</span>}
         </CollapsibleTrigger>
         <CollapsibleContent>
