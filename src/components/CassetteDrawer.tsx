@@ -79,6 +79,45 @@ const CassetteDrawer = ({ caseData, onClose }: CassetteDrawerProps) => {
                 return section.quote ? <CaseQuote key={i} quote={section.quote} /> : null;
               case "hr":
                 return <hr key={i} className="border-vanta-border my-8" />;
+              case "bio":
+                return (
+                  <div key={i} className="mb-8">
+                    <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-low mb-4">
+                      {section.label}
+                    </p>
+                    <div className="space-y-3 border border-vanta-border p-4">
+                      {section.bioItems?.map((item, j) => (
+                        <div key={j}>
+                          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-primary mb-0.5">
+                            {item.key}
+                          </p>
+                          <p className="font-sans text-[13px] text-vanta-text-mid leading-relaxed">
+                            {item.value}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              case "meeting-prep":
+                return (
+                  <div key={i} className="mb-8">
+                    <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-low mb-4">
+                      {section.label}
+                    </p>
+                    <div className="space-y-4">
+                      {section.prepItems?.map((item, j) => (
+                        <div key={j} className="flex gap-3">
+                          <span className="font-mono text-[11px] text-primary mt-0.5">{item.n}</span>
+                          <div>
+                            <p className="font-sans text-[13px] text-foreground font-medium mb-1">{item.title}</p>
+                            <p className="font-sans text-[12px] text-vanta-text-mid leading-relaxed">{item.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
               case "signal-architecture":
                 return (
                   <div key={i} className="mb-8 p-5 bg-vanta-accent-faint border border-vanta-accent-border">

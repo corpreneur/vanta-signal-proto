@@ -24,11 +24,24 @@ export interface Quote {
   attr: string;
 }
 
+export interface BioItem {
+  key: string;
+  value: string;
+}
+
+export interface PrepItem {
+  n: string;
+  title: string;
+  desc: string;
+}
+
 export interface CaseSection {
-  type: 'steps' | 'quote' | 'hr' | 'signal-architecture' | 'five-layers';
+  type: 'steps' | 'quote' | 'hr' | 'signal-architecture' | 'five-layers' | 'bio' | 'meeting-prep';
   label?: string;
   steps?: Step[];
   quote?: Quote;
+  bioItems?: BioItem[];
+  prepItems?: PrepItem[];
 }
 
 export interface CaseData {
