@@ -75,7 +75,7 @@ interface CollapsibleNavGroupProps {
   activeClassName?: string;
 }
 
-function CollapsibleNavGroup({ label, items, collapsed, currentPath, activeClassName = "text-foreground bg-vanta-bg-elevated" }: CollapsibleNavGroupProps) {
+function CollapsibleNavGroup({ label, items, collapsed, currentPath, activeClassName = "border-l-2 border-vanta-accent text-foreground bg-vanta-bg-elevated" }: CollapsibleNavGroupProps) {
   const hasActiveChild = items.some((item) => currentPath === item.url || currentPath.startsWith(item.url + "/"));
 
   return (
@@ -93,7 +93,7 @@ function CollapsibleNavGroup({ label, items, collapsed, currentPath, activeClass
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={`${item.url}?skip-auth=1`}
-                      className="group/nav flex items-center gap-2 px-2 py-2 pl-6 font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5"
+                      className="group/nav flex items-center gap-2 px-2 py-2 pl-6 border-l-2 border-transparent font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5"
                       activeClassName={activeClassName}
                     >
                       <item.icon className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover/nav:scale-110" />
@@ -136,8 +136,8 @@ export function ProductSidebar() {
                   <NavLink
                     to="/?skip-auth=1"
                     end
-                    className="group/nav flex items-center gap-2 px-2 py-2 font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-vanta-accent hover:bg-vanta-accent-faint transition-all duration-200 hover:translate-x-0.5"
-                    activeClassName="text-vanta-accent bg-vanta-accent-faint"
+                    className="group/nav flex items-center gap-2 px-2 py-2 border-l-2 border-transparent font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-vanta-accent hover:bg-vanta-accent-faint transition-all duration-200 hover:translate-x-0.5"
+                    activeClassName="border-l-2 border-vanta-accent text-vanta-accent bg-vanta-accent-faint"
                   >
                     <LayoutDashboard className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover/nav:scale-110" />
                     {!collapsed && <span>Dashboard</span>}
@@ -149,8 +149,8 @@ export function ProductSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={`${item.url}?skip-auth=1`}
-                      className="group/nav flex items-center gap-2 px-2 py-2 font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5"
-                      activeClassName="text-foreground bg-vanta-bg-elevated"
+                      className="group/nav flex items-center gap-2 px-2 py-2 border-l-2 border-transparent font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5"
+                      activeClassName="border-l-2 border-vanta-accent text-foreground bg-vanta-bg-elevated"
                     >
                       <item.icon className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover/nav:scale-110" />
                       {!collapsed && <span>{item.title}</span>}
@@ -181,8 +181,8 @@ export function ProductSidebar() {
                       <SidebarMenuButton asChild>
                         <NavLink
                           to={`/case/${c.id}?skip-auth=1`}
-                          className="group/nav flex items-center gap-2 px-2 py-2 pl-6 font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5"
-                          activeClassName="text-foreground bg-vanta-bg-elevated"
+                          className="group/nav flex items-center gap-2 px-2 py-2 pl-6 border-l-2 border-transparent font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5"
+                          activeClassName="border-l-2 border-vanta-accent text-foreground bg-vanta-bg-elevated"
                         >
                           <BookMarked className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover/nav:scale-110" />
                           {!collapsed && <span className="truncate">{c.name}</span>}
