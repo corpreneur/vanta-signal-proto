@@ -8,7 +8,7 @@ import type { FilterState } from "@/components/SignalFilters";
 import type { SignalType } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
-import { ShieldOff, BarChart3 } from "lucide-react";
+import { ShieldOff, BarChart3, ArrowUpDown, AlertTriangle } from "lucide-react";
 
 const fetchSignals = async (): Promise<Signal[]> => {
   const { data, error } = await supabase
@@ -37,15 +37,21 @@ const fetchSignals = async (): Promise<Signal[]> => {
     linqMessageId: row.linq_message_id,
     emailMetadata: (row as Record<string, unknown>).email_metadata as Signal["emailMetadata"] || null,
     meetingId: (row as Record<string, unknown>).meeting_id as string | null,
+    riskLevel: (row as Record<string, unknown>).risk_level as Signal["riskLevel"] || null,
+    dueDate: (row as Record<string, unknown>).due_date as string | null,
+    callPointer: (row as Record<string, unknown>).call_pointer as string | null,
   }));
 };
 
 const SIGNAL_TYPES_ORDER: SignalType[] = ["INTRO", "INSIGHT", "INVESTMENT", "DECISION", "CONTEXT", "MEETING", "PHONE_CALL"];
 
 type Tab = "feed" | "filtered";
+type SortMode = "captured" | "due_date";
 
 const Signals = () => {
   const [activeTab, setActiveTab] = useState<Tab>("feed");
+  const [sortMode, setSortMode] = useState<SortMode>("captured");
+  const [showOverdueOnly, setShowOverdueOnly] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     type: "ALL",
     sender: "ALL",
@@ -113,10 +119,27 @@ const Signals = () => {
   }, [queryClient]);
 
   // Split signals into feed (non-noise) and filtered (noise)
-  const feedSignals = useMemo(
-    () => [...signals].filter((s) => s.signalType !== "NOISE").sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()),
-    [signals]
-  );
+  const feedSignals = useMemo(() => {
+    let items = signals.filter((s) => s.signalType !== "NOISE");
+
+    // Overdue filter
+    if (showOverdueOnly) {
+      const today = new Date().toISOString().split("T")[0];
+      items = items.filter((s) => s.dueDate && s.dueDate < today && s.status !== "Complete");
+    }
+
+    // Sort
+    if (sortMode === "due_date") {
+      return items.sort((a, b) => {
+        // Signals with due dates first, then by date ascending (soonest first)
+        if (!a.dueDate && !b.dueDate) return new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime();
+        if (!a.dueDate) return 1;
+        if (!b.dueDate) return -1;
+        return a.dueDate.localeCompare(b.dueDate);
+      });
+    }
+    return items.sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime());
+  }, [signals, sortMode, showOverdueOnly]);
 
   const noiseSignals = useMemo(
     () => [...signals].filter((s) => s.signalType === "NOISE").sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()),
@@ -124,6 +147,11 @@ const Signals = () => {
   );
 
   const activeSignals = activeTab === "feed" ? feedSignals : noiseSignals;
+
+  const overdueCount = useMemo(() => {
+    const today = new Date().toISOString().split("T")[0];
+    return signals.filter((s) => s.signalType !== "NOISE" && s.dueDate && s.dueDate < today && s.status !== "Complete").length;
+  }, [signals]);
 
   const senders = useMemo(
     () => [...new Set(activeSignals.map((s) => s.sender))].sort(),
@@ -186,6 +214,12 @@ const Signals = () => {
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Filtered</p>
           <p className="font-display text-[24px] text-muted-foreground">{noiseSignals.length}</p>
         </div>
+        {overdueCount > 0 && (
+          <div>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Overdue</p>
+            <p className="font-display text-[24px] text-destructive">{overdueCount}</p>
+          </div>
+        )}
         <div>
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Pipeline</p>
           <div className="flex items-center gap-2">
@@ -233,6 +267,35 @@ const Signals = () => {
         <>
           <TagBrowser tagCounts={tagCounts} activeType={filters.type} onSelect={handleTagSelect} />
           <SignalFilters filters={filters} onChange={setFilters} senders={senders} />
+
+          {/* Sort & due date controls */}
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <button
+              onClick={() => setSortMode(sortMode === "captured" ? "due_date" : "captured")}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.15em] border transition-colors ${
+                sortMode === "due_date"
+                  ? "border-vanta-accent text-vanta-accent bg-vanta-accent-faint"
+                  : "border-vanta-border text-vanta-text-low hover:border-vanta-accent-border hover:text-vanta-accent"
+              }`}
+            >
+              <ArrowUpDown className="w-3 h-3" />
+              {sortMode === "due_date" ? "Sort: Due Date" : "Sort: Recent"}
+            </button>
+
+            {overdueCount > 0 && (
+              <button
+                onClick={() => setShowOverdueOnly(!showOverdueOnly)}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.15em] border transition-colors ${
+                  showOverdueOnly
+                    ? "border-destructive text-destructive bg-destructive/10"
+                    : "border-vanta-border text-vanta-text-low hover:border-destructive hover:text-destructive"
+                }`}
+              >
+                <AlertTriangle className="w-3 h-3" />
+                Overdue Only ({overdueCount})
+              </button>
+            )}
+          </div>
 
           {briefs.length > 0 && (
             <div className="mb-6">

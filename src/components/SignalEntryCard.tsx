@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, Copy, Check, CheckCircle, Video, Phone, ArrowUpFromLine } from "lucide-react";
+import { ChevronDown, Copy, Check, CheckCircle, Video, Phone, ArrowUpFromLine, Shield, CalendarClock, Pointer } from "lucide-react";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS, PHONE_CALL_TAGS, PHONE_TAG_LABELS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,6 +36,30 @@ const PRIORITY_STYLES: Record<string, string> = {
   medium: "text-vanta-text-mid border-vanta-border bg-transparent",
   low: "text-vanta-text-muted border-vanta-border bg-transparent",
 };
+
+const RISK_STYLES: Record<string, string> = {
+  critical: "text-destructive border-destructive bg-destructive/10",
+  high: "text-vanta-accent border-vanta-accent-border bg-vanta-accent-faint",
+  medium: "text-vanta-accent-amber border-vanta-accent-amber-border bg-vanta-accent-amber-faint",
+  low: "text-vanta-text-muted border-vanta-border bg-transparent",
+};
+
+function formatDueDate(dateStr: string): { label: string; isOverdue: boolean } {
+  const due = new Date(dateStr + "T00:00:00");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const diffMs = due.getTime() - today.getTime();
+  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 0) return { label: `${Math.abs(diffDays)}d overdue`, isOverdue: true };
+  if (diffDays === 0) return { label: "Due today", isOverdue: true };
+  if (diffDays === 1) return { label: "Due tomorrow", isOverdue: false };
+  if (diffDays <= 7) return { label: `Due in ${diffDays}d`, isOverdue: false };
+  return {
+    label: due.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+    isOverdue: false,
+  };
+}
 
 interface SignalEntryCardProps {
   signal: Signal;
@@ -132,10 +156,33 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
                 {signal.source}
               </span>
             ) : null}
+            {signal.riskLevel && (
+              <span
+                className={`inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border ${RISK_STYLES[signal.riskLevel]}`}
+              >
+                <Shield className="w-3 h-3" />
+                {signal.riskLevel}
+              </span>
+            )}
           </div>
-          <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-vanta-text-muted whitespace-nowrap">
-            {formatTimestamp(signal.capturedAt)}
-          </span>
+          <div className="flex items-center gap-2">
+            {signal.dueDate && (() => {
+              const { label, isOverdue } = formatDueDate(signal.dueDate);
+              return (
+                <span
+                  className={`inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.12em] ${
+                    isOverdue ? "text-destructive" : "text-vanta-text-muted"
+                  }`}
+                >
+                  <CalendarClock className="w-3 h-3" />
+                  {label}
+                </span>
+              );
+            })()}
+            <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-vanta-text-muted whitespace-nowrap">
+              {formatTimestamp(signal.capturedAt)}
+            </span>
+          </div>
         </div>
 
         {/* Sender */}
@@ -238,6 +285,21 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
                     {formatAction(action)}
                   </span>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Call pointer */}
+          {signal.callPointer && (
+            <div>
+              <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-2">
+                Call Pointer
+              </h4>
+              <div className="flex items-center gap-1.5">
+                <Pointer className="w-3 h-3 text-vanta-text-low" />
+                <p className="font-mono text-[11px] leading-[1.6] text-vanta-text-low">
+                  {signal.callPointer}
+                </p>
               </div>
             </div>
           )}

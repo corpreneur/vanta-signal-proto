@@ -14,6 +14,9 @@ interface Classification {
   priority: string;
   summary: string;
   actionsTaken: string[];
+  riskLevel: string | null;
+  dueDate: string | null;
+  callPointer: string | null;
 }
 
 async function classifySignal(text: string, apiKey: string): Promise<Classification> {
@@ -27,9 +30,13 @@ Classify the following unstructured text into exactly ONE signal type:
 - CONTEXT: background information, relationship context, or reference material
 - NOISE: irrelevant, spam, or low-value content
 
-Also assign a priority: high, medium, or low.
-Provide a concise 1-sentence summary.
-List 0-3 recommended next actions as short phrases.`;
+Also assign:
+- priority: high, medium, or low
+- riskLevel: low, medium, high, or critical (null if not applicable)
+- dueDate: ISO date string (YYYY-MM-DD) if a deadline or due date is mentioned, otherwise null
+- callPointer: a brief reference to who/what to follow up with (e.g. "Call back John re: term sheet"), otherwise null
+- summary: concise 1-sentence summary
+- actionsTaken: 0-3 recommended next actions as short phrases`;
 
   const res = await fetch(LOVABLE_AI_URL, {
     method: "POST",
@@ -56,8 +63,11 @@ List 0-3 recommended next actions as short phrases.`;
                 priority: { type: "string", enum: ["high", "medium", "low"] },
                 summary: { type: "string" },
                 actionsTaken: { type: "array", items: { type: "string" } },
+                riskLevel: { type: ["string", "null"], enum: ["low", "medium", "high", "critical", null] },
+                dueDate: { type: ["string", "null"], description: "ISO date YYYY-MM-DD or null" },
+                callPointer: { type: ["string", "null"], description: "Brief follow-up reference or null" },
               },
-              required: ["signalType", "priority", "summary", "actionsTaken"],
+              required: ["signalType", "priority", "summary", "actionsTaken", "riskLevel", "dueDate", "callPointer"],
               additionalProperties: false,
             },
           },
@@ -123,6 +133,9 @@ serve(async (req) => {
         summary: classification.summary,
         actions_taken: classification.actionsTaken,
         status: "Captured",
+        risk_level: classification.riskLevel || null,
+        due_date: classification.dueDate || null,
+        call_pointer: classification.callPointer || null,
       })
       .select()
       .single();

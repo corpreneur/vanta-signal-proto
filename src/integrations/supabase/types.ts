@@ -99,14 +99,17 @@ export type Database = {
       signals: {
         Row: {
           actions_taken: string[]
+          call_pointer: string | null
           captured_at: string
           created_at: string
+          due_date: string | null
           email_metadata: Json | null
           id: string
           linq_message_id: string | null
           meeting_id: string | null
           priority: Database["public"]["Enums"]["signal_priority"]
           raw_payload: Json | null
+          risk_level: Database["public"]["Enums"]["signal_risk_level"] | null
           sender: string
           signal_type: Database["public"]["Enums"]["signal_type"]
           source: Database["public"]["Enums"]["signal_source"]
@@ -116,14 +119,17 @@ export type Database = {
         }
         Insert: {
           actions_taken?: string[]
+          call_pointer?: string | null
           captured_at?: string
           created_at?: string
+          due_date?: string | null
           email_metadata?: Json | null
           id?: string
           linq_message_id?: string | null
           meeting_id?: string | null
           priority?: Database["public"]["Enums"]["signal_priority"]
           raw_payload?: Json | null
+          risk_level?: Database["public"]["Enums"]["signal_risk_level"] | null
           sender: string
           signal_type?: Database["public"]["Enums"]["signal_type"]
           source?: Database["public"]["Enums"]["signal_source"]
@@ -133,14 +139,17 @@ export type Database = {
         }
         Update: {
           actions_taken?: string[]
+          call_pointer?: string | null
           captured_at?: string
           created_at?: string
+          due_date?: string | null
           email_metadata?: Json | null
           id?: string
           linq_message_id?: string | null
           meeting_id?: string | null
           priority?: Database["public"]["Enums"]["signal_priority"]
           raw_payload?: Json | null
+          risk_level?: Database["public"]["Enums"]["signal_risk_level"] | null
           sender?: string
           signal_type?: Database["public"]["Enums"]["signal_type"]
           source?: Database["public"]["Enums"]["signal_source"]
@@ -195,6 +204,7 @@ export type Database = {
     }
     Enums: {
       signal_priority: "high" | "medium" | "low"
+      signal_risk_level: "low" | "medium" | "high" | "critical"
       signal_source: "linq" | "gmail" | "manual" | "recall" | "phone"
       signal_status: "Captured" | "In Progress" | "Complete"
       signal_type:
@@ -334,6 +344,7 @@ export const Constants = {
   public: {
     Enums: {
       signal_priority: ["high", "medium", "low"],
+      signal_risk_level: ["low", "medium", "high", "critical"],
       signal_source: ["linq", "gmail", "manual", "recall", "phone"],
       signal_status: ["Captured", "In Progress", "Complete"],
       signal_type: [

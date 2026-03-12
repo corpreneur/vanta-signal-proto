@@ -2,6 +2,7 @@ export type SignalType = 'INTRO' | 'INSIGHT' | 'INVESTMENT' | 'DECISION' | 'CONT
 export type SignalPriority = 'high' | 'medium' | 'low';
 export type SignalStatus = 'Captured' | 'In Progress' | 'Complete';
 export type SignalSource = 'linq' | 'gmail' | 'manual' | 'recall' | 'phone';
+export type SignalRiskLevel = 'low' | 'medium' | 'high' | 'critical';
 
 export interface Signal {
   id: string;
@@ -25,6 +26,9 @@ export interface Signal {
     date?: string;
   } | null;
   meetingId?: string | null;
+  riskLevel?: SignalRiskLevel | null;
+  dueDate?: string | null; // ISO date string
+  callPointer?: string | null;
 }
 
 export interface MeetingArtifact {
