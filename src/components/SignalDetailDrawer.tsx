@@ -42,17 +42,11 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   const queryClient = useQueryClient();
 
   // Sync status when signal changes
-  const signalStatus = signal?.status;
-  useState(() => {
-    if (signalStatus) setCurrentStatus(signalStatus);
-  });
+  useEffect(() => {
+    if (signal?.status) setCurrentStatus(signal.status);
+  }, [signal?.id, signal?.status]);
 
   if (!signal) return null;
-
-  // Update currentStatus when a different signal is opened
-  if (signal.status !== currentStatus && !updatingStatus) {
-    setCurrentStatus(signal.status);
-  }
 
   const colors = SIGNAL_TYPE_COLORS[signal.signalType];
 
