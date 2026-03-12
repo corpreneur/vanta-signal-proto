@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import Nav from "@/components/Nav";
-import NavDrawer from "@/components/NavDrawer";
 import Overlay from "@/components/Overlay";
 import RelationshipGraph from "@/components/RelationshipGraph";
 import { supabase } from "@/integrations/supabase/client";
