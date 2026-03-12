@@ -8,6 +8,7 @@ import type { FilterState } from "@/components/SignalFilters";
 import type { SignalType } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
+import { ShieldOff, BarChart3 } from "lucide-react";
 
 const fetchSignals = async (): Promise<Signal[]> => {
   const { data, error } = await supabase
@@ -41,7 +42,10 @@ const fetchSignals = async (): Promise<Signal[]> => {
 
 const SIGNAL_TYPES_ORDER: SignalType[] = ["INTRO", "INSIGHT", "INVESTMENT", "DECISION", "CONTEXT", "MEETING", "PHONE_CALL"];
 
+type Tab = "feed" | "filtered";
+
 const Signals = () => {
+  const [activeTab, setActiveTab] = useState<Tab>("feed");
   const [filters, setFilters] = useState<FilterState>({
     type: "ALL",
     sender: "ALL",
@@ -108,35 +112,39 @@ const Signals = () => {
     };
   }, [queryClient]);
 
-  const senders = useMemo(
-    () => [...new Set(signals.map((s) => s.sender))].sort(),
+  // Split signals into feed (non-noise) and filtered (noise)
+  const feedSignals = useMemo(
+    () => [...signals].filter((s) => s.signalType !== "NOISE").sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()),
     [signals]
   );
 
-  const sortedSignals = useMemo(
-    () =>
-      [...signals].sort(
-        (a, b) =>
-          new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()
-      ),
+  const noiseSignals = useMemo(
+    () => [...signals].filter((s) => s.signalType === "NOISE").sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()),
     [signals]
+  );
+
+  const activeSignals = activeTab === "feed" ? feedSignals : noiseSignals;
+
+  const senders = useMemo(
+    () => [...new Set(activeSignals.map((s) => s.sender))].sort(),
+    [activeSignals]
   );
 
   const tagCounts = useMemo(
     () =>
       SIGNAL_TYPES_ORDER.map((type) => ({
         type,
-        count: signals.filter((s) => s.signalType === type).length,
+        count: feedSignals.filter((s) => s.signalType === type).length,
       })),
-    [signals]
+    [feedSignals]
   );
 
   const handleTagSelect = (type: SignalType | "ALL") => {
     setFilters((prev) => ({ ...prev, type }));
   };
 
-  const highCount = sortedSignals.filter((s) => s.priority === "high").length;
-  const actionCount = sortedSignals.reduce((acc, s) => acc + s.actionsTaken.length, 0);
+  const highCount = feedSignals.filter((s) => s.priority === "high").length;
+  const actionCount = feedSignals.reduce((acc, s) => acc + s.actionsTaken.length, 0);
 
   return (
     <div className="max-w-[960px] mx-auto px-5 py-10 md:px-10">
@@ -164,7 +172,7 @@ const Signals = () => {
       <div className="flex flex-wrap gap-6 mb-6 pb-6 border-b border-vanta-border">
         <div>
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Signals Captured</p>
-          <p className="font-display text-[24px] text-vanta-text">{sortedSignals.length}</p>
+          <p className="font-display text-[24px] text-vanta-text">{feedSignals.length}</p>
         </div>
         <div>
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">High Strength</p>
@@ -175,6 +183,10 @@ const Signals = () => {
           <p className="font-display text-[24px] text-vanta-text">{actionCount}</p>
         </div>
         <div>
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Filtered</p>
+          <p className="font-display text-[24px] text-muted-foreground">{noiseSignals.length}</p>
+        </div>
+        <div>
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Pipeline</p>
           <div className="flex items-center gap-2">
             <div className="w-1.5 h-1.5 bg-vanta-accent" style={{ animation: "pulse-dot 2s ease-in-out infinite" }} />
@@ -183,18 +195,76 @@ const Signals = () => {
         </div>
       </div>
 
-      <TagBrowser tagCounts={tagCounts} activeType={filters.type} onSelect={handleTagSelect} />
-      <SignalFilters filters={filters} onChange={setFilters} senders={senders} />
+      {/* Tabs */}
+      <div className="flex items-center gap-0 mb-6 border-b border-vanta-border">
+        <button
+          onClick={() => setActiveTab("feed")}
+          className={`flex items-center gap-1.5 px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.15em] border-b-2 transition-colors ${
+            activeTab === "feed"
+              ? "border-vanta-accent text-vanta-accent"
+              : "border-transparent text-vanta-text-low hover:text-foreground"
+          }`}
+        >
+          <BarChart3 className="w-3.5 h-3.5" />
+          Signal Feed
+          <span className="ml-1 font-mono text-[9px] text-muted-foreground">
+            {feedSignals.length}
+          </span>
+        </button>
+        <button
+          onClick={() => setActiveTab("filtered")}
+          className={`flex items-center gap-1.5 px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.15em] border-b-2 transition-colors ${
+            activeTab === "filtered"
+              ? "border-vanta-accent text-vanta-accent"
+              : "border-transparent text-vanta-text-low hover:text-foreground"
+          }`}
+        >
+          <ShieldOff className="w-3.5 h-3.5" />
+          Filtered Items
+          {noiseSignals.length > 0 && (
+            <span className="ml-1 px-1.5 py-0.5 font-mono text-[9px] bg-muted text-muted-foreground rounded-sm">
+              {noiseSignals.length}
+            </span>
+          )}
+        </button>
+      </div>
 
-      {briefs.length > 0 && (
-        <div className="mb-6">
-          {briefs.map((brief: any) => (
-            <PreMeetingBriefCard key={brief.id} brief={brief} />
-          ))}
-        </div>
+      {activeTab === "feed" && (
+        <>
+          <TagBrowser tagCounts={tagCounts} activeType={filters.type} onSelect={handleTagSelect} />
+          <SignalFilters filters={filters} onChange={setFilters} senders={senders} />
+
+          {briefs.length > 0 && (
+            <div className="mb-6">
+              {briefs.map((brief: any) => (
+                <PreMeetingBriefCard key={brief.id} brief={brief} />
+              ))}
+            </div>
+          )}
+
+          <SignalFeed signals={feedSignals} filters={filters} />
+        </>
       )}
 
-      <SignalFeed signals={sortedSignals} filters={filters} />
+      {activeTab === "filtered" && (
+        <>
+          {noiseSignals.length === 0 ? (
+            <div className="border border-vanta-border bg-vanta-bg-elevated p-10 text-center">
+              <ShieldOff className="w-5 h-5 text-muted-foreground mx-auto mb-3" />
+              <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-vanta-text-low">
+                No filtered items. All signals passed classification.
+              </p>
+            </div>
+          ) : (
+            <>
+              <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground mb-4">
+                These signals were classified as noise. Review and promote any that contain real value.
+              </p>
+              <SignalFeed signals={noiseSignals} filters={{ type: "ALL", sender: "ALL", priority: "ALL", search: "" }} showPromote />
+            </>
+          )}
+        </>
+      )}
     </div>
   );
 };

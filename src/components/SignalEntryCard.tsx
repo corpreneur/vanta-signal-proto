@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, Copy, Check, CheckCircle, Video, Phone } from "lucide-react";
+import { ChevronDown, Copy, Check, CheckCircle, Video, Phone, ArrowUpFromLine } from "lucide-react";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS, PHONE_CALL_TAGS, PHONE_TAG_LABELS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,12 +40,14 @@ const PRIORITY_STYLES: Record<string, string> = {
 interface SignalEntryCardProps {
   signal: Signal;
   onClick?: () => void;
+  showPromote?: boolean;
 }
 
-const SignalEntryCard = ({ signal, onClick }: SignalEntryCardProps) => {
+const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps) => {
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
   const [markingReviewed, setMarkingReviewed] = useState(false);
+  const [promoting, setPromoting] = useState(false);
   const queryClient = useQueryClient();
   const colors = SIGNAL_TYPE_COLORS[signal.signalType];
 
@@ -76,6 +78,22 @@ const SignalEntryCard = ({ signal, onClick }: SignalEntryCardProps) => {
   const handleExpand = (e: React.MouseEvent) => {
     e.stopPropagation();
     setExpanded((prev) => !prev);
+  };
+
+  const handlePromote = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setPromoting(true);
+    const { error } = await supabase
+      .from("signals")
+      .update({ signal_type: "CONTEXT" as const })
+      .eq("id", signal.id);
+    setPromoting(false);
+    if (error) {
+      toast.error("Failed to promote signal");
+    } else {
+      queryClient.invalidateQueries({ queryKey: ["signals"] });
+      toast.success("Signal promoted to Context");
+    }
   };
 
   return (
@@ -164,6 +182,17 @@ const SignalEntryCard = ({ signal, onClick }: SignalEntryCardProps) => {
             >
               <CheckCircle className="w-3 h-3" />
               {markingReviewed ? "Saving…" : "Mark Reviewed"}
+            </button>
+          )}
+
+          {showPromote && (
+            <button
+              onClick={handlePromote}
+              disabled={promoting}
+              className="flex items-center gap-1.5 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-accent border border-vanta-accent-border hover:bg-vanta-accent-faint transition-colors disabled:opacity-50"
+            >
+              <ArrowUpFromLine className="w-3 h-3" />
+              {promoting ? "Promoting…" : "Promote"}
             </button>
           )}
 

@@ -7,9 +7,10 @@ import SignalDetailDrawer from "@/components/SignalDetailDrawer";
 interface SignalFeedProps {
   signals: Signal[];
   filters: FilterState;
+  showPromote?: boolean;
 }
 
-const SignalFeed = ({ signals, filters }: SignalFeedProps) => {
+const SignalFeed = ({ signals, filters, showPromote }: SignalFeedProps) => {
   const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
 
   const filtered = signals.filter((s) => {
