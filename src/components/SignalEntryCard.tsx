@@ -80,6 +80,22 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
     setExpanded((prev) => !prev);
   };
 
+  const handlePromote = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setPromoting(true);
+    const { error } = await supabase
+      .from("signals")
+      .update({ signal_type: "CONTEXT" as const })
+      .eq("id", signal.id);
+    setPromoting(false);
+    if (error) {
+      toast.error("Failed to promote signal");
+    } else {
+      queryClient.invalidateQueries({ queryKey: ["signals"] });
+      toast.success("Signal promoted to Context");
+    }
+  };
+
   return (
     <div
       className={`border border-vanta-border bg-vanta-bg-elevated transition-colors hover:border-vanta-border-mid ${
