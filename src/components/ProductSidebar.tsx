@@ -59,6 +59,7 @@ const platformItems = [
   { title: "Noise Filter", url: "/product/noise", icon: Volume2 },
   { title: "Ontology", url: "/ontology", icon: Layers },
   { title: "Phone FMC", url: "/phone-fmc", icon: BookOpen },
+  { title: "Architecture", url: "/architecture", icon: FileCode },
 ];
 
 export function ProductSidebar() {
