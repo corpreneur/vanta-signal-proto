@@ -93,8 +93,7 @@ function CollapsibleNavGroup({ label, items, collapsed, currentPath, activeClass
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={`${item.url}?skip-auth=1`}
-                      className="flex items-center gap-2 px-2 py-1.5 pl-6 font-mono text-[11px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
-                      activeClassName={activeClassName}
+                      className="flex items-center gap-2 px-2 py-2 pl-6 font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-colors"
                     >
                       <item.icon className="h-3.5 w-3.5 shrink-0" />
                       {!collapsed && <span>{item.title}</span>}
