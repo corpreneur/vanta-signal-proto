@@ -302,6 +302,7 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
                 </p>
               </div>
             </div>
+          )}
 
           {/* Source context */}
           <div className="flex items-center gap-4">
