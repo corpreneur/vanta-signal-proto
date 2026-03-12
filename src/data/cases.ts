@@ -24,11 +24,24 @@ export interface Quote {
   attr: string;
 }
 
+export interface BioItem {
+  key: string;
+  value: string;
+}
+
+export interface PrepItem {
+  n: string;
+  title: string;
+  desc: string;
+}
+
 export interface CaseSection {
-  type: 'steps' | 'quote' | 'hr' | 'signal-architecture' | 'five-layers';
+  type: 'steps' | 'quote' | 'hr' | 'signal-architecture' | 'five-layers' | 'bio' | 'meeting-prep';
   label?: string;
   steps?: Step[];
   quote?: Quote;
+  bioItems?: BioItem[];
+  prepItems?: PrepItem[];
 }
 
 export interface CaseData {
@@ -124,6 +137,26 @@ export const cases: CaseData[] = [
             title: "Persistent Agent Built.",
             desc: "Bio and prep don't disappear. Vanta builds a persistent agent — a living context layer that updates as the relationship evolves.",
           },
+        ],
+      },
+      {
+        type: "bio",
+        label: "Quick Bio — Kristina Windham",
+        bioItems: [
+          { key: "Role", value: "Senior Vice President, Business Development & Partnerships" },
+          { key: "Company", value: "United Masters" },
+          { key: "Focus", value: "Strategic partnerships, brand integrations, and revenue growth across music and entertainment verticals" },
+          { key: "Background", value: "15+ years across media, entertainment, and digital platforms. Previously held senior roles in partnership strategy at major music and media companies." },
+          { key: "Signal", value: "Steve's direct intro suggests she's a decision-maker in a live deal or strategic initiative — not a casual connection." },
+        ],
+      },
+      {
+        type: "meeting-prep",
+        label: "Meeting Prep — Thursday",
+        prepItems: [
+          { n: "01", title: "Open with Steve's context.", desc: "Reference the intro naturally. She already knows the framing — don't re-pitch, build from it." },
+          { n: "02", title: "Probe: What does United Masters need from intelligence infrastructure?", desc: "She's in BD — find out where their data gaps are. Artist analytics? Brand partner matching? Revenue forecasting?" },
+          { n: "03", title: "Watch for: Decision velocity.", desc: "How fast does she move? Is she evaluating or already building? This tells you if it's a Q2 or Q4 conversation." },
         ],
       },
       {
