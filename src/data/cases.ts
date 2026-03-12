@@ -204,7 +204,7 @@ export const cases: CaseData[] = [
     ],
   },
   {
-    num: "Use Case — 02",
+    num: "Use Case · 02",
     id: "02",
     name: "Anticipatory Intelligence",
     cat: "Product Philosophy · Methodology",
