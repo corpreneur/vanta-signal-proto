@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import type { Signal } from "@/data/signals";
+import type { Signal, SignalStatus } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+
+const STATUSES: SignalStatus[] = ["Captured", "In Progress", "Complete"];
 
 function formatTimestamp(iso: string): string {
   return new Date(iso).toLocaleString("en-US", {
@@ -34,6 +37,9 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   const [replyTo, setReplyTo] = useState("");
   const [replyMessage, setReplyMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState<SignalStatus>(signal.status);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+  const queryClient = useQueryClient();
 
   if (!signal) return null;
 
@@ -96,17 +102,38 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
             <span className="inline-block px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.15em] border border-vanta-border text-vanta-text-low bg-transparent">
               {signal.priority}
             </span>
-            <span
-              className={`inline-block px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.15em] border ${
-                signal.status === "Complete"
+            <select
+              value={currentStatus}
+              disabled={updatingStatus}
+              onChange={async (e) => {
+                const newStatus = e.target.value as SignalStatus;
+                setUpdatingStatus(true);
+                const { error } = await supabase
+                  .from("signals")
+                  .update({ status: newStatus })
+                  .eq("id", signal.id);
+                setUpdatingStatus(false);
+                if (error) {
+                  toast.error("Failed to update status");
+                  console.error(error);
+                } else {
+                  setCurrentStatus(newStatus);
+                  queryClient.invalidateQueries({ queryKey: ["signals"] });
+                  toast.success(`Status → ${newStatus}`);
+                }
+              }}
+              className={`inline-block px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.15em] border bg-transparent cursor-pointer focus:outline-none appearance-none ${
+                currentStatus === "Complete"
                   ? "text-vanta-accent border-vanta-accent-border"
-                  : signal.status === "In Progress"
+                  : currentStatus === "In Progress"
                   ? "text-vanta-accent-amber border-vanta-accent-amber-border"
                   : "text-vanta-text-low border-vanta-border"
-              }`}
+              } ${updatingStatus ? "opacity-50" : ""}`}
             >
-              {signal.status}
-            </span>
+              {STATUSES.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
           </div>
           <SheetTitle className="font-mono text-[12px] uppercase tracking-[0.12em] text-vanta-text-mid text-left">
             {signal.sender}
