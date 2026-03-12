@@ -35,17 +35,17 @@ import {
 } from "@/components/ui/sidebar";
 
 const channelItems = [
-  { title: "iMessage", url: "/product/intro", icon: MessageSquare, color: "text-vanta-accent" },
-  { title: "Phone", url: "/product/phone-call", icon: Phone, color: "text-vanta-accent-phone" },
-  { title: "Zoom", url: "/product/meeting", icon: Video, color: "text-vanta-accent-zoom" },
-  { title: "Email", url: "/product/email", icon: Mail, color: "text-vanta-accent-teal" },
-  { title: "Calendar", url: "/product/calendar", icon: Calendar, color: "text-vanta-accent-amber" },
+  { title: "iMessage", url: "/product/intro", icon: MessageSquare },
+  { title: "Phone", url: "/product/phone-call", icon: Phone },
+  { title: "Zoom", url: "/product/meeting", icon: Video },
+  { title: "Email", url: "/product/email", icon: Mail },
+  { title: "Calendar", url: "/product/calendar", icon: Calendar },
 ];
 
 const productItems = [
-  { title: "Insight Engine", url: "/product/insight", icon: Lightbulb, color: "text-vanta-accent-teal" },
-  { title: "Investment Intel", url: "/product/investment", icon: TrendingUp, color: "text-vanta-accent-amber" },
-  { title: "Decision Capture", url: "/product/decision", icon: Gavel, color: "text-vanta-accent-violet" },
+  { title: "Insight Engine", url: "/product/insight", icon: Lightbulb },
+  { title: "Investment Intel", url: "/product/investment", icon: TrendingUp },
+  { title: "Decision Capture", url: "/product/decision", icon: Gavel },
 ];
 
 const coreItems = [
