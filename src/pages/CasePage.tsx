@@ -6,7 +6,7 @@ import CaseQuote from "@/components/case-parts/CaseQuote";
 import CaseCallout from "@/components/case-parts/CaseCallout";
 import CaseTags from "@/components/case-parts/CaseTags";
 import SignalArchitecture from "@/components/SignalArchitecture";
-import ProductLayout from "@/components/ProductLayout";
+
 
 const CasePage = () => {
   const { id } = useParams<{ id: string }>();
