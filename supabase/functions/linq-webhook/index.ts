@@ -348,20 +348,25 @@ Deno.serve(async (req) => {
       const authHeader = req.headers.get("x-linq-signature") || new URL(req.url).searchParams.get("token");
 
       if (linqToken && authHeader !== linqToken) {
-        // Also accept service role or anon key via Authorization header (internal testing)
-        const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-        const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+        // Also accept Supabase keys via Authorization/apikey headers (internal testing)
+        const knownKeys = [
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"),
+          Deno.env.get("SUPABASE_ANON_KEY"),
+          Deno.env.get("SUPABASE_PUBLISHABLE_KEY"),
+        ].filter(Boolean);
+
         const bearerToken = req.headers.get("authorization")?.replace("Bearer ", "");
         const apikeyHeader = req.headers.get("apikey");
 
-        const isInternal = (serviceRoleKey && (bearerToken === serviceRoleKey || apikeyHeader === serviceRoleKey)) ||
-                           (anonKey && (bearerToken === anonKey || apikeyHeader === anonKey));
+        const isInternal = knownKeys.some(k => k === bearerToken || k === apikeyHeader);
 
         if (!isInternal) {
+          console.error("Auth failed. Bearer present:", !!bearerToken, "apikey present:", !!apikeyHeader, "knownKeys count:", knownKeys.length);
           return new Response(JSON.stringify({ error: "Unauthorized" }), {
             status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
           });
         }
+        console.log("Authenticated via internal Supabase key");
       }
     }
 
