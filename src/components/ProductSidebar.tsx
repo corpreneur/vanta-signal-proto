@@ -75,7 +75,7 @@ interface CollapsibleNavGroupProps {
   activeClassName?: string;
 }
 
-function CollapsibleNavGroup({ label, items, collapsed, currentPath, activeClassName = "text-foreground bg-vanta-bg-elevated" }: CollapsibleNavGroupProps) {
+function CollapsibleNavGroup({ label, items, collapsed, currentPath, activeClassName = "border-l-2 border-vanta-accent text-foreground bg-vanta-bg-elevated" }: CollapsibleNavGroupProps) {
   const hasActiveChild = items.some((item) => currentPath === item.url || currentPath.startsWith(item.url + "/"));
 
   return (
