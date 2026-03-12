@@ -15,6 +15,7 @@ import Ontology from "./pages/Ontology";
 import ProductSignalPage from "./pages/ProductSignalPage";
 import Architecture from "./pages/Architecture";
 import BrainDump from "./pages/BrainDump";
+import ReleaseNotes from "./pages/ReleaseNotes";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const skipAuth = new URLSearchParams(window.location.search).get("skip-auth") === "1";
