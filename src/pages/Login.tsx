@@ -29,7 +29,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-end relative overflow-hidden">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-end sm:justify-center relative overflow-hidden">
       {/* Hero image — full bleed background */}
       <div
         className="absolute inset-0 opacity-0"
