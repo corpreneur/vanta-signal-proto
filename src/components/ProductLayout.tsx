@@ -1,7 +1,8 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { ProductSidebar } from "@/components/ProductSidebar";
 import { Menu } from "lucide-react";
 import { useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 interface ProductLayoutProps {
   children: React.ReactNode;
@@ -25,6 +26,22 @@ const BREADCRUMB_MAP: Record<string, string> = {
   "/product/noise": "Platform · Noise Filter",
 };
 
+function HamburgerTrigger({ breadcrumb }: { breadcrumb: string }) {
+  const { toggleSidebar } = useSidebar();
+  return (
+    <Button
+      variant="ghost"
+      onClick={toggleSidebar}
+      className="flex items-center gap-2 h-auto px-3 py-1.5 rounded-md bg-vanta-bg-elevated border border-vanta-border text-vanta-text-low hover:text-vanta-accent hover:bg-vanta-bg-elevated transition-colors"
+    >
+      <Menu className="h-4 w-4 shrink-0" />
+      <span className="font-mono text-[10px] uppercase tracking-[0.15em]">
+        {breadcrumb.split(" · ").pop()}
+      </span>
+    </Button>
+  );
+}
+
 export default function ProductLayout({ children }: ProductLayoutProps) {
   const location = useLocation();
   const path = location.pathname;
@@ -36,12 +53,7 @@ export default function ProductLayout({ children }: ProductLayoutProps) {
         <ProductSidebar />
         <div className="flex-1 flex flex-col min-w-0">
           <header className="sticky top-0 z-50 h-12 flex items-center border-b border-vanta-border bg-background/95 backdrop-blur-md px-3">
-            <SidebarTrigger className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-vanta-bg-elevated border border-vanta-border text-vanta-text-low hover:text-vanta-accent transition-colors">
-              <Menu className="h-4 w-4 shrink-0" />
-              <span className="font-mono text-[10px] uppercase tracking-[0.15em]">
-                {breadcrumb.split(" · ").pop()}
-              </span>
-            </SidebarTrigger>
+            <HamburgerTrigger breadcrumb={breadcrumb} />
           </header>
           <main className="flex-1">
             {children}
