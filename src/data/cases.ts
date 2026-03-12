@@ -281,7 +281,7 @@ export const cases: CaseData[] = [
     tags: ["Product Philosophy", "Akio Morita", "Text Thread Signal", "Category Design", "Framework", "Anticipation Layer"],
   },
   {
-    num: "Use Case — 03",
+    num: "Use Case · 03",
     id: "03",
     name: "First Principles",
     cat: "Investment Intelligence · First Principles",

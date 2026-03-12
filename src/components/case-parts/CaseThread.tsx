@@ -23,7 +23,7 @@ const CaseThread = ({ thread }: CaseThreadProps) => {
                 <div className="flex items-center gap-3 my-4">
                   <div className="flex-1 h-px bg-vanta-border-mid" />
                   <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted">
-                    The Manual Trigger — Today
+                    The Manual Trigger · Today
                   </span>
                   <div className="flex-1 h-px bg-vanta-border-mid" />
                 </div>

@@ -189,7 +189,7 @@ const Ontology = () => {
             Most intelligence products are features bolted onto someone else's infrastructure. Vanta's advantage is that the capture layer, the classification layer, and the delivery layer are all first-party.
           </p>
           <p className="font-sans text-[13px] text-vanta-text-mid leading-relaxed">
-            Five channels. One pipeline. Every signal classified, scored, and actionable — before the user opens the app.
+            Five channels. One pipeline. Every signal classified, scored, and actionable… before the user opens the app.
           </p>
         </div>
       </section>

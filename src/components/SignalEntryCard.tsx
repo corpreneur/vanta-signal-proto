@@ -125,7 +125,7 @@ const SignalEntryCard = ({ signal, onClick }: SignalEntryCardProps) => {
           {signal.sender}
         </p>
 
-        {/* Summary — the extracted insight headline */}
+        {/* Summary, the extracted insight headline */}
         <p className="font-sans text-[14px] leading-[1.6] text-vanta-text mb-3">
           {signal.summary}
         </p>
