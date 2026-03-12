@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Nav from "@/components/Nav";
 import NavDrawer from "@/components/NavDrawer";
 import Overlay from "@/components/Overlay";
@@ -7,6 +8,12 @@ import SignalFilters from "@/components/SignalFilters";
 import type { FilterState } from "@/components/SignalFilters";
 import { mockSignals } from "@/data/mockSignals";
 import { cases } from "@/data/cases";
+import type { Signal } from "@/data/signals";
+
+// Mock fetch — will be replaced with real Notion API call
+const fetchSignals = async (): Promise<Signal[]> => {
+  return [...mockSignals];
+};
 
 const Signals = () => {
   const [navOpen, setNavOpen] = useState(false);
@@ -16,20 +23,26 @@ const Signals = () => {
     priority: "ALL",
   });
 
+  const { data: signals = [] } = useQuery({
+    queryKey: ["signals"],
+    queryFn: fetchSignals,
+    refetchInterval: 60_000,
+  });
+
   // Derive unique senders from the signal data
   const senders = useMemo(
-    () => [...new Set(mockSignals.map((s) => s.sender))].sort(),
-    []
+    () => [...new Set(signals.map((s) => s.sender))].sort(),
+    [signals]
   );
 
   // Sort signals reverse-chronologically
   const sortedSignals = useMemo(
     () =>
-      [...mockSignals].sort(
+      [...signals].sort(
         (a, b) =>
           new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()
       ),
-    []
+    [signals]
   );
 
   const toggleNav = () => {
