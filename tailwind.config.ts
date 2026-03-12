@@ -13,6 +13,11 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        display: ["'DM Serif Display'", "Georgia", "serif"],
+        sans: ["'Syne'", "system-ui", "-apple-system", "sans-serif"],
+        mono: ["'DM Mono'", "'SF Mono'", "Menlo", "Consolas", "monospace"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -57,33 +62,52 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        vanta: {
+          bg: "hsl(var(--vanta-bg))",
+          "bg-elevated": "hsl(var(--vanta-bg-elevated))",
+          text: "hsl(var(--vanta-text))",
+          "text-mid": "hsl(var(--vanta-text-mid))",
+          "text-low": "hsl(var(--vanta-text-low))",
+          "text-muted": "hsl(var(--vanta-text-muted))",
+          accent: "hsl(var(--vanta-accent))",
+          "accent-bg": "hsl(var(--vanta-accent-bg))",
+          "accent-border": "hsl(var(--vanta-accent-border))",
+          "accent-faint": "hsl(var(--vanta-accent-faint))",
+          border: "hsl(var(--vanta-border))",
+          "border-mid": "hsl(var(--vanta-border-mid))",
+          "bubble-in": "hsl(var(--vanta-bubble-in))",
+          "bubble-in-border": "hsl(var(--vanta-bubble-in-border))",
+          "bubble-out": "hsl(var(--vanta-bubble-out))",
+          "bubble-out-border": "hsl(var(--vanta-bubble-out-border))",
+        },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: "0px",
+        md: "0px",
+        sm: "0px",
+        DEFAULT: "0px",
+      },
+      transitionTimingFunction: {
+        drawer: "cubic-bezier(0.32, 0, 0.15, 1)",
+      },
+      animation: {
+        "fade-up": "fadeUp 0.5s ease forwards",
+        "fade-up-1": "fadeUp 0.5s ease 0.06s forwards",
+        "fade-up-2": "fadeUp 0.5s ease 0.12s forwards",
+        "fade-up-3": "fadeUp 0.5s ease 0.18s forwards",
+        "pulse-dot": "pulse-dot 2s ease-in-out infinite",
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
       },
     },
   },
