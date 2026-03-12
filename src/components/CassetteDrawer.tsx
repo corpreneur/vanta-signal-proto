@@ -1,9 +1,11 @@
+import { useEffect, useRef } from "react";
 import type { CaseData } from "@/data/cases";
 import CaseThread from "@/components/case-parts/CaseThread";
 import CaseSteps from "@/components/case-parts/CaseSteps";
 import CaseQuote from "@/components/case-parts/CaseQuote";
 import CaseCallout from "@/components/case-parts/CaseCallout";
 import CaseTags from "@/components/case-parts/CaseTags";
+import SignalArchitecture from "@/components/SignalArchitecture";
 
 interface CassetteDrawerProps {
   caseData: CaseData | null;
