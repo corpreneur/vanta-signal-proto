@@ -47,6 +47,7 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
   const [markingReviewed, setMarkingReviewed] = useState(false);
+  const [promoting, setPromoting] = useState(false);
   const queryClient = useQueryClient();
   const colors = SIGNAL_TYPE_COLORS[signal.signalType];
 
