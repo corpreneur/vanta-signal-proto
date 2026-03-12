@@ -216,8 +216,7 @@ export default function ProductSignalPage() {
   const colors = SIGNAL_TYPE_COLORS[product.type];
 
   return (
-    <ProductLayout>
-      <div className="max-w-[720px] mx-auto px-5 py-10 md:px-10 md:py-16">
+      <div className="max-w-[960px] mx-auto px-5 py-10 md:px-10 md:py-16">
         {/* Header */}
         <div className="flex items-center gap-3 mb-2">
           <product.icon className={`w-6 h-6 ${colors.text}`} />
