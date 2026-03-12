@@ -37,6 +37,9 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   const [replyTo, setReplyTo] = useState("");
   const [replyMessage, setReplyMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState<SignalStatus>(signal.status);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+  const queryClient = useQueryClient();
 
   if (!signal) return null;
 
