@@ -93,7 +93,7 @@ const Ontology = () => {
         <div className="border-l-2 border-primary pl-5 mb-8">
           <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-primary mb-2">Product Concept</p>
           <p className="font-display text-[18px] italic text-foreground leading-relaxed mb-3">
-            "The creative entrepreneur's day produces more signal than any system captures. Not because the tools are bad — because the architecture is wrong."
+            "The creative entrepreneur's day produces more signal than any system captures. Not because the tools are bad… because the architecture is wrong."
           </p>
           <p className="font-sans text-[13px] text-vanta-text-mid leading-relaxed">
             Conventional products sit on top of channels and ask the user to change behavior. Vanta sits underneath them. When you own the iMessage relay, the SIM card, the meeting bot, and the email connection, capture becomes invisible.
