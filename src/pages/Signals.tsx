@@ -43,6 +43,7 @@ const Signals = () => {
     type: "ALL",
     sender: "ALL",
     priority: "ALL",
+    search: "",
   });
   const queryClient = useQueryClient();
 
