@@ -20,7 +20,7 @@ const CHANNELS: ChannelDef[] = [
     source: "linq",
     capture: "Linq relay — messages forwarded through Vanta's iMessage bridge. No app install required on contacts.",
     signalTypes: ["INTRO", "INSIGHT", "INVESTMENT", "DECISION", "CONTEXT"],
-    narrative: "iMessage is the primary channel for high-trust communication among creative entrepreneurs. Intros happen here. Deals close here. The signal density per message is the highest of any channel — but without capture, it disappears into a thread.",
+    narrative: "iMessage is the primary channel for high-trust communication among creative entrepreneurs. Intros happen here. Deals close here. The signal density per message is the highest of any channel… but without capture, it disappears into a thread.",
   },
   {
     id: "phone", label: "Native Phone", icon: Phone,
