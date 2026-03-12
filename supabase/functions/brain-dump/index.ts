@@ -30,9 +30,13 @@ Classify the following unstructured text into exactly ONE signal type:
 - CONTEXT: background information, relationship context, or reference material
 - NOISE: irrelevant, spam, or low-value content
 
-Also assign a priority: high, medium, or low.
-Provide a concise 1-sentence summary.
-List 0-3 recommended next actions as short phrases.`;
+Also assign:
+- priority: high, medium, or low
+- riskLevel: low, medium, high, or critical (null if not applicable)
+- dueDate: ISO date string (YYYY-MM-DD) if a deadline or due date is mentioned, otherwise null
+- callPointer: a brief reference to who/what to follow up with (e.g. "Call back John re: term sheet"), otherwise null
+- summary: concise 1-sentence summary
+- actionsTaken: 0-3 recommended next actions as short phrases`;
 
   const res = await fetch(LOVABLE_AI_URL, {
     method: "POST",
