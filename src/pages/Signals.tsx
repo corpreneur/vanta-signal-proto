@@ -46,9 +46,12 @@ const fetchSignals = async (): Promise<Signal[]> => {
 const SIGNAL_TYPES_ORDER: SignalType[] = ["INTRO", "INSIGHT", "INVESTMENT", "DECISION", "CONTEXT", "MEETING", "PHONE_CALL"];
 
 type Tab = "feed" | "filtered";
+type SortMode = "captured" | "due_date";
 
 const Signals = () => {
   const [activeTab, setActiveTab] = useState<Tab>("feed");
+  const [sortMode, setSortMode] = useState<SortMode>("captured");
+  const [showOverdueOnly, setShowOverdueOnly] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     type: "ALL",
     sender: "ALL",
