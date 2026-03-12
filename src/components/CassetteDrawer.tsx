@@ -101,15 +101,6 @@ const CassetteDrawer = ({ caseData, onClose }: CassetteDrawerProps) => {
           {/* Tags */}
           <CaseTags tags={caseData.tags} />
 
-          {/* Footer link */}
-          <div className="mt-8 pt-6 border-t border-vanta-border">
-            <a
-              href={caseData.standaloneHref}
-              className="font-sans text-[13px] text-vanta-text-low hover:text-foreground transition-colors"
-            >
-              View Full Page ↗
-            </a>
-          </div>
         </div>
       )}
     </div>
