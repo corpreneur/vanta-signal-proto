@@ -1,0 +1,1 @@
+ALTER TYPE public.signal_source ADD VALUE IF NOT EXISTS 'phone';
