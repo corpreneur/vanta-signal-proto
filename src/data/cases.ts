@@ -322,6 +322,18 @@ export const cases: CaseData[] = [
           text: "As I dip out for my nightly deluge of dance/dinner drama, look at it this way.",
           timestamp: "9:03 PM",
         },
+        {
+          sender: "John Greene",
+          direction: "in",
+          text: "Read this. 13 questions Marc Andreessen asks before every investment. Run Vanta through the whole thing.",
+          link: { source: "a16z", title: "The 13 Questions" },
+        },
+        {
+          sender: "William → Vanta",
+          direction: "out",
+          text: "Run the a16z framework against our thesis. Full stress test. Investment-grade output.",
+          separator: true,
+        },
       ],
     },
     sections: [

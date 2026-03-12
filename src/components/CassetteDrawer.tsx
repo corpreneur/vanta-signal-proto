@@ -130,16 +130,7 @@ const CassetteDrawer = ({ caseData, onClose }: CassetteDrawerProps) => {
                   </div>
                 );
               case "signal-architecture":
-                return (
-                  <div key={i} className="mb-8 p-5 bg-vanta-accent-faint border border-vanta-accent-border">
-                    <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-primary mb-2">
-                      Signal Architecture
-                    </p>
-                    <p className="font-sans text-[13px] text-vanta-text-mid leading-relaxed">
-                      Vanta is engineering automatic signal detection across every connected source — so every introduction becomes an orchestrated sequence before you open the thread.
-                    </p>
-                  </div>
-                );
+                return <SignalArchitecture key={i} />;
               default:
                 return null;
             }
