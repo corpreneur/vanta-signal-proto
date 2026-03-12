@@ -1,9 +1,11 @@
+import { useEffect, useRef } from "react";
 import type { CaseData } from "@/data/cases";
 import CaseThread from "@/components/case-parts/CaseThread";
 import CaseSteps from "@/components/case-parts/CaseSteps";
 import CaseQuote from "@/components/case-parts/CaseQuote";
 import CaseCallout from "@/components/case-parts/CaseCallout";
 import CaseTags from "@/components/case-parts/CaseTags";
+import SignalArchitecture from "@/components/SignalArchitecture";
 
 interface CassetteDrawerProps {
   caseData: CaseData | null;
@@ -12,10 +14,19 @@ interface CassetteDrawerProps {
 
 const CassetteDrawer = ({ caseData, onClose }: CassetteDrawerProps) => {
   const open = caseData !== null;
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Reset scroll to top when case changes
+  useEffect(() => {
+    if (open && scrollRef.current) {
+      scrollRef.current.scrollTop = 0;
+    }
+  }, [caseData, open]);
 
   return (
     <div
-      className={`fixed top-0 right-0 z-50 h-full w-full max-w-[520px] bg-background border-l border-vanta-border overflow-y-auto transition-transform duration-[400ms] ease-drawer ${
+      ref={scrollRef}
+      className={`fixed top-0 right-0 z-50 h-full w-full max-w-[540px] bg-background border-l border-vanta-border overflow-y-auto transition-transform duration-[400ms] ease-drawer ${
         open ? "translate-x-0" : "translate-x-full"
       }`}
     >
@@ -119,16 +130,7 @@ const CassetteDrawer = ({ caseData, onClose }: CassetteDrawerProps) => {
                   </div>
                 );
               case "signal-architecture":
-                return (
-                  <div key={i} className="mb-8 p-5 bg-vanta-accent-faint border border-vanta-accent-border">
-                    <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-primary mb-2">
-                      Signal Architecture
-                    </p>
-                    <p className="font-sans text-[13px] text-vanta-text-mid leading-relaxed">
-                      Vanta is engineering automatic signal detection across every connected source — so every introduction becomes an orchestrated sequence before you open the thread.
-                    </p>
-                  </div>
-                );
+                return <SignalArchitecture key={i} />;
               default:
                 return null;
             }

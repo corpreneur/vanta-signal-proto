@@ -32,7 +32,7 @@ const CaseThread = ({ thread }: CaseThreadProps) => {
                 <div
                   className={`max-w-[85%] p-3 border ${
                     isVantaTrigger
-                      ? "bg-vanta-bubble-out border-vanta-bubble-out-border"
+                      ? "bg-vanta-accent-faint border-primary"
                       : isOut
                         ? "bg-vanta-bubble-out border-vanta-bubble-out-border"
                         : "bg-vanta-bubble-in border-vanta-bubble-in-border"

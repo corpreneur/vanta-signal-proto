@@ -72,7 +72,7 @@ export const cases: CaseData[] = [
     sub: "iMessage · Email · Calendar · Automatic Orchestration",
     cardCat: "Signal Intelligence",
     cardDesc: "A single iMessage from Steve Stoute — one name, three words of context — and Vanta orchestrates a full intelligence sequence: bio research, meeting prep, outreach email, persistent agent.",
-    cardSignal: { label: "Signal", text: "Noise" },
+    cardSignal: { label: "The Trigger", text: "Noise" },
     cardMeta: { layer: "Intelligence", output: "Brief + Bio" },
     standaloneHref: "/case-01",
     heroQuote: {
@@ -321,6 +321,18 @@ export const cases: CaseData[] = [
           direction: "in",
           text: "As I dip out for my nightly deluge of dance/dinner drama, look at it this way.",
           timestamp: "9:03 PM",
+        },
+        {
+          sender: "John Greene",
+          direction: "in",
+          text: "Read this. 13 questions Marc Andreessen asks before every investment. Run Vanta through the whole thing.",
+          link: { source: "a16z", title: "The 13 Questions" },
+        },
+        {
+          sender: "William → Vanta",
+          direction: "out",
+          text: "Run the a16z framework against our thesis. Full stress test. Investment-grade output.",
+          separator: true,
         },
       ],
     },

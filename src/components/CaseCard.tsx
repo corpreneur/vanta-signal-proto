@@ -51,12 +51,23 @@ const CaseCard = ({ caseData, index, onOpen, isActive }: CaseCardProps) => {
         </span>
       </div>
 
-      <button
-        onClick={(e) => { e.stopPropagation(); onOpen(index); }}
-        className="font-sans text-[13px] text-primary hover:underline"
-      >
-        Read Case →
-      </button>
+      <div className="flex items-center gap-4">
+        <button
+          onClick={(e) => { e.stopPropagation(); onOpen(index); }}
+          className="font-sans text-[13px] text-primary hover:underline"
+        >
+          Read Case →
+        </button>
+        <a
+          href={caseData.standaloneHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className="font-sans text-[13px] text-vanta-text-low hover:text-primary transition-colors"
+        >
+          Full Page ↗
+        </a>
+      </div>
     </article>
   );
 };
