@@ -205,6 +205,54 @@ const PRODUCTS: Record<string, ProductDef> = {
     ],
     whyItMatters: "Signal-to-noise ratio is the product. Every piece of noise that reaches the user erodes trust in the system. Vanta earns trust by knowing what not to show you.",
   },
+  email: {
+    type: "CONTEXT",
+    label: "Email",
+    icon: Mail,
+    tagline: "Every inbox thread is a signal stream… structured, classified, and never buried again.",
+    channels: ["Gmail via OAuth", "IMAP polling"],
+    narrative: [
+      "Email remains the primary channel for formal business communication. Introductions, term sheets, partnership proposals, investor updates… the most consequential exchanges still happen in inboxes. But email volume makes it impossible to separate signal from noise manually.",
+      "Vanta connects to Gmail via OAuth and polls for new threads on a configurable cadence. Every inbound message is classified through the same two-stage AI pipeline used across all channels. Introductions are detected and briefed. Investment language is flagged. Decisions are captured.",
+      "The result is that your inbox becomes a structured signal source. You don't need to read every email to know what matters. Vanta reads them for you and surfaces what counts.",
+    ],
+    howItWorks: [
+      { step: "OAuth Connect", desc: "Gmail connected via OAuth 2.0 with read-only scopes. No passwords stored, no forwarding rules needed." },
+      { step: "Thread Polling", desc: "New threads and replies are polled on a configurable interval… default every 5 minutes during business hours." },
+      { step: "AI Classification", desc: "Each message runs through Haiku triage and Sonnet deep analysis… same pipeline as iMessage and phone." },
+      { step: "Signal Extraction", desc: "Introductions, investment signals, decisions, and insights are extracted with full thread context and sender attribution." },
+    ],
+    signalExamples: [
+      "An investor emails a term sheet with specific valuation language and a 48-hour response window",
+      "A partner forwards a warm introduction to a potential enterprise client with context about their needs",
+      "A board member sends quarterly financials with commentary about burn rate concerns",
+    ],
+    whyItMatters: "Email is where commitments are formalised and records are created. Missing a signal in your inbox isn't just inefficiency… it's liability. Vanta ensures nothing consequential is ever buried.",
+  },
+  calendar: {
+    type: "MEETING",
+    label: "Calendar",
+    icon: Calendar,
+    tagline: "Your schedule is a signal map… every event is context waiting to be activated.",
+    channels: ["Google Calendar via OAuth", "Zoom Meeting Links"],
+    narrative: [
+      "The calendar is the most underutilised intelligence surface in a creative entrepreneur's stack. It contains the answer to the most important question in any relationship-driven business: who are you about to talk to, and what do you need to know?",
+      "Vanta syncs with Google Calendar to detect upcoming meetings, extract attendee lists, and cross-reference every participant against your full signal history. The result is a pre-meeting brief delivered before you walk into the room… or join the Zoom.",
+      "Calendar integration also powers post-meeting workflows. When a meeting ends, Vanta knows who was in the room and can attribute signals from the transcript to specific attendees in your relationship graph.",
+    ],
+    howItWorks: [
+      { step: "Calendar Sync", desc: "Google Calendar connected via OAuth. Events with attendees are detected and indexed automatically." },
+      { step: "Attendee Lookup", desc: "Each attendee is cross-referenced against the relationship graph… past signals, open commitments, and relevant context are surfaced." },
+      { step: "Pre-Meeting Brief", desc: "A structured brief is generated and delivered to your dashboard and optionally via Linq… 30 minutes before the meeting starts." },
+      { step: "Post-Meeting Link", desc: "After the meeting, transcript signals are attributed to attendees and logged against their profiles." },
+    ],
+    signalExamples: [
+      "A meeting with an investor in 2 hours surfaces their last three investment signals and an open commitment from 6 weeks ago",
+      "A team standup brief shows unresolved decisions from the last two standups with the same attendees",
+      "A client call brief surfaces a relationship signal from a phone call last week that mentioned contract renewal timing",
+    ],
+    whyItMatters: "Preparation is leverage. The entrepreneur who walks into every meeting with full context has a structural advantage over the one who wings it. Vanta makes preparation automatic.",
+  },
 };
 
 export default function ProductSignalPage() {
