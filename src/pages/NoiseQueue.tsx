@@ -96,7 +96,7 @@ export default function NoiseQueue() {
   const promotedCount = signals.length - visible.length - dismissedCount;
 
   return (
-    <div className="max-w-[960px] mx-auto px-4 pt-8 md:pt-12 pb-16">
+    <div className="max-w-[960px] mx-auto px-0 pt-0 pb-16">
       <Motion>
         <header className="mb-6">
           <h1 className="font-display text-2xl md:text-3xl text-foreground tracking-tight">
