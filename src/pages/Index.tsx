@@ -65,12 +65,12 @@ async function fetchTodayMeetingCount(): Promise<number> {
 /* ── constants ─────────────────────────────────────────── */
 
 const CHANNELS = [
-  { key: "linq", label: "iMessage", icon: MessageSquare, color: "text-vanta-accent", bg: "bg-vanta-accent-faint", border: "border-vanta-accent-border", href: "/product/intro" },
-  { key: "phone", label: "Phone", icon: Phone, color: "text-vanta-accent-phone", bg: "bg-vanta-accent-phone-faint", border: "border-vanta-accent-phone-border", href: "/product/phone-call" },
-  { key: "recall", label: "Zoom", icon: Video, color: "text-vanta-accent-zoom", bg: "bg-vanta-accent-zoom-faint", border: "border-vanta-accent-zoom-border", href: "/product/meeting" },
-  { key: "gmail", label: "Email", icon: Mail, color: "text-vanta-accent-teal", bg: "bg-vanta-accent-teal-faint", border: "border-vanta-accent-teal-border", href: "/product/email" },
-  { key: "calendar", label: "Calendar", icon: Calendar, color: "text-vanta-accent-amber", bg: "bg-vanta-accent-amber-faint", border: "border-vanta-accent-amber-border", href: "/product/calendar" },
-  { key: "manual", label: "Brain Dump", icon: StickyNote, color: "text-vanta-accent-violet", bg: "bg-vanta-accent-violet-faint", border: "border-vanta-accent-violet-border", href: "/brain-dump" },
+  { key: "linq", label: "iMessage", icon: MessageSquare, color: "text-vanta-accent", bg: "bg-vanta-accent/10", ring: "ring-vanta-accent/20", barColor: "bg-vanta-accent", href: "/product/intro" },
+  { key: "phone", label: "Phone", icon: Phone, color: "text-vanta-accent-phone", bg: "bg-vanta-accent-phone/10", ring: "ring-vanta-accent-phone/20", barColor: "bg-vanta-accent-phone", href: "/product/phone-call" },
+  { key: "recall", label: "Zoom", icon: Video, color: "text-vanta-accent-zoom", bg: "bg-vanta-accent-zoom/10", ring: "ring-vanta-accent-zoom/20", barColor: "bg-vanta-accent-zoom", href: "/product/meeting" },
+  { key: "gmail", label: "Email", icon: Mail, color: "text-vanta-accent-teal", bg: "bg-vanta-accent-teal/10", ring: "ring-vanta-accent-teal/20", barColor: "bg-vanta-accent-teal", href: "/product/email" },
+  { key: "calendar", label: "Calendar", icon: Calendar, color: "text-vanta-accent-amber", bg: "bg-vanta-accent-amber/10", ring: "ring-vanta-accent-amber/20", barColor: "bg-vanta-accent-amber", href: "/product/calendar" },
+  { key: "manual", label: "Brain Dump", icon: StickyNote, color: "text-vanta-accent-violet", bg: "bg-vanta-accent-violet/10", ring: "ring-vanta-accent-violet/20", barColor: "bg-vanta-accent-violet", href: "/brain-dump" },
 ];
 
 const SOURCE_ICONS: Record<string, typeof MessageSquare> = {
