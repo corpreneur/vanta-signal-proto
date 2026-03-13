@@ -17,6 +17,11 @@ const SignalFeed = ({ signals, filters, showPromote }: SignalFeedProps) => {
     if (filters.type !== "ALL" && s.signalType !== filters.type) return false;
     if (filters.sender !== "ALL" && s.sender !== filters.sender) return false;
     if (filters.priority !== "ALL" && s.priority !== filters.priority) return false;
+    if (filters.chatMode && filters.chatMode !== "ALL") {
+      const isGroup = s.rawPayload && typeof s.rawPayload === "object" && (s.rawPayload as Record<string, unknown>)._vanta_group_chat === true;
+      if (filters.chatMode === "group" && !isGroup) return false;
+      if (filters.chatMode === "direct" && isGroup) return false;
+    }
     if (filters.search) {
       const q = filters.search.toLowerCase();
       const match =
