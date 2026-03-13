@@ -237,24 +237,50 @@ const Index = () => {
       <Motion delay={120}>
         <section className="mb-10">
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-4">Channels</p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-px bg-vanta-border border border-vanta-border">
-            {CHANNELS.map((ch) => (
-              <Link
-                key={ch.key}
-                to={ch.href}
-                className="flex flex-col items-center gap-1.5 py-5 px-3 bg-card hover:bg-vanta-bg-elevated transition-colors group relative"
-              >
-                <ch.icon className={`w-5 h-5 ${ch.color} opacity-60`} />
-                <span className="font-mono text-[10px] uppercase tracking-wider text-vanta-text-low">{ch.label}</span>
-                <span className="font-display text-[20px] text-foreground">{channelData.counts[ch.key] || 0}</span>
-                {channelData.latest[ch.key] ? (
-                  <span className="font-mono text-[8px] text-vanta-text-muted">{formatRelative(channelData.latest[ch.key])}</span>
-                ) : (
-                  <span className="font-mono text-[8px] text-vanta-text-muted">no signals</span>
-                )}
-                <ChevronRight className="w-3 h-3 text-vanta-text-muted absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </Link>
-            ))}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {CHANNELS.map((ch) => {
+              const count = channelData.counts[ch.key] || 0;
+              const maxCount = Math.max(...Object.values(channelData.counts), 1);
+              const barWidth = count > 0 ? Math.max(12, (count / maxCount) * 100) : 0;
+              const freshness = channelData.latest[ch.key] ? formatRelative(channelData.latest[ch.key]) : null;
+
+              return (
+                <Link
+                  key={ch.key}
+                  to={ch.href}
+                  className="group relative flex flex-col justify-between p-5 bg-card border border-vanta-border rounded-sm hover:border-foreground/10 transition-all duration-300 hover:shadow-md overflow-hidden"
+                >
+                  {/* Top: icon badge + freshness */}
+                  <div className="flex items-start justify-between mb-5">
+                    <div className={`w-9 h-9 rounded-lg ${ch.bg} flex items-center justify-center ring-1 ${ch.ring} transition-transform duration-300 group-hover:scale-110`}>
+                      <ch.icon className={`w-4 h-4 ${ch.color}`} />
+                    </div>
+                    {freshness ? (
+                      <span className="font-mono text-[8px] text-vanta-text-muted mt-1">{freshness}</span>
+                    ) : (
+                      <span className="font-mono text-[8px] text-vanta-text-muted mt-1 italic">idle</span>
+                    )}
+                  </div>
+
+                  {/* Count + label */}
+                  <div>
+                    <p className="font-display text-[32px] leading-none text-foreground mb-1 tracking-tight">{count}</p>
+                    <p className="font-mono text-[10px] uppercase tracking-wider text-vanta-text-low">{ch.label}</p>
+                  </div>
+
+                  {/* Signal strength bar */}
+                  <div className="mt-4 h-1 w-full bg-vanta-border/50 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full ${ch.barColor} rounded-full transition-all duration-700 ease-out opacity-50 group-hover:opacity-100`}
+                      style={{ width: `${barWidth}%` }}
+                    />
+                  </div>
+
+                  {/* Hover arrow */}
+                  <ChevronRight className="w-3.5 h-3.5 text-vanta-text-muted absolute right-3 top-5 opacity-0 group-hover:opacity-60 transition-all duration-200 translate-x-1 group-hover:translate-x-0" />
+                </Link>
+              );
+            })}
           </div>
         </section>
       </Motion>
