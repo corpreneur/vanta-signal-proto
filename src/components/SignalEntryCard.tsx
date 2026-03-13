@@ -161,12 +161,16 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
                 {signal.source}
               </span>
             ) : null}
-            {signal.rawPayload && typeof signal.rawPayload === "object" && (signal.rawPayload as Record<string, unknown>)._vanta_group_chat === true && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border border-vanta-border text-vanta-text-mid bg-vanta-bg-elevated">
-                <Users className="w-3 h-3" />
-                Group
-              </span>
-            )}
+            {signal.rawPayload && typeof signal.rawPayload === "object" && (signal.rawPayload as Record<string, unknown>)._vanta_group_chat === true && (() => {
+              const participants = (signal.rawPayload as Record<string, unknown>)._vanta_participants as string[] | undefined;
+              const count = participants?.length;
+              return (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border border-vanta-border text-vanta-text-mid bg-vanta-bg-elevated">
+                  <Users className="w-3 h-3" />
+                  Group{count ? ` · ${count}` : ""}
+                </span>
+              );
+            })()}
             {signal.riskLevel && (
               <span
                 className={`inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border ${RISK_STYLES[signal.riskLevel]}`}
