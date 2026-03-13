@@ -46,6 +46,7 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   const [replyOpen, setReplyOpen] = useState(false);
   const [replyTo, setReplyTo] = useState("");
   const [replyMessage, setReplyMessage] = useState("");
+  const [replyMediaUrl, setReplyMediaUrl] = useState("");
   const [sending, setSending] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<SignalStatus>("Captured");
   const [updatingStatus, setUpdatingStatus] = useState(false);
