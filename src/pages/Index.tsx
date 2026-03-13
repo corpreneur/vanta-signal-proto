@@ -68,8 +68,10 @@ const Index = () => {
     refetchInterval: 60_000,
   });
 
-  const highCount = useMemo(() => signals.filter((s) => s.priority === "high").length, [signals]);
-  const actionCount = useMemo(() => signals.reduce((acc, s) => acc + s.actionsTaken.length, 0), [signals]);
+  const activeSignals = useMemo(() => signals.filter((s) => s.signalType !== "NOISE"), [signals]);
+  const noiseCount = useMemo(() => signals.length - activeSignals.length, [signals, activeSignals]);
+  const highCount = useMemo(() => activeSignals.filter((s) => s.priority === "high").length, [activeSignals]);
+  const actionCount = useMemo(() => activeSignals.reduce((acc, s) => acc + s.actionsTaken.length, 0), [activeSignals]);
 
   const channelCounts = useMemo(() => {
     const counts: Record<string, number> = {};
