@@ -67,8 +67,11 @@ const productItems = [
 const coreItems = [
   { title: "Signal Feed", url: "/signals", icon: BarChart3 },
   { title: "Command", url: "/command", icon: Zap },
+  { title: "Smart Contacts", url: "/contacts", icon: Users },
+  { title: "Noise Queue", url: "/noise-queue", icon: Filter },
   { title: "Classification Audit", url: "/audit", icon: ShieldCheck },
   { title: "Relationship Graph", url: "/graph", icon: Network },
+  { title: "User Modes", url: "/user-modes", icon: SlidersHorizontal },
 ];
 
 const platformItems = [
