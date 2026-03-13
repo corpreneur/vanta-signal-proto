@@ -66,7 +66,7 @@ const productItems = [
 
 const coreItems = [
   { title: "Signal Feed", url: "/signals", icon: BarChart3 },
-  { title: "Command", url: "/command", icon: Zap },
+  { title: "Daily Command", url: "/command", icon: Zap },
   { title: "Smart Contacts", url: "/contacts", icon: Users },
   { title: "Noise Queue", url: "/noise-queue", icon: Filter },
   { title: "Classification Audit", url: "/audit", icon: ShieldCheck },
