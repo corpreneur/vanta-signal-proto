@@ -373,14 +373,9 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 1. Skip AI — use static classification
-    const classification = {
-      signalType: "CONTEXT" as string,
-      priority: "medium" as string,
-      summary: `Message from ${parsed.sender}: ${parsed.body.slice(0, 120)}`,
-      actionsTaken: ["NOTION_LOG"] as string[],
-    };
-    console.log("Bypassed AI classification, using static CONTEXT");
+    // 1. Classify with AI
+    const classification = await classifySignal(parsed.body, parsed.sender, lovableApiKey);
+    console.log("AI classification:", classification.signalType, classification.priority);
 
     // 2. Insert signal
     const { data, error } = await supabase.from("signals").insert({
@@ -411,9 +406,9 @@ Deno.serve(async (req) => {
       priority: classification.priority,
     };
 
-    // 3. Auto-reply with fallback template (no AI)
-    if (parsed.senderHandle) {
-      const replyText = FALLBACK_TEMPLATES[classification.signalType] || "Received — I'll follow up shortly.";
+    // 3. Auto-reply (AI-generated for non-NOISE signals)
+    if (parsed.senderHandle && classification.signalType !== "NOISE") {
+      const replyText = await generateReply(classification.signalType, parsed.sender, parsed.body, classification.summary, lovableApiKey);
       const sendResult = await sendLinqReply(parsed.senderHandle, replyText, parsed.chatId);
       result.autoReply = { sent: sendResult.success, to: parsed.senderHandle, error: sendResult.error };
 
