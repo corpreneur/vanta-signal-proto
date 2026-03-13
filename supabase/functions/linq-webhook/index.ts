@@ -363,14 +363,14 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 1. Classify
-    const classification = await classifySignal(parsed.body, parsed.sender, lovableApiKey);
-
-    if (classification.signalType === "NOISE") {
-      return new Response(JSON.stringify({ skipped: true, reason: "NOISE", sender: parsed.sender }), {
-        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    // 1. Skip AI — use static classification
+    const classification = {
+      signalType: "CONTEXT" as string,
+      priority: "medium" as string,
+      summary: `Message from ${parsed.sender}: ${parsed.body.slice(0, 120)}`,
+      actionsTaken: ["NOTION_LOG"] as string[],
+    };
+    console.log("Bypassed AI classification, using static CONTEXT");
 
     // 2. Insert signal
     const { data, error } = await supabase.from("signals").insert({
@@ -393,7 +393,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    console.log("Signal created:", data.id, classification.signalType, classification.priority);
+    console.log("Signal created:", data.id);
 
     const result: Record<string, unknown> = {
       id: data.id,
@@ -401,22 +401,17 @@ Deno.serve(async (req) => {
       priority: classification.priority,
     };
 
-    // 3. Auto-reply to sender for ALL non-NOISE signals
+    // 3. Auto-reply with fallback template (no AI)
     if (parsed.senderHandle) {
-      const replyText = await generateReply(
-        classification.signalType, parsed.sender, parsed.body, classification.summary, lovableApiKey
-      );
+      const replyText = FALLBACK_TEMPLATES[classification.signalType] || "Received — I'll follow up shortly.";
+      const sendResult = await sendLinqReply(parsed.senderHandle, replyText, parsed.chatId);
+      result.autoReply = { sent: sendResult.success, to: parsed.senderHandle, error: sendResult.error };
 
-      if (replyText) {
-        const sendResult = await sendLinqReply(parsed.senderHandle, replyText, parsed.chatId);
-        result.autoReply = { sent: sendResult.success, to: parsed.senderHandle, chatId: parsed.chatId, error: sendResult.error };
-
-        if (sendResult.success) {
-          await supabase.from("signals").update({
-            status: "In Progress",
-            actions_taken: [...classification.actionsTaken, "AUTO_REPLY_SENT"],
-          }).eq("id", data.id);
-        }
+      if (sendResult.success) {
+        await supabase.from("signals").update({
+          status: "In Progress",
+          actions_taken: [...classification.actionsTaken, "AUTO_REPLY_SENT"],
+        }).eq("id", data.id);
       }
     }
 
