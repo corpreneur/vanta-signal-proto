@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import SignalFeed from "@/components/SignalFeed";
 import SignalFilters from "@/components/SignalFilters";
 import TagBrowser from "@/components/TagBrowser";
@@ -8,7 +8,9 @@ import type { FilterState } from "@/components/SignalFilters";
 import type { SignalType } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
-import { ShieldOff, BarChart3, ArrowUpDown, AlertTriangle } from "lucide-react";
+import { ShieldOff, BarChart3, ArrowUpDown, AlertTriangle, Users } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
 
 const fetchSignals = async (): Promise<Signal[]> => {
   const { data, error } = await supabase
@@ -64,6 +66,32 @@ const Signals = () => {
     queryKey: ["signals"],
     queryFn: fetchSignals,
     refetchInterval: 60_000,
+  });
+
+  const { data: groupAutoReply = false } = useQuery({
+    queryKey: ["group-autoreply-setting"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("system_settings")
+        .select("value")
+        .eq("key", "group_autoreply_enabled")
+        .single();
+      return data?.value === true;
+    },
+  });
+
+  const toggleGroupAutoReply = useMutation({
+    mutationFn: async (enabled: boolean) => {
+      const { error } = await supabase
+        .from("system_settings")
+        .update({ value: enabled as any, updated_at: new Date().toISOString() })
+        .eq("key", "group_autoreply_enabled");
+      if (error) throw error;
+    },
+    onSuccess: (_, enabled) => {
+      queryClient.invalidateQueries({ queryKey: ["group-autoreply-setting"] });
+      toast(enabled ? "Group auto-replies enabled" : "Group auto-replies disabled");
+    },
   });
 
   const { data: briefs = [] } = useQuery({
@@ -220,12 +248,21 @@ const Signals = () => {
             <p className="font-display text-[24px] text-destructive">{overdueCount}</p>
           </div>
         )}
-        <div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Pipeline</p>
-          <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 bg-vanta-accent" style={{ animation: "pulse-dot 2s ease-in-out infinite" }} />
-            <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-vanta-accent">Active</p>
-          </div>
+        <div className="ml-auto flex items-center gap-2">
+          <Users className="w-3.5 h-3.5 text-vanta-text-low" />
+          <label
+            htmlFor="group-autoreply"
+            className="font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low cursor-pointer select-none"
+          >
+            Group Auto-Reply
+          </label>
+          <Switch
+            id="group-autoreply"
+            checked={groupAutoReply}
+            onCheckedChange={(checked) => toggleGroupAutoReply.mutate(checked)}
+            disabled={toggleGroupAutoReply.isPending}
+            className="data-[state=checked]:bg-vanta-accent"
+          />
         </div>
       </div>
 
