@@ -48,6 +48,8 @@ interface ContactSummary {
   signalTypes: Record<string, number>;
   dominantType: string;
   recentSignals: Signal[];
+  strength: number; // 0–100
+  strengthLabel: string;
 }
 
 function daysBetween(iso: string): number {
