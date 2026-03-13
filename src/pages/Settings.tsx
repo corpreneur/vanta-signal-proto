@@ -364,6 +364,11 @@ export default function Settings() {
         <TabsContent value="modes">
           <UserModes />
         </TabsContent>
+
+        {/* Classification Audit Tab */}
+        <TabsContent value="audit">
+          <ClassificationAudit />
+        </TabsContent>
       </Tabs>
     </div>
   );

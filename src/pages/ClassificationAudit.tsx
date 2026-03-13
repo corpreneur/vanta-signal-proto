@@ -189,19 +189,7 @@ export default function ClassificationAudit() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-2">
-          <ShieldCheck className="h-5 w-5 text-vanta-accent" />
-          <h1 className="font-sans text-xl font-bold tracking-tight text-foreground">
-            Classification Audit
-          </h1>
-        </div>
-        <p className="font-mono text-xs text-muted-foreground">
-          Review AI classifications and manually reclassify signals.
-        </p>
-      </div>
+    <div className="space-y-6">
 
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
