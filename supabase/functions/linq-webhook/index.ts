@@ -406,9 +406,9 @@ Deno.serve(async (req) => {
       priority: classification.priority,
     };
 
-    // 3. Auto-reply with fallback template (no AI)
-    if (parsed.senderHandle) {
-      const replyText = FALLBACK_TEMPLATES[classification.signalType] || "Received — I'll follow up shortly.";
+    // 3. Auto-reply (AI-generated for non-NOISE signals)
+    if (parsed.senderHandle && classification.signalType !== "NOISE") {
+      const replyText = await generateReply(classification.signalType, parsed.sender, parsed.body, classification.summary, lovableApiKey);
       const sendResult = await sendLinqReply(parsed.senderHandle, replyText, parsed.chatId);
       result.autoReply = { sent: sendResult.success, to: parsed.senderHandle, error: sendResult.error };
 
