@@ -220,14 +220,20 @@ const Signals = () => {
           <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-vanta-accent">
             Signal Log · Live
           </p>
+          {(isExecutive || isDnd) && (
+            <span className="flex items-center gap-1 ml-2 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider border border-foreground text-foreground bg-vanta-bg-elevated">
+              {isExecutive ? <Briefcase className="w-3 h-3" /> : <BellOff className="w-3 h-3" />}
+              {isExecutive ? "Executive" : "DND"}
+            </span>
+          )}
         </div>
         <h1 className="font-display text-[28px] md:text-[36px] leading-[1.15] text-vanta-text mb-3">
           Captured Signals
         </h1>
         <p className="font-sans text-[13px] md:text-[14px] leading-[1.6] text-vanta-text-mid max-w-[640px]">
-          A curated feed of intellectual capital captured from real conversations.
-          Every message is evaluated through a two-stage AI pipeline… what
-          matters is extracted before it disappears into the scroll.
+          {isExecutive
+            ? "Showing high-priority signals only. Switch to Creative mode for the full stream."
+            : "A curated feed of intellectual capital captured from real conversations. Every message is evaluated through a two-stage AI pipeline… what matters is extracted before it disappears into the scroll."}
         </p>
       </header>
 

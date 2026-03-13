@@ -6,6 +6,7 @@ import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { SIGNAL_TYPE_COLORS, type SignalType } from "@/data/signals";
+import { useUserMode } from "@/hooks/use-user-mode";
 
 const QUICK_TAGS = ["@person", "#priority", "#followup", "#idea", "#decision"];
 
