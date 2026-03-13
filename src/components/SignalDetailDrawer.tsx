@@ -418,6 +418,18 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
                       className="w-full bg-background border border-vanta-border text-vanta-text-mid font-mono text-[11px] px-3 py-2 leading-[1.5] focus:outline-none focus:border-vanta-accent-border placeholder:text-vanta-text-muted resize-none"
                     />
                   </div>
+                  <div>
+                    <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">
+                      Attach Media URL (optional)
+                    </label>
+                    <input
+                      type="url"
+                      value={replyMediaUrl}
+                      onChange={(e) => setReplyMediaUrl(e.target.value)}
+                      placeholder="https://example.com/image.jpg"
+                      className="w-full bg-background border border-vanta-border text-vanta-text-mid font-mono text-[11px] px-3 py-1.5 focus:outline-none focus:border-vanta-accent-border placeholder:text-vanta-text-muted"
+                    />
+                  </div>
                   <div className="flex gap-2">
                     <button
                       onClick={handleSend}
