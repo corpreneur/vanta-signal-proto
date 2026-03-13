@@ -64,6 +64,9 @@ const productItems = [
   { title: "Investment Intel", url: "/product/investment", icon: TrendingUp },
   { title: "Decision Capture", url: "/product/decision", icon: Gavel },
 ];
+const coreItems = [
+  { title: "Signal Feed", url: "/signals", icon: BarChart3 },
+];
 
 const platformItems = [
   { title: "Context Layer", url: "/product/context", icon: FileText },
