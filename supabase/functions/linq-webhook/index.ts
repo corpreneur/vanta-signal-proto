@@ -31,7 +31,7 @@ interface ParsedMessage {
   isGroupChat: boolean;
   participants: string[]; // all handles in the chat
   emojis: string[]; // emoji characters found in parts
-  attachments: Array<{ type: string; value?: string; mime?: string }>; // non-text, non-emoji parts
+  attachments: Array<{ type: string; url?: string; mime?: string; filename?: string; attachmentId?: string }>; // non-text, non-emoji parts
 }
 
 interface ParsedReaction {
@@ -165,7 +165,7 @@ function parseLinqPayload(payload: Record<string, unknown>): ParsedMessage | nul
     // Extract text, emojis, and attachments from parts
     const textParts: string[] = [];
     const emojis: string[] = [];
-    const attachments: Array<{ type: string; value?: string; mime?: string }> = [];
+    const attachments: Array<{ type: string; url?: string; mime?: string; filename?: string; attachmentId?: string }> = [];
 
     for (const part of parts || []) {
       const partType = String(part.type || "");
@@ -176,11 +176,13 @@ function parseLinqPayload(payload: Record<string, unknown>): ParsedMessage | nul
       } else if (partType === "sticker") {
         emojis.push(String(part.value || "🏷️"));
       } else if (partType) {
-        // Capture attachments (image, video, audio, file, etc.)
+        // Capture attachments (image, video, audio, file, media, etc.)
         attachments.push({
           type: partType,
-          value: part.value ? String(part.value) : undefined,
-          mime: part.mime_type ? String(part.mime_type) : undefined,
+          url: part.url ? String(part.url) : (part.value ? String(part.value) : undefined),
+          mime: (part.mime_type || part.content_type) ? String(part.mime_type || part.content_type) : undefined,
+          filename: part.filename ? String(part.filename) : undefined,
+          attachmentId: part.attachment_id ? String(part.attachment_id) : undefined,
         });
       }
     }
@@ -632,7 +634,12 @@ Deno.serve(async (req) => {
     }
 
     // 1. Classify with AI (group context passed for better classification)
-    const classification = await classifySignal(parsed.body, parsed.sender, lovableApiKey, parsed.isGroupChat, parsed.participants);
+    // Enrich body with attachment context for AI classification
+    const attachmentContext = parsed.attachments.length > 0
+      ? `\n[Attachments: ${parsed.attachments.map((a) => a.mime || a.type).join(", ")}]`
+      : "";
+    const classificationBody = parsed.body + attachmentContext;
+    const classification = await classifySignal(classificationBody, parsed.sender, lovableApiKey, parsed.isGroupChat, parsed.participants);
     console.log("AI classification:", classification.signalType, classification.priority, parsed.isGroupChat ? "(group)" : "(1:1)");
 
     // 2. Insert signal (with group chat + emoji + attachment metadata in raw_payload)

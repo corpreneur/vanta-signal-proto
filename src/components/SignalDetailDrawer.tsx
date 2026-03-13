@@ -5,7 +5,7 @@ import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { Video, FileText, MessageSquare, Sparkles } from "lucide-react";
+import { Video, FileText, MessageSquare, Sparkles, Image, Film, Mic, Paperclip, Download, ExternalLink } from "lucide-react";
 
 const STATUSES: SignalStatus[] = ["Captured", "In Progress", "Complete"];
 
@@ -46,6 +46,7 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   const [replyOpen, setReplyOpen] = useState(false);
   const [replyTo, setReplyTo] = useState("");
   const [replyMessage, setReplyMessage] = useState("");
+  const [replyMediaUrl, setReplyMediaUrl] = useState("");
   const [sending, setSending] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<SignalStatus>("Captured");
   const [updatingStatus, setUpdatingStatus] = useState(false);
@@ -120,8 +121,12 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
 
     setSending(true);
     try {
+      const invokeBody: Record<string, unknown> = { to: replyTo.trim(), message: replyMessage.trim() };
+      if (replyMediaUrl.trim()) {
+        invokeBody.media = [{ url: replyMediaUrl.trim() }];
+      }
       const { data, error } = await supabase.functions.invoke("linq-send", {
-        body: { to: replyTo.trim(), message: replyMessage.trim() },
+        body: invokeBody,
       });
 
       if (error) throw error;
@@ -413,6 +418,18 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
                       className="w-full bg-background border border-vanta-border text-vanta-text-mid font-mono text-[11px] px-3 py-2 leading-[1.5] focus:outline-none focus:border-vanta-accent-border placeholder:text-vanta-text-muted resize-none"
                     />
                   </div>
+                  <div>
+                    <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">
+                      Attach Media URL (optional)
+                    </label>
+                    <input
+                      type="url"
+                      value={replyMediaUrl}
+                      onChange={(e) => setReplyMediaUrl(e.target.value)}
+                      placeholder="https://example.com/image.jpg"
+                      className="w-full bg-background border border-vanta-border text-vanta-text-mid font-mono text-[11px] px-3 py-1.5 focus:outline-none focus:border-vanta-accent-border placeholder:text-vanta-text-muted"
+                    />
+                  </div>
                   <div className="flex gap-2">
                     <button
                       onClick={handleSend}
@@ -444,6 +461,66 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
                   </p>
                 </section>
               )}
+
+              {/* Attachments Gallery */}
+              {signal.rawPayload && typeof signal.rawPayload === "object" && (() => {
+                const rp = signal.rawPayload as Record<string, unknown>;
+                const attachments = rp._vanta_attachments as Array<{ type: string; url?: string; mime?: string; filename?: string }> | undefined;
+                if (!attachments || attachments.length === 0) return null;
+                return (
+                  <section>
+                    <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-2">
+                      Attachments ({attachments.length})
+                    </h3>
+                    <div className="space-y-3">
+                      {attachments.map((att, i) => {
+                        const isImage = att.mime?.startsWith("image") || att.type === "image";
+                        const isVideo = att.mime?.startsWith("video") || att.type === "video";
+                        const isAudio = att.mime?.startsWith("audio") || att.type === "audio";
+
+                        if (isImage && att.url) {
+                          return (
+                            <a key={i} href={att.url} target="_blank" rel="noopener noreferrer" className="block border border-vanta-border hover:border-vanta-accent-border transition-colors">
+                              <img src={att.url} alt={att.filename || "Image"} className="w-full max-h-64 object-contain bg-vanta-bg-elevated" />
+                              {att.filename && <p className="font-mono text-[9px] text-vanta-text-muted px-2 py-1">{att.filename}</p>}
+                            </a>
+                          );
+                        }
+                        if (isVideo && att.url) {
+                          return (
+                            <div key={i} className="border border-vanta-border bg-vanta-bg-elevated">
+                              <video src={att.url} controls preload="metadata" className="w-full" />
+                              {att.filename && <p className="font-mono text-[9px] text-vanta-text-muted px-2 py-1">{att.filename}</p>}
+                            </div>
+                          );
+                        }
+                        if (isAudio && att.url) {
+                          return (
+                            <div key={i} className="border border-vanta-border bg-vanta-bg-elevated p-3">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Mic className="w-3 h-3 text-vanta-text-mid" />
+                                <span className="font-mono text-[10px] text-vanta-text-mid">{att.filename || "Audio"}</span>
+                              </div>
+                              <audio src={att.url} controls className="w-full" />
+                            </div>
+                          );
+                        }
+                        // Generic file / document
+                        return (
+                          <a key={i} href={att.url || "#"} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 border border-vanta-border bg-vanta-bg-elevated hover:border-vanta-accent-border transition-colors">
+                            <Paperclip className="w-4 h-4 text-vanta-text-mid flex-shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <p className="font-mono text-[11px] text-vanta-text-mid truncate">{att.filename || att.type}</p>
+                              {att.mime && <p className="font-mono text-[9px] text-vanta-text-muted">{att.mime}</p>}
+                            </div>
+                            <Download className="w-3 h-3 text-vanta-text-muted flex-shrink-0" />
+                          </a>
+                        );
+                      })}
+                    </div>
+                  </section>
+                );
+              })()}
 
               {/* Raw Payload */}
               {signal.rawPayload && (
