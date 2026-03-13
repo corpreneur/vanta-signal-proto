@@ -195,6 +195,50 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
                 </span>
               );
             })()}
+            {/* Attachment badges */}
+            {signal.rawPayload && typeof signal.rawPayload === "object" && (() => {
+              const rp = signal.rawPayload as Record<string, unknown>;
+              const attachments = rp._vanta_attachments as Array<{ type: string; url?: string; mime?: string; filename?: string }> | undefined;
+              if (!attachments || attachments.length === 0) return null;
+              const getIcon = (type: string, mime?: string) => {
+                if (mime?.startsWith("image") || type === "image") return <Image className="w-3 h-3" />;
+                if (mime?.startsWith("video") || type === "video") return <Film className="w-3 h-3" />;
+                if (mime?.startsWith("audio") || type === "audio") return <Mic className="w-3 h-3" />;
+                if (type === "file" || type === "document") return <FileText className="w-3 h-3" />;
+                return <Paperclip className="w-3 h-3" />;
+              };
+              const getLabel = (type: string, mime?: string) => {
+                if (mime?.startsWith("image") || type === "image") return "Image";
+                if (mime?.startsWith("video") || type === "video") return "Video";
+                if (mime?.startsWith("audio") || type === "audio") return "Audio";
+                if (type === "file" || type === "document") return "File";
+                return type;
+              };
+              // Group by label
+              const groups: Record<string, number> = {};
+              attachments.forEach((a) => {
+                const label = getLabel(a.type, a.mime);
+                groups[label] = (groups[label] || 0) + 1;
+              });
+              return (
+                <>
+                  {Object.entries(groups).map(([label, count]) => (
+                    <span key={label} className="inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border border-vanta-border text-vanta-text-mid bg-vanta-bg-elevated">
+                      {getIcon(label.toLowerCase())}
+                      {label}{count > 1 ? ` ×${count}` : ""}
+                    </span>
+                  ))}
+                  {/* Thumbnail for first image attachment */}
+                  {attachments.find((a) => (a.mime?.startsWith("image") || a.type === "image") && a.url) && (
+                    <img
+                      src={attachments.find((a) => (a.mime?.startsWith("image") || a.type === "image") && a.url)!.url}
+                      alt="attachment"
+                      className="w-8 h-8 object-cover border border-vanta-border rounded-sm"
+                    />
+                  )}
+                </>
+              );
+            })()}
             {signal.riskLevel && (
               <span
                 className={`inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border ${RISK_STYLES[signal.riskLevel]}`}
