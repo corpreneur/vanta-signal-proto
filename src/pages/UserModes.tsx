@@ -4,8 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Motion } from "@/components/ui/motion";
 import { toast } from "sonner";
 import { Zap, Briefcase, BellOff, Check } from "lucide-react";
-
-type UserMode = "creative" | "executive" | "dnd";
+import { useUserMode, type UserMode } from "@/hooks/use-user-mode";
 
 interface ModeConfig {
   id: UserMode;
