@@ -41,7 +41,7 @@ const Login = () => {
           className="w-full h-full object-cover object-top"
         />
         {/* Gradient overlay — heavier bottom fade to fully mask image text behind form */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/90 via-40% to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background from-35% via-background/95 via-50% to-background/30" />
       </div>
 
       {/* Content */}
