@@ -57,11 +57,6 @@ export default function UserModes() {
   const queryClient = useQueryClient();
   const { mode: currentMode } = useUserMode();
   const [selected, setSelected] = useState<UserMode>("creative");
-  const isLoading = false;
-
-export default function UserModes() {
-  const queryClient = useQueryClient();
-  const [selected, setSelected] = useState<UserMode>("creative");
 
   useEffect(() => {
     if (currentMode) setSelected(currentMode);
