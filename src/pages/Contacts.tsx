@@ -258,6 +258,27 @@ export default function Contacts() {
                         </p>
                       </div>
                     </div>
+
+                    {/* Strength score */}
+                    <div className="flex items-center gap-2 shrink-0">
+                      <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all ${
+                            contact.strength >= 75 ? "bg-emerald-500" :
+                            contact.strength >= 50 ? "bg-sky-500" :
+                            contact.strength >= 25 ? "bg-amber-500" : "bg-muted-foreground"
+                          }`}
+                          style={{ width: `${contact.strength}%` }}
+                        />
+                      </div>
+                      <span className={`font-mono text-[9px] uppercase tracking-wider ${
+                        contact.strength >= 75 ? "text-emerald-500" :
+                        contact.strength >= 50 ? "text-sky-500" :
+                        contact.strength >= 25 ? "text-amber-500" : "text-muted-foreground"
+                      }`}>
+                        {contact.strength}
+                      </span>
+                    </div>
                     <div className="flex items-center gap-2 shrink-0">
                       {contact.highPriority > 0 && (
                         <span className="px-1.5 py-0.5 font-mono text-[9px] text-vanta-accent border border-vanta-accent-border bg-vanta-accent-faint">
