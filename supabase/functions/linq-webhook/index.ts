@@ -373,14 +373,9 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 1. Skip AI — use static classification
-    const classification = {
-      signalType: "CONTEXT" as string,
-      priority: "medium" as string,
-      summary: `Message from ${parsed.sender}: ${parsed.body.slice(0, 120)}`,
-      actionsTaken: ["NOTION_LOG"] as string[],
-    };
-    console.log("Bypassed AI classification, using static CONTEXT");
+    // 1. Classify with AI
+    const classification = await classifySignal(parsed.body, parsed.sender, lovableApiKey);
+    console.log("AI classification:", classification.signalType, classification.priority);
 
     // 2. Insert signal
     const { data, error } = await supabase.from("signals").insert({
