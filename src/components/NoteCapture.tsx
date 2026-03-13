@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
-import { Plus, X, Mic, MicOff, Loader2, Tag, Send, Bookmark, Share2, Pencil } from "lucide-react";
+import { Plus, X, Mic, MicOff, Loader2, Tag, Send, Bookmark, Share2, Pencil, Zap } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -17,8 +18,17 @@ const SIGNAL_TYPE_LABELS: Record<string, string> = {
   NOISE: "Noise",
 };
 
+interface ClassificationResult {
+  signalType: string;
+  priority: string;
+  summary: string;
+  suggestedTitle?: string;
+  suggestedTags?: string[];
+  suggestedContacts?: string[];
+  accelerators?: string[];
+}
+
 interface NoteCaptureProps {
-  /** When true, renders inline (page mode) vs. FAB overlay */
   inline?: boolean;
 }
 
@@ -27,12 +37,14 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
   const [text, setText] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<{
-    signalType: string;
-    priority: string;
-    summary: string;
-    suggestedActions?: string[];
-  } | null>(null);
+  const [result, setResult] = useState<ClassificationResult | null>(null);
+
+  // Editable result state
+  const [editableTitle, setEditableTitle] = useState("");
+  const [editableTags, setEditableTags] = useState<string[]>([]);
+  const [editableContacts, setEditableContacts] = useState<string[]>([]);
+  const [newTagInput, setNewTagInput] = useState("");
+  const [showTagInput, setShowTagInput] = useState(false);
 
   const { toast } = useToast();
   const { isListening, isSupported, startListening, stopListening, resetTranscript } =
@@ -74,11 +86,11 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
 
       if (error) throw error;
 
-      const classification = data.classification;
-      setResult({
-        ...classification,
-        suggestedActions: ["Set reminder", "Create task", "Add to brief"],
-      });
+      const classification = data.classification as ClassificationResult;
+      setResult(classification);
+      setEditableTitle(classification.suggestedTitle || "");
+      setEditableTags(classification.suggestedTags || []);
+      setEditableContacts(classification.suggestedContacts || []);
 
       toast({
         title: `Captured as ${SIGNAL_TYPE_LABELS[classification.signalType] || classification.signalType}`,
@@ -88,8 +100,7 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
       console.error("Note capture error:", e);
       toast({
         title: "Capture failed",
-        description:
-          e instanceof Error ? e.message : "Something went wrong.",
+        description: e instanceof Error ? e.message : "Something went wrong.",
         variant: "destructive",
       });
     } finally {
@@ -101,14 +112,47 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
     setText("");
     setSelectedTags([]);
     setResult(null);
+    setEditableTitle("");
+    setEditableTags([]);
+    setEditableContacts([]);
+    setNewTagInput("");
+    setShowTagInput(false);
     if (!inline) setOpen(false);
+  };
+
+  const handleNewNote = () => {
+    setText("");
+    setSelectedTags([]);
+    setResult(null);
+    setEditableTitle("");
+    setEditableTags([]);
+    setEditableContacts([]);
+    setNewTagInput("");
+    setShowTagInput(false);
+  };
+
+  const removeTag = (tag: string) => {
+    setEditableTags((prev) => prev.filter((t) => t !== tag));
+  };
+
+  const addTag = () => {
+    const trimmed = newTagInput.trim();
+    if (trimmed && !editableTags.includes(trimmed)) {
+      setEditableTags((prev) => [...prev, trimmed]);
+    }
+    setNewTagInput("");
+    setShowTagInput(false);
+  };
+
+  const removeContact = (contact: string) => {
+    setEditableContacts((prev) => prev.filter((c) => c !== contact));
   };
 
   const colors = result
     ? SIGNAL_TYPE_COLORS[result.signalType as SignalType]
     : null;
 
-  // ── FAB (floating action button) ──
+  // ── FAB ──
   if (!inline && !open) {
     return (
       <button
@@ -121,7 +165,7 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
     );
   }
 
-  // ── Expanded note surface ──
+  // ── Note surface ──
   const noteContent = (
     <div className="space-y-4">
       {/* Top bar */}
@@ -170,7 +214,7 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
         ))}
       </div>
 
-      {/* Quick actions */}
+      {/* Quick actions toolbar */}
       <div className="flex items-center gap-2 pt-1 border-t border-border">
         {isSupported && (
           <button
@@ -183,35 +227,19 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
             }`}
             title={isListening ? "Stop" : "Dictate"}
           >
-            {isListening ? (
-              <MicOff className="h-4 w-4" />
-            ) : (
-              <Mic className="h-4 w-4" />
-            )}
+            {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
           </button>
         )}
-        <button
-          className="p-2 rounded-md text-muted-foreground hover:text-foreground transition-colors"
-          title="Tag"
-        >
+        <button className="p-2 rounded-md text-muted-foreground hover:text-foreground transition-colors" title="Tag">
           <Tag className="h-4 w-4" />
         </button>
-        <button
-          className="p-2 rounded-md text-muted-foreground hover:text-foreground transition-colors"
-          title="Edit"
-        >
+        <button className="p-2 rounded-md text-muted-foreground hover:text-foreground transition-colors" title="Edit">
           <Pencil className="h-4 w-4" />
         </button>
-        <button
-          className="p-2 rounded-md text-muted-foreground hover:text-foreground transition-colors"
-          title="Share"
-        >
+        <button className="p-2 rounded-md text-muted-foreground hover:text-foreground transition-colors" title="Share">
           <Share2 className="h-4 w-4" />
         </button>
-        <button
-          className="p-2 rounded-md text-muted-foreground hover:text-foreground transition-colors"
-          title="Bookmark"
-        >
+        <button className="p-2 rounded-md text-muted-foreground hover:text-foreground transition-colors" title="Bookmark">
           <Bookmark className="h-4 w-4" />
         </button>
 
@@ -221,56 +249,154 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
             disabled={!text.trim() || loading}
             className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.15em] px-3 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40 transition-all"
           >
-            {loading ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <Send className="h-3.5 w-3.5" />
-            )}
+            {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
             {loading ? "Saving…" : "Save"}
           </button>
         </div>
       </div>
 
-      {/* AI Result — suggested classification + actions */}
+      {/* ── AI Result Card ── */}
       {result && colors && (
         <div
-          className={`rounded-md border p-3 space-y-2.5 ${colors.bg} ${colors.border} animate-in fade-in slide-in-from-bottom-2 duration-300`}
+          className={`rounded-md border p-4 space-y-3 ${colors.bg} ${colors.border} animate-in fade-in slide-in-from-bottom-2 duration-300`}
         >
+          {/* Classification badge */}
           <div className="flex items-center gap-2">
-            <span
-              className={`font-mono text-[10px] uppercase tracking-widest ${colors.text}`}
-            >
+            <span className={`font-mono text-[10px] uppercase tracking-widest ${colors.text}`}>
               {SIGNAL_TYPE_LABELS[result.signalType] || result.signalType}
             </span>
             <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
               · {result.priority}
             </span>
           </div>
+
+          {/* Summary */}
           <p className="font-mono text-xs text-foreground leading-relaxed">
             {result.summary}
           </p>
 
-          {/* Suggested actions */}
-          {result.suggestedActions && (
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {result.suggestedActions.map((action) => (
+          {/* Editable Title */}
+          <div className="space-y-1">
+            <label className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground">
+              Title
+            </label>
+            <Input
+              value={editableTitle}
+              onChange={(e) => setEditableTitle(e.target.value)}
+              className="h-8 font-mono text-xs bg-background/50 border-border"
+              placeholder="Note title…"
+            />
+          </div>
+
+          {/* Tags */}
+          <div className="space-y-1.5">
+            <label className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground">
+              Tags
+            </label>
+            <div className="flex flex-wrap gap-1.5">
+              {editableTags.map((tag) => (
                 <button
-                  key={action}
-                  className="font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1 rounded-full border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
+                  key={tag}
+                  onClick={() => removeTag(tag)}
+                  className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive transition-all min-h-[36px]"
                 >
-                  {action}
+                  <X className="h-3 w-3" />
+                  {tag}
                 </button>
               ))}
+              {showTagInput ? (
+                <form
+                  onSubmit={(e) => { e.preventDefault(); addTag(); }}
+                  className="flex items-center gap-1"
+                >
+                  <Input
+                    value={newTagInput}
+                    onChange={(e) => setNewTagInput(e.target.value)}
+                    className="h-8 w-24 font-mono text-[10px] bg-background/50 border-border"
+                    placeholder="Tag…"
+                    autoFocus
+                    onBlur={addTag}
+                  />
+                </form>
+              ) : (
+                <button
+                  onClick={() => setShowTagInput(true)}
+                  className="font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1.5 rounded-full border border-dashed border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all min-h-[36px]"
+                >
+                  + add
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Contacts */}
+          {editableContacts.length > 0 && (
+            <div className="space-y-1.5">
+              <label className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground">
+                Add
+              </label>
+              <div className="flex flex-wrap gap-1.5">
+                {editableContacts.map((contact) => (
+                  <button
+                    key={contact}
+                    onClick={() => removeContact(contact)}
+                    className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1.5 rounded-full border border-accent/40 bg-accent/10 text-accent-foreground hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive transition-all min-h-[36px]"
+                  >
+                    + {contact}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
+          {/* Quick Actions row */}
+          <div className="space-y-1.5 pt-1 border-t border-border/50">
+            <label className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground">
+              Quick Actions
+            </label>
+            <div className="flex items-center gap-2">
+              <button className="p-2 rounded-md text-muted-foreground hover:text-foreground transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center" title="Tag">
+                <Tag className="h-4 w-4" />
+              </button>
+              <button className="p-2 rounded-md text-muted-foreground hover:text-foreground transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center" title="Share">
+                <Share2 className="h-4 w-4" />
+              </button>
+              <button className="p-2 rounded-md text-muted-foreground hover:text-foreground transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center" title="Save">
+                <Bookmark className="h-4 w-4" />
+              </button>
+              <button className="p-2 rounded-md text-muted-foreground hover:text-foreground transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center" title="Edit">
+                <Pencil className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* VANTA Suggests — Accelerators */}
+          {result.accelerators && result.accelerators.length > 0 && (
+            <div className="space-y-1.5 pt-1 border-t border-border/50">
+              <div className="flex items-center gap-1.5">
+                <Zap className="h-3 w-3 text-primary" />
+                <label className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground">
+                  VANTA Suggests
+                </label>
+              </div>
+              <div className="flex flex-col gap-1">
+                {result.accelerators.map((action) => (
+                  <button
+                    key={action}
+                    className="flex items-center gap-2 font-mono text-[10px] tracking-wide px-3 py-2 rounded-md text-foreground bg-background/40 hover:bg-primary/10 hover:text-primary border border-border/50 hover:border-primary/30 transition-all text-left min-h-[36px]"
+                  >
+                    <span className="text-primary">▸</span>
+                    {action}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* New note */}
           <button
-            onClick={() => {
-              setText("");
-              setSelectedTags([]);
-              setResult(null);
-            }}
-            className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+            onClick={handleNewNote}
+            className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors pt-1"
           >
             + New note
           </button>
@@ -279,18 +405,15 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
     </div>
   );
 
-  if (inline) {
-    return noteContent;
-  }
+  if (inline) return noteContent;
 
-  // Overlay mode
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div
         className="absolute inset-0 bg-background/60 backdrop-blur-sm"
         onClick={handleDismiss}
       />
-      <div className="relative w-full max-w-lg mx-4 mb-4 sm:mb-0 bg-card border border-border rounded-xl p-5 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <div className="relative w-full max-w-lg mx-4 mb-4 sm:mb-0 bg-card border border-border rounded-xl p-5 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300 max-h-[85vh] overflow-y-auto">
         {noteContent}
       </div>
     </div>
