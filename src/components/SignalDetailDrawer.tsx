@@ -43,6 +43,7 @@ interface SignalDetailDrawerProps {
 }
 
 const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [replyOpen, setReplyOpen] = useState(false);
   const [replyTo, setReplyTo] = useState("");
   const [replyMessage, setReplyMessage] = useState("");
