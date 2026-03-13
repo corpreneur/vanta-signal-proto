@@ -1,10 +1,13 @@
 import type { SignalType, SignalPriority } from "@/data/signals";
 
+export type ChatMode = "ALL" | "group" | "direct";
+
 export interface FilterState {
   type: SignalType | "ALL";
   sender: string;
   priority: SignalPriority | "ALL";
   search: string;
+  chatMode: ChatMode;
 }
 
 interface SignalFiltersProps {
@@ -23,6 +26,12 @@ const SIGNAL_TYPES: (SignalType | "ALL")[] = [
 ];
 
 const PRIORITIES: (SignalPriority | "ALL")[] = ["ALL", "high", "medium", "low"];
+
+const CHAT_MODES: { value: ChatMode; label: string }[] = [
+  { value: "ALL", label: "All Chats" },
+  { value: "group", label: "Group Only" },
+  { value: "direct", label: "1:1 Only" },
+];
 
 const SignalFilters = ({ filters, onChange, senders }: SignalFiltersProps) => {
   return (
@@ -56,6 +65,26 @@ const SignalFilters = ({ filters, onChange, senders }: SignalFiltersProps) => {
           {SIGNAL_TYPES.map((t) => (
             <option key={t} value={t}>
               {t === "ALL" ? "All Types" : t}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Chat Mode */}
+      <div className="flex flex-col gap-1">
+        <label className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted">
+          Chat Mode
+        </label>
+        <select
+          value={filters.chatMode}
+          onChange={(e) =>
+            onChange({ ...filters, chatMode: e.target.value as ChatMode })
+          }
+          className="bg-vanta-bg-elevated border border-vanta-border text-vanta-text-mid font-mono text-[11px] uppercase tracking-[0.1em] px-3 py-1.5 focus:outline-none focus:border-vanta-accent-border appearance-none cursor-pointer min-w-[140px]"
+        >
+          {CHAT_MODES.map((m) => (
+            <option key={m.value} value={m.value}>
+              {m.label}
             </option>
           ))}
         </select>
