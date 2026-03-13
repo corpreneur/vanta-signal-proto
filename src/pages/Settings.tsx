@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
-import { Save, RotateCcw, Settings2, MessageSquare, Users, Bell, Shield } from "lucide-react";
+import { Save, RotateCcw, Settings2, MessageSquare, Users, Bell, Shield, Smartphone, Phone, Video, Mail, Calendar } from "lucide-react";
 
 interface SettingRow {
   key: string;
@@ -48,6 +48,24 @@ const SETTING_META: Record<string, { label: string; description: string; icon: R
   },
 };
 
+// Source channel definitions
+const SOURCE_CHANNELS: Array<{
+  key: string;
+  label: string;
+  description: string;
+  icon: React.ElementType;
+  iconColor: string;
+}> = [
+  { key: "source_linq_enabled", label: "Linq / iMessage", description: "SMS and iMessage signals via Linq", icon: Smartphone, iconColor: "text-vanta-accent opacity-60" },
+  { key: "source_phone_enabled", label: "Phone", description: "Native phone call intelligence", icon: Phone, iconColor: "text-vanta-accent-phone opacity-60" },
+  { key: "source_recall_enabled", label: "Zoom", description: "Meeting recordings and transcripts via Recall", icon: Video, iconColor: "text-vanta-accent-zoom opacity-60" },
+  { key: "source_gmail_enabled", label: "Email", description: "Gmail inbox signal ingestion", icon: Mail, iconColor: "text-vanta-accent-teal opacity-60" },
+  { key: "source_calendar_enabled", label: "Calendar", description: "Meeting briefs and scheduling intelligence", icon: Calendar, iconColor: "text-vanta-accent-amber opacity-60" },
+];
+
+// Keys that belong to Connected Sources (exclude from general settings)
+const SOURCE_KEYS = new Set(SOURCE_CHANNELS.map((c) => c.key));
+
 export default function Settings() {
   const queryClient = useQueryClient();
   const { data: settings, isLoading } = useQuery({ queryKey: ["system_settings"], queryFn: fetchSettings });
@@ -74,7 +92,7 @@ export default function Settings() {
     },
     onSuccess: (_, { key }) => {
       queryClient.invalidateQueries({ queryKey: ["system_settings"] });
-      toast.success(`${SETTING_META[key]?.label || key} saved`);
+      toast.success(`${SETTING_META[key]?.label || SOURCE_CHANNELS.find((c) => c.key === key)?.label || key} saved`);
     },
     onError: (err) => {
       toast.error(`Save failed: ${err.message}`);
@@ -100,6 +118,14 @@ export default function Settings() {
     return JSON.stringify(editedValues[key]) !== JSON.stringify(original.value);
   };
 
+  const handleSourceToggle = async (key: string, checked: boolean) => {
+    setEditedValues((p) => ({ ...p, [key]: checked }));
+    // Auto-save source toggles
+    setSaving((p) => ({ ...p, [key]: true }));
+    await saveMutation.mutateAsync({ key, value: checked });
+    setSaving((p) => ({ ...p, [key]: false }));
+  };
+
   const formatTimestamp = (iso: string) => {
     const d = new Date(iso);
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
@@ -113,13 +139,17 @@ export default function Settings() {
     );
   }
 
-  // Group settings by section
+  // Group settings by section (excluding source settings)
   const sections: Record<string, SettingRow[]> = {};
   (settings || []).forEach((s) => {
+    if (SOURCE_KEYS.has(s.key)) return; // handled separately
     const section = SETTING_META[s.key]?.section || "Other";
     if (!sections[section]) sections[section] = [];
     sections[section].push(s);
   });
+
+  // Count active sources
+  const activeSources = SOURCE_CHANNELS.filter((c) => editedValues[c.key] === true).length;
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 md:py-12">
@@ -132,12 +162,60 @@ export default function Settings() {
           </h1>
         </div>
         <p className="font-mono text-xs text-vanta-text-muted uppercase tracking-widest">
-          System configuration · AI behavior · Feature toggles
+          System configuration · AI behavior · Connected sources
         </p>
       </div>
 
-      {/* Settings sections */}
       <div className="space-y-10">
+        {/* Connected Sources */}
+        <div>
+          <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-vanta-text-low mb-1 border-b border-vanta-border pb-2">
+            Connected Sources
+          </h2>
+          <p className="font-mono text-[11px] text-vanta-text-muted mb-4 mt-2">
+            {activeSources} of {SOURCE_CHANNELS.length} channels active. Disabled sources are excluded from the Signal Feed.
+          </p>
+          <div className="space-y-1">
+            {SOURCE_CHANNELS.map((channel) => {
+              const isActive = editedValues[channel.key] === true;
+              const Icon = channel.icon;
+              return (
+                <div
+                  key={channel.key}
+                  className={`flex items-center justify-between p-4 border transition-colors ${
+                    isActive ? "border-vanta-border bg-vanta-bg-elevated" : "border-vanta-border/50 bg-vanta-bg opacity-50"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className={`w-4 h-4 ${channel.iconColor}`} />
+                    <div>
+                      <p className="font-mono text-[12px] font-medium text-foreground">
+                        {channel.label}
+                      </p>
+                      <p className="font-mono text-[10px] text-vanta-text-muted">
+                        {channel.description}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className={`font-mono text-[9px] uppercase tracking-widest ${
+                      isActive ? "text-vanta-signal-green" : "text-vanta-text-muted"
+                    }`}>
+                      {saving[channel.key] ? "Saving…" : isActive ? "Active" : "Inactive"}
+                    </span>
+                    <Switch
+                      checked={isActive}
+                      onCheckedChange={(checked) => handleSourceToggle(channel.key, checked)}
+                      disabled={saving[channel.key]}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* General settings sections */}
         {Object.entries(sections).map(([sectionName, sectionSettings]) => (
           <div key={sectionName}>
             <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-vanta-text-low mb-4 border-b border-vanta-border pb-2">
