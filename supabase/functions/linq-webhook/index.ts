@@ -512,6 +512,68 @@ Deno.serve(async (req) => {
     const payload = JSON.parse(rawBody);
     console.log("Webhook event:", payload.event_type || "legacy", payload.event_id || "no-event-id");
 
+    // ── Handle reaction/tapback events first ──
+    const reaction = parseLinqReaction(payload);
+    if (reaction) {
+      const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+
+      // Skip self-reactions
+      if (isSelfMessage(reaction.senderHandle)) {
+        return new Response(JSON.stringify({ skipped: true, reason: "self-reaction filtered" }), {
+          status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Find the target signal by linq_message_id
+      if (reaction.targetMessageId) {
+        const { data: targetSignal } = await supabase
+          .from("signals")
+          .select("id, raw_payload")
+          .eq("linq_message_id", reaction.targetMessageId)
+          .limit(1)
+          .single();
+
+        if (targetSignal) {
+          const existingPayload = (targetSignal.raw_payload || {}) as Record<string, unknown>;
+          const existingReactions = (existingPayload._vanta_reactions || []) as Array<Record<string, unknown>>;
+
+          if (reaction.removed) {
+            // Remove the reaction
+            const updatedReactions = existingReactions.filter(
+              (r) => !(r.emoji === reaction.emoji && r.sender === reaction.sender)
+            );
+            await supabase.from("signals").update({
+              raw_payload: { ...existingPayload, _vanta_reactions: updatedReactions },
+            }).eq("id", targetSignal.id);
+
+            console.log(`Reaction removed: ${reaction.emoji} by ${reaction.sender} on signal ${targetSignal.id}`);
+          } else {
+            // Add the reaction
+            existingReactions.push({
+              emoji: reaction.emoji,
+              sender: reaction.sender,
+              timestamp: reaction.timestamp,
+            });
+            await supabase.from("signals").update({
+              raw_payload: { ...existingPayload, _vanta_reactions: existingReactions },
+            }).eq("id", targetSignal.id);
+
+            console.log(`Reaction added: ${reaction.emoji} by ${reaction.sender} on signal ${targetSignal.id}`);
+          }
+
+          return new Response(JSON.stringify({ processed: 1, type: "reaction", targetSignalId: targetSignal.id }), {
+            status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+      }
+
+      // No target signal found — log and acknowledge
+      console.log("Reaction received but no matching signal found:", reaction.targetMessageId);
+      return new Response(JSON.stringify({ skipped: true, reason: "reaction target not found" }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Parse the payload (handles v3 2026-02-03, legacy formats, and group chats)
     const parsed = parseLinqPayload(payload);
 
@@ -553,11 +615,19 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Log emoji and attachment metadata
+    if (parsed.emojis.length > 0) {
+      console.log("Emojis in message:", parsed.emojis.join(" "));
+    }
+    if (parsed.attachments.length > 0) {
+      console.log("Attachments:", parsed.attachments.map((a) => a.type).join(", "));
+    }
+
     // 1. Classify with AI (group context passed for better classification)
     const classification = await classifySignal(parsed.body, parsed.sender, lovableApiKey, parsed.isGroupChat, parsed.participants);
     console.log("AI classification:", classification.signalType, classification.priority, parsed.isGroupChat ? "(group)" : "(1:1)");
 
-    // 2. Insert signal (with group chat metadata in raw_payload)
+    // 2. Insert signal (with group chat + emoji + attachment metadata in raw_payload)
     const signalPayload: Record<string, unknown> = {
       sender: parsed.sender,
       source_message: parsed.body,
@@ -572,6 +642,9 @@ Deno.serve(async (req) => {
         _vanta_group_chat: parsed.isGroupChat,
         _vanta_chat_id: parsed.chatId,
         _vanta_participants: parsed.participants,
+        _vanta_emojis: parsed.emojis.length > 0 ? parsed.emojis : undefined,
+        _vanta_attachments: parsed.attachments.length > 0 ? parsed.attachments : undefined,
+        _vanta_reactions: [], // initialized empty, populated by reaction events
       },
       captured_at: parsed.timestamp,
     };
