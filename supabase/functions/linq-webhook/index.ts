@@ -431,8 +431,25 @@ Deno.serve(async (req) => {
     };
 
     // 3. Auto-reply (AI-generated for non-NOISE signals)
-    // For group chats, reply into the group thread via chatId
-    if (parsed.senderHandle && classification.signalType !== "NOISE") {
+    // Check group auto-reply setting before replying in group chats
+    let shouldAutoReply = parsed.senderHandle && classification.signalType !== "NOISE";
+
+    if (shouldAutoReply && parsed.isGroupChat) {
+      const { data: settingRow } = await supabase
+        .from("system_settings")
+        .select("value")
+        .eq("key", "group_autoreply_enabled")
+        .single();
+
+      const groupAutoReplyEnabled = settingRow?.value === true;
+      if (!groupAutoReplyEnabled) {
+        console.log("Group auto-reply disabled — skipping reply for group chat");
+        shouldAutoReply = false;
+        result.autoReply = { sent: false, reason: "group_autoreply_disabled" };
+      }
+    }
+
+    if (shouldAutoReply) {
       const replyText = await generateReply(classification.signalType, parsed.sender, parsed.body, classification.summary, lovableApiKey, parsed.isGroupChat);
 
       // Group chats: always reply into the thread (chatId). 1:1: fall back to direct send.
