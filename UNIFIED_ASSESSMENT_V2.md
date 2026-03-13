@@ -16,7 +16,7 @@ The consensus is clear: the "move fast and break things" phase is over. The plat
 
 | ID | Priority | Title | Team | Status |
 |:---|:---:|:---|:---|:---|
-| **SEC-01** | **P0** | Implement RLS Policies | Engineering | **OPEN** |
+| **SEC-01** | **P0** | Implement RLS Policies | Engineering | **DONE** |
 | **INFRA-01** | **P0** | Create Staging Environment & Purge Test Data | Engineering | **DONE** (test data purged) |
 | **PROD-01** | **P0** | Fix Broken Routes for New Pages | Product | **DONE** |
 | **PROD-02** | **P1** | Fix Signal Count Discrepancy | Product | **DONE** |

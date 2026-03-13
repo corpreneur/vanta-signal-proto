@@ -497,14 +497,22 @@ Deno.serve(async (req) => {
     const webhookTimestamp = req.headers.get("x-webhook-timestamp");
 
     if (webhookSignature && webhookTimestamp && signingSecret) {
-      // Signature verification temporarily in log-only mode
       const age = Math.abs(Date.now() / 1000 - parseInt(webhookTimestamp));
       const valid = age <= 300 && await verifyWebhookSignature(signingSecret, rawBody, webhookTimestamp, webhookSignature);
       if (valid) {
         console.log("HMAC signature verified");
       } else {
-        console.warn("HMAC signature mismatch — allowing through (debug mode). Age:", age);
+        console.error("HMAC signature verification FAILED. Age:", age);
+        return new Response(JSON.stringify({ error: "Invalid webhook signature" }), {
+          status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
+    } else if (signingSecret) {
+      // Signing secret is configured but no HMAC headers — reject
+      console.error("Missing HMAC headers on webhook request");
+      return new Response(JSON.stringify({ error: "Missing webhook signature" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
     // When no HMAC headers: allow through (for internal testing / legacy)
     // Production Linq webhooks always include HMAC headers

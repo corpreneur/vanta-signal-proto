@@ -186,7 +186,7 @@ export default function BrainDump() {
             variant="ghost"
             size="sm"
             className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground p-0 h-auto"
-            onClick={() => navigate("/signals?skip-auth=1")}
+            onClick={() => navigate("/signals")}
           >
             View in Signal Feed →
           </Button>
