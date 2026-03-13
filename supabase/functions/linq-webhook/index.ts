@@ -105,6 +105,43 @@ function isSelfMessage(senderHandle: string): boolean {
 
 // ─── Parse Linq v3 webhook payload ──────────────────────────────────────────
 
+// ─── Parse Linq v3 reaction/tapback event ───────────────────────────────────
+
+function parseLinqReaction(payload: Record<string, unknown>): ParsedReaction | null {
+  const eventType = String(payload.event_type || "");
+  // Handle reaction events: message.reaction, message.tapback, reaction.added, reaction.removed
+  if (!eventType.match(/reaction|tapback/i)) return null;
+
+  const data = payload.data as Record<string, unknown> | undefined;
+  if (!data) return null;
+
+  const senderHandle = data.sender_handle as Record<string, unknown> | undefined;
+  const chat = data.chat as Record<string, unknown> | undefined;
+  const reaction = data.reaction as Record<string, unknown> | undefined;
+  const targetMessage = data.message as Record<string, unknown> | undefined;
+
+  // Extract the emoji from reaction data
+  const emoji = String(
+    reaction?.emoji || reaction?.text || reaction?.value || data.emoji || data.tapback || ""
+  );
+
+  if (!emoji) return null;
+
+  return {
+    eventId: payload.event_id ? String(payload.event_id) : null,
+    sender: senderHandle?.handle ? String(senderHandle.handle) : "Unknown",
+    senderHandle: senderHandle?.handle ? String(senderHandle.handle) : "",
+    emoji,
+    targetMessageId: targetMessage?.id ? String(targetMessage.id) : (data.message_id ? String(data.message_id) : null),
+    chatId: chat?.id ? String(chat.id) : null,
+    timestamp: data.sent_at ? String(data.sent_at) : new Date().toISOString(),
+    removed: eventType.includes("removed") || (data.removed === true),
+    rawPayload: payload,
+  };
+}
+
+// ─── Parse Linq v3 webhook payload ──────────────────────────────────────────
+
 function parseLinqPayload(payload: Record<string, unknown>): ParsedMessage | null {
   // V3 2026-02-03 format: { event_type, event_id, data: { sender_handle, parts, chat, ... } }
   if (payload.event_type && payload.data) {
@@ -125,26 +162,48 @@ function parseLinqPayload(payload: Record<string, unknown>): ParsedMessage | nul
       .map((m) => String(m.handle || m.phone || ""))
       .filter(Boolean);
 
-    // Extract text from parts
-    const textParts = (parts || [])
-      .filter((p) => p.type === "text")
-      .map((p) => String(p.value || ""));
+    // Extract text, emojis, and attachments from parts
+    const textParts: string[] = [];
+    const emojis: string[] = [];
+    const attachments: Array<{ type: string; value?: string; mime?: string }> = [];
+
+    for (const part of parts || []) {
+      const partType = String(part.type || "");
+      if (partType === "text") {
+        textParts.push(String(part.value || ""));
+      } else if (partType === "emoji" || partType === "reaction" || partType === "tapback") {
+        emojis.push(String(part.value || part.emoji || ""));
+      } else if (partType === "sticker") {
+        emojis.push(String(part.value || "🏷️"));
+      } else if (partType) {
+        // Capture attachments (image, video, audio, file, etc.)
+        attachments.push({
+          type: partType,
+          value: part.value ? String(part.value) : undefined,
+          mime: part.mime_type ? String(part.mime_type) : undefined,
+        });
+      }
+    }
+
     const body = textParts.join("\n").trim();
 
-    if (!body) return null;
+    // Allow messages with only emojis (no text body required if emojis present)
+    if (!body && emojis.length === 0 && attachments.length === 0) return null;
 
     return {
       eventId: payload.event_id ? String(payload.event_id) : null,
       eventType,
       sender: senderHandle?.handle ? String(senderHandle.handle) : "Unknown",
       senderHandle: senderHandle?.handle ? String(senderHandle.handle) : "",
-      body,
+      body: body || emojis.join(" ") || `[${attachments.map((a) => a.type).join(", ")}]`,
       chatId: chat?.id ? String(chat.id) : null,
       messageId: data.id ? String(data.id) : null,
       timestamp: data.sent_at ? String(data.sent_at) : new Date().toISOString(),
       rawPayload: payload,
       isGroupChat,
       participants,
+      emojis,
+      attachments,
     };
   }
 
@@ -165,6 +224,8 @@ function parseLinqPayload(payload: Record<string, unknown>): ParsedMessage | nul
     rawPayload: payload,
     isGroupChat: false,
     participants: [],
+    emojis: [],
+    attachments: [],
   };
 }
 
