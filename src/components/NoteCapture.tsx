@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Plus, X, Mic, MicOff, Loader2, Tag, Send, Bookmark, Share2, Pencil, Zap } from "lucide-react";
+import { Plus, X, Mic, MicOff, Loader2, Tag, Send, Bookmark, Share2, Pencil, Zap, Mail, MessageSquare, Clock, FileText, CheckCircle2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
@@ -28,8 +28,54 @@ interface ClassificationResult {
   accelerators?: string[];
 }
 
+type AcceleratorIntent = "email" | "sms" | "reminder" | "task" | "document";
+
 interface NoteCaptureProps {
   inline?: boolean;
+}
+
+/**
+ * Detect the intent behind an accelerator phrase to route to the right action.
+ */
+function detectIntent(action: string): AcceleratorIntent {
+  const lower = action.toLowerCase();
+  if (
+    lower.includes("send email") ||
+    lower.includes("send invoice") ||
+    lower.includes("follow-up email") ||
+    lower.includes("follow up email") ||
+    lower.includes("email")
+  ) return "email";
+  if (
+    lower.includes("send text") ||
+    lower.includes("send sms") ||
+    lower.includes("text ")
+  ) return "sms";
+  if (
+    lower.includes("remind") ||
+    lower.includes("schedule") ||
+    lower.includes("set reminder") ||
+    lower.includes("revisit")
+  ) return "reminder";
+  if (
+    lower.includes("one-pager") ||
+    lower.includes("document") ||
+    lower.includes("draft") ||
+    lower.includes("create a") ||
+    lower.includes("surface") ||
+    lower.includes("associated files")
+  ) return "document";
+  return "task";
+}
+
+function intentIcon(intent: AcceleratorIntent) {
+  switch (intent) {
+    case "email": return <Mail className="h-3.5 w-3.5" />;
+    case "sms": return <MessageSquare className="h-3.5 w-3.5" />;
+    case "reminder": return <Clock className="h-3.5 w-3.5" />;
+    case "document": return <FileText className="h-3.5 w-3.5" />;
+    case "task": return <CheckCircle2 className="h-3.5 w-3.5" />;
+  }
 }
 
 export default function NoteCapture({ inline = false }: NoteCaptureProps) {
@@ -38,6 +84,7 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ClassificationResult | null>(null);
+  const [firedAccelerators, setFiredAccelerators] = useState<Set<string>>(new Set());
 
   // Editable result state
   const [editableTitle, setEditableTitle] = useState("");
@@ -78,6 +125,7 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
     if (isListening) stopListening();
     setLoading(true);
     setResult(null);
+    setFiredAccelerators(new Set());
 
     try {
       const { data, error } = await supabase.functions.invoke("brain-dump", {
@@ -117,6 +165,7 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
     setEditableContacts([]);
     setNewTagInput("");
     setShowTagInput(false);
+    setFiredAccelerators(new Set());
     if (!inline) setOpen(false);
   };
 
@@ -129,6 +178,7 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
     setEditableContacts([]);
     setNewTagInput("");
     setShowTagInput(false);
+    setFiredAccelerators(new Set());
   };
 
   const removeTag = (tag: string) => {
@@ -146,6 +196,68 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
 
   const removeContact = (contact: string) => {
     setEditableContacts((prev) => prev.filter((c) => c !== contact));
+  };
+
+  // ── Accelerator action handler ──
+  const handleAccelerator = async (action: string) => {
+    const intent = detectIntent(action);
+    const title = editableTitle || result?.summary || action;
+    const contacts = editableContacts;
+
+    switch (intent) {
+      case "email": {
+        const to = contacts.length > 0 ? contacts.join(", ") : "";
+        const subject = encodeURIComponent(title);
+        const body = encodeURIComponent(result?.summary || text);
+        window.open(`mailto:${to}?subject=${subject}&body=${body}`, "_self");
+        toast({ title: "Opening email client", description: action });
+        break;
+      }
+      case "sms": {
+        const smsBody = encodeURIComponent(result?.summary || text);
+        window.open(`sms:?body=${smsBody}`, "_self");
+        toast({ title: "Opening messages", description: action });
+        break;
+      }
+      case "reminder":
+      case "task": {
+        try {
+          const { error } = await supabase
+            .from("signals")
+            .update({ status: "In Progress" as const })
+            .eq("id", "placeholder"); // We'll create a new signal instead
+
+          // Create a new DECISION signal for the task
+          const { data: fn, error: fnError } = await supabase.functions.invoke("brain-dump", {
+            body: { text: `[Task from accelerator] ${action}. Context: ${title}` },
+          });
+
+          if (fnError) throw fnError;
+
+          toast({
+            title: intent === "reminder" ? "Reminder created" : "Task created",
+            description: `"${action}" saved to your signal feed`,
+          });
+        } catch (e) {
+          console.error("Accelerator task error:", e);
+          toast({
+            title: "Could not create task",
+            description: e instanceof Error ? e.message : "Something went wrong.",
+            variant: "destructive",
+          });
+        }
+        break;
+      }
+      case "document": {
+        toast({
+          title: "Coming soon",
+          description: `"${action}" — document creation will be available soon.`,
+        });
+        break;
+      }
+    }
+
+    setFiredAccelerators((prev) => new Set(prev).add(action));
   };
 
   const colors = result
@@ -380,15 +492,27 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
                 </label>
               </div>
               <div className="flex flex-col gap-1">
-                {result.accelerators.map((action) => (
-                  <button
-                    key={action}
-                    className="flex items-center gap-2 font-mono text-[10px] tracking-wide px-3 py-2 rounded-md text-foreground bg-background/40 hover:bg-primary/10 hover:text-primary border border-border/50 hover:border-primary/30 transition-all text-left min-h-[36px]"
-                  >
-                    <span className="text-primary">▸</span>
-                    {action}
-                  </button>
-                ))}
+                {result.accelerators.map((action) => {
+                  const intent = detectIntent(action);
+                  const fired = firedAccelerators.has(action);
+                  return (
+                    <button
+                      key={action}
+                      onClick={() => !fired && handleAccelerator(action)}
+                      disabled={fired}
+                      className={`flex items-center gap-2 font-mono text-[10px] tracking-wide px-3 py-2 rounded-md border text-left min-h-[36px] transition-all ${
+                        fired
+                          ? "opacity-50 bg-primary/5 border-primary/20 text-muted-foreground cursor-default"
+                          : "text-foreground bg-background/40 hover:bg-primary/10 hover:text-primary border-border/50 hover:border-primary/30"
+                      }`}
+                    >
+                      <span className="text-primary shrink-0">
+                        {fired ? <CheckCircle2 className="h-3.5 w-3.5" /> : intentIcon(intent)}
+                      </span>
+                      <span className={fired ? "line-through" : ""}>{action}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
