@@ -18,6 +18,7 @@ import {
   FileCode,
   ChevronRight,
   PenLine,
+  ShieldCheck,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { ThemeToggle } from "@/components/ThemeToggle";

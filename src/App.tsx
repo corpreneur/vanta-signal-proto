@@ -45,6 +45,7 @@ const App = () => (
           <Route path="/architecture" element={<ProtectedRoute><ProductLayout><Architecture /></ProductLayout></ProtectedRoute>} />
           <Route path="/brain-dump" element={<ProtectedRoute><ProductLayout><BrainDump /></ProductLayout></ProtectedRoute>} />
           <Route path="/releases" element={<ProtectedRoute><ProductLayout><ReleaseNotes /></ProductLayout></ProtectedRoute>} />
+          <Route path="/audit" element={<ProtectedRoute><ProductLayout><ClassificationAudit /></ProductLayout></ProtectedRoute>} />
           {/* Legacy case study redirects */}
           <Route path="/case-01" element={<Navigate to="/case/01" replace />} />
           <Route path="/case-02" element={<Navigate to="/case/02" replace />} />
