@@ -1,9 +1,6 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { cases } from "@/data/cases";
-import CaseCard from "@/components/CaseCard";
-import CaseCardSoon from "@/components/CaseCardSoon";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
 import {
