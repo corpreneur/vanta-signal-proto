@@ -274,25 +274,51 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
     ? SIGNAL_TYPE_COLORS[result.signalType as SignalType]
     : null;
 
-  // ── VANTA Orb (hidden in DND mode) ──
+  // ── VANTA Orb — signature ever-present capture element ──
   if (!inline && !open) {
     if (isDnd) return null;
     return (
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 group"
-        aria-label="New note"
+        className="fixed bottom-6 right-6 z-50 group h-16 w-16"
+        aria-label="Capture a thought"
       >
-        {/* Ambient pulse ring */}
-        <span className="absolute inset-0 rounded-full bg-primary/20 animate-ping [animation-duration:3s]" />
-        {/* Glow ring */}
-        <span className="absolute -inset-1 rounded-full bg-primary/10 blur-md group-hover:bg-primary/20 transition-all duration-500" />
-        {/* Orb body */}
-        <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_0_20px_hsl(var(--primary)/0.3)] group-hover:shadow-[0_0_30px_hsl(var(--primary)/0.5)] group-hover:scale-110 group-active:scale-95 transition-all duration-300">
-          {/* VANTA dot mark */}
-          <span className="absolute h-2 w-2 rounded-full bg-primary-foreground/90" />
-          {/* Outer ring detail */}
-          <span className="absolute h-10 w-10 rounded-full border border-primary-foreground/20" />
+        {/* Breathing aura — outermost */}
+        <span
+          className="absolute inset-[-8px] rounded-full border border-primary/10"
+          style={{ animation: "vanta-breathe 4s ease-in-out infinite" }}
+        />
+        {/* Second breathing ring, offset phase */}
+        <span
+          className="absolute inset-[-4px] rounded-full border border-primary/15"
+          style={{ animation: "vanta-breathe 4s ease-in-out infinite 1s" }}
+        />
+
+        {/* Orbital accent — a small dot that orbits the main body */}
+        <span
+          className="absolute inset-[-6px]"
+          style={{ animation: "vanta-orbit 8s linear infinite" }}
+        >
+          <span className="absolute top-0 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-primary/60" />
+        </span>
+
+        {/* Glow halo */}
+        <span className="absolute inset-0 rounded-full bg-primary/8 blur-lg group-hover:bg-primary/15 transition-all duration-700" />
+
+        {/* Main orb body */}
+        <span
+          className="relative flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground transition-all duration-500 group-hover:scale-105 group-active:scale-90"
+          style={{ animation: "vanta-glow-pulse 4s ease-in-out infinite" }}
+        >
+          {/* Inner concentric ring */}
+          <span className="absolute h-10 w-10 rounded-full border border-primary-foreground/15 group-hover:border-primary-foreground/30 transition-colors duration-500" />
+          {/* Core dot — the VANTA mark */}
+          <span className="h-2.5 w-2.5 rounded-full bg-primary-foreground/90 group-hover:bg-primary-foreground transition-colors duration-300" />
+        </span>
+
+        {/* Whisper label — appears on hover */}
+        <span className="absolute -top-8 left-1/2 -translate-x-1/2 font-mono text-[8px] uppercase tracking-[0.25em] text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-500 whitespace-nowrap pointer-events-none">
+          Capture
         </span>
       </button>
     );
