@@ -171,6 +171,29 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
                 </span>
               );
             })()}
+            {/* Emoji reactions on this signal */}
+            {signal.rawPayload && typeof signal.rawPayload === "object" && (() => {
+              const rp = signal.rawPayload as Record<string, unknown>;
+              const reactions = rp._vanta_reactions as Array<{ emoji: string; sender: string }> | undefined;
+              const emojis = rp._vanta_emojis as string[] | undefined;
+              const allEmojis = [
+                ...(emojis || []),
+                ...(reactions || []).map((r) => r.emoji),
+              ].filter(Boolean);
+              if (allEmojis.length === 0) return null;
+              // Dedupe and count
+              const counts: Record<string, number> = {};
+              allEmojis.forEach((e) => { counts[e] = (counts[e] || 0) + 1; });
+              return (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs border border-vanta-border bg-vanta-bg-elevated rounded-sm">
+                  {Object.entries(counts).map(([emoji, count]) => (
+                    <span key={emoji} title={`${count} reaction${count > 1 ? "s" : ""}`}>
+                      {emoji}{count > 1 ? <span className="font-mono text-[10px] text-vanta-text-muted ml-0.5">{count}</span> : null}
+                    </span>
+                  ))}
+                </span>
+              );
+            })()}
             {signal.riskLevel && (
               <span
                 className={`inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border ${RISK_STYLES[signal.riskLevel]}`}
