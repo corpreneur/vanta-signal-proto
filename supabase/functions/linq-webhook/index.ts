@@ -287,7 +287,7 @@ async function sendLinqReply(
 
     const body = chatId
       ? { message: { parts: [{ type: "text", value: message }] } }
-      : { from: fromNumber, to: [toNumber], message: { parts: [{ type: "text", value: message }] } };
+      : { from: fromNumber, to: [normalizedTo], message: { parts: [{ type: "text", value: message }] } };
 
     const res = await fetch(url, {
       method: "POST",
