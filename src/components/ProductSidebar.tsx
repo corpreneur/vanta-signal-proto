@@ -18,7 +18,7 @@ import {
   FileCode,
   ChevronRight,
   PenLine,
-  ShieldCheck,
+  
   Settings2,
   LogOut,
   Zap,
