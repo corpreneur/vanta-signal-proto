@@ -198,22 +198,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Case Studies */}
-      <section>
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-4">Case Studies</p>
-        <div className="grid grid-cols-1 gap-px md:grid-cols-2">
-          {cases.map((c, i) => (
-            <CaseCard
-              key={c.id}
-              caseData={c}
-              index={i}
-              onOpen={() => {}}
-              isActive={false}
-            />
-          ))}
-          <CaseCardSoon />
-        </div>
-      </section>
     </div>
   );
 };
