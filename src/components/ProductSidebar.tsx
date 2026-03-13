@@ -42,12 +42,12 @@ import {
 } from "@/components/ui/collapsible";
 
 const channelItems = [
-  { title: "Brain Dump", url: "/brain-dump", icon: PenLine },
   { title: "iMessage", url: "/product/intro", icon: MessageSquare },
   { title: "Phone", url: "/product/phone-call", icon: Phone },
   { title: "Zoom", url: "/product/meeting", icon: Video },
   { title: "Email", url: "/product/email", icon: Mail },
   { title: "Calendar", url: "/product/calendar", icon: Calendar },
+  { title: "Brain Dump", url: "/brain-dump", icon: PenLine },
 ];
 
 const productItems = [
