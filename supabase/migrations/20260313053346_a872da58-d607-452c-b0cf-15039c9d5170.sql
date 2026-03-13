@@ -1,0 +1,1 @@
+DELETE FROM signals WHERE sender LIKE '+%' OR sender = 'Test Contact';
