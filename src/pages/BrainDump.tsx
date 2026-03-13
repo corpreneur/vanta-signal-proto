@@ -1,13 +1,13 @@
-import { useState, useRef } from "react";
-import { PenLine, Loader2, ArrowRight, Mic, MicOff, Link2 } from "lucide-react";
+import { useState } from "react";
+import { PenLine, Link2, FileText } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { SIGNAL_TYPE_COLORS, type SignalType } from "@/data/signals";
-import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
+import NoteCapture from "@/components/NoteCapture";
 
 const SIGNAL_TYPE_LABELS: Record<string, string> = {
   INTRO: "Introduction",
@@ -18,13 +18,13 @@ const SIGNAL_TYPE_LABELS: Record<string, string> = {
   NOISE: "Noise",
 };
 
-type InputMode = "text" | "link";
+type InputMode = "note" | "link" | "notion";
 
 export default function BrainDump() {
-  const [text, setText] = useState("");
+  const [inputMode, setInputMode] = useState<InputMode>("note");
   const [linkUrl, setLinkUrl] = useState("");
-  const [inputMode, setInputMode] = useState<InputMode>("text");
   const [loading, setLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
   const [result, setResult] = useState<{
     signalType: string;
     priority: string;
@@ -32,65 +32,33 @@ export default function BrainDump() {
   } | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { isListening, isSupported, startListening, stopListening, resetTranscript } = useSpeechRecognition();
-  const textBeforeVoiceRef = useRef("");
 
-  const handleVoiceToggle = () => {
-    if (isListening) {
-      stopListening();
-    } else {
-      textBeforeVoiceRef.current = text;
-      resetTranscript();
-      startListening((voiceText) => {
-        setText(textBeforeVoiceRef.current + (textBeforeVoiceRef.current ? "\n" : "") + voiceText);
-      });
-    }
-  };
-
-  const [statusMessage, setStatusMessage] = useState("");
-
-  const handleSubmit = async () => {
-    if (loading) return;
-    
-    const content = inputMode === "link" ? linkUrl.trim() : text.trim();
-    if (!content) return;
-
-    if (isListening) stopListening();
+  const handleLinkSubmit = async () => {
+    if (!linkUrl.trim() || loading) return;
     setLoading(true);
     setResult(null);
+    setStatusMessage("Scraping URL…");
 
     try {
-      if (inputMode === "link") {
-        setStatusMessage("Scraping URL…");
-      } else {
-        setStatusMessage("Classifying…");
-      }
-
       const { data, error } = await supabase.functions.invoke("brain-dump", {
-        body: inputMode === "link" 
-          ? { url: content }
-          : { text: content },
+        body: { url: linkUrl.trim() },
       });
-
       setStatusMessage("");
-
       if (error) throw error;
 
       const classification = data.classification;
       setResult(classification);
-      if (inputMode === "text") setText("");
-      else setLinkUrl("");
-
+      setLinkUrl("");
       toast({
         title: `Classified as ${SIGNAL_TYPE_LABELS[classification.signalType] || classification.signalType}`,
         description: classification.summary,
       });
     } catch (e: unknown) {
       setStatusMessage("");
-      console.error("Brain dump error:", e);
+      console.error("Link scrape error:", e);
       toast({
         title: "Classification failed",
-        description: e instanceof Error ? e.message : "Something went wrong. Try again.",
+        description: e instanceof Error ? e.message : "Something went wrong.",
         variant: "destructive",
       });
     } finally {
@@ -113,115 +81,93 @@ export default function BrainDump() {
           </h1>
         </div>
         <p className="font-mono text-xs text-muted-foreground leading-relaxed max-w-md">
-          Paste a voice memo transcript, jot meeting notes, dump a thought.
-          Vanta will classify it and add it to your signal pipeline.
+          Share thoughts, ideas, or notes anytime. Vanta organizes, collects
+          context, and suggests actions.
         </p>
       </div>
 
       {/* Input mode tabs */}
       <div className="flex gap-1.5">
-        <button
-          onClick={() => setInputMode("text")}
-          className={`font-mono text-[10px] uppercase tracking-[0.15em] px-3 py-1.5 rounded-full border transition-all duration-200 ${
-            inputMode === "text"
-              ? "bg-primary/10 border-primary text-primary"
-              : "bg-transparent border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
-          }`}
-        >
-          Text / Voice
-        </button>
-        <button
-          onClick={() => setInputMode("link")}
-          className={`font-mono text-[10px] uppercase tracking-[0.15em] px-3 py-1.5 rounded-full border transition-all duration-200 ${
-            inputMode === "link"
-              ? "bg-primary/10 border-primary text-primary"
-              : "bg-transparent border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
-          }`}
-        >
-          <Link2 className="h-3 w-3 inline mr-1" />
-          Paste Link
-        </button>
-      </div>
-
-      {/* Input area */}
-      <div className="space-y-3">
-        {inputMode === "text" ? (
-          <>
-            <div className="relative">
-              <Textarea
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder={isListening ? "Listening…" : "Start typing or paste text here..."}
-                className={`min-h-[200px] bg-vanta-bg-elevated border-vanta-border font-mono text-sm text-foreground placeholder:text-muted-foreground resize-y pr-12 ${
-                  isListening ? "border-primary/50 ring-1 ring-primary/20" : ""
-                }`}
-                disabled={loading}
-                maxLength={10000}
-              />
-              {/* Mic button */}
-              {isSupported && (
-                <button
-                  onClick={handleVoiceToggle}
-                  disabled={loading}
-                  className={`absolute top-3 right-3 p-2 rounded-md border transition-all duration-200 ${
-                    isListening
-                      ? "bg-red-500/15 border-red-500/30 text-red-400 animate-pulse"
-                      : "bg-vanta-bg-elevated border-vanta-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
-                  }`}
-                  title={isListening ? "Stop recording" : "Start voice input"}
-                >
-                  {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                </button>
-              )}
-            </div>
-            {isListening && (
-              <p className="font-mono text-[10px] uppercase tracking-wider text-red-400 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
-                Recording — speak now
-              </p>
-            )}
-          </>
-        ) : (
-          <div className="space-y-2">
-            <Input
-              value={linkUrl}
-              onChange={(e) => setLinkUrl(e.target.value)}
-              placeholder="https://chatgpt.com/share/... or any article URL"
-              className="bg-vanta-bg-elevated border-vanta-border font-mono text-sm"
-              disabled={loading}
-              type="url"
-            />
-            <p className="font-mono text-[10px] text-muted-foreground leading-relaxed">
-              Paste a ChatGPT share link, blog post, article, or any web page. Firecrawl will extract the content and classify it as a signal.
-            </p>
-          </div>
-        )}
-
-        <div className="flex items-center justify-between">
-          <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
-            {inputMode === "text"
-              ? `${text.length.toLocaleString()} / 10,000`
-              : linkUrl ? "URL ready" : "Paste a URL"}
-          </span>
-          <Button
-            onClick={handleSubmit}
-            disabled={(inputMode === "text" ? !text.trim() : !linkUrl.trim()) || loading}
-            className="font-mono text-xs uppercase tracking-wider"
+        {([
+          { key: "note" as const, label: "Note", icon: PenLine },
+          { key: "link" as const, label: "Paste Link", icon: Link2 },
+          { key: "notion" as const, label: "Notion", icon: FileText },
+        ]).map(({ key, label, icon: Icon }) => (
+          <button
+            key={key}
+            onClick={() => setInputMode(key)}
+            className={`font-mono text-[10px] uppercase tracking-[0.15em] px-3 py-1.5 rounded-full border transition-all duration-200 flex items-center gap-1 ${
+              inputMode === key
+                ? "bg-primary/10 border-primary text-primary"
+                : "bg-transparent border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
+            }`}
           >
-            {loading ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                {statusMessage || "Processing…"}
-              </>
-            ) : (
-              "Classify & Save"
-            )}
-          </Button>
-        </div>
+            <Icon className="h-3 w-3" />
+            {label}
+          </button>
+        ))}
       </div>
 
-      {/* Result */}
-      {result && colors && (
+      {/* ─── Note mode: NoteCapture component ─── */}
+      {inputMode === "note" && (
+        <div className="border border-border rounded-xl p-5 bg-card">
+          <NoteCapture inline />
+        </div>
+      )}
+
+      {/* ─── Link mode ─── */}
+      {inputMode === "link" && (
+        <div className="space-y-3">
+          <Input
+            value={linkUrl}
+            onChange={(e) => setLinkUrl(e.target.value)}
+            placeholder="https://chatgpt.com/share/... or any article URL"
+            className="bg-vanta-bg-elevated border-vanta-border font-mono text-sm"
+            disabled={loading}
+            type="url"
+          />
+          <p className="font-mono text-[10px] text-muted-foreground leading-relaxed">
+            Paste a ChatGPT share link, blog post, or any web page. Content
+            will be extracted and classified as a signal.
+          </p>
+          <div className="flex items-center justify-between">
+            <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
+              {linkUrl ? "URL ready" : "Paste a URL"}
+            </span>
+            <Button
+              onClick={handleLinkSubmit}
+              disabled={!linkUrl.trim() || loading}
+              className="font-mono text-xs uppercase tracking-wider"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  {statusMessage || "Processing…"}
+                </>
+              ) : (
+                "Classify & Save"
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Notion mode (placeholder) ─── */}
+      {inputMode === "notion" && (
+        <div className="border border-dashed border-border rounded-xl p-8 flex flex-col items-center gap-3">
+          <FileText className="h-8 w-8 text-muted-foreground" />
+          <p className="font-mono text-xs text-muted-foreground text-center max-w-xs leading-relaxed">
+            Notion import coming soon. Paste a Notion page URL to pull content
+            directly into your signal pipeline.
+          </p>
+          <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground/60 border border-border rounded-full px-3 py-1">
+            In Development
+          </span>
+        </div>
+      )}
+
+      {/* Link mode result */}
+      {inputMode === "link" && result && colors && (
         <div
           className={`rounded-md border p-4 space-y-3 ${colors.bg} ${colors.border}`}
         >
@@ -242,7 +188,7 @@ export default function BrainDump() {
             className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground p-0 h-auto"
             onClick={() => navigate("/signals?skip-auth=1")}
           >
-            View in Signal Feed <ArrowRight className="h-3 w-3 ml-1" />
+            View in Signal Feed →
           </Button>
         </div>
       )}
