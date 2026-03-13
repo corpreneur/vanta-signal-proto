@@ -163,7 +163,7 @@ const Index = () => {
         <div className="flex items-center justify-between mb-4">
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted">Recent Signals</p>
           <Link
-            to="/signals?skip-auth=1"
+            to="/signals"
             className="font-mono text-[9px] uppercase tracking-wider text-primary hover:text-vanta-accent transition-colors flex items-center gap-1"
           >
             View All <ArrowRight className="w-3 h-3" />

@@ -20,10 +20,12 @@ import {
   PenLine,
   ShieldCheck,
   Settings2,
+  LogOut,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { cases } from "@/data/cases";
 import {
   Sidebar,
@@ -97,7 +99,7 @@ function CollapsibleNavGroup({ label, items, collapsed, currentPath, activeClass
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink
-                      to={`${item.url}?skip-auth=1`}
+                      to={item.url}
                       className="group/nav flex items-center gap-2 px-2 py-2 pl-6 border-l-2 border-transparent font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5"
                       activeClassName={activeClassName}
                     >
@@ -120,11 +122,17 @@ export function ProductSidebar() {
   const collapsed = state === "collapsed";
   const location = useLocation();
   const currentPath = location.pathname;
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/login");
+  };
 
   return (
     <Sidebar collapsible="icon" className="border-r border-vanta-border bg-vanta-bg">
       <SidebarHeader className="px-3 py-5">
-        <a href="/?skip-auth=1" className="flex items-center gap-2">
+        <a href="/" className="flex items-center gap-2">
           <span className="font-sans text-[17px] font-extrabold tracking-[0.2em] uppercase text-foreground">
             {collapsed ? "V" : "VANTA"}
           </span>
@@ -139,7 +147,7 @@ export function ProductSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <NavLink
-                    to="/?skip-auth=1"
+                    to="/"
                     end
                     className="group/nav flex items-center gap-2 px-2 py-2 border-l-2 border-transparent font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-vanta-accent hover:bg-vanta-accent-faint transition-all duration-200 hover:translate-x-0.5"
                     activeClassName="border-l-2 border-vanta-accent text-vanta-accent bg-vanta-accent-faint"
@@ -153,7 +161,7 @@ export function ProductSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink
-                      to={`${item.url}?skip-auth=1`}
+                      to={item.url}
                       className="group/nav flex items-center gap-2 px-2 py-2 border-l-2 border-transparent font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5"
                       activeClassName="border-l-2 border-vanta-accent text-foreground bg-vanta-bg-elevated"
                     >
@@ -185,7 +193,7 @@ export function ProductSidebar() {
                     <SidebarMenuItem key={c.id}>
                       <SidebarMenuButton asChild>
                         <NavLink
-                          to={`/case/${c.id}?skip-auth=1`}
+                          to={`/case/${c.id}`}
                           className="group/nav flex items-center gap-2 px-2 py-2 pl-6 border-l-2 border-transparent font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5"
                           activeClassName="border-l-2 border-vanta-accent text-foreground bg-vanta-bg-elevated"
                         >
@@ -207,7 +215,7 @@ export function ProductSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <NavLink
-                to="/settings?skip-auth=1"
+                to="/settings"
                 className="group/nav flex items-center gap-2 px-2 py-2 border-l-2 border-transparent font-mono text-[11px] uppercase tracking-wider text-vanta-text-muted hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200"
                 activeClassName="border-l-2 border-vanta-accent text-foreground bg-vanta-bg-elevated"
               >
@@ -219,13 +227,24 @@ export function ProductSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <NavLink
-                to="/releases?skip-auth=1"
+                to="/releases"
                 className="group/nav flex items-center gap-2 px-2 py-2 border-l-2 border-transparent font-mono text-[11px] uppercase tracking-wider text-vanta-text-muted hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200"
                 activeClassName="border-l-2 border-vanta-accent text-foreground bg-vanta-bg-elevated"
               >
                 <FileText className="h-3.5 w-3.5 shrink-0" />
                 {!collapsed && <span>Release Notes</span>}
               </NavLink>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <button
+                onClick={handleLogout}
+                className="group/nav flex items-center gap-2 px-2 py-2 border-l-2 border-transparent font-mono text-[11px] uppercase tracking-wider text-vanta-text-muted hover:text-destructive hover:bg-destructive/10 transition-all duration-200 w-full"
+              >
+                <LogOut className="h-3.5 w-3.5 shrink-0" />
+                {!collapsed && <span>Sign Out</span>}
+              </button>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
