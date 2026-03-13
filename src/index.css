@@ -216,3 +216,24 @@
   from { opacity: 0; transform: translateX(-50%) scale(0.6); }
   to { opacity: 1; transform: translateX(-50%) scale(1); }
 }
+
+/* VANTA Orb animations */
+@keyframes vanta-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.15); opacity: 0.15; }
+}
+
+@keyframes vanta-orbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes vanta-glow-pulse {
+  0%, 100% { box-shadow: 0 0 16px 2px hsl(var(--primary) / 0.15); }
+  50% { box-shadow: 0 0 28px 6px hsl(var(--primary) / 0.3); }
+}
+
+@keyframes vanta-orb-expand {
+  from { transform: scale(1); border-radius: 9999px; }
+  to { transform: scale(1); border-radius: var(--radius, 0.75rem); }
+}
