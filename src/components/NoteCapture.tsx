@@ -274,8 +274,9 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
     ? SIGNAL_TYPE_COLORS[result.signalType as SignalType]
     : null;
 
-  // ── FAB ──
+  // ── FAB (hidden in DND mode) ──
   if (!inline && !open) {
+    if (isDnd) return null;
     return (
       <button
         onClick={() => setOpen(true)}
