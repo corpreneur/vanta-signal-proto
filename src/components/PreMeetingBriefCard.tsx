@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Video, ChevronDown, X, Users } from "lucide-react";
+import { Video, ChevronDown, X, Users, FileText } from "lucide-react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 
