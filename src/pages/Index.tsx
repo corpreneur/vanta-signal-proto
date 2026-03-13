@@ -75,11 +75,11 @@ const Index = () => {
 
   const channelCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    signals.forEach((s) => {
+    activeSignals.forEach((s) => {
       counts[s.source] = (counts[s.source] || 0) + 1;
     });
     return counts;
-  }, [signals]);
+  }, [activeSignals]);
 
   const recentSignals = useMemo(
     () => [...signals].sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()).slice(0, 5),
