@@ -61,6 +61,13 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
     if (signal?.status) setCurrentStatus(signal.status);
   }, [signal?.id, signal?.status]);
 
+  // Reset scroll position when a new signal opens
+  useEffect(() => {
+    if (open && scrollRef.current) {
+      scrollRef.current.scrollTop = 0;
+    }
+  }, [signal?.id, open]);
+
   // Fetch meeting artifact for recall signals
   useEffect(() => {
     if (!signal || signal.source !== "recall") {
