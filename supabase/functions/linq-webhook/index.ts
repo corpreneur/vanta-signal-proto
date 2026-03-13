@@ -165,7 +165,7 @@ function parseLinqPayload(payload: Record<string, unknown>): ParsedMessage | nul
     // Extract text, emojis, and attachments from parts
     const textParts: string[] = [];
     const emojis: string[] = [];
-    const attachments: Array<{ type: string; value?: string; mime?: string }> = [];
+    const attachments: Array<{ type: string; url?: string; mime?: string; filename?: string; attachmentId?: string }> = [];
 
     for (const part of parts || []) {
       const partType = String(part.type || "");
@@ -176,11 +176,13 @@ function parseLinqPayload(payload: Record<string, unknown>): ParsedMessage | nul
       } else if (partType === "sticker") {
         emojis.push(String(part.value || "🏷️"));
       } else if (partType) {
-        // Capture attachments (image, video, audio, file, etc.)
+        // Capture attachments (image, video, audio, file, media, etc.)
         attachments.push({
           type: partType,
-          value: part.value ? String(part.value) : undefined,
-          mime: part.mime_type ? String(part.mime_type) : undefined,
+          url: part.url ? String(part.url) : (part.value ? String(part.value) : undefined),
+          mime: (part.mime_type || part.content_type) ? String(part.mime_type || part.content_type) : undefined,
+          filename: part.filename ? String(part.filename) : undefined,
+          attachmentId: part.attachment_id ? String(part.attachment_id) : undefined,
         });
       }
     }
