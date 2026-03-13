@@ -51,8 +51,14 @@ Deno.serve(async (req) => {
           Authorization: `Bearer ${linqApiKey}`,
           "Content-Type": "application/json",
         },
+        const parts: Array<Record<string, unknown>> = [{ type: "text", value: body.message.trim() }];
+        if (body.media?.length) {
+          for (const m of body.media) {
+            parts.push({ type: "media", url: m.url, ...(m.content_type ? { content_type: m.content_type } : {}) });
+          }
+        }
         body: JSON.stringify({
-          message: { parts: [{ type: "text", value: body.message.trim() }] },
+          message: { parts },
         }),
       });
 
