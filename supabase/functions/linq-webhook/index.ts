@@ -28,6 +28,8 @@ interface ParsedMessage {
   messageId: string | null;
   timestamp: string;
   rawPayload: Record<string, unknown>;
+  isGroupChat: boolean;
+  participants: string[]; // all handles in the chat
 }
 
 // ─── Auto-reply config ──────────────────────────────────────────────────────
