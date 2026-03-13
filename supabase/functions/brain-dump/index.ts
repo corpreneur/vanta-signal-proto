@@ -17,6 +17,10 @@ interface Classification {
   riskLevel: string | null;
   dueDate: string | null;
   callPointer: string | null;
+  suggestedTitle: string;
+  suggestedTags: string[];
+  suggestedContacts: string[];
+  accelerators: string[];
 }
 
 async function classifySignal(text: string, apiKey: string): Promise<Classification> {
@@ -36,7 +40,17 @@ Also assign:
 - dueDate: ISO date string (YYYY-MM-DD) if a deadline or due date is mentioned, otherwise null
 - callPointer: a brief reference to who/what to follow up with (e.g. "Call back John re: term sheet"), otherwise null
 - summary: concise 1-sentence summary
-- actionsTaken: 0-3 recommended next actions as short phrases`;
+- actionsTaken: 0-3 recommended next actions as short phrases
+- suggestedTitle: a concise, descriptive title for this note (3-8 words)
+- suggestedTags: 2-5 topic/keyword tags extracted from the content (e.g. "Invoice", "Payment", "Feature Ideas", "VANTA")
+- suggestedContacts: names or initials of people mentioned or relevant to this note. Extract from @mentions, names, or contextual references. Return empty array if none found.
+- accelerators: 2-5 specific, actionable next steps parsed from the user's intent. These should be extracted from meaning — not generic templates. Examples:
+  - If user says "send invoice for shoot" → "Send invoice for shoot"
+  - If user says "follow up on payment" → "Send follow-up email re: payment"
+  - If user mentions a person → "Send to [person name]"
+  - If content is an idea → "Create a one-pager", "Schedule reminder to revisit"
+  - If a date is mentioned → "Set reminder for [date]"
+  - Always consider: document creation, follow-ups, reminders, sharing with mentioned people, and surfacing related files`;
 
   const res = await fetch(LOVABLE_AI_URL, {
     method: "POST",
@@ -55,7 +69,7 @@ Also assign:
           type: "function",
           function: {
             name: "classify_signal",
-            description: "Classify unstructured text into a signal.",
+            description: "Classify unstructured text into a signal with smart metadata.",
             parameters: {
               type: "object",
               properties: {
@@ -66,8 +80,12 @@ Also assign:
                 riskLevel: { type: ["string", "null"], enum: ["low", "medium", "high", "critical", null] },
                 dueDate: { type: ["string", "null"], description: "ISO date YYYY-MM-DD or null" },
                 callPointer: { type: ["string", "null"], description: "Brief follow-up reference or null" },
+                suggestedTitle: { type: "string", description: "Concise 3-8 word title for the note" },
+                suggestedTags: { type: "array", items: { type: "string" }, description: "2-5 topic/keyword tags" },
+                suggestedContacts: { type: "array", items: { type: "string" }, description: "Names/initials of people mentioned" },
+                accelerators: { type: "array", items: { type: "string" }, description: "2-5 specific actionable next steps parsed from intent" },
               },
-              required: ["signalType", "priority", "summary", "actionsTaken", "riskLevel", "dueDate", "callPointer"],
+              required: ["signalType", "priority", "summary", "actionsTaken", "riskLevel", "dueDate", "callPointer", "suggestedTitle", "suggestedTags", "suggestedContacts", "accelerators"],
               additionalProperties: false,
             },
           },
@@ -140,7 +158,6 @@ serve(async (req) => {
 
       const scraped = scrapeData.data?.markdown || scrapeData.markdown || "";
       const title = scrapeData.data?.metadata?.title || scrapeData.metadata?.title || "";
-      // Combine user text (if any) with scraped content
       const prefix = text && text.trim() ? `${text.trim()}\n\n---\n\n` : "";
       text = `${prefix}[Scraped from: ${formattedUrl}]${title ? ` — ${title}` : ""}\n\n${scraped}`;
       console.log(`Scraped ${scraped.length} chars from ${formattedUrl}`);
@@ -153,7 +170,6 @@ serve(async (req) => {
       });
     }
 
-    // Truncate to 10k chars for classification
     if (text.length > 10000) {
       text = text.substring(0, 10000);
     }
@@ -163,7 +179,6 @@ serve(async (req) => {
 
     const classification = await classifySignal(text.trim(), apiKey);
 
-    // Insert into signals table using service role
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
