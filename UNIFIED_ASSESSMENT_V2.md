@@ -23,7 +23,7 @@ The consensus is clear: the "move fast and break things" phase is over. The plat
 | **PROD-03** | **P1** | Purge Test Data from Production Feed | Product | **DONE** |
 | **ENG-02** | **P1** | Add Error Handling for Speech Recognition | Engineering | **DONE** |
 | **PROD-04** | **P2** | Fix Inconsistent Signal Counts in Filters | Product | **DONE** |
-| **ENG-03** | **P2** | Add Input Validation on Brain Dump | Engineering | **OPEN** |
+| **ENG-03** | **P2** | Add Input Validation on Brain Dump | Engineering | **DONE** |
 
 ## 4. Strategic Roadmap
 
