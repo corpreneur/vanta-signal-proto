@@ -8,9 +8,10 @@ import type { FilterState } from "@/components/SignalFilters";
 import type { SignalType } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
-import { ShieldOff, BarChart3, ArrowUpDown, AlertTriangle, Users } from "lucide-react";
+import { ShieldOff, BarChart3, ArrowUpDown, AlertTriangle, Users, Briefcase, BellOff } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import { useUserMode } from "@/hooks/use-user-mode";
 
 const fetchSignals = async (): Promise<Signal[]> => {
   const { data, error } = await supabase
