@@ -42,6 +42,7 @@ export function useSpeechRecognition() {
   }, []);
 
   const startListening = useCallback((onTranscript: (text: string) => void) => {
+    setErrorMessage(null);
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) return;
 
