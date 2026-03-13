@@ -126,7 +126,7 @@ function buildContacts(signals: Signal[]): ContactSummary[] {
   return results;
 }
 
-type SortMode = "signals" | "recency" | "alpha" | "high";
+type SortMode = "signals" | "recency" | "alpha" | "high" | "strength";
 
 export default function Contacts() {
   const navigate = useNavigate();
