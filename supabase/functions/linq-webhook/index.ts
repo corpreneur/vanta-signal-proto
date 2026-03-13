@@ -30,6 +30,20 @@ interface ParsedMessage {
   rawPayload: Record<string, unknown>;
   isGroupChat: boolean;
   participants: string[]; // all handles in the chat
+  emojis: string[]; // emoji characters found in parts
+  attachments: Array<{ type: string; value?: string; mime?: string }>; // non-text, non-emoji parts
+}
+
+interface ParsedReaction {
+  eventId: string | null;
+  sender: string;
+  senderHandle: string;
+  emoji: string;
+  targetMessageId: string | null;
+  chatId: string | null;
+  timestamp: string;
+  removed: boolean; // true if reaction was removed (tapback toggle off)
+  rawPayload: Record<string, unknown>;
 }
 
 // ─── Auto-reply config ──────────────────────────────────────────────────────
