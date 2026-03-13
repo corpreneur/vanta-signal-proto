@@ -31,7 +31,7 @@ interface ParsedMessage {
   isGroupChat: boolean;
   participants: string[]; // all handles in the chat
   emojis: string[]; // emoji characters found in parts
-  attachments: Array<{ type: string; value?: string; mime?: string }>; // non-text, non-emoji parts
+  attachments: Array<{ type: string; url?: string; mime?: string; filename?: string; attachmentId?: string }>; // non-text, non-emoji parts
 }
 
 interface ParsedReaction {
