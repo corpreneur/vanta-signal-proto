@@ -48,6 +48,8 @@ interface ContactSummary {
   signalTypes: Record<string, number>;
   dominantType: string;
   recentSignals: Signal[];
+  strength: number; // 0–100
+  strengthLabel: string;
 }
 
 function daysBetween(iso: string): number {
@@ -62,8 +64,31 @@ function recencyLabel(days: number): string {
   return `${Math.floor(days / 30)}mo ago`;
 }
 
+/** Compute a 0–100 relationship strength score */
+function computeStrength(c: Omit<ContactSummary, "strength" | "strengthLabel">): { strength: number; strengthLabel: string } {
+  // Frequency: log-scaled, capped contribution of 40
+  const freqScore = Math.min(40, (Math.log2(c.signalCount + 1) / Math.log2(50)) * 40);
+
+  // Recency: exponential decay, max 35
+  const recencyScore = Math.max(0, 35 * Math.exp(-c.daysSinceLast / 14));
+
+  // Priority weight: high-priority ratio, max 25
+  const priorityRatio = c.signalCount > 0 ? c.highPriority / c.signalCount : 0;
+  const priorityScore = priorityRatio * 25;
+
+  const raw = Math.round(freqScore + recencyScore + priorityScore);
+  const strength = Math.min(100, Math.max(0, raw));
+
+  let strengthLabel = "Cold";
+  if (strength >= 75) strengthLabel = "Strong";
+  else if (strength >= 50) strengthLabel = "Warm";
+  else if (strength >= 25) strengthLabel = "Cooling";
+
+  return { strength, strengthLabel };
+}
+
 function buildContacts(signals: Signal[]): ContactSummary[] {
-  const map = new Map<string, ContactSummary>();
+  const map = new Map<string, Omit<ContactSummary, "strength" | "strengthLabel">>();
   for (const s of signals) {
     const existing = map.get(s.sender);
     if (existing) {
@@ -90,21 +115,23 @@ function buildContacts(signals: Signal[]): ContactSummary[] {
       });
     }
   }
+  const results: ContactSummary[] = [];
   for (const node of map.values()) {
     let max = 0;
     for (const [type, count] of Object.entries(node.signalTypes)) {
       if (count > max) { max = count; node.dominantType = type; }
     }
+    results.push({ ...node, ...computeStrength(node) });
   }
-  return Array.from(map.values());
+  return results;
 }
 
-type SortMode = "signals" | "recency" | "alpha" | "high";
+type SortMode = "signals" | "recency" | "alpha" | "high" | "strength";
 
 export default function Contacts() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [sort, setSort] = useState<SortMode>("recency");
+  const [sort, setSort] = useState<SortMode>("strength");
 
   const { data: signals = [], isLoading } = useQuery({
     queryKey: ["contacts-signals"],
@@ -121,6 +148,7 @@ export default function Contacts() {
       list = list.filter((c) => c.name.toLowerCase().includes(q));
     }
     const sortFns: Record<SortMode, (a: ContactSummary, b: ContactSummary) => number> = {
+      strength: (a, b) => b.strength - a.strength,
       signals: (a, b) => b.signalCount - a.signalCount,
       recency: (a, b) => a.daysSinceLast - b.daysSinceLast,
       alpha: (a, b) => a.name.localeCompare(b.name),
@@ -176,8 +204,8 @@ export default function Contacts() {
               className="pl-9 font-mono text-xs bg-vanta-bg-elevated border-vanta-border"
             />
           </div>
-          <div className="flex gap-1">
-            {(["recency", "signals", "high", "alpha"] as SortMode[]).map((m) => (
+          <div className="flex gap-1 flex-wrap">
+            {(["strength", "recency", "signals", "high", "alpha"] as SortMode[]).map((m) => (
               <button
                 key={m}
                 onClick={() => setSort(m)}
@@ -187,7 +215,7 @@ export default function Contacts() {
                     : "border-vanta-border text-vanta-text-low hover:text-foreground hover:border-vanta-border-mid"
                 }`}
               >
-                {m === "high" ? "Priority" : m === "alpha" ? "A–Z" : m === "signals" ? "Density" : "Recent"}
+                {m === "high" ? "Priority" : m === "alpha" ? "A–Z" : m === "signals" ? "Density" : m === "strength" ? "Strength" : "Recent"}
               </button>
             ))}
           </div>
@@ -229,6 +257,27 @@ export default function Contacts() {
                           {recencyLabel(contact.daysSinceLast)} · {contact.signalCount} signals
                         </p>
                       </div>
+                    </div>
+
+                    {/* Strength score */}
+                    <div className="flex items-center gap-2 shrink-0">
+                      <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all ${
+                            contact.strength >= 75 ? "bg-emerald-500" :
+                            contact.strength >= 50 ? "bg-sky-500" :
+                            contact.strength >= 25 ? "bg-amber-500" : "bg-muted-foreground"
+                          }`}
+                          style={{ width: `${contact.strength}%` }}
+                        />
+                      </div>
+                      <span className={`font-mono text-[9px] uppercase tracking-wider ${
+                        contact.strength >= 75 ? "text-emerald-500" :
+                        contact.strength >= 50 ? "text-sky-500" :
+                        contact.strength >= 25 ? "text-amber-500" : "text-muted-foreground"
+                      }`}>
+                        {contact.strength}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       {contact.highPriority > 0 && (
