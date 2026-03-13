@@ -80,6 +80,7 @@ function intentIcon(intent: AcceleratorIntent) {
 }
 
 export default function NoteCapture({ inline = false }: NoteCaptureProps) {
+  const { isDnd } = useUserMode();
   const [open, setOpen] = useState(inline);
   const [text, setText] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
