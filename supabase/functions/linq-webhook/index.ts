@@ -30,6 +30,20 @@ interface ParsedMessage {
   rawPayload: Record<string, unknown>;
   isGroupChat: boolean;
   participants: string[]; // all handles in the chat
+  emojis: string[]; // emoji characters found in parts
+  attachments: Array<{ type: string; value?: string; mime?: string }>; // non-text, non-emoji parts
+}
+
+interface ParsedReaction {
+  eventId: string | null;
+  sender: string;
+  senderHandle: string;
+  emoji: string;
+  targetMessageId: string | null;
+  chatId: string | null;
+  timestamp: string;
+  removed: boolean; // true if reaction was removed (tapback toggle off)
+  rawPayload: Record<string, unknown>;
 }
 
 // ─── Auto-reply config ──────────────────────────────────────────────────────
@@ -91,6 +105,43 @@ function isSelfMessage(senderHandle: string): boolean {
 
 // ─── Parse Linq v3 webhook payload ──────────────────────────────────────────
 
+// ─── Parse Linq v3 reaction/tapback event ───────────────────────────────────
+
+function parseLinqReaction(payload: Record<string, unknown>): ParsedReaction | null {
+  const eventType = String(payload.event_type || "");
+  // Handle reaction events: message.reaction, message.tapback, reaction.added, reaction.removed
+  if (!eventType.match(/reaction|tapback/i)) return null;
+
+  const data = payload.data as Record<string, unknown> | undefined;
+  if (!data) return null;
+
+  const senderHandle = data.sender_handle as Record<string, unknown> | undefined;
+  const chat = data.chat as Record<string, unknown> | undefined;
+  const reaction = data.reaction as Record<string, unknown> | undefined;
+  const targetMessage = data.message as Record<string, unknown> | undefined;
+
+  // Extract the emoji from reaction data
+  const emoji = String(
+    reaction?.emoji || reaction?.text || reaction?.value || data.emoji || data.tapback || ""
+  );
+
+  if (!emoji) return null;
+
+  return {
+    eventId: payload.event_id ? String(payload.event_id) : null,
+    sender: senderHandle?.handle ? String(senderHandle.handle) : "Unknown",
+    senderHandle: senderHandle?.handle ? String(senderHandle.handle) : "",
+    emoji,
+    targetMessageId: targetMessage?.id ? String(targetMessage.id) : (data.message_id ? String(data.message_id) : null),
+    chatId: chat?.id ? String(chat.id) : null,
+    timestamp: data.sent_at ? String(data.sent_at) : new Date().toISOString(),
+    removed: eventType.includes("removed") || (data.removed === true),
+    rawPayload: payload,
+  };
+}
+
+// ─── Parse Linq v3 webhook payload ──────────────────────────────────────────
+
 function parseLinqPayload(payload: Record<string, unknown>): ParsedMessage | null {
   // V3 2026-02-03 format: { event_type, event_id, data: { sender_handle, parts, chat, ... } }
   if (payload.event_type && payload.data) {
@@ -111,26 +162,48 @@ function parseLinqPayload(payload: Record<string, unknown>): ParsedMessage | nul
       .map((m) => String(m.handle || m.phone || ""))
       .filter(Boolean);
 
-    // Extract text from parts
-    const textParts = (parts || [])
-      .filter((p) => p.type === "text")
-      .map((p) => String(p.value || ""));
+    // Extract text, emojis, and attachments from parts
+    const textParts: string[] = [];
+    const emojis: string[] = [];
+    const attachments: Array<{ type: string; value?: string; mime?: string }> = [];
+
+    for (const part of parts || []) {
+      const partType = String(part.type || "");
+      if (partType === "text") {
+        textParts.push(String(part.value || ""));
+      } else if (partType === "emoji" || partType === "reaction" || partType === "tapback") {
+        emojis.push(String(part.value || part.emoji || ""));
+      } else if (partType === "sticker") {
+        emojis.push(String(part.value || "🏷️"));
+      } else if (partType) {
+        // Capture attachments (image, video, audio, file, etc.)
+        attachments.push({
+          type: partType,
+          value: part.value ? String(part.value) : undefined,
+          mime: part.mime_type ? String(part.mime_type) : undefined,
+        });
+      }
+    }
+
     const body = textParts.join("\n").trim();
 
-    if (!body) return null;
+    // Allow messages with only emojis (no text body required if emojis present)
+    if (!body && emojis.length === 0 && attachments.length === 0) return null;
 
     return {
       eventId: payload.event_id ? String(payload.event_id) : null,
       eventType,
       sender: senderHandle?.handle ? String(senderHandle.handle) : "Unknown",
       senderHandle: senderHandle?.handle ? String(senderHandle.handle) : "",
-      body,
+      body: body || emojis.join(" ") || `[${attachments.map((a) => a.type).join(", ")}]`,
       chatId: chat?.id ? String(chat.id) : null,
       messageId: data.id ? String(data.id) : null,
       timestamp: data.sent_at ? String(data.sent_at) : new Date().toISOString(),
       rawPayload: payload,
       isGroupChat,
       participants,
+      emojis,
+      attachments,
     };
   }
 
@@ -151,6 +224,8 @@ function parseLinqPayload(payload: Record<string, unknown>): ParsedMessage | nul
     rawPayload: payload,
     isGroupChat: false,
     participants: [],
+    emojis: [],
+    attachments: [],
   };
 }
 
@@ -437,6 +512,68 @@ Deno.serve(async (req) => {
     const payload = JSON.parse(rawBody);
     console.log("Webhook event:", payload.event_type || "legacy", payload.event_id || "no-event-id");
 
+    // ── Handle reaction/tapback events first ──
+    const reaction = parseLinqReaction(payload);
+    if (reaction) {
+      const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+
+      // Skip self-reactions
+      if (isSelfMessage(reaction.senderHandle)) {
+        return new Response(JSON.stringify({ skipped: true, reason: "self-reaction filtered" }), {
+          status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Find the target signal by linq_message_id
+      if (reaction.targetMessageId) {
+        const { data: targetSignal } = await supabase
+          .from("signals")
+          .select("id, raw_payload")
+          .eq("linq_message_id", reaction.targetMessageId)
+          .limit(1)
+          .single();
+
+        if (targetSignal) {
+          const existingPayload = (targetSignal.raw_payload || {}) as Record<string, unknown>;
+          const existingReactions = (existingPayload._vanta_reactions || []) as Array<Record<string, unknown>>;
+
+          if (reaction.removed) {
+            // Remove the reaction
+            const updatedReactions = existingReactions.filter(
+              (r) => !(r.emoji === reaction.emoji && r.sender === reaction.sender)
+            );
+            await supabase.from("signals").update({
+              raw_payload: { ...existingPayload, _vanta_reactions: updatedReactions },
+            }).eq("id", targetSignal.id);
+
+            console.log(`Reaction removed: ${reaction.emoji} by ${reaction.sender} on signal ${targetSignal.id}`);
+          } else {
+            // Add the reaction
+            existingReactions.push({
+              emoji: reaction.emoji,
+              sender: reaction.sender,
+              timestamp: reaction.timestamp,
+            });
+            await supabase.from("signals").update({
+              raw_payload: { ...existingPayload, _vanta_reactions: existingReactions },
+            }).eq("id", targetSignal.id);
+
+            console.log(`Reaction added: ${reaction.emoji} by ${reaction.sender} on signal ${targetSignal.id}`);
+          }
+
+          return new Response(JSON.stringify({ processed: 1, type: "reaction", targetSignalId: targetSignal.id }), {
+            status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+      }
+
+      // No target signal found — log and acknowledge
+      console.log("Reaction received but no matching signal found:", reaction.targetMessageId);
+      return new Response(JSON.stringify({ skipped: true, reason: "reaction target not found" }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Parse the payload (handles v3 2026-02-03, legacy formats, and group chats)
     const parsed = parseLinqPayload(payload);
 
@@ -478,11 +615,19 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Log emoji and attachment metadata
+    if (parsed.emojis.length > 0) {
+      console.log("Emojis in message:", parsed.emojis.join(" "));
+    }
+    if (parsed.attachments.length > 0) {
+      console.log("Attachments:", parsed.attachments.map((a) => a.type).join(", "));
+    }
+
     // 1. Classify with AI (group context passed for better classification)
     const classification = await classifySignal(parsed.body, parsed.sender, lovableApiKey, parsed.isGroupChat, parsed.participants);
     console.log("AI classification:", classification.signalType, classification.priority, parsed.isGroupChat ? "(group)" : "(1:1)");
 
-    // 2. Insert signal (with group chat metadata in raw_payload)
+    // 2. Insert signal (with group chat + emoji + attachment metadata in raw_payload)
     const signalPayload: Record<string, unknown> = {
       sender: parsed.sender,
       source_message: parsed.body,
@@ -497,6 +642,9 @@ Deno.serve(async (req) => {
         _vanta_group_chat: parsed.isGroupChat,
         _vanta_chat_id: parsed.chatId,
         _vanta_participants: parsed.participants,
+        _vanta_emojis: parsed.emojis.length > 0 ? parsed.emojis : undefined,
+        _vanta_attachments: parsed.attachments.length > 0 ? parsed.attachments : undefined,
+        _vanta_reactions: [], // initialized empty, populated by reaction events
       },
       captured_at: parsed.timestamp,
     };
