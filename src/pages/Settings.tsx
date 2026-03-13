@@ -194,6 +194,10 @@ export default function Settings() {
             <SlidersHorizontal className="w-3.5 h-3.5" />
             User Modes
           </TabsTrigger>
+          <TabsTrigger value="audit" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            Classification Audit
+          </TabsTrigger>
         </TabsList>
 
         {/* General Settings Tab */}
