@@ -43,11 +43,11 @@ const fetchSignals = async (): Promise<Signal[]> => {
 };
 
 const CHANNELS = [
-  { key: "linq", label: "iMessage", icon: MessageSquare, color: "text-vanta-accent", bg: "bg-vanta-accent-faint", border: "border-vanta-accent-border", href: "/product/intro?skip-auth=1" },
-  { key: "phone", label: "Phone", icon: Phone, color: "text-vanta-accent-phone", bg: "bg-vanta-accent-phone-faint", border: "border-vanta-accent-phone-border", href: "/product/phone-call?skip-auth=1" },
-  { key: "recall", label: "Zoom", icon: Video, color: "text-vanta-accent-zoom", bg: "bg-vanta-accent-zoom-faint", border: "border-vanta-accent-zoom-border", href: "/product/meeting?skip-auth=1" },
-  { key: "gmail", label: "Email", icon: Mail, color: "text-vanta-accent-teal", bg: "bg-vanta-accent-teal-faint", border: "border-vanta-accent-teal-border", href: "/product/email?skip-auth=1" },
-  { key: "calendar", label: "Calendar", icon: Calendar, color: "text-vanta-accent-amber", bg: "bg-vanta-accent-amber-faint", border: "border-vanta-accent-amber-border", href: "/product/calendar?skip-auth=1" },
+  { key: "linq", label: "iMessage", icon: MessageSquare, color: "text-vanta-accent", bg: "bg-vanta-accent-faint", border: "border-vanta-accent-border", href: "/product/intro" },
+  { key: "phone", label: "Phone", icon: Phone, color: "text-vanta-accent-phone", bg: "bg-vanta-accent-phone-faint", border: "border-vanta-accent-phone-border", href: "/product/phone-call" },
+  { key: "recall", label: "Zoom", icon: Video, color: "text-vanta-accent-zoom", bg: "bg-vanta-accent-zoom-faint", border: "border-vanta-accent-zoom-border", href: "/product/meeting" },
+  { key: "gmail", label: "Email", icon: Mail, color: "text-vanta-accent-teal", bg: "bg-vanta-accent-teal-faint", border: "border-vanta-accent-teal-border", href: "/product/email" },
+  { key: "calendar", label: "Calendar", icon: Calendar, color: "text-vanta-accent-amber", bg: "bg-vanta-accent-amber-faint", border: "border-vanta-accent-amber-border", href: "/product/calendar" },
 ];
 
 const SIGNAL_TYPE_COLORS: Record<string, string> = {
