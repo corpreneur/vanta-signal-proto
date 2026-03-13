@@ -311,7 +311,7 @@ const Index = () => {
         <Motion delay={200}>
           <div className="mb-12 text-center">
             <Link
-              to="/noise-queue"
+              to="/settings?tab=noise"
               className="font-mono text-[10px] text-vanta-text-muted hover:text-vanta-text-low transition-colors"
             >
               {noiseCount} item{noiseCount !== 1 ? "s" : ""} filtered as noise · Review queue →
