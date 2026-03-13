@@ -28,6 +28,8 @@ interface ParsedMessage {
   messageId: string | null;
   timestamp: string;
   rawPayload: Record<string, unknown>;
+  isGroupChat: boolean;
+  participants: string[]; // all handles in the chat
 }
 
 // ─── Auto-reply config ──────────────────────────────────────────────────────
@@ -77,6 +79,16 @@ async function verifyWebhookSignature(
   }
 }
 
+// ─── Check if sender is our own number (loop prevention for group chats) ───
+
+function isSelfMessage(senderHandle: string): boolean {
+  const rawFrom = Deno.env.get("LINQ_FROM_NUMBER");
+  if (!rawFrom) return false;
+  const ownNumber = toE164(rawFrom);
+  const senderNormalized = toE164(senderHandle);
+  return ownNumber === senderNormalized;
+}
+
 // ─── Parse Linq v3 webhook payload ──────────────────────────────────────────
 
 function parseLinqPayload(payload: Record<string, unknown>): ParsedMessage | null {
@@ -90,6 +102,14 @@ function parseLinqPayload(payload: Record<string, unknown>): ParsedMessage | nul
     const senderHandle = data.sender_handle as Record<string, unknown> | undefined;
     const chat = data.chat as Record<string, unknown> | undefined;
     const parts = data.parts as Array<Record<string, unknown>> | undefined;
+
+    // Extract group chat metadata
+    const chatMembers = chat?.members as Array<Record<string, unknown>> | undefined;
+    const chatType = chat?.type ? String(chat.type) : null;
+    const isGroupChat = chatType === "group" || (chatMembers ? chatMembers.length > 2 : false);
+    const participants = (chatMembers || [])
+      .map((m) => String(m.handle || m.phone || ""))
+      .filter(Boolean);
 
     // Extract text from parts
     const textParts = (parts || [])
@@ -109,34 +129,8 @@ function parseLinqPayload(payload: Record<string, unknown>): ParsedMessage | nul
       messageId: data.id ? String(data.id) : null,
       timestamp: data.sent_at ? String(data.sent_at) : new Date().toISOString(),
       rawPayload: payload,
-    };
-  }
-
-  // V3 2025-01-01 format: { event_type, data: { message: { from_handle, ... }, chat_id } }
-  if (payload.event_type && payload.data) {
-    const data = payload.data as Record<string, unknown>;
-    const message = data.message as Record<string, unknown> | undefined;
-    if (!message) return null;
-
-    const fromHandle = message.from_handle as Record<string, unknown> | undefined;
-    const parts = message.parts as Array<Record<string, unknown>> | undefined;
-    const textParts = (parts || [])
-      .filter((p) => p.type === "text")
-      .map((p) => String(p.value || ""));
-    const body = textParts.join("\n").trim();
-
-    if (!body) return null;
-
-    return {
-      eventId: payload.event_id ? String(payload.event_id) : null,
-      eventType: String(payload.event_type),
-      sender: fromHandle?.handle ? String(fromHandle.handle) : "Unknown",
-      senderHandle: fromHandle?.handle ? String(fromHandle.handle) : "",
-      body,
-      chatId: data.chat_id ? String(data.chat_id) : null,
-      messageId: message.id ? String(message.id) : null,
-      timestamp: message.sent_at ? String(message.sent_at) : new Date().toISOString(),
-      rawPayload: payload,
+      isGroupChat,
+      participants,
     };
   }
 
@@ -155,19 +149,25 @@ function parseLinqPayload(payload: Record<string, unknown>): ParsedMessage | nul
     messageId: payload.id ? String(payload.id) : null,
     timestamp: payload.timestamp ? String(payload.timestamp) : new Date().toISOString(),
     rawPayload: payload,
+    isGroupChat: false,
+    participants: [],
   };
 }
 
 // ─── AI: Classify signal ────────────────────────────────────────────────────
 
-async function classifySignal(message: string, sender: string, apiKey: string): Promise<Classification> {
+async function classifySignal(message: string, sender: string, apiKey: string, isGroupChat: boolean, participants: string[]): Promise<Classification> {
+  const groupContext = isGroupChat
+    ? `\nThis message is from a GROUP CHAT with ${participants.length} participants: ${participants.join(", ")}. Consider group dynamics — the signal may reference shared context among participants.`
+    : "";
+
   const systemPrompt = `You are a signal classifier for an executive intelligence system called Vanta Wireless.
-You receive raw messages from an executive's messaging platform and must classify them.
+You receive raw messages from an executive's messaging platform and must classify them.${groupContext}
 
 Return ONLY valid JSON with these fields:
 - signalType: one of "INTRO", "INSIGHT", "INVESTMENT", "DECISION", "CONTEXT", "NOISE"
 - priority: one of "high", "medium", "low"
-- summary: A 1-3 sentence intelligence briefing of the message's significance (write in third person, professional tone)
+- summary: A 1-3 sentence intelligence briefing of the message's significance (write in third person, professional tone)${isGroupChat ? ". Include the sender's identity and group context in the summary." : ""}
 - actionsTaken: array of action codes. Choose from: "BIO_RESEARCH", "MEETING_PREP", "EMAIL_DRAFT", "AGENT_BUILD", "FRAMEWORK_EXTRACT", "NOTION_LOG", "THESIS_ANALYSIS", "CALENDAR_HOLD", "BRIEF_COMPILE"
 
 Classification rules:
@@ -216,10 +216,14 @@ Action rules:
 
 // ─── AI: Generate reply ─────────────────────────────────────────────────────
 
-async function generateReply(signalType: string, sender: string, message: string, summary: string, apiKey: string): Promise<string> {
+async function generateReply(signalType: string, sender: string, message: string, summary: string, apiKey: string, isGroupChat: boolean): Promise<string> {
+  const groupInstruction = isGroupChat
+    ? "\n- This is a GROUP CHAT. Address the sender by name if possible. Keep reply brief since others can see it."
+    : "";
+
   const systemPrompt = `You are a concise, professional executive assistant for Vanta Wireless.
 Generate a short reply (2-3 sentences max) acknowledging the incoming message.
-- Be warm but professional. Write as if from a busy executive.
+- Be warm but professional. Write as if from a busy executive.${groupInstruction}
 - For INTRO: Thank the sender, confirm you'll follow up with the introduced person.
 - For INVESTMENT: Acknowledge receipt, signal thoughtful engagement.
 - For DECISION: Confirm you're reviewing and will respond with next steps.
@@ -280,7 +284,7 @@ async function sendLinqReply(
   const normalizedTo = toE164(toNumber);
 
   try {
-    // If we have a chatId, send to existing chat thread
+    // If we have a chatId, send to existing chat thread (works for both 1:1 and group)
     const url = chatId
       ? `${LINQ_API_URL}/${chatId}/messages`
       : LINQ_API_URL;
@@ -344,7 +348,7 @@ Deno.serve(async (req) => {
     const payload = JSON.parse(rawBody);
     console.log("Webhook event:", payload.event_type || "legacy", payload.event_id || "no-event-id");
 
-    // Parse the payload (handles v3 2026-02-03, v3 2025-01-01, and legacy formats)
+    // Parse the payload (handles v3 2026-02-03, legacy formats, and group chats)
     const parsed = parseLinqPayload(payload);
 
     if (!parsed) {
@@ -352,6 +356,18 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ skipped: true, reason: "not a processable message event" }), {
         status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // ── Self-message filter: skip messages from our own number (prevents loops in group chats) ──
+    if (isSelfMessage(parsed.senderHandle)) {
+      console.log("Skipping self-message from own number:", parsed.senderHandle);
+      return new Response(JSON.stringify({ skipped: true, reason: "self-message filtered" }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (parsed.isGroupChat) {
+      console.log(`Group chat detected — chatId: ${parsed.chatId}, participants: ${parsed.participants.length}`);
     }
 
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
@@ -373,12 +389,12 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 1. Classify with AI
-    const classification = await classifySignal(parsed.body, parsed.sender, lovableApiKey);
-    console.log("AI classification:", classification.signalType, classification.priority);
+    // 1. Classify with AI (group context passed for better classification)
+    const classification = await classifySignal(parsed.body, parsed.sender, lovableApiKey, parsed.isGroupChat, parsed.participants);
+    console.log("AI classification:", classification.signalType, classification.priority, parsed.isGroupChat ? "(group)" : "(1:1)");
 
-    // 2. Insert signal
-    const { data, error } = await supabase.from("signals").insert({
+    // 2. Insert signal (with group chat metadata in raw_payload)
+    const signalPayload: Record<string, unknown> = {
       sender: parsed.sender,
       source_message: parsed.body,
       signal_type: classification.signalType,
@@ -387,9 +403,16 @@ Deno.serve(async (req) => {
       actions_taken: classification.actionsTaken,
       status: "Captured",
       linq_message_id: parsed.eventId || parsed.messageId || null,
-      raw_payload: parsed.rawPayload,
+      raw_payload: {
+        ...parsed.rawPayload,
+        _vanta_group_chat: parsed.isGroupChat,
+        _vanta_chat_id: parsed.chatId,
+        _vanta_participants: parsed.participants,
+      },
       captured_at: parsed.timestamp,
-    }).select().single();
+    };
+
+    const { data, error } = await supabase.from("signals").insert(signalPayload).select().single();
 
     if (error) {
       console.error("Insert error:", error);
@@ -404,13 +427,17 @@ Deno.serve(async (req) => {
       id: data.id,
       signalType: classification.signalType,
       priority: classification.priority,
+      isGroupChat: parsed.isGroupChat,
     };
 
     // 3. Auto-reply (AI-generated for non-NOISE signals)
+    // For group chats, reply into the group thread via chatId
     if (parsed.senderHandle && classification.signalType !== "NOISE") {
-      const replyText = await generateReply(classification.signalType, parsed.sender, parsed.body, classification.summary, lovableApiKey);
+      const replyText = await generateReply(classification.signalType, parsed.sender, parsed.body, classification.summary, lovableApiKey, parsed.isGroupChat);
+
+      // Group chats: always reply into the thread (chatId). 1:1: fall back to direct send.
       const sendResult = await sendLinqReply(parsed.senderHandle, replyText, parsed.chatId);
-      result.autoReply = { sent: sendResult.success, to: parsed.senderHandle, error: sendResult.error };
+      result.autoReply = { sent: sendResult.success, to: parsed.isGroupChat ? `group:${parsed.chatId}` : parsed.senderHandle, error: sendResult.error };
 
       if (sendResult.success) {
         await supabase.from("signals").update({
@@ -421,7 +448,8 @@ Deno.serve(async (req) => {
     }
 
     // 4. Notify owner at NOTIFY_NUMBER
-    const notifyText = `[SIGNAL] ${classification.signalType} / ${classification.priority}\nFrom: ${parsed.sender}\n${classification.summary}`;
+    const groupLabel = parsed.isGroupChat ? ` [GROUP: ${parsed.participants.length} members]` : "";
+    const notifyText = `[SIGNAL] ${classification.signalType} / ${classification.priority}${groupLabel}\nFrom: ${parsed.sender}\n${classification.summary}`;
     const notifyResult = await sendLinqReply(NOTIFY_NUMBER, notifyText);
     result.notification = { sent: notifyResult.success, error: notifyResult.error };
 
