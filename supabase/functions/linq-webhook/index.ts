@@ -415,8 +415,8 @@ Deno.serve(async (req) => {
       priority: classification.priority,
     };
 
-    // 3. Auto-reply if triggered
-    if (shouldAutoReply(classification.signalType, classification.priority) && parsed.senderHandle) {
+    // 3. Auto-reply to sender for ALL non-NOISE signals
+    if (parsed.senderHandle) {
       const replyText = await generateReply(
         classification.signalType, parsed.sender, parsed.body, classification.summary, lovableApiKey
       );
@@ -433,6 +433,11 @@ Deno.serve(async (req) => {
         }
       }
     }
+
+    // 4. Notify owner at NOTIFY_NUMBER
+    const notifyText = `[SIGNAL] ${classification.signalType} / ${classification.priority}\nFrom: ${parsed.sender}\n${classification.summary}`;
+    const notifyResult = await sendLinqReply(NOTIFY_NUMBER, notifyText);
+    result.notification = { sent: notifyResult.success, error: notifyResult.error };
 
     return new Response(JSON.stringify({ processed: 1, results: [result] }), {
       status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
