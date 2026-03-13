@@ -24,6 +24,9 @@ import Settings from "./pages/Settings";
 import ContactTimeline from "./pages/ContactTimeline";
 import Briefing from "./pages/Briefing";
 import Command from "./pages/Command";
+import Contacts from "./pages/Contacts";
+import NoiseQueue from "./pages/NoiseQueue";
+import UserModes from "./pages/UserModes";
 import type { Session } from "@supabase/supabase-js";
 
 const ProtectedRoute = ({ children, session }: { children: React.ReactNode; session: Session | null }) => {
@@ -78,6 +81,9 @@ const AppRoutes = () => {
       <Route path="/contact/:name" element={<ProtectedRoute session={session}><ProductLayout><ContactTimeline /></ProductLayout></ProtectedRoute>} />
       <Route path="/briefing/:id" element={<ProtectedRoute session={session}><ProductLayout><Briefing /></ProductLayout></ProtectedRoute>} />
       <Route path="/command" element={<ProtectedRoute session={session}><ProductLayout><Command /></ProductLayout></ProtectedRoute>} />
+      <Route path="/contacts" element={<ProtectedRoute session={session}><ProductLayout><Contacts /></ProductLayout></ProtectedRoute>} />
+      <Route path="/noise-queue" element={<ProtectedRoute session={session}><ProductLayout><NoiseQueue /></ProductLayout></ProtectedRoute>} />
+      <Route path="/user-modes" element={<ProtectedRoute session={session}><ProductLayout><UserModes /></ProductLayout></ProtectedRoute>} />
       <Route path="/case-01" element={<Navigate to="/case/01" replace />} />
       <Route path="/case-02" element={<Navigate to="/case/02" replace />} />
       <Route path="/case-03" element={<Navigate to="/case/03" replace />} />
