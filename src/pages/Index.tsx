@@ -120,7 +120,7 @@ const Index = () => {
       <div className="flex flex-wrap gap-6 mb-8 pb-6 border-b border-vanta-border">
         <div>
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Signals Captured</p>
-          <p className="font-display text-[28px] text-vanta-text">{signals.length}</p>
+          <p className="font-display text-[28px] text-vanta-text">{activeSignals.length}</p>
         </div>
         <div>
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">High Strength</p>
