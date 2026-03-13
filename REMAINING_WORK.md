@@ -45,15 +45,13 @@ This document provides a single, reconciled view of all outstanding work for the
 | **LINQ-MAINT-01** | **Low** | Remove Legacy Payload Support | **RESOLVED**. Legacy flat-format parsing removed from `linq-webhook`. Only v3 `event_type`/`data` payloads accepted. |
 | **LINQ-MAINT-02** | **Low** | Add API Versioning to Edge Function URLs | **DEFERRED**. Edge functions are invoked by name via SDK, not by URL path. Versioning requires a custom API gateway — not actionable in current architecture. Revisit if/when migrating to custom gateway. |
 
-### 2.4. UP NEXT: Q2 2026 Strategic Initiatives
+### 2.4. DONE (Q2 2026 Strategic Initiatives — Sprint 1)
 
-These items are validated by user research and ready for dedicated design and architecture sprints.
-
-| Item | Description | Target |
+| Item | Description | Resolution |
 |:---|:---|:---|
-| **Smart Contact List v1** | Unified contact intelligence view with relationship context, recent signals, and interaction history | Q2 Sprint 1 |
-| **Quarantine / Noise Review Queue** | User-facing queue to review, promote, or dismiss AI-classified noise signals | Q2 Sprint 1 |
-| **User Modes (Creative, Executive, DND)** | Context-aware UI modes that adjust notification density, signal priority thresholds, and FAB behavior | Q2 Sprint 2 |
+| **Smart Contact List v1** | Unified contact intelligence view with relationship context, recent signals, and interaction history | **RESOLVED**. New `/contacts` page with search, multi-sort, contact cards with signal type chips, source icons, and recent signal previews. |
+| **Quarantine / Noise Review Queue** | User-facing queue to review, promote, or dismiss AI-classified noise signals | **RESOLVED**. New `/noise-queue` page with promote-to-type selector, dismiss action, and live stats. |
+| **User Modes (Creative, Executive, DND)** | Context-aware UI modes that adjust notification density, signal priority thresholds, and FAB behavior | **RESOLVED**. New `/user-modes` page with mode selection cards, trait lists, and persistent mode setting via `system_settings`. |
 
 ### 2.5. CUT (Removed from Roadmap)
 
