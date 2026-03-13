@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, Copy, Check, CheckCircle, Video, Phone, ArrowUpFromLine, Shield, CalendarClock, Pointer } from "lucide-react";
+import { ChevronDown, Copy, Check, CheckCircle, Video, Phone, ArrowUpFromLine, Shield, CalendarClock, Pointer, Users } from "lucide-react";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS, PHONE_CALL_TAGS, PHONE_TAG_LABELS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
@@ -161,6 +161,12 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
                 {signal.source}
               </span>
             ) : null}
+            {signal.rawPayload && typeof signal.rawPayload === "object" && (signal.rawPayload as Record<string, unknown>)._vanta_group_chat === true && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border border-vanta-border text-vanta-text-mid bg-vanta-bg-elevated">
+                <Users className="w-3 h-3" />
+                Group
+              </span>
+            )}
             {signal.riskLevel && (
               <span
                 className={`inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border ${RISK_STYLES[signal.riskLevel]}`}
