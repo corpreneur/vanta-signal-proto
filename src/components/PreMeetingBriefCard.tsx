@@ -111,11 +111,19 @@ const PreMeetingBriefCard = ({ brief }: PreMeetingBriefCardProps) => {
           ))}
         </div>
 
-        {/* Expand toggle */}
-        <button
-          onClick={() => setExpanded((p) => !p)}
-          className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-zoom-border hover:text-vanta-accent-zoom transition-colors"
-        >
+        {/* Actions row */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <Link
+            to={`/briefing/${brief.id}`}
+            className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-accent-zoom border border-vanta-accent-zoom-border hover:bg-vanta-accent-zoom-faint transition-colors"
+          >
+            <FileText className="w-3 h-3" />
+            Full Dossier
+          </Link>
+          <button
+            onClick={() => setExpanded((p) => !p)}
+            className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-zoom-border hover:text-vanta-accent-zoom transition-colors"
+          >
           <ChevronDown
             className={`w-3 h-3 transition-transform ${expanded ? "rotate-180" : ""}`}
           />
