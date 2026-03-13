@@ -6,8 +6,8 @@ import heroImage from "@/assets/vanta-hero.jpg";
 type AuthMode = "login" | "signup" | "forgot";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("vantasignals@vantasignal.app");
+  const [password, setPassword] = useState("ScalingEffects26!");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
