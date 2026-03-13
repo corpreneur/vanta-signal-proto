@@ -20,3 +20,9 @@ verify_jwt = false
 
 [functions.brain-dump]
 verify_jwt = false
+
+[functions.create-reminder]
+verify_jwt = false
+
+[functions.daily-digest]
+verify_jwt = false
