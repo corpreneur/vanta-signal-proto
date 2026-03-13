@@ -254,6 +254,13 @@ Generate a short reply (2-3 sentences max) acknowledging the incoming message.
   }
 }
 
+// ─── Normalize to E.164 ─────────────────────────────────────────────────────
+
+function toE164(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  return digits.startsWith("1") ? `+${digits}` : `+1${digits}`;
+}
+
 // ─── Send via Linq (supports chat threading) ────────────────────────────────
 
 async function sendLinqReply(
@@ -262,12 +269,15 @@ async function sendLinqReply(
   chatId?: string | null
 ): Promise<{ success: boolean; error?: string }> {
   const linqApiKey = Deno.env.get("LINQ_PARTNER_API_KEY");
-  const fromNumber = Deno.env.get("LINQ_FROM_NUMBER");
+  const rawFrom = Deno.env.get("LINQ_FROM_NUMBER");
 
-  if (!linqApiKey || !fromNumber) {
+  if (!linqApiKey || !rawFrom) {
     console.error("LINQ_PARTNER_API_KEY or LINQ_FROM_NUMBER not configured");
     return { success: false, error: "Linq send not configured" };
   }
+
+  const fromNumber = toE164(rawFrom);
+  const normalizedTo = toE164(toNumber);
 
   try {
     // If we have a chatId, send to existing chat thread
