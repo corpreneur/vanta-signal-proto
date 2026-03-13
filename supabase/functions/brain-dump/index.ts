@@ -307,6 +307,8 @@ serve(async (req) => {
     });
   } catch (e) {
     console.error("brain-dump error:", e);
+    const { logError } = await import("../_shared/log-error.ts");
+    await logError("brain-dump", e);
     const status = e instanceof Error && e.message.includes("429") ? 429 : 500;
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
