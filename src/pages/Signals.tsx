@@ -248,12 +248,21 @@ const Signals = () => {
             <p className="font-display text-[24px] text-destructive">{overdueCount}</p>
           </div>
         )}
-        <div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Pipeline</p>
-          <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 bg-vanta-accent" style={{ animation: "pulse-dot 2s ease-in-out infinite" }} />
-            <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-vanta-accent">Active</p>
-          </div>
+        <div className="ml-auto flex items-center gap-2">
+          <Users className="w-3.5 h-3.5 text-vanta-text-low" />
+          <label
+            htmlFor="group-autoreply"
+            className="font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low cursor-pointer select-none"
+          >
+            Group Auto-Reply
+          </label>
+          <Switch
+            id="group-autoreply"
+            checked={groupAutoReply}
+            onCheckedChange={(checked) => toggleGroupAutoReply.mutate(checked)}
+            disabled={toggleGroupAutoReply.isPending}
+            className="data-[state=checked]:bg-vanta-accent"
+          />
         </div>
       </div>
 
