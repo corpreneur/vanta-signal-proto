@@ -144,7 +144,7 @@ const Index = () => {
       {/* Channel Grid */}
       <section className="mb-10">
         <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-4">Channels</p>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-px bg-vanta-border border border-vanta-border">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-px bg-vanta-border border border-vanta-border">
           {CHANNELS.map((ch) => (
             <Link
               key={ch.key}
