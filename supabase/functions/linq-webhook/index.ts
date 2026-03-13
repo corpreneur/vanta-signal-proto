@@ -214,34 +214,123 @@ Action rules:
   }
 }
 
+// ─── Fetch context for reply generation ─────────────────────────────────────
+
+interface ReplyContext {
+  recentMessages: Array<{ sender: string; body: string; signal_type: string; captured_at: string }>;
+  senderHistory: { totalSignals: number; signalTypes: Record<string, number>; firstSeen: string };
+  persona: string | null;
+}
+
+async function fetchReplyContext(
+  supabase: ReturnType<typeof createClient>,
+  sender: string,
+  chatId: string | null
+): Promise<ReplyContext> {
+  // Fetch persona from system_settings
+  const { data: personaRow } = await supabase
+    .from("system_settings")
+    .select("value")
+    .eq("key", "reply_persona")
+    .single();
+
+  // Fetch recent messages from same chat or sender (last 8)
+  let recentQuery = supabase
+    .from("signals")
+    .select("sender, source_message, signal_type, captured_at")
+    .order("captured_at", { ascending: false })
+    .limit(8);
+
+  if (chatId) {
+    // For group chats, get recent messages from same chat thread
+    recentQuery = recentQuery.contains("raw_payload", { _vanta_chat_id: chatId });
+  } else {
+    recentQuery = recentQuery.eq("sender", sender);
+  }
+
+  const { data: recentRows } = await recentQuery;
+
+  // Fetch sender relationship history
+  const { data: senderRows } = await supabase
+    .from("signals")
+    .select("signal_type, captured_at")
+    .eq("sender", sender)
+    .order("captured_at", { ascending: true });
+
+  const signalTypes: Record<string, number> = {};
+  (senderRows || []).forEach((r) => {
+    signalTypes[r.signal_type] = (signalTypes[r.signal_type] || 0) + 1;
+  });
+
+  return {
+    recentMessages: (recentRows || []).map((r) => ({
+      sender: r.sender,
+      body: r.source_message,
+      signal_type: r.signal_type,
+      captured_at: r.captured_at,
+    })),
+    senderHistory: {
+      totalSignals: senderRows?.length || 0,
+      signalTypes,
+      firstSeen: senderRows?.[0]?.captured_at || new Date().toISOString(),
+    },
+    persona: typeof personaRow?.value === "string" ? personaRow.value : null,
+  };
+}
+
 // ─── AI: Generate reply ─────────────────────────────────────────────────────
 
-async function generateReply(signalType: string, sender: string, message: string, summary: string, apiKey: string, isGroupChat: boolean): Promise<string> {
+async function generateReply(
+  signalType: string,
+  sender: string,
+  message: string,
+  summary: string,
+  apiKey: string,
+  isGroupChat: boolean,
+  context: ReplyContext
+): Promise<string> {
   const groupInstruction = isGroupChat
-    ? "\n- This is a GROUP CHAT. Address the sender by name if possible. Keep reply brief since others can see it."
+    ? "\n- This is a GROUP CHAT. Address the sender by first name. Keep reply brief."
     : "";
 
-  const systemPrompt = `You are a concise, professional executive assistant for Vanta Wireless.
-Generate a short reply (2-3 sentences max) acknowledging the incoming message.
-- Be warm but professional. Write as if from a busy executive.${groupInstruction}
-- For INTRO: Thank the sender, confirm you'll follow up with the introduced person.
-- For INVESTMENT: Acknowledge receipt, signal thoughtful engagement.
-- For DECISION: Confirm you're reviewing and will respond with next steps.
+  // Build conversation history block
+  const historyBlock = context.recentMessages.length > 0
+    ? `\n\nRecent conversation history (newest first):\n${context.recentMessages
+        .map((m) => `- [${m.signal_type}] ${m.sender}: "${m.body.slice(0, 120)}"`)
+        .join("\n")}`
+    : "";
+
+  // Build sender relationship block
+  const relationshipBlock = context.senderHistory.totalSignals > 1
+    ? `\n\nSender profile: ${sender} has sent ${context.senderHistory.totalSignals} signals since ${new Date(context.senderHistory.firstSeen).toLocaleDateString()}. Signal breakdown: ${Object.entries(context.senderHistory.signalTypes).map(([t, c]) => `${t}(${c})`).join(", ")}.`
+    : `\n\nThis is a new contact — first message from ${sender}.`;
+
+  // Use stored persona or fallback
+  const personaPrompt = context.persona || `You are a concise, professional executive AI. Generate a 1-2 sentence reply. Never start with "Thank you for sharing." Vary your style.`;
+
+  const systemPrompt = `${personaPrompt}${groupInstruction}
+
+Context rules:
+- For INTRO: Acknowledge the introduction with genuine interest, confirm follow-up.
+- For INVESTMENT: Show engagement with the specific thesis or deal, not generic acknowledgment.
+- For DECISION: Reference what the decision is about, confirm review.
+- For INSIGHT: Engage with the actual idea — push back gently, build on it, or ask a sharp question.
+- For CONTEXT: Brief acknowledgment that references the specific content.
 - Never promise specific timelines. Never use exclamation marks.
 - Do NOT use greetings like "Hi" or "Hey" — start directly.
-- Return ONLY the reply text, no JSON, no quotes, no formatting.`;
+- Return ONLY the reply text, no JSON, no quotes, no formatting.${historyBlock}${relationshipBlock}`;
 
   try {
     const res = await fetch(LOVABLE_AI_URL, {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: `Signal type: ${signalType}\nSender: ${sender}\nOriginal message: ${message}\nAI summary: ${summary}\n\nWrite the reply:` },
         ],
-        temperature: 0.4,
+        temperature: 0.6,
       }),
     });
 
@@ -450,7 +539,9 @@ Deno.serve(async (req) => {
     }
 
     if (shouldAutoReply) {
-      const replyText = await generateReply(classification.signalType, parsed.sender, parsed.body, classification.summary, lovableApiKey, parsed.isGroupChat);
+      // Fetch conversation history, sender memory, and persona config
+      const replyContext = await fetchReplyContext(supabase, parsed.sender, parsed.chatId);
+      const replyText = await generateReply(classification.signalType, parsed.sender, parsed.body, classification.summary, lovableApiKey, parsed.isGroupChat, replyContext);
 
       // Group chats: always reply into the thread (chatId). 1:1: fall back to direct send.
       const sendResult = await sendLinqReply(parsed.senderHandle, replyText, parsed.chatId);
