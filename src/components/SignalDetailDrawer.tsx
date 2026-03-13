@@ -121,8 +121,12 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
 
     setSending(true);
     try {
+      const invokeBody: Record<string, unknown> = { to: replyTo.trim(), message: replyMessage.trim() };
+      if (replyMediaUrl.trim()) {
+        invokeBody.media = [{ url: replyMediaUrl.trim() }];
+      }
       const { data, error } = await supabase.functions.invoke("linq-send", {
-        body: { to: replyTo.trim(), message: replyMessage.trim() },
+        body: invokeBody,
       });
 
       if (error) throw error;
