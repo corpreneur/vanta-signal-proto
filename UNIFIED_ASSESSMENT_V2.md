@@ -17,12 +17,12 @@ The consensus is clear: the "move fast and break things" phase is over. The plat
 | ID | Priority | Title | Team | Status |
 |:---|:---:|:---|:---|:---|
 | **SEC-01** | **P0** | Implement RLS Policies | Engineering | **OPEN** |
-| **INFRA-01** | **P0** | Create Staging Environment & Purge Test Data | Engineering | **OPEN** |
-| **PROD-01** | **P0** | Fix Broken Routes for New Pages | Product | **OPEN** |
-| **PROD-02** | **P1** | Fix Signal Count Discrepancy | Product | **OPEN** |
-| **PROD-03** | **P1** | Purge Test Data from Production Feed | Product | **OPEN** |
-| **ENG-02** | **P1** | Add Error Handling for Speech Recognition | Engineering | **OPEN** |
-| **PROD-04** | **P2** | Fix Inconsistent Signal Counts in Filters | Product | **OPEN** |
+| **INFRA-01** | **P0** | Create Staging Environment & Purge Test Data | Engineering | **DONE** (test data purged) |
+| **PROD-01** | **P0** | Fix Broken Routes for New Pages | Product | **DONE** |
+| **PROD-02** | **P1** | Fix Signal Count Discrepancy | Product | **DONE** |
+| **PROD-03** | **P1** | Purge Test Data from Production Feed | Product | **DONE** |
+| **ENG-02** | **P1** | Add Error Handling for Speech Recognition | Engineering | **DONE** |
+| **PROD-04** | **P2** | Fix Inconsistent Signal Counts in Filters | Product | **DONE** |
 | **ENG-03** | **P2** | Add Input Validation on Brain Dump | Engineering | **OPEN** |
 
 ## 4. Strategic Roadmap

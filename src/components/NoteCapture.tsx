@@ -99,6 +99,14 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
   const textBeforeVoiceRef = useRef("");
 
   const handleVoiceToggle = () => {
+    if (!isSupported) {
+      toast({
+        title: "Speech recognition unavailable",
+        description: "Your browser does not support speech recognition. Try Chrome or Edge.",
+        variant: "destructive",
+      });
+      return;
+    }
     if (isListening) {
       stopListening();
     } else {
@@ -328,20 +336,20 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
 
       {/* Quick actions toolbar */}
       <div className="flex items-center gap-2 pt-1 border-t border-border">
-        {isSupported && (
-          <button
-            onClick={handleVoiceToggle}
-            disabled={loading}
-            className={`p-2 rounded-md transition-all ${
-              isListening
-                ? "text-red-400 bg-red-500/10"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            title={isListening ? "Stop" : "Dictate"}
-          >
-            {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-          </button>
-        )}
+        <button
+          onClick={handleVoiceToggle}
+          disabled={loading}
+          className={`p-2 rounded-md transition-all ${
+            !isSupported
+              ? "text-muted-foreground/40 cursor-not-allowed"
+              : isListening
+              ? "text-red-400 bg-red-500/10"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+          title={!isSupported ? "Speech recognition not supported in this browser" : isListening ? "Stop" : "Dictate"}
+        >
+          {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+        </button>
         <button className="p-2 rounded-md text-muted-foreground hover:text-foreground transition-colors" title="Tag">
           <Tag className="h-4 w-4" />
         </button>

@@ -1,0 +1,1 @@
+DELETE FROM signals WHERE id = '7d207ac0-5f25-439d-a43f-725fc2dbb583';

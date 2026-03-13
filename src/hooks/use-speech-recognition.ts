@@ -33,6 +33,7 @@ export function useSpeechRecognition() {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [isSupported, setIsSupported] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   useEffect(() => {
@@ -41,6 +42,7 @@ export function useSpeechRecognition() {
   }, []);
 
   const startListening = useCallback((onTranscript: (text: string) => void) => {
+    setErrorMessage(null);
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) return;
 
@@ -70,8 +72,13 @@ export function useSpeechRecognition() {
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
       console.error("Speech recognition error:", event.error);
-      if (event.error !== "no-speech") {
-        setIsListening(false);
+      setIsListening(false);
+      if (event.error === "not-allowed") {
+        setErrorMessage("Microphone access denied. Please allow microphone permissions in your browser settings.");
+      } else if (event.error === "network") {
+        setErrorMessage("Network error during speech recognition. Check your connection.");
+      } else if (event.error !== "no-speech" && event.error !== "aborted") {
+        setErrorMessage(`Speech recognition error: ${event.error}`);
       }
     };
 
@@ -92,5 +99,7 @@ export function useSpeechRecognition() {
     setTranscript("");
   }, []);
 
-  return { isListening, transcript, isSupported, startListening, stopListening, resetTranscript };
+  const clearError = useCallback(() => setErrorMessage(null), []);
+
+  return { isListening, transcript, isSupported, errorMessage, startListening, stopListening, resetTranscript, clearError };
 }

@@ -68,20 +68,22 @@ const Index = () => {
     refetchInterval: 60_000,
   });
 
-  const highCount = useMemo(() => signals.filter((s) => s.priority === "high").length, [signals]);
-  const actionCount = useMemo(() => signals.reduce((acc, s) => acc + s.actionsTaken.length, 0), [signals]);
+  const activeSignals = useMemo(() => signals.filter((s) => s.signalType !== "NOISE"), [signals]);
+  const noiseCount = useMemo(() => signals.length - activeSignals.length, [signals, activeSignals]);
+  const highCount = useMemo(() => activeSignals.filter((s) => s.priority === "high").length, [activeSignals]);
+  const actionCount = useMemo(() => activeSignals.reduce((acc, s) => acc + s.actionsTaken.length, 0), [activeSignals]);
 
   const channelCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    signals.forEach((s) => {
+    activeSignals.forEach((s) => {
       counts[s.source] = (counts[s.source] || 0) + 1;
     });
     return counts;
-  }, [signals]);
+  }, [activeSignals]);
 
   const recentSignals = useMemo(
-    () => [...signals].sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()).slice(0, 5),
-    [signals]
+    () => [...activeSignals].sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()).slice(0, 5),
+    [activeSignals]
   );
 
   const formatTime = (iso: string) => {
@@ -118,7 +120,7 @@ const Index = () => {
       <div className="flex flex-wrap gap-6 mb-8 pb-6 border-b border-vanta-border">
         <div>
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Signals Captured</p>
-          <p className="font-display text-[28px] text-vanta-text">{signals.length}</p>
+          <p className="font-display text-[28px] text-vanta-text">{activeSignals.length}</p>
         </div>
         <div>
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">High Strength</p>
