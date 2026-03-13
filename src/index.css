@@ -13,7 +13,7 @@
     --popover: 0 0% 3.1%;
     --popover-foreground: 43 33% 95.3%;
 
-    --primary: 79 95% 64%;
+    --primary: 30 4% 75%;
     --primary-foreground: 0 0% 3.1%;
 
     --secondary: 0 0% 6.7%;
@@ -22,7 +22,7 @@
     --muted: 0 0% 5.1%;
     --muted-foreground: 43 33% 37%;
 
-    --accent: 79 95% 64%;
+    --accent: 30 4% 75%;
     --accent-foreground: 0 0% 3.1%;
 
     --destructive: 0 84.2% 60.2%;
@@ -30,18 +30,18 @@
 
     --border: 0 0% 100% / 0.07;
     --input: 0 0% 100% / 0.07;
-    --ring: 79 95% 64%;
+    --ring: 30 4% 75%;
 
     --radius: 0px;
 
     --sidebar-background: 0 0% 3.1%;
     --sidebar-foreground: 43 33% 95.3%;
-    --sidebar-primary: 79 95% 64%;
+    --sidebar-primary: 30 4% 75%;
     --sidebar-primary-foreground: 0 0% 3.1%;
     --sidebar-accent: 0 0% 6.7%;
     --sidebar-accent-foreground: 43 33% 95.3%;
     --sidebar-border: 0 0% 100% / 0.07;
-    --sidebar-ring: 79 95% 64%;
+    --sidebar-ring: 30 4% 75%;
 
     /* Vanta custom tokens */
     --vanta-bg: 0 0% 3.1%;
@@ -50,16 +50,16 @@
     --vanta-text-mid: 43 33% 95.3% / 0.6;
     --vanta-text-low: 43 33% 95.3% / 0.35;
     --vanta-text-muted: 43 33% 95.3% / 0.22;
-    --vanta-accent: 79 95% 64%;
-    --vanta-accent-bg: 79 95% 64% / 0.08;
-    --vanta-accent-border: 79 95% 64% / 0.2;
-    --vanta-accent-faint: 79 95% 64% / 0.06;
+    --vanta-accent: 30 4% 75%;
+    --vanta-accent-bg: 30 4% 75% / 0.08;
+    --vanta-accent-border: 30 4% 75% / 0.2;
+    --vanta-accent-faint: 30 4% 75% / 0.06;
     --vanta-border: 0 0% 100% / 0.07;
     --vanta-border-mid: 0 0% 100% / 0.05;
     --vanta-bubble-in: 0 0% 100% / 0.04;
     --vanta-bubble-in-border: 0 0% 100% / 0.07;
-    --vanta-bubble-out: 79 95% 64% / 0.09;
-    --vanta-bubble-out-border: 79 95% 64% / 0.18;
+    --vanta-bubble-out: 30 4% 75% / 0.09;
+    --vanta-bubble-out-border: 30 4% 75% / 0.18;
 
     /* Signal type accent colors */
     --vanta-accent-teal: 162 89% 63%;
@@ -115,7 +115,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 0%;
 
-    --primary: 79 95% 38%;
+    --primary: 30 4% 18%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 90%;
@@ -124,7 +124,7 @@
     --muted: 0 0% 90%;
     --muted-foreground: 0 0% 35%;
 
-    --accent: 79 95% 38%;
+    --accent: 30 4% 18%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 50%;
@@ -132,34 +132,34 @@
 
     --border: 0 0% 0% / 0.12;
     --input: 0 0% 0% / 0.12;
-    --ring: 79 95% 38%;
+    --ring: 30 4% 18%;
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 0 0% 0%;
-    --sidebar-primary: 79 95% 38%;
+    --sidebar-primary: 30 4% 18%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 94.9%;
     --sidebar-accent-foreground: 0 0% 0%;
     --sidebar-border: 0 0% 0% / 0.1;
-    --sidebar-ring: 79 95% 38%;
+    --sidebar-ring: 30 4% 18%;
 
     /* Vanta custom tokens - light (Chunk spec) */
     --vanta-bg: 0 0% 94.9%;
     --vanta-bg-elevated: 0 0% 100%;
-    --vanta-text: 0 0% 0%;
-    --vanta-text-mid: 0 0% 0% / 0.65;
-    --vanta-text-low: 0 0% 0% / 0.45;
-    --vanta-text-muted: 0 0% 0% / 0.3;
-    --vanta-accent: 79 95% 38%;
-    --vanta-accent-bg: 79 95% 38% / 0.08;
-    --vanta-accent-border: 79 95% 38% / 0.25;
-    --vanta-accent-faint: 79 95% 38% / 0.06;
+    --vanta-text: 0 0% 5%;
+    --vanta-text-mid: 0 0% 5% / 0.7;
+    --vanta-text-low: 0 0% 5% / 0.5;
+    --vanta-text-muted: 0 0% 5% / 0.35;
+    --vanta-accent: 30 4% 18%;
+    --vanta-accent-bg: 30 4% 18% / 0.08;
+    --vanta-accent-border: 30 4% 18% / 0.25;
+    --vanta-accent-faint: 30 4% 18% / 0.06;
     --vanta-border: 0 0% 0% / 0.12;
     --vanta-border-mid: 0 0% 0% / 0.06;
     --vanta-bubble-in: 0 0% 0% / 0.04;
     --vanta-bubble-in-border: 0 0% 0% / 0.1;
-    --vanta-bubble-out: 79 95% 38% / 0.1;
-    --vanta-bubble-out-border: 79 95% 38% / 0.2;
+    --vanta-bubble-out: 30 4% 18% / 0.1;
+    --vanta-bubble-out-border: 30 4% 18% / 0.2;
 
     /* Signal type accent colors - darker for light bg */
     --vanta-accent-teal: 162 89% 32%;
