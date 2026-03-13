@@ -381,15 +381,100 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
             renderMeetingContent()
           ) : (
             <>
-              {/* Reply / Compose */}
-              {!replyOpen ? (
-                <button
-                  onClick={handleOpenReply}
-                  className="w-full h-9 bg-primary text-primary-foreground font-mono text-[10px] uppercase tracking-[0.15em] hover:bg-primary/90 transition-colors"
-                >
-                  Reply via Linq
-                </button>
-              ) : (
+              {/* Smart Actions — contextual by signal type */}
+              <section className="space-y-2">
+                <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted">
+                  Smart Actions
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {/* Reply via Linq — always available */}
+                  {!replyOpen && (
+                    <button
+                      onClick={handleOpenReply}
+                      className="flex items-center gap-1.5 h-8 px-3 bg-primary text-primary-foreground font-mono text-[10px] uppercase tracking-[0.15em] hover:bg-primary/90 transition-colors"
+                    >
+                      <MessageSquare className="w-3 h-3" />
+                      Reply via Linq
+                    </button>
+                  )}
+
+                  {/* INTRO → Draft Reply Email */}
+                  {signal.signalType === "INTRO" && (
+                    <button
+                      onClick={() => {
+                        const subject = encodeURIComponent(`Re: Introduction from ${signal.sender}`);
+                        const body = encodeURIComponent(`Following up on the introduction.\n\nContext: ${signal.summary}`);
+                        window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
+                      }}
+                      className="flex items-center gap-1.5 h-8 px-3 border border-vanta-border text-vanta-text-mid font-mono text-[10px] uppercase tracking-[0.15em] hover:border-vanta-accent-border hover:text-vanta-accent transition-colors"
+                    >
+                      <Mail className="w-3 h-3" />
+                      Draft Reply
+                    </button>
+                  )}
+
+                  {/* MEETING → Schedule Follow-Up */}
+                  {(signal.signalType === "MEETING" || signal.source === "recall") && (
+                    <button
+                      onClick={() => {
+                        const tomorrow = new Date();
+                        tomorrow.setDate(tomorrow.getDate() + 1);
+                        tomorrow.setHours(10, 0, 0, 0);
+                        const end = new Date(tomorrow);
+                        end.setMinutes(30);
+                        const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+                        const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Follow up: ${signal.sender}`)}&details=${encodeURIComponent(signal.summary)}&dates=${fmt(tomorrow)}/${fmt(end)}`;
+                        window.open(url, "_blank");
+                      }}
+                      className="flex items-center gap-1.5 h-8 px-3 border border-vanta-border text-vanta-text-mid font-mono text-[10px] uppercase tracking-[0.15em] hover:border-vanta-accent-border hover:text-vanta-accent transition-colors"
+                    >
+                      <CalendarPlus className="w-3 h-3" />
+                      Schedule Follow-Up
+                    </button>
+                  )}
+
+                  {/* DECISION → Create Task */}
+                  {signal.signalType === "DECISION" && (
+                    <button
+                      onClick={() => {
+                        const subject = encodeURIComponent(`Task: ${signal.summary.slice(0, 60)}`);
+                        const body = encodeURIComponent(`Decision signal from ${signal.sender}:\n\n${signal.summary}\n\nOriginal: ${signal.sourceMessage}`);
+                        window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
+                        toast.success("Opening task draft");
+                      }}
+                      className="flex items-center gap-1.5 h-8 px-3 border border-vanta-border text-vanta-text-mid font-mono text-[10px] uppercase tracking-[0.15em] hover:border-vanta-accent-border hover:text-vanta-accent transition-colors"
+                    >
+                      <ListChecks className="w-3 h-3" />
+                      Create Task
+                    </button>
+                  )}
+
+                  {/* INVESTMENT → Flag for Review */}
+                  {signal.signalType === "INVESTMENT" && (
+                    <button
+                      onClick={async () => {
+                        const { error } = await supabase
+                          .from("signals")
+                          .update({ status: "In Progress" as const, risk_level: "high" as const })
+                          .eq("id", signal.id);
+                        if (error) {
+                          toast.error("Failed to flag");
+                        } else {
+                          queryClient.invalidateQueries({ queryKey: ["signals"] });
+                          toast.success("Flagged for review");
+                        }
+                      }}
+                      className="flex items-center gap-1.5 h-8 px-3 border border-vanta-border text-vanta-text-mid font-mono text-[10px] uppercase tracking-[0.15em] hover:border-vanta-signal-red-border hover:text-vanta-signal-red transition-colors"
+                    >
+                      <Flag className="w-3 h-3" />
+                      Flag for Review
+                    </button>
+                  )}
+                </div>
+              </section>
+
+              {/* Reply Compose (shown when open) */}
+              {replyOpen && (
                 <section className="border border-vanta-accent-border bg-vanta-bg-elevated p-4 space-y-3">
                   <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent mb-1">
                     Compose Reply
