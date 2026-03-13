@@ -53,18 +53,11 @@ const MODES: ModeConfig[] = [
   },
 ];
 
-async function fetchCurrentMode(): Promise<UserMode> {
-  const { data, error } = await supabase
-    .from("system_settings")
-    .select("value")
-    .eq("key", "user_mode")
-    .maybeSingle();
-  if (error || !data) return "creative";
-  const val = typeof data.value === "string" ? data.value : JSON.stringify(data.value);
-  const cleaned = val.replace(/"/g, "");
-  if (["creative", "executive", "dnd"].includes(cleaned)) return cleaned as UserMode;
-  return "creative";
-}
+export default function UserModes() {
+  const queryClient = useQueryClient();
+  const { mode: currentMode } = useUserMode();
+  const [selected, setSelected] = useState<UserMode>("creative");
+  const isLoading = false;
 
 export default function UserModes() {
   const queryClient = useQueryClient();
