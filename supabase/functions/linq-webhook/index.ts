@@ -32,22 +32,15 @@ interface ParsedMessage {
 
 // ─── Auto-reply config ──────────────────────────────────────────────────────
 
-const AUTO_REPLY_TRIGGERS: Record<string, string[]> = {
-  INTRO: ["high"],
-  INVESTMENT: ["high", "medium", "low"],
-  DECISION: ["high", "medium", "low"],
-};
+const NOTIFY_NUMBER = "+18326510238";
 
 const FALLBACK_TEMPLATES: Record<string, string> = {
   INTRO: "Thank you for the introduction. I've noted this and will follow up shortly to schedule a conversation.",
+  INSIGHT: "Noted — this is a valuable insight. I've captured it and will incorporate it into my thinking.",
   INVESTMENT: "Received — I've logged this on the investment side and will circle back with thoughts shortly.",
   DECISION: "Got it. I'm reviewing this now and will respond with a decision or next steps soon.",
+  CONTEXT: "Appreciated — I've logged this context for reference.",
 };
-
-function shouldAutoReply(signalType: string, priority: string): boolean {
-  const allowedPriorities = AUTO_REPLY_TRIGGERS[signalType];
-  return !!allowedPriorities && allowedPriorities.includes(priority);
-}
 
 // ─── HMAC-SHA256 signature verification ─────────────────────────────────────
 
@@ -422,8 +415,8 @@ Deno.serve(async (req) => {
       priority: classification.priority,
     };
 
-    // 3. Auto-reply if triggered
-    if (shouldAutoReply(classification.signalType, classification.priority) && parsed.senderHandle) {
+    // 3. Auto-reply to sender for ALL non-NOISE signals
+    if (parsed.senderHandle) {
       const replyText = await generateReply(
         classification.signalType, parsed.sender, parsed.body, classification.summary, lovableApiKey
       );
@@ -440,6 +433,11 @@ Deno.serve(async (req) => {
         }
       }
     }
+
+    // 4. Notify owner at NOTIFY_NUMBER
+    const notifyText = `[SIGNAL] ${classification.signalType} / ${classification.priority}\nFrom: ${parsed.sender}\n${classification.summary}`;
+    const notifyResult = await sendLinqReply(NOTIFY_NUMBER, notifyText);
+    result.notification = { sent: notifyResult.success, error: notifyResult.error };
 
     return new Response(JSON.stringify({ processed: 1, results: [result] }), {
       status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
