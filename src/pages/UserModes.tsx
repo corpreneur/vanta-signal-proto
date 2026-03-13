@@ -4,8 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Motion } from "@/components/ui/motion";
 import { toast } from "sonner";
 import { Zap, Briefcase, BellOff, Check } from "lucide-react";
-
-type UserMode = "creative" | "executive" | "dnd";
+import { useUserMode, type UserMode } from "@/hooks/use-user-mode";
 
 interface ModeConfig {
   id: UserMode;
@@ -54,27 +53,10 @@ const MODES: ModeConfig[] = [
   },
 ];
 
-async function fetchCurrentMode(): Promise<UserMode> {
-  const { data, error } = await supabase
-    .from("system_settings")
-    .select("value")
-    .eq("key", "user_mode")
-    .maybeSingle();
-  if (error || !data) return "creative";
-  const val = typeof data.value === "string" ? data.value : JSON.stringify(data.value);
-  const cleaned = val.replace(/"/g, "");
-  if (["creative", "executive", "dnd"].includes(cleaned)) return cleaned as UserMode;
-  return "creative";
-}
-
 export default function UserModes() {
   const queryClient = useQueryClient();
+  const { mode: currentMode } = useUserMode();
   const [selected, setSelected] = useState<UserMode>("creative");
-
-  const { data: currentMode, isLoading } = useQuery({
-    queryKey: ["user-mode"],
-    queryFn: fetchCurrentMode,
-  });
 
   useEffect(() => {
     if (currentMode) setSelected(currentMode);
@@ -109,7 +91,7 @@ export default function UserModes() {
         </header>
       </Motion>
 
-      {isLoading && (
+      {!currentMode && (
         <div className="py-16 text-center">
           <div className="w-2 h-2 bg-primary animate-pulse mx-auto" />
         </div>

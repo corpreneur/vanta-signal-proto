@@ -6,6 +6,7 @@ import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { SIGNAL_TYPE_COLORS, type SignalType } from "@/data/signals";
+import { useUserMode } from "@/hooks/use-user-mode";
 
 const QUICK_TAGS = ["@person", "#priority", "#followup", "#idea", "#decision"];
 
@@ -79,6 +80,7 @@ function intentIcon(intent: AcceleratorIntent) {
 }
 
 export default function NoteCapture({ inline = false }: NoteCaptureProps) {
+  const { isDnd } = useUserMode();
   const [open, setOpen] = useState(inline);
   const [text, setText] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -272,8 +274,9 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
     ? SIGNAL_TYPE_COLORS[result.signalType as SignalType]
     : null;
 
-  // ── FAB ──
+  // ── FAB (hidden in DND mode) ──
   if (!inline && !open) {
+    if (isDnd) return null;
     return (
       <button
         onClick={() => setOpen(true)}

@@ -8,9 +8,10 @@ import type { FilterState } from "@/components/SignalFilters";
 import type { SignalType } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
-import { ShieldOff, BarChart3, ArrowUpDown, AlertTriangle, Users } from "lucide-react";
+import { ShieldOff, BarChart3, ArrowUpDown, AlertTriangle, Users, Briefcase, BellOff } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import { useUserMode } from "@/hooks/use-user-mode";
 
 const fetchSignals = async (): Promise<Signal[]> => {
   const { data, error } = await supabase
@@ -51,6 +52,7 @@ type Tab = "feed" | "filtered";
 type SortMode = "captured" | "due_date";
 
 const Signals = () => {
+  const { mode, isExecutive, isDnd } = useUserMode();
   const [activeTab, setActiveTab] = useState<Tab>("feed");
   const [sortMode, setSortMode] = useState<SortMode>("captured");
   const [showOverdueOnly, setShowOverdueOnly] = useState(false);
@@ -151,6 +153,11 @@ const Signals = () => {
   const feedSignals = useMemo(() => {
     let items = signals.filter((s) => s.signalType !== "NOISE");
 
+    // Executive mode: only HIGH priority
+    if (isExecutive) {
+      items = items.filter((s) => s.priority === "high");
+    }
+
     // Overdue filter
     if (showOverdueOnly) {
       const today = new Date().toISOString().split("T")[0];
@@ -160,7 +167,6 @@ const Signals = () => {
     // Sort
     if (sortMode === "due_date") {
       return items.sort((a, b) => {
-        // Signals with due dates first, then by date ascending (soonest first)
         if (!a.dueDate && !b.dueDate) return new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime();
         if (!a.dueDate) return 1;
         if (!b.dueDate) return -1;
@@ -168,7 +174,7 @@ const Signals = () => {
       });
     }
     return items.sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime());
-  }, [signals, sortMode, showOverdueOnly]);
+  }, [signals, sortMode, showOverdueOnly, isExecutive]);
 
   const noiseSignals = useMemo(
     () => [...signals].filter((s) => s.signalType === "NOISE").sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()),
@@ -214,14 +220,20 @@ const Signals = () => {
           <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-vanta-accent">
             Signal Log · Live
           </p>
+          {(isExecutive || isDnd) && (
+            <span className="flex items-center gap-1 ml-2 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider border border-foreground text-foreground bg-vanta-bg-elevated">
+              {isExecutive ? <Briefcase className="w-3 h-3" /> : <BellOff className="w-3 h-3" />}
+              {isExecutive ? "Executive" : "DND"}
+            </span>
+          )}
         </div>
         <h1 className="font-display text-[28px] md:text-[36px] leading-[1.15] text-vanta-text mb-3">
           Captured Signals
         </h1>
         <p className="font-sans text-[13px] md:text-[14px] leading-[1.6] text-vanta-text-mid max-w-[640px]">
-          A curated feed of intellectual capital captured from real conversations.
-          Every message is evaluated through a two-stage AI pipeline… what
-          matters is extracted before it disappears into the scroll.
+          {isExecutive
+            ? "Showing high-priority signals only. Switch to Creative mode for the full stream."
+            : "A curated feed of intellectual capital captured from real conversations. Every message is evaluated through a two-stage AI pipeline… what matters is extracted before it disappears into the scroll."}
         </p>
       </header>
 
