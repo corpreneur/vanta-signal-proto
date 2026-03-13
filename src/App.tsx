@@ -16,6 +16,7 @@ import ProductSignalPage from "./pages/ProductSignalPage";
 import Architecture from "./pages/Architecture";
 import BrainDump from "./pages/BrainDump";
 import ReleaseNotes from "./pages/ReleaseNotes";
+import ClassificationAudit from "./pages/ClassificationAudit";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const skipAuth = new URLSearchParams(window.location.search).get("skip-auth") === "1";
