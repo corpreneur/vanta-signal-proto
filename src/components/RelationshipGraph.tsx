@@ -82,6 +82,7 @@ interface RelationshipGraphProps {
 }
 
 export default function RelationshipGraph({ signals }: RelationshipGraphProps) {
+  const navigate = useNavigate();
   const nodes = useMemo(() => buildNodes(signals), [signals]);
   const maxSignals = useMemo(() => Math.max(...nodes.map((n) => n.signalCount), 1), [nodes]);
 
