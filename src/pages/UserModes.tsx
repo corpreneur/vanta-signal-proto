@@ -91,7 +91,7 @@ export default function UserModes() {
         </header>
       </Motion>
 
-      {isLoading && (
+      {!currentMode && (
         <div className="py-16 text-center">
           <div className="w-2 h-2 bg-primary animate-pulse mx-auto" />
         </div>
