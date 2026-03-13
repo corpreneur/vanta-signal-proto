@@ -539,7 +539,9 @@ Deno.serve(async (req) => {
     }
 
     if (shouldAutoReply) {
-      const replyText = await generateReply(classification.signalType, parsed.sender, parsed.body, classification.summary, lovableApiKey, parsed.isGroupChat);
+      // Fetch conversation history, sender memory, and persona config
+      const replyContext = await fetchReplyContext(supabase, parsed.sender, parsed.chatId);
+      const replyText = await generateReply(classification.signalType, parsed.sender, parsed.body, classification.summary, lovableApiKey, parsed.isGroupChat, replyContext);
 
       // Group chats: always reply into the thread (chatId). 1:1: fall back to direct send.
       const sendResult = await sendLinqReply(parsed.senderHandle, replyText, parsed.chatId);
