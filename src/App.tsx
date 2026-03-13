@@ -24,6 +24,9 @@ import Settings from "./pages/Settings";
 import ContactTimeline from "./pages/ContactTimeline";
 import Briefing from "./pages/Briefing";
 import Command from "./pages/Command";
+import Contacts from "./pages/Contacts";
+import NoiseQueue from "./pages/NoiseQueue";
+import UserModes from "./pages/UserModes";
 import type { Session } from "@supabase/supabase-js";
 
 const ProtectedRoute = ({ children, session }: { children: React.ReactNode; session: Session | null }) => {
