@@ -9,14 +9,24 @@ const LINQ_API_URL = "https://api.linqapp.com/api/partner/v3/chats";
 interface SendRequest {
   to: string | string[];
   message: string;
-  chatId?: string; // If provided, sends to existing chat thread
-  media?: Array<{ url: string; content_type?: string }>; // Optional media attachments
+  chatId?: string;
+  media?: Array<{ url: string; content_type?: string }>;
 }
 
 /** Strip to E.164: remove spaces, dashes, parens — keep leading + */
 function toE164(phone: string): string {
   const digits = phone.replace(/[^\d]/g, "");
   return digits.startsWith("1") && digits.length === 11 ? `+${digits}` : `+1${digits}`;
+}
+
+function buildParts(message: string, media?: Array<{ url: string; content_type?: string }>): Array<Record<string, unknown>> {
+  const parts: Array<Record<string, unknown>> = [{ type: "text", value: message.trim() }];
+  if (media?.length) {
+    for (const m of media) {
+      parts.push({ type: "media", url: m.url, ...(m.content_type ? { content_type: m.content_type } : {}) });
+    }
+  }
+  return parts;
 }
 
 Deno.serve(async (req) => {
@@ -41,6 +51,8 @@ Deno.serve(async (req) => {
       );
     }
 
+    const parts = buildParts(body.message, body.media);
+
     // If chatId provided, send to existing conversation thread
     if (body.chatId) {
       console.log("Sending to existing chat:", body.chatId);
@@ -51,15 +63,7 @@ Deno.serve(async (req) => {
           Authorization: `Bearer ${linqApiKey}`,
           "Content-Type": "application/json",
         },
-        const parts: Array<Record<string, unknown>> = [{ type: "text", value: body.message.trim() }];
-        if (body.media?.length) {
-          for (const m of body.media) {
-            parts.push({ type: "media", url: m.url, ...(m.content_type ? { content_type: m.content_type } : {}) });
-          }
-        }
-        body: JSON.stringify({
-          message: { parts },
-        }),
+        body: JSON.stringify({ message: { parts } }),
       });
 
       const responseText = await res.text();
@@ -100,7 +104,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         from: fromNumber,
         to: recipients,
-        message: { parts: [{ type: "text", value: body.message.trim() }] },
+        message: { parts },
       }),
     });
 

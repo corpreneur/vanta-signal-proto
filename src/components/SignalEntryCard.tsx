@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, Copy, Check, CheckCircle, Video, Phone, ArrowUpFromLine, Shield, CalendarClock, Pointer, Users, Reply, Bell, Calendar } from "lucide-react";
+import { ChevronDown, Copy, Check, CheckCircle, Video, Phone, ArrowUpFromLine, Shield, CalendarClock, Pointer, Users, Reply, Bell, Calendar, Image, Film, FileText, Mic, Paperclip } from "lucide-react";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS, PHONE_CALL_TAGS, PHONE_TAG_LABELS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
