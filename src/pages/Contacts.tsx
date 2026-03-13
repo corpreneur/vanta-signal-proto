@@ -148,6 +148,7 @@ export default function Contacts() {
       list = list.filter((c) => c.name.toLowerCase().includes(q));
     }
     const sortFns: Record<SortMode, (a: ContactSummary, b: ContactSummary) => number> = {
+      strength: (a, b) => b.strength - a.strength,
       signals: (a, b) => b.signalCount - a.signalCount,
       recency: (a, b) => a.daysSinceLast - b.daysSinceLast,
       alpha: (a, b) => a.name.localeCompare(b.name),
