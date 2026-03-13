@@ -21,6 +21,7 @@ import {
   ShieldCheck,
   Settings2,
   LogOut,
+  Zap,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -62,6 +63,7 @@ const productItems = [
 
 const coreItems = [
   { title: "Signal Feed", url: "/signals", icon: BarChart3 },
+  { title: "Command", url: "/command", icon: Zap },
   { title: "Classification Audit", url: "/audit", icon: ShieldCheck },
   { title: "Relationship Graph", url: "/graph", icon: Network },
 ];

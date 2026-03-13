@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 
@@ -81,6 +82,7 @@ interface RelationshipGraphProps {
 }
 
 export default function RelationshipGraph({ signals }: RelationshipGraphProps) {
+  const navigate = useNavigate();
   const nodes = useMemo(() => buildNodes(signals), [signals]);
   const maxSignals = useMemo(() => Math.max(...nodes.map((n) => n.signalCount), 1), [nodes]);
 
@@ -150,7 +152,8 @@ export default function RelationshipGraph({ signals }: RelationshipGraphProps) {
           return (
             <div
               key={node.name}
-              className={`absolute flex flex-col items-center group cursor-default`}
+              onClick={() => navigate(`/contact/${encodeURIComponent(node.name)}`)}
+              className={`absolute flex flex-col items-center group cursor-pointer`}
               style={{
                 left: `calc(50% + ${x}px - ${size / 2}px)`,
                 top: `calc(50% + ${y}px - ${size / 2}px)`,
@@ -203,7 +206,8 @@ export default function RelationshipGraph({ signals }: RelationshipGraphProps) {
           return (
             <div
               key={node.name}
-              className="grid grid-cols-[1fr_60px_60px_80px] gap-0 px-3 py-2 border-b border-vanta-border-mid hover:bg-vanta-bg-elevated transition-colors"
+              onClick={() => navigate(`/contact/${encodeURIComponent(node.name)}`)}
+              className="grid grid-cols-[1fr_60px_60px_80px] gap-0 px-3 py-2 border-b border-vanta-border-mid hover:bg-vanta-bg-elevated transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-2 min-w-0">
                 <span className={`w-2 h-2 ${colors.bg} border ${colors.border} shrink-0`} style={{ borderRadius: "50%" }} />

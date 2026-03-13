@@ -28,6 +28,7 @@ const BREADCRUMB_MAP: Record<string, string> = {
   "/architecture": "Platform · Architecture",
   "/brain-dump": "Brain Dump",
   "/releases": "Release Notes",
+  "/command": "Command",
 };
 
 function HamburgerTrigger({ breadcrumb }: { breadcrumb: string }) {

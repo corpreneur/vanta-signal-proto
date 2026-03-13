@@ -1,0 +1,288 @@
+import { useParams, Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { ArrowLeft, Video, Users, MessageSquare, Phone, Mail, StickyNote } from "lucide-react";
+import { Motion } from "@/components/ui/motion";
+import type { Signal } from "@/data/signals";
+import { SIGNAL_TYPE_COLORS } from "@/data/signals";
+
+interface MatchedSignal {
+  id: string;
+  matched_attendee: string;
+  signal_type: string;
+  summary: string;
+  priority: string;
+  captured_at: string;
+  sender: string;
+}
+
+interface AttendeeContext {
+  signal_count: number;
+  signal_types: string[];
+  last_signal: string;
+}
+
+interface Brief {
+  id: string;
+  meeting_id: string;
+  brief_text: string;
+  matched_signals: MatchedSignal[];
+  attendee_context: Record<string, AttendeeContext>;
+  created_at: string;
+  dismissed: boolean;
+}
+
+interface Meeting {
+  id: string;
+  title: string;
+  starts_at: string;
+  ends_at: string | null;
+  attendees: unknown;
+}
+
+const SOURCE_ICONS: Record<string, React.ElementType> = {
+  linq: MessageSquare,
+  phone: Phone,
+  recall: Video,
+  gmail: Mail,
+  manual: StickyNote,
+};
+
+async function fetchBriefing(id: string) {
+  const { data: brief, error } = await supabase
+    .from("pre_meeting_briefs")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (error) throw error;
+
+  const { data: meeting } = await supabase
+    .from("upcoming_meetings")
+    .select("*")
+    .eq("id", brief.meeting_id)
+    .single();
+
+  // Fetch full signals for each attendee
+  const attendeeNames = Object.keys(brief.attendee_context as Record<string, unknown> || {});
+  let attendeeSignals: Record<string, Signal[]> = {};
+
+  if (attendeeNames.length > 0) {
+    const { data: sigs } = await supabase
+      .from("signals")
+      .select("*")
+      .in("sender", attendeeNames)
+      .order("captured_at", { ascending: false })
+      .limit(100);
+
+    if (sigs) {
+      for (const row of sigs) {
+        const sender = row.sender;
+        if (!attendeeSignals[sender]) attendeeSignals[sender] = [];
+        attendeeSignals[sender].push({
+          id: row.id,
+          signalType: row.signal_type,
+          sender: row.sender,
+          summary: row.summary,
+          sourceMessage: row.source_message,
+          priority: row.priority,
+          capturedAt: row.captured_at,
+          actionsTaken: row.actions_taken || [],
+          status: row.status,
+          source: (row as Record<string, unknown>).source as Signal["source"] || "linq",
+          rawPayload: row.raw_payload as Record<string, unknown> | null,
+          linqMessageId: row.linq_message_id,
+        });
+      }
+    }
+  }
+
+  return {
+    brief: brief as unknown as Brief,
+    meeting: meeting as unknown as Meeting | null,
+    attendeeSignals,
+  };
+}
+
+export default function Briefing() {
+  const { id } = useParams<{ id: string }>();
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["briefing", id],
+    queryFn: () => fetchBriefing(id!),
+    enabled: !!id,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="max-w-[720px] mx-auto px-5 py-12">
+        <div className="w-2 h-2 bg-primary animate-pulse mx-auto" />
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="max-w-[720px] mx-auto px-5 py-12 text-center">
+        <p className="font-mono text-xs text-vanta-text-muted uppercase tracking-widest">Brief not found</p>
+      </div>
+    );
+  }
+
+  const { brief, meeting, attendeeSignals } = data;
+  const attendees = Object.entries(brief.attendee_context);
+
+  const meetingTime = meeting?.starts_at
+    ? new Date(meeting.starts_at).toLocaleString("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      })
+    : null;
+
+  return (
+    <div className="max-w-[720px] mx-auto px-5 py-8 md:py-12">
+      {/* Back */}
+      <Link
+        to="/signals"
+        className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.15em] text-vanta-text-low hover:text-vanta-accent transition-colors mb-6"
+      >
+        <ArrowLeft className="w-3 h-3" />
+        Signal Feed
+      </Link>
+
+      {/* Header */}
+      <Motion>
+        <header className="mb-8 border-b border-vanta-accent-zoom-border pb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.15em] border border-vanta-accent-zoom-border text-vanta-accent-zoom bg-vanta-accent-zoom-faint">
+              <Video className="w-3 h-3" />
+              Pre-Meeting Dossier
+            </span>
+          </div>
+
+          {meeting && (
+            <h1 className="font-display text-[clamp(24px,4vw,36px)] leading-tight text-foreground mb-2">
+              {meeting.title}
+            </h1>
+          )}
+
+          {meetingTime && (
+            <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-vanta-accent-zoom mb-3">
+              {meetingTime}
+            </p>
+          )}
+
+          <p className="font-sans text-[14px] leading-relaxed text-vanta-text-mid">
+            {brief.brief_text}
+          </p>
+        </header>
+      </Motion>
+
+      {/* Attendees overview */}
+      <Motion delay={60}>
+        <div className="flex items-center gap-2 flex-wrap mb-6">
+          <Users className="w-4 h-4 text-vanta-text-muted" />
+          {attendees.map(([name, ctx]) => (
+            <Link
+              key={name}
+              to={`/contact/${encodeURIComponent(name)}`}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] border border-vanta-accent-zoom-border text-vanta-text-mid bg-vanta-bg-elevated hover:border-vanta-accent hover:text-vanta-accent transition-colors"
+            >
+              {name}
+              <span className="text-vanta-accent-zoom font-bold">{ctx.signal_count}</span>
+            </Link>
+          ))}
+        </div>
+      </Motion>
+
+      {/* Per-attendee dossier */}
+      <div className="space-y-8">
+        {attendees.map(([name, ctx], ai) => {
+          const signals = attendeeSignals[name] || [];
+          const matchedForAttendee = brief.matched_signals.filter((ms) => ms.matched_attendee === name);
+
+          return (
+            <Motion key={name} delay={120 + ai * 80}>
+              <section className="border border-vanta-border">
+                {/* Attendee header */}
+                <div className="p-5 border-b border-vanta-border bg-vanta-bg-elevated">
+                  <div className="flex items-center justify-between mb-2">
+                    <Link
+                      to={`/contact/${encodeURIComponent(name)}`}
+                      className="font-mono text-sm font-medium text-foreground hover:text-vanta-accent transition-colors"
+                    >
+                      {name}
+                    </Link>
+                    <span className="font-mono text-[9px] uppercase tracking-widest text-vanta-text-muted">
+                      {ctx.signal_count} signals
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {ctx.signal_types.map((t) => {
+                      const c = SIGNAL_TYPE_COLORS[t as keyof typeof SIGNAL_TYPE_COLORS];
+                      return (
+                        <span key={t} className={`px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-wider border ${c?.text || "text-vanta-text-low"} ${c?.bg || ""} ${c?.border || "border-vanta-border"}`}>
+                          {t}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Matched signals (key talking points) */}
+                {matchedForAttendee.length > 0 && (
+                  <div className="p-5 border-b border-vanta-border">
+                    <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent-zoom mb-3">
+                      Key Talking Points
+                    </h3>
+                    <div className="space-y-2">
+                      {matchedForAttendee.map((ms) => (
+                        <div key={ms.id} className="border-l-2 border-vanta-accent-zoom-border pl-3">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <span className="font-mono text-[9px] uppercase tracking-wider text-vanta-accent-zoom">{ms.signal_type}</span>
+                            <span className="font-mono text-[8px] text-vanta-text-muted">
+                              {new Date(ms.captured_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                            </span>
+                          </div>
+                          <p className="font-sans text-[13px] text-foreground leading-relaxed">{ms.summary}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Full signal history for this attendee */}
+                {signals.length > 0 && (
+                  <div className="p-5">
+                    <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-3">
+                      Recent History ({signals.length})
+                    </h3>
+                    <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                      {signals.slice(0, 10).map((s) => {
+                        const colors = SIGNAL_TYPE_COLORS[s.signalType];
+                        return (
+                          <div key={s.id} className="flex gap-3 py-2 border-b border-vanta-border-mid last:border-0">
+                            <span className={`px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-wider border ${colors.text} ${colors.bg} ${colors.border} self-start`}>
+                              {s.signalType}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-sans text-[12px] text-vanta-text-mid leading-relaxed truncate">{s.summary}</p>
+                              <p className="font-mono text-[9px] text-vanta-text-muted mt-0.5">
+                                {new Date(s.capturedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })} via {s.source}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </section>
+            </Motion>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
