@@ -59,6 +59,7 @@ const Signals = () => {
     sender: "ALL",
     priority: "ALL",
     search: "",
+    chatMode: "ALL",
   });
   const queryClient = useQueryClient();
 
