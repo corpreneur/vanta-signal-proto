@@ -59,6 +59,7 @@ const Signals = () => {
     sender: "ALL",
     priority: "ALL",
     search: "",
+    chatMode: "ALL",
   });
   const queryClient = useQueryClient();
 
@@ -360,7 +361,7 @@ const Signals = () => {
               <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground mb-4">
                 These signals were classified as noise. Review and promote any that contain real value.
               </p>
-              <SignalFeed signals={noiseSignals} filters={{ type: "ALL", sender: "ALL", priority: "ALL", search: "" }} showPromote />
+              <SignalFeed signals={noiseSignals} filters={{ type: "ALL", sender: "ALL", priority: "ALL", search: "", chatMode: "ALL" }} showPromote />
             </>
           )}
         </>
