@@ -52,6 +52,7 @@ type Tab = "feed" | "filtered";
 type SortMode = "captured" | "due_date";
 
 const Signals = () => {
+  const { mode, isExecutive, isDnd } = useUserMode();
   const [activeTab, setActiveTab] = useState<Tab>("feed");
   const [sortMode, setSortMode] = useState<SortMode>("captured");
   const [showOverdueOnly, setShowOverdueOnly] = useState(false);
