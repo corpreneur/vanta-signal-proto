@@ -127,8 +127,9 @@ const PreMeetingBriefCard = ({ brief }: PreMeetingBriefCardProps) => {
           <ChevronDown
             className={`w-3 h-3 transition-transform ${expanded ? "rotate-180" : ""}`}
           />
-          {expanded ? "Hide" : "View"} Matched Signals ({brief.matched_signals.length})
-        </button>
+            {expanded ? "Hide" : "View"} Matched Signals ({brief.matched_signals.length})
+          </button>
+        </div>
       </div>
 
       {/* Expanded: matched signals */}

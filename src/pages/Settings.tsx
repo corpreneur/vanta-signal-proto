@@ -34,6 +34,18 @@ const SETTING_META: Record<string, { label: string; description: string; icon: R
     icon: Users,
     section: "AI & Automation",
   },
+  digest_enabled: {
+    label: "Daily Digest",
+    description: "When enabled, a morning digest of the top 5 signals and overdue items is sent via iMessage at 7:00 AM CT.",
+    icon: Bell,
+    section: "Notifications",
+  },
+  digest_time: {
+    label: "Digest Time",
+    description: "The time of day (CT) to send the daily digest. Format: HH:MM (24h).",
+    icon: Bell,
+    section: "Notifications",
+  },
 };
 
 export default function Settings() {

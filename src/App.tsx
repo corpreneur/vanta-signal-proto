@@ -75,6 +75,9 @@ const AppRoutes = () => {
       <Route path="/releases" element={<ProtectedRoute session={session}><ProductLayout><ReleaseNotes /></ProductLayout></ProtectedRoute>} />
       <Route path="/audit" element={<ProtectedRoute session={session}><ProductLayout><ClassificationAudit /></ProductLayout></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute session={session}><ProductLayout><Settings /></ProductLayout></ProtectedRoute>} />
+      <Route path="/contact/:name" element={<ProtectedRoute session={session}><ProductLayout><ContactTimeline /></ProductLayout></ProtectedRoute>} />
+      <Route path="/briefing/:id" element={<ProtectedRoute session={session}><ProductLayout><Briefing /></ProductLayout></ProtectedRoute>} />
+      <Route path="/command" element={<ProtectedRoute session={session}><ProductLayout><Command /></ProductLayout></ProtectedRoute>} />
       <Route path="/case-01" element={<Navigate to="/case/01" replace />} />
       <Route path="/case-02" element={<Navigate to="/case/02" replace />} />
       <Route path="/case-03" element={<Navigate to="/case/03" replace />} />

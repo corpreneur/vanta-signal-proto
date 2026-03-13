@@ -282,6 +282,54 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
             </button>
           )}
 
+          {/* Remind */}
+          {signal.status !== "Complete" && (
+            <button
+              onClick={async (e) => {
+                e.stopPropagation();
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const dueDate = tomorrow.toISOString().split("T")[0];
+                setSettingReminder(true);
+                try {
+                  const { data, error } = await supabase.functions.invoke("create-reminder", {
+                    body: { signal_id: signal.id, due_date: dueDate },
+                  });
+                  if (error) throw error;
+                  queryClient.invalidateQueries({ queryKey: ["signals"] });
+                  toast.success("Reminder set for tomorrow");
+                } catch {
+                  toast.error("Failed to set reminder");
+                }
+                setSettingReminder(false);
+              }}
+              disabled={settingReminder}
+              className="flex items-center gap-1.5 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent transition-colors disabled:opacity-50"
+            >
+              <Bell className="w-3 h-3" />
+              {settingReminder ? "Setting…" : "Remind"}
+            </button>
+          )}
+
+          {/* Calendar Hold */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const tomorrow = new Date();
+              tomorrow.setDate(tomorrow.getDate() + 1);
+              tomorrow.setHours(9, 0, 0, 0);
+              const end = new Date(tomorrow);
+              end.setMinutes(30);
+              const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+              const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Follow up: ${signal.sender}`)}&details=${encodeURIComponent(signal.summary)}&dates=${fmt(tomorrow)}/${fmt(end)}`;
+              window.open(url, "_blank");
+            }}
+            className="flex items-center gap-1.5 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent transition-colors"
+          >
+            <Calendar className="w-3 h-3" />
+            Cal Hold
+          </button>
+
           <button
             onClick={handleExpand}
             className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent transition-colors ml-auto"

@@ -206,7 +206,8 @@ export default function RelationshipGraph({ signals }: RelationshipGraphProps) {
           return (
             <div
               key={node.name}
-              className="grid grid-cols-[1fr_60px_60px_80px] gap-0 px-3 py-2 border-b border-vanta-border-mid hover:bg-vanta-bg-elevated transition-colors"
+              onClick={() => navigate(`/contact/${encodeURIComponent(node.name)}`)}
+              className="grid grid-cols-[1fr_60px_60px_80px] gap-0 px-3 py-2 border-b border-vanta-border-mid hover:bg-vanta-bg-elevated transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-2 min-w-0">
                 <span className={`w-2 h-2 ${colors.bg} border ${colors.border} shrink-0`} style={{ borderRadius: "50%" }} />
