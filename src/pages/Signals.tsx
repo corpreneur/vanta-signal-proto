@@ -153,6 +153,11 @@ const Signals = () => {
   const feedSignals = useMemo(() => {
     let items = signals.filter((s) => s.signalType !== "NOISE");
 
+    // Executive mode: only HIGH priority
+    if (isExecutive) {
+      items = items.filter((s) => s.priority === "high");
+    }
+
     // Overdue filter
     if (showOverdueOnly) {
       const today = new Date().toISOString().split("T")[0];
@@ -162,7 +167,6 @@ const Signals = () => {
     // Sort
     if (sortMode === "due_date") {
       return items.sort((a, b) => {
-        // Signals with due dates first, then by date ascending (soonest first)
         if (!a.dueDate && !b.dueDate) return new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime();
         if (!a.dueDate) return 1;
         if (!b.dueDate) return -1;
@@ -170,7 +174,7 @@ const Signals = () => {
       });
     }
     return items.sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime());
-  }, [signals, sortMode, showOverdueOnly]);
+  }, [signals, sortMode, showOverdueOnly, isExecutive]);
 
   const noiseSignals = useMemo(
     () => [...signals].filter((s) => s.signalType === "NOISE").sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()),
