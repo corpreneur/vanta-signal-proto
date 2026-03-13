@@ -68,6 +68,32 @@ const Signals = () => {
     refetchInterval: 60_000,
   });
 
+  const { data: groupAutoReply = false } = useQuery({
+    queryKey: ["group-autoreply-setting"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("system_settings")
+        .select("value")
+        .eq("key", "group_autoreply_enabled")
+        .single();
+      return data?.value === true;
+    },
+  });
+
+  const toggleGroupAutoReply = useMutation({
+    mutationFn: async (enabled: boolean) => {
+      const { error } = await supabase
+        .from("system_settings")
+        .update({ value: enabled as any, updated_at: new Date().toISOString() })
+        .eq("key", "group_autoreply_enabled");
+      if (error) throw error;
+    },
+    onSuccess: (_, enabled) => {
+      queryClient.invalidateQueries({ queryKey: ["group-autoreply-setting"] });
+      toast(enabled ? "Group auto-replies enabled" : "Group auto-replies disabled");
+    },
+  });
+
   const { data: briefs = [] } = useQuery({
     queryKey: ["pre-meeting-briefs"],
     queryFn: async () => {
