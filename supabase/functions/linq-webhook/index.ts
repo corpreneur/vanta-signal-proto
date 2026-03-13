@@ -634,7 +634,12 @@ Deno.serve(async (req) => {
     }
 
     // 1. Classify with AI (group context passed for better classification)
-    const classification = await classifySignal(parsed.body, parsed.sender, lovableApiKey, parsed.isGroupChat, parsed.participants);
+    // Enrich body with attachment context for AI classification
+    const attachmentContext = parsed.attachments.length > 0
+      ? `\n[Attachments: ${parsed.attachments.map((a) => a.mime || a.type).join(", ")}]`
+      : "";
+    const classificationBody = parsed.body + attachmentContext;
+    const classification = await classifySignal(classificationBody, parsed.sender, lovableApiKey, parsed.isGroupChat, parsed.participants);
     console.log("AI classification:", classification.signalType, classification.priority, parsed.isGroupChat ? "(group)" : "(1:1)");
 
     // 2. Insert signal (with group chat + emoji + attachment metadata in raw_payload)

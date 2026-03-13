@@ -10,6 +10,7 @@ interface SendRequest {
   to: string | string[];
   message: string;
   chatId?: string; // If provided, sends to existing chat thread
+  media?: Array<{ url: string; content_type?: string }>; // Optional media attachments
 }
 
 /** Strip to E.164: remove spaces, dashes, parens — keep leading + */
