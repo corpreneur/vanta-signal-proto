@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 export function ThemeToggle() {
   const [light, setLight] = useState(() => {
     if (typeof window !== "undefined") {
-      return document.documentElement.classList.contains("light");
+      const stored = localStorage.getItem("vanta-theme");
+      if (stored) return stored === "light";
+      return true; // default to light
     }
-    return false;
+    return true;
   });
 
   useEffect(() => {
@@ -18,14 +20,6 @@ export function ThemeToggle() {
       localStorage.setItem("vanta-theme", "dark");
     }
   }, [light]);
-
-  // Hydrate from localStorage on mount
-  useEffect(() => {
-    const stored = localStorage.getItem("vanta-theme");
-    if (stored === "light") {
-      setLight(true);
-    }
-  }, []);
 
   return (
     <button
