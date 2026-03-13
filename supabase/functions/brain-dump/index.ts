@@ -108,29 +108,90 @@ Also assign:
   return JSON.parse(toolCall.function.arguments) as Classification;
 }
 
+const MAX_TEXT_LENGTH = 10_000;
+const MAX_URL_LENGTH = 2_048;
+const URL_PATTERN = /^https?:\/\/[^\s<>"{}|\\^`\[\]]+$/i;
+
+function sanitizeText(input: string): string {
+  // Strip null bytes, control chars (except newlines/tabs), and excessive whitespace
+  return input
+    .replace(/\0/g, "")
+    .replace(/[\x01-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
+    .replace(/\n{4,}/g, "\n\n\n")
+    .trim();
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
-  try {
-    const body = await req.json();
-    let { text } = body;
-    const { url } = body;
+  // Only accept POST
+  if (req.method !== "POST") {
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
-    // If a URL is provided, scrape it via Firecrawl first
-    if (url && typeof url === "string" && url.trim().length > 0) {
+  try {
+    let body: Record<string, unknown>;
+    try {
+      body = await req.json();
+    } catch {
+      return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    let { text } = body as { text?: string };
+    const { url } = body as { url?: string };
+
+    // Validate URL if provided
+    if (url !== undefined && url !== null && url !== "") {
+      if (typeof url !== "string") {
+        return new Response(JSON.stringify({ error: "URL must be a string" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const trimmedUrl = url.trim();
+      if (trimmedUrl.length > MAX_URL_LENGTH) {
+        return new Response(JSON.stringify({ error: `URL must be under ${MAX_URL_LENGTH} characters` }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      let formattedUrl = trimmedUrl;
+      if (!formattedUrl.startsWith("http://") && !formattedUrl.startsWith("https://")) {
+        formattedUrl = `https://${formattedUrl}`;
+      }
+
+      if (!URL_PATTERN.test(formattedUrl)) {
+        return new Response(JSON.stringify({ error: "Invalid URL format" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Block private/internal network URLs
+      const hostname = new URL(formattedUrl).hostname;
+      if (hostname === "localhost" || hostname.startsWith("127.") || hostname.startsWith("10.") || hostname.startsWith("192.168.") || hostname === "0.0.0.0" || hostname.endsWith(".local")) {
+        return new Response(JSON.stringify({ error: "Internal URLs are not allowed" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
       const firecrawlKey = Deno.env.get("FIRECRAWL_API_KEY");
       if (!firecrawlKey) {
         return new Response(JSON.stringify({ error: "Firecrawl not configured" }), {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
-      }
-
-      let formattedUrl = url.trim();
-      if (!formattedUrl.startsWith("http://") && !formattedUrl.startsWith("https://")) {
-        formattedUrl = `https://${formattedUrl}`;
       }
 
       console.log("Scraping URL for brain-dump:", formattedUrl);
@@ -158,20 +219,30 @@ serve(async (req) => {
 
       const scraped = scrapeData.data?.markdown || scrapeData.markdown || "";
       const title = scrapeData.data?.metadata?.title || scrapeData.metadata?.title || "";
-      const prefix = text && text.trim() ? `${text.trim()}\n\n---\n\n` : "";
+      const prefix = text && typeof text === "string" && text.trim() ? `${sanitizeText(text)}\n\n---\n\n` : "";
       text = `${prefix}[Scraped from: ${formattedUrl}]${title ? ` — ${title}` : ""}\n\n${scraped}`;
       console.log(`Scraped ${scraped.length} chars from ${formattedUrl}`);
     }
 
-    if (!text || typeof text !== "string" || text.trim().length === 0) {
-      return new Response(JSON.stringify({ error: "Text is required" }), {
+    // Validate text
+    if (!text || typeof text !== "string") {
+      return new Response(JSON.stringify({ error: "Text is required and must be a string" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    if (text.length > 10000) {
-      text = text.substring(0, 10000);
+    text = sanitizeText(text);
+
+    if (text.length === 0) {
+      return new Response(JSON.stringify({ error: "Text cannot be empty" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (text.length > MAX_TEXT_LENGTH) {
+      text = text.substring(0, MAX_TEXT_LENGTH);
     }
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
