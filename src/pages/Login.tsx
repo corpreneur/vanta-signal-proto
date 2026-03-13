@@ -1,46 +1,92 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/vanta-hero.jpg";
 
-const VALID_USERNAME = "vantasignals";
-const VALID_PASSWORD = "ScalingEffects26!";
+type AuthMode = "login" | "signup" | "forgot";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState<AuthMode>("login");
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    setTimeout(() => {
-      if (username === VALID_USERNAME && password === VALID_PASSWORD) {
-        sessionStorage.setItem("vanta-auth", "true");
-        navigate("/");
-      } else {
-        setError("Invalid credentials");
-      }
-      setLoading(false);
-    }, 600);
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (authError) {
+      setError(authError.message);
+    } else {
+      navigate("/");
+    }
+    setLoading(false);
   };
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setMessage("");
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters");
+      setLoading(false);
+      return;
+    }
+
+    const { error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: window.location.origin },
+    });
+
+    if (authError) {
+      setError(authError.message);
+    } else {
+      setMessage("Check your email to confirm your account, then sign in.");
+      setMode("login");
+    }
+    setLoading(false);
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setMessage("");
+
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    if (resetError) {
+      setError(resetError.message);
+    } else {
+      setMessage("Password reset email sent. Check your inbox.");
+    }
+    setLoading(false);
+  };
+
+  const handleSubmit = mode === "login" ? handleLogin : mode === "signup" ? handleSignup : handleForgotPassword;
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-end sm:justify-center relative overflow-hidden">
-      {/* Hero image — full bleed background */}
+      {/* Hero image */}
       <div
         className="absolute inset-0 opacity-0"
         style={{ animation: "fadeUp 1.2s ease-out 0.1s forwards" }}
       >
-        <img
-          src={heroImage}
-          alt=""
-          className="w-full h-full object-cover object-top"
-        />
-        {/* Gradient overlay — heavier bottom fade to fully mask image text behind form */}
+        <img src={heroImage} alt="" className="w-full h-full object-cover object-top" />
         <div className="absolute inset-0 bg-gradient-to-t from-background from-35% via-background/95 via-50% to-background/30" />
       </div>
 
@@ -67,43 +113,83 @@ const Login = () => {
         >
           <div>
             <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-low mb-2">
-              Username
+              Email
             </label>
             <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full h-11 bg-background/60 backdrop-blur-sm border border-vanta-border px-3 font-mono text-[13px] text-foreground placeholder:text-vanta-text-muted focus:outline-none focus:border-vanta-accent-border transition-colors"
-              placeholder="Enter username"
-              autoComplete="username"
+              placeholder="you@example.com"
+              autoComplete="email"
+              required
             />
           </div>
 
-          <div>
-            <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-low mb-2">
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-11 bg-background/60 backdrop-blur-sm border border-vanta-border px-3 font-mono text-[13px] text-foreground placeholder:text-vanta-text-muted focus:outline-none focus:border-vanta-accent-border transition-colors"
-              placeholder="Enter password"
-              autoComplete="current-password"
-            />
-          </div>
-
-          {error && (
-            <p className="font-mono text-[11px] text-destructive">{error}</p>
+          {mode !== "forgot" && (
+            <div>
+              <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-low mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full h-11 bg-background/60 backdrop-blur-sm border border-vanta-border px-3 font-mono text-[13px] text-foreground placeholder:text-vanta-text-muted focus:outline-none focus:border-vanta-accent-border transition-colors"
+                placeholder={mode === "signup" ? "Min 8 characters" : "Enter password"}
+                autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                required
+                minLength={mode === "signup" ? 8 : undefined}
+              />
+            </div>
           )}
+
+          {error && <p className="font-mono text-[11px] text-destructive">{error}</p>}
+          {message && <p className="font-mono text-[11px] text-vanta-accent">{message}</p>}
 
           <button
             type="submit"
             disabled={loading}
             className="w-full h-11 bg-stone-300 text-stone-900 font-mono text-[11px] uppercase tracking-[0.15em] hover:bg-stone-200 transition-colors disabled:opacity-50 mt-2"
           >
-            {loading ? "Authenticating…" : "Access Platform"}
+            {loading
+              ? "Processing..."
+              : mode === "login"
+              ? "Sign In"
+              : mode === "signup"
+              ? "Create Account"
+              : "Send Reset Link"}
           </button>
+
+          <div className="flex justify-between pt-1">
+            {mode === "login" && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => { setMode("signup"); setError(""); setMessage(""); }}
+                  className="font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low hover:text-foreground transition-colors"
+                >
+                  Create Account
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setMode("forgot"); setError(""); setMessage(""); }}
+                  className="font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low hover:text-foreground transition-colors"
+                >
+                  Forgot Password
+                </button>
+              </>
+            )}
+            {mode !== "login" && (
+              <button
+                type="button"
+                onClick={() => { setMode("login"); setError(""); setMessage(""); }}
+                className="font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low hover:text-foreground transition-colors"
+              >
+                Back to Sign In
+              </button>
+            )}
+          </div>
         </form>
 
         <p

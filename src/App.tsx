@@ -1,11 +1,14 @@
+import { useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { supabase } from "@/integrations/supabase/client";
 import ProductLayout from "@/components/ProductLayout";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import Signals from "./pages/Signals";
 import CasePage from "./pages/CasePage";
@@ -18,15 +21,64 @@ import BrainDump from "./pages/BrainDump";
 import ReleaseNotes from "./pages/ReleaseNotes";
 import ClassificationAudit from "./pages/ClassificationAudit";
 import Settings from "./pages/Settings";
+import type { Session } from "@supabase/supabase-js";
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const skipAuth = new URLSearchParams(window.location.search).get("skip-auth") === "1";
-  if (skipAuth) sessionStorage.setItem("vanta-auth", "true");
-  const authed = sessionStorage.getItem("vanta-auth") === "true";
-  return authed ? <>{children}</> : <Navigate to="/login" replace />;
+const ProtectedRoute = ({ children, session }: { children: React.ReactNode; session: Session | null }) => {
+  if (!session) return <Navigate to="/login" replace />;
+  return <>{children}</>;
 };
 
 const queryClient = new QueryClient();
+
+const AppRoutes = () => {
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-2 h-2 bg-primary animate-pulse" />
+      </div>
+    );
+  }
+
+  return (
+    <Routes>
+      <Route path="/login" element={session ? <Navigate to="/" replace /> : <Login />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/" element={<ProtectedRoute session={session}><ProductLayout><Index /></ProductLayout></ProtectedRoute>} />
+      <Route path="/signals" element={<ProtectedRoute session={session}><ProductLayout><Signals /></ProductLayout></ProtectedRoute>} />
+      <Route path="/case/:id" element={<ProtectedRoute session={session}><ProductLayout><CasePage /></ProductLayout></ProtectedRoute>} />
+      <Route path="/graph" element={<ProtectedRoute session={session}><ProductLayout><Graph /></ProductLayout></ProtectedRoute>} />
+      <Route path="/phone-fmc" element={<ProtectedRoute session={session}><ProductLayout><PhoneFMC /></ProductLayout></ProtectedRoute>} />
+      <Route path="/ontology" element={<ProtectedRoute session={session}><ProductLayout><Ontology /></ProductLayout></ProtectedRoute>} />
+      <Route path="/product/:signalType" element={<ProtectedRoute session={session}><ProductLayout><ProductSignalPage /></ProductLayout></ProtectedRoute>} />
+      <Route path="/architecture" element={<ProtectedRoute session={session}><ProductLayout><Architecture /></ProductLayout></ProtectedRoute>} />
+      <Route path="/brain-dump" element={<ProtectedRoute session={session}><ProductLayout><BrainDump /></ProductLayout></ProtectedRoute>} />
+      <Route path="/releases" element={<ProtectedRoute session={session}><ProductLayout><ReleaseNotes /></ProductLayout></ProtectedRoute>} />
+      <Route path="/audit" element={<ProtectedRoute session={session}><ProductLayout><ClassificationAudit /></ProductLayout></ProtectedRoute>} />
+      <Route path="/settings" element={<ProtectedRoute session={session}><ProductLayout><Settings /></ProductLayout></ProtectedRoute>} />
+      <Route path="/case-01" element={<Navigate to="/case/01" replace />} />
+      <Route path="/case-02" element={<Navigate to="/case/02" replace />} />
+      <Route path="/case-03" element={<Navigate to="/case/03" replace />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -34,27 +86,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/" element={<ProtectedRoute><ProductLayout><Index /></ProductLayout></ProtectedRoute>} />
-          <Route path="/signals" element={<ProtectedRoute><ProductLayout><Signals /></ProductLayout></ProtectedRoute>} />
-          <Route path="/case/:id" element={<ProtectedRoute><ProductLayout><CasePage /></ProductLayout></ProtectedRoute>} />
-          <Route path="/graph" element={<ProtectedRoute><ProductLayout><Graph /></ProductLayout></ProtectedRoute>} />
-          <Route path="/phone-fmc" element={<ProtectedRoute><ProductLayout><PhoneFMC /></ProductLayout></ProtectedRoute>} />
-          <Route path="/ontology" element={<ProtectedRoute><ProductLayout><Ontology /></ProductLayout></ProtectedRoute>} />
-          <Route path="/product/:signalType" element={<ProtectedRoute><ProductLayout><ProductSignalPage /></ProductLayout></ProtectedRoute>} />
-          <Route path="/architecture" element={<ProtectedRoute><ProductLayout><Architecture /></ProductLayout></ProtectedRoute>} />
-          <Route path="/brain-dump" element={<ProtectedRoute><ProductLayout><BrainDump /></ProductLayout></ProtectedRoute>} />
-          <Route path="/releases" element={<ProtectedRoute><ProductLayout><ReleaseNotes /></ProductLayout></ProtectedRoute>} />
-          <Route path="/audit" element={<ProtectedRoute><ProductLayout><ClassificationAudit /></ProductLayout></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute><ProductLayout><Settings /></ProductLayout></ProtectedRoute>} />
-          {/* Legacy case study redirects */}
-          <Route path="/case-01" element={<Navigate to="/case/01" replace />} />
-          <Route path="/case-02" element={<Navigate to="/case/02" replace />} />
-          <Route path="/case-03" element={<Navigate to="/case/03" replace />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AppRoutes />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
