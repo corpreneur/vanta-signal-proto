@@ -53,21 +53,19 @@ const channelItems = [
   { title: "Zoom", url: "/product/meeting", icon: Video },
   { title: "Email", url: "/product/email", icon: Mail },
   { title: "Calendar", url: "/product/calendar", icon: Calendar },
-  { title: "Brain Dump", url: "/brain-dump", icon: PenLine },
 ];
 
 const productItems = [
+  { title: "Daily Command", url: "/command", icon: Zap },
+  { title: "Smart Contacts", url: "/contacts", icon: Users },
+  { title: "Relationship Graph", url: "/graph", icon: Network },
+  { title: "Brain Dump", url: "/brain-dump", icon: PenLine },
   { title: "Insight Engine", url: "/product/insight", icon: Lightbulb },
   { title: "Investment Intel", url: "/product/investment", icon: TrendingUp },
   { title: "Decision Capture", url: "/product/decision", icon: Gavel },
 ];
-
 const coreItems = [
   { title: "Signal Feed", url: "/signals", icon: BarChart3 },
-  { title: "Daily Command", url: "/command", icon: Zap },
-  { title: "Smart Contacts", url: "/contacts", icon: Users },
-  
-  { title: "Relationship Graph", url: "/graph", icon: Network },
 ];
 
 const platformItems = [
