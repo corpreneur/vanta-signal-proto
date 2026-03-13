@@ -131,7 +131,7 @@ type SortMode = "signals" | "recency" | "alpha" | "high" | "strength";
 export default function Contacts() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [sort, setSort] = useState<SortMode>("recency");
+  const [sort, setSort] = useState<SortMode>("strength");
 
   const { data: signals = [], isLoading } = useQuery({
     queryKey: ["contacts-signals"],
