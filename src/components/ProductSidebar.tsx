@@ -21,6 +21,7 @@ import {
   ShieldCheck,
   Settings2,
   LogOut,
+  Zap,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { ThemeToggle } from "@/components/ThemeToggle";
