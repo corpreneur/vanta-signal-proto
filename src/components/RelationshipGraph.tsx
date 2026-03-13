@@ -152,7 +152,8 @@ export default function RelationshipGraph({ signals }: RelationshipGraphProps) {
           return (
             <div
               key={node.name}
-              className={`absolute flex flex-col items-center group cursor-default`}
+              onClick={() => navigate(`/contact/${encodeURIComponent(node.name)}`)}
+              className={`absolute flex flex-col items-center group cursor-pointer`}
               style={{
                 left: `calc(50% + ${x}px - ${size / 2}px)`,
                 top: `calc(50% + ${y}px - ${size / 2}px)`,
