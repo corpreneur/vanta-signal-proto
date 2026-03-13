@@ -5,7 +5,7 @@ import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { Video, FileText, MessageSquare, Sparkles, Image, Film, Mic, Paperclip, Download, ExternalLink } from "lucide-react";
+import { Video, FileText, MessageSquare, Sparkles, Image, Film, Mic, Paperclip, Download, ExternalLink, Mail, CalendarPlus, Flag, ListChecks } from "lucide-react";
 
 const STATUSES: SignalStatus[] = ["Captured", "In Progress", "Complete"];
 
