@@ -51,7 +51,9 @@ const Login = () => {
           className="mb-10 text-center opacity-0"
           style={{ animation: "fadeUp 0.8s ease-out 0.5s forwards" }}
         >
-          <h1 className="sr-only">VANTA</h1>
+          <h1 className="font-display text-[48px] sm:text-[64px] leading-none text-foreground tracking-tight">
+            VANTA
+          </h1>
           <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-vanta-text-low mt-3">
             Less noise, more progress
           </p>
