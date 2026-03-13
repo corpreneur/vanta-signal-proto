@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import type { Signal, SignalStatus, MeetingArtifact } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
@@ -43,6 +43,7 @@ interface SignalDetailDrawerProps {
 }
 
 const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [replyOpen, setReplyOpen] = useState(false);
   const [replyTo, setReplyTo] = useState("");
   const [replyMessage, setReplyMessage] = useState("");
@@ -59,6 +60,13 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   useEffect(() => {
     if (signal?.status) setCurrentStatus(signal.status);
   }, [signal?.id, signal?.status]);
+
+  // Reset scroll position when a new signal opens
+  useEffect(() => {
+    if (open && scrollRef.current) {
+      scrollRef.current.scrollTop = 0;
+    }
+  }, [signal?.id, open]);
 
   // Fetch meeting artifact for recall signals
   useEffect(() => {
@@ -313,6 +321,7 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   return (
     <Sheet open={open} onOpenChange={(v) => { if (!v) { setReplyOpen(false); onClose(); } }}>
       <SheetContent
+        ref={scrollRef}
         side="right"
         className="w-full sm:max-w-[520px] bg-background border-l border-vanta-border p-0 overflow-y-auto"
       >

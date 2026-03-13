@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      error_logs: {
+        Row: {
+          created_at: string
+          error_context: Json | null
+          error_message: string
+          function_name: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          error_context?: Json | null
+          error_message: string
+          function_name: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          error_context?: Json | null
+          error_message?: string
+          function_name?: string
+          id?: string
+        }
+        Relationships: []
+      }
       meeting_artifacts: {
         Row: {
           attendees: Json | null

@@ -268,6 +268,8 @@ Deno.serve(async (req) => {
     );
   } catch (err) {
     console.error("phone-call-webhook error:", err);
+    const { logError } = await import("../_shared/log-error.ts");
+    await logError("phone-call-webhook", err);
     return new Response(
       JSON.stringify({ error: String(err) }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
