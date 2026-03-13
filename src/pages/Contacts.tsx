@@ -204,8 +204,8 @@ export default function Contacts() {
               className="pl-9 font-mono text-xs bg-vanta-bg-elevated border-vanta-border"
             />
           </div>
-          <div className="flex gap-1">
-            {(["recency", "signals", "high", "alpha"] as SortMode[]).map((m) => (
+          <div className="flex gap-1 flex-wrap">
+            {(["strength", "recency", "signals", "high", "alpha"] as SortMode[]).map((m) => (
               <button
                 key={m}
                 onClick={() => setSort(m)}
@@ -215,7 +215,7 @@ export default function Contacts() {
                     : "border-vanta-border text-vanta-text-low hover:text-foreground hover:border-vanta-border-mid"
                 }`}
               >
-                {m === "high" ? "Priority" : m === "alpha" ? "A–Z" : m === "signals" ? "Density" : "Recent"}
+                {m === "high" ? "Priority" : m === "alpha" ? "A–Z" : m === "signals" ? "Density" : m === "strength" ? "Strength" : "Recent"}
               </button>
             ))}
           </div>
