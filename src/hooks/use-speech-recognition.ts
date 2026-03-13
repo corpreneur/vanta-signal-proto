@@ -99,5 +99,7 @@ export function useSpeechRecognition() {
     setTranscript("");
   }, []);
 
-  return { isListening, transcript, isSupported, startListening, stopListening, resetTranscript };
+  const clearError = useCallback(() => setErrorMessage(null), []);
+
+  return { isListening, transcript, isSupported, errorMessage, startListening, stopListening, resetTranscript, clearError };
 }
