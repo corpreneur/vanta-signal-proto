@@ -321,6 +321,7 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   return (
     <Sheet open={open} onOpenChange={(v) => { if (!v) { setReplyOpen(false); onClose(); } }}>
       <SheetContent
+        ref={scrollRef}
         side="right"
         className="w-full sm:max-w-[520px] bg-background border-l border-vanta-border p-0 overflow-y-auto"
       >

@@ -209,26 +209,9 @@ function parseLinqPayload(payload: Record<string, unknown>): ParsedMessage | nul
     };
   }
 
-  // Legacy / test format: flat { sender, body, id, timestamp }
-  const sender = String(payload.sender || payload.from || "Unknown");
-  const body = String(payload.body || payload.text || payload.message || "");
-  if (!body.trim()) return null;
-
-  return {
-    eventId: null,
-    eventType: "message.received",
-    sender,
-    senderHandle: String(payload.from || payload.sender || ""),
-    body,
-    chatId: null,
-    messageId: payload.id ? String(payload.id) : null,
-    timestamp: payload.timestamp ? String(payload.timestamp) : new Date().toISOString(),
-    rawPayload: payload,
-    isGroupChat: false,
-    participants: [],
-    emojis: [],
-    attachments: [],
-  };
+  // Unsupported payload format
+  console.warn("[linq-webhook] Unrecognized payload format, skipping:", JSON.stringify(payload).slice(0, 200));
+  return null;
 }
 
 // ─── AI: Classify signal ────────────────────────────────────────────────────
