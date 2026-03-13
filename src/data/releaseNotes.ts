@@ -10,6 +10,29 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "0.9.6",
+    date: "2026-03-13",
+    title: "Q2 Strategic Features & Tech Debt Sprint",
+    changes: [
+      { type: "feature", text: "Smart Contact List — unified contact intelligence with signal aggregation, sorting, and search" },
+      { type: "feature", text: "Noise Review Queue — promote or dismiss AI-classified noise signals" },
+      { type: "feature", text: "User Modes — Creative, Executive, and DND modes with persistent settings" },
+      { type: "improvement", text: "Structured error logging to database across all edge functions" },
+      { type: "fix", text: "Signal detail drawer now resets scroll position on signal switch" },
+      { type: "improvement", text: "Removed legacy flat-payload support from Linq webhook (v3 strict)" },
+    ],
+  },
+  {
+    version: "0.9.5",
+    date: "2026-03-13",
+    title: "Light Mode & Theme Stabilization",
+    changes: [
+      { type: "fix", text: "Purged residual lime-green accent from light mode — replaced with warm charcoal palette" },
+      { type: "improvement", text: "Improved light-mode contrast for dashboard stats, FAB, and pipeline indicators" },
+      { type: "fix", text: "Theme toggle now defaults to light mode and syncs correctly with localStorage" },
+    ],
+  },
+  {
     version: "0.9.4",
     date: "2026-03-12",
     title: "Brand-Forward Login & Dashboard",
