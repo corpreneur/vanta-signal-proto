@@ -5,9 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Save, RotateCcw, Settings2, MessageSquare, Users, Bell, Shield, Smartphone, Phone, Video, Mail, Calendar, Filter, SlidersHorizontal } from "lucide-react";
+import { Save, RotateCcw, Settings2, MessageSquare, Users, Bell, Shield, Smartphone, Phone, Video, Mail, Calendar, Filter, SlidersHorizontal, ShieldCheck } from "lucide-react";
 import UserModes from "./UserModes";
 import NoiseQueue from "./NoiseQueue";
+import ClassificationAudit from "./ClassificationAudit";
 
 interface SettingRow {
   key: string;
@@ -69,7 +70,7 @@ const SOURCE_CHANNELS: Array<{
 
 const SOURCE_KEYS = new Set(SOURCE_CHANNELS.map((c) => c.key));
 
-const TAB_MAP: Record<string, string> = { noise: "noise", modes: "modes" };
+const TAB_MAP: Record<string, string> = { noise: "noise", modes: "modes", audit: "audit" };
 
 export default function Settings() {
   const queryClient = useQueryClient();
@@ -192,6 +193,10 @@ export default function Settings() {
           <TabsTrigger value="modes" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
             <SlidersHorizontal className="w-3.5 h-3.5" />
             User Modes
+          </TabsTrigger>
+          <TabsTrigger value="audit" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            Classification Audit
           </TabsTrigger>
         </TabsList>
 
@@ -358,6 +363,11 @@ export default function Settings() {
         {/* User Modes Tab */}
         <TabsContent value="modes">
           <UserModes />
+        </TabsContent>
+
+        {/* Classification Audit Tab */}
+        <TabsContent value="audit">
+          <ClassificationAudit />
         </TabsContent>
       </Tabs>
     </div>

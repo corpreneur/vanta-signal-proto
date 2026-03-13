@@ -19,7 +19,7 @@ import ProductSignalPage from "./pages/ProductSignalPage";
 import Architecture from "./pages/Architecture";
 import BrainDump from "./pages/BrainDump";
 import ReleaseNotes from "./pages/ReleaseNotes";
-import ClassificationAudit from "./pages/ClassificationAudit";
+
 import Settings from "./pages/Settings";
 import ContactTimeline from "./pages/ContactTimeline";
 import Briefing from "./pages/Briefing";
@@ -76,7 +76,7 @@ const AppRoutes = () => {
       <Route path="/architecture" element={<ProtectedRoute session={session}><ProductLayout><Architecture /></ProductLayout></ProtectedRoute>} />
       <Route path="/brain-dump" element={<ProtectedRoute session={session}><ProductLayout><BrainDump /></ProductLayout></ProtectedRoute>} />
       <Route path="/releases" element={<ProtectedRoute session={session}><ProductLayout><ReleaseNotes /></ProductLayout></ProtectedRoute>} />
-      <Route path="/audit" element={<ProtectedRoute session={session}><ProductLayout><ClassificationAudit /></ProductLayout></ProtectedRoute>} />
+      <Route path="/audit" element={<Navigate to="/settings?tab=audit" replace />} />
       <Route path="/settings" element={<ProtectedRoute session={session}><ProductLayout><Settings /></ProductLayout></ProtectedRoute>} />
       <Route path="/contact/:name" element={<ProtectedRoute session={session}><ProductLayout><ContactTimeline /></ProductLayout></ProtectedRoute>} />
       <Route path="/briefing/:id" element={<ProtectedRoute session={session}><ProductLayout><Briefing /></ProductLayout></ProtectedRoute>} />
