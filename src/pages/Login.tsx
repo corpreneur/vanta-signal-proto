@@ -40,8 +40,8 @@ const Login = () => {
           alt=""
           className="w-full h-full object-cover object-top"
         />
-        {/* Gradient overlay — bottom fade to black for form legibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
+        {/* Gradient overlay — heavier bottom fade to fully mask image text behind form */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/90 via-40% to-transparent" />
       </div>
 
       {/* Content */}
