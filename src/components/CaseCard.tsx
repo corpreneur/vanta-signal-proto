@@ -58,15 +58,6 @@ const CaseCard = ({ caseData, index, onOpen, isActive }: CaseCardProps) => {
         >
           Read Case →
         </button>
-        <a
-          href={caseData.standaloneHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={(e) => e.stopPropagation()}
-          className="font-sans text-[13px] text-vanta-text-low hover:text-primary transition-colors"
-        >
-          Full Page ↗
-        </a>
       </div>
     </article>
   );

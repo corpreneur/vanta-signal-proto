@@ -298,7 +298,7 @@ interface ReplyContext {
 }
 
 async function fetchReplyContext(
-  supabase: ReturnType<typeof createClient>,
+  supabase: any,
   sender: string,
   chatId: string | null
 ): Promise<ReplyContext> {

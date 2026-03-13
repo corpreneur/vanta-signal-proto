@@ -1,9 +1,6 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { cases } from "@/data/cases";
-import CaseCard from "@/components/CaseCard";
-import CaseCardSoon from "@/components/CaseCardSoon";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
 import {
@@ -198,22 +195,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Case Studies */}
-      <section>
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-4">Case Studies</p>
-        <div className="grid grid-cols-1 gap-px md:grid-cols-2">
-          {cases.map((c, i) => (
-            <CaseCard
-              key={c.id}
-              caseData={c}
-              index={i}
-              onOpen={() => {}}
-              isActive={false}
-            />
-          ))}
-          <CaseCardSoon />
-        </div>
-      </section>
     </div>
   );
 };
