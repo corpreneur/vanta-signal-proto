@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { StickyNote } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,6 +49,7 @@ const CHANNELS = [
   { key: "recall", label: "Zoom", icon: Video, color: "text-vanta-accent-zoom", bg: "bg-vanta-accent-zoom-faint", border: "border-vanta-accent-zoom-border", href: "/product/meeting" },
   { key: "gmail", label: "Email", icon: Mail, color: "text-vanta-accent-teal", bg: "bg-vanta-accent-teal-faint", border: "border-vanta-accent-teal-border", href: "/product/email" },
   { key: "calendar", label: "Calendar", icon: Calendar, color: "text-vanta-accent-amber", bg: "bg-vanta-accent-amber-faint", border: "border-vanta-accent-amber-border", href: "/product/calendar" },
+  { key: "manual", label: "Brain Dump", icon: StickyNote, color: "text-vanta-accent-violet", bg: "bg-vanta-accent-violet-faint", border: "border-vanta-accent-violet-border", href: "/brain-dump" },
 ];
 
 const SIGNAL_TYPE_COLORS: Record<string, string> = {
@@ -142,7 +144,7 @@ const Index = () => {
       {/* Channel Grid */}
       <section className="mb-10">
         <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-4">Channels</p>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-px bg-vanta-border border border-vanta-border">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-px bg-vanta-border border border-vanta-border">
           {CHANNELS.map((ch) => (
             <Link
               key={ch.key}
