@@ -32,22 +32,15 @@ interface ParsedMessage {
 
 // ─── Auto-reply config ──────────────────────────────────────────────────────
 
-const AUTO_REPLY_TRIGGERS: Record<string, string[]> = {
-  INTRO: ["high"],
-  INVESTMENT: ["high", "medium", "low"],
-  DECISION: ["high", "medium", "low"],
-};
+const NOTIFY_NUMBER = "+18326510238";
 
 const FALLBACK_TEMPLATES: Record<string, string> = {
   INTRO: "Thank you for the introduction. I've noted this and will follow up shortly to schedule a conversation.",
+  INSIGHT: "Noted — this is a valuable insight. I've captured it and will incorporate it into my thinking.",
   INVESTMENT: "Received — I've logged this on the investment side and will circle back with thoughts shortly.",
   DECISION: "Got it. I'm reviewing this now and will respond with a decision or next steps soon.",
+  CONTEXT: "Appreciated — I've logged this context for reference.",
 };
-
-function shouldAutoReply(signalType: string, priority: string): boolean {
-  const allowedPriorities = AUTO_REPLY_TRIGGERS[signalType];
-  return !!allowedPriorities && allowedPriorities.includes(priority);
-}
 
 // ─── HMAC-SHA256 signature verification ─────────────────────────────────────
 
