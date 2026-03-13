@@ -4,11 +4,9 @@ import { useEffect, useState } from "react";
 export function ThemeToggle() {
   const [light, setLight] = useState(() => {
     if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("vanta-theme");
-      if (stored) return stored === "light";
-      return true; // default to light
+      return document.documentElement.classList.contains("light");
     }
-    return true;
+    return false;
   });
 
   useEffect(() => {
