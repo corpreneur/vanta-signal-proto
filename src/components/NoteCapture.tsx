@@ -99,6 +99,14 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
   const textBeforeVoiceRef = useRef("");
 
   const handleVoiceToggle = () => {
+    if (!isSupported) {
+      toast({
+        title: "Speech recognition unavailable",
+        description: "Your browser does not support speech recognition. Try Chrome or Edge.",
+        variant: "destructive",
+      });
+      return;
+    }
     if (isListening) {
       stopListening();
     } else {
