@@ -82,8 +82,8 @@ const Index = () => {
   }, [activeSignals]);
 
   const recentSignals = useMemo(
-    () => [...signals].sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()).slice(0, 5),
-    [signals]
+    () => [...activeSignals].sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()).slice(0, 5),
+    [activeSignals]
   );
 
   const formatTime = (iso: string) => {
