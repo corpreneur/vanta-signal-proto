@@ -274,16 +274,26 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
     ? SIGNAL_TYPE_COLORS[result.signalType as SignalType]
     : null;
 
-  // ── FAB (hidden in DND mode) ──
+  // ── VANTA Orb (hidden in DND mode) ──
   if (!inline && !open) {
     if (isDnd) return null;
     return (
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+        className="fixed bottom-6 right-6 z-50 group"
         aria-label="New note"
       >
-        <Plus className="h-6 w-6" />
+        {/* Ambient pulse ring */}
+        <span className="absolute inset-0 rounded-full bg-primary/20 animate-ping [animation-duration:3s]" />
+        {/* Glow ring */}
+        <span className="absolute -inset-1 rounded-full bg-primary/10 blur-md group-hover:bg-primary/20 transition-all duration-500" />
+        {/* Orb body */}
+        <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_0_20px_hsl(var(--primary)/0.3)] group-hover:shadow-[0_0_30px_hsl(var(--primary)/0.5)] group-hover:scale-110 group-active:scale-95 transition-all duration-300">
+          {/* VANTA dot mark */}
+          <span className="absolute h-2 w-2 rounded-full bg-primary-foreground/90" />
+          {/* Outer ring detail */}
+          <span className="absolute h-10 w-10 rounded-full border border-primary-foreground/20" />
+        </span>
       </button>
     );
   }
