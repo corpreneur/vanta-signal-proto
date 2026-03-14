@@ -317,6 +317,7 @@ const Signals = () => {
 
       {activeTab === "feed" && (
         <>
+          <MorningContext signals={feedSignals} />
           <TagBrowser tagCounts={tagCounts} activeType={filters.type} onSelect={handleTagSelect} />
           <SignalFilters filters={filters} onChange={setFilters} senders={senders} />
 
