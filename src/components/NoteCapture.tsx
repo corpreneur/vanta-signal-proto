@@ -299,7 +299,7 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
           className="absolute inset-[-6px]"
           style={{ animation: "vanta-orbit 8s linear infinite" }}
         >
-          <span className="absolute top-0 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-primary/60" />
+          <span className="absolute top-0 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-primary/90 shadow-[0_0_6px_1px_hsl(var(--primary)/0.4)]" />
         </span>
 
         {/* Glow halo */}
