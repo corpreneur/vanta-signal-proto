@@ -437,7 +437,73 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
             Cal Hold
           </button>
 
-          <button
+          {/* Contextual Smart Actions by signal type */}
+          {signal.signalType === "INTRO" && signal.status !== "Complete" && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                const subject = encodeURIComponent(`Re: Introduction — ${signal.sender}`);
+                const body = encodeURIComponent(`Hi,\n\nFollowing up on the introduction from ${signal.sender}.\n\n${signal.summary}\n\nBest regards`);
+                window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
+              }}
+              className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-accent border border-vanta-accent-border hover:bg-vanta-accent-faint transition-colors"
+            >
+              <Mail className="w-3 h-3" />
+              Draft Reply
+            </button>
+          )}
+          {signal.signalType === "MEETING" && signal.status !== "Complete" && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                const nextWeek = new Date();
+                nextWeek.setDate(nextWeek.getDate() + 7);
+                nextWeek.setHours(10, 0, 0, 0);
+                const end = new Date(nextWeek);
+                end.setMinutes(30);
+                const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+                const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Follow-up: ${signal.sender}`)}&details=${encodeURIComponent(signal.summary)}&dates=${fmt(nextWeek)}/${fmt(end)}`;
+                window.open(url, "_blank");
+              }}
+              className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-accent border border-vanta-accent-border hover:bg-vanta-accent-faint transition-colors"
+            >
+              <Calendar className="w-3 h-3" />
+              Follow-Up
+            </button>
+          )}
+          {signal.signalType === "DECISION" && signal.status !== "Complete" && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigator.clipboard.writeText(`TASK: ${signal.summary}\nFrom: ${signal.sender}\nPriority: ${signal.priority}\nContext: ${signal.sourceMessage}`);
+                toast.success("Decision exported as task to clipboard");
+              }}
+              className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-accent border border-vanta-accent-border hover:bg-vanta-accent-faint transition-colors"
+            >
+              <FileOutput className="w-3 h-3" />
+              Create Task
+            </button>
+          )}
+          {signal.signalType === "INVESTMENT" && signal.status !== "Complete" && (
+            <button
+              onClick={async (e) => {
+                e.stopPropagation();
+                const { error } = await supabase
+                  .from("signals")
+                  .update({ pinned: true })
+                  .eq("id", signal.id);
+                if (!error) {
+                  queryClient.invalidateQueries({ queryKey: ["signals"] });
+                  toast.success("Flagged for review");
+                }
+              }}
+              className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-accent border border-vanta-accent-border hover:bg-vanta-accent-faint transition-colors"
+            >
+              <Flag className="w-3 h-3" />
+              Flag Review
+            </button>
+          )}
+
             onClick={handleExpand}
             className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent transition-colors ml-auto"
           >
