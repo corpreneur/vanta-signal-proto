@@ -4,6 +4,7 @@ import SignalFeed from "@/components/SignalFeed";
 import SignalFilters from "@/components/SignalFilters";
 import TagBrowser from "@/components/TagBrowser";
 import PreMeetingBriefCard from "@/components/PreMeetingBriefCard";
+import MorningContext from "@/components/MorningContext";
 import type { FilterState } from "@/components/SignalFilters";
 import type { SignalType } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
