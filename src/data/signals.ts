@@ -29,6 +29,7 @@ export interface Signal {
   riskLevel?: SignalRiskLevel | null;
   dueDate?: string | null; // ISO date string
   callPointer?: string | null;
+  pinned?: boolean;
 }
 
 export interface MeetingArtifact {
