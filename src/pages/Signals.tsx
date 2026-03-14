@@ -52,6 +52,14 @@ const SIGNAL_TYPES_ORDER: SignalType[] = ["INTRO", "INSIGHT", "INVESTMENT", "DEC
 
 type Tab = "feed" | "filtered";
 type SortMode = "captured" | "due_date";
+type PriorityLens = "all" | "time" | "money" | "urgency";
+
+const LENS_CONFIG: Record<PriorityLens, { label: string; icon: typeof BarChart3; description: string; types: SignalType[] }> = {
+  all: { label: "All Signals", icon: BarChart3, description: "Full curated feed", types: [] },
+  time: { label: "Time", icon: ArrowUpDown, description: "Meetings, follow-ups, deadlines", types: ["MEETING", "PHONE_CALL", "DECISION"] },
+  money: { label: "Money", icon: BarChart3, description: "Investments, deals, opportunities", types: ["INVESTMENT", "INTRO", "INSIGHT"] },
+  urgency: { label: "Urgency", icon: AlertTriangle, description: "High-priority, overdue, at-risk", types: [] },
+};
 
 const Signals = () => {
   const { mode, isExecutive, isDnd } = useUserMode();
