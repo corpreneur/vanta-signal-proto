@@ -90,7 +90,7 @@ export const cases: CaseData[] = [
         {
           sender: "Steve Stoute · Vanta Founder",
           direction: "in",
-          text: "William pls meet Kristina Windham.. Kristina as discussed William is our Chief Business Officer and my spirit animal. You guys should connect",
+          text: "William pls meet Kristina Windham.. Kristina as discussed William is our Chief Business Officer. You guys should connect",
           timestamp: "7:16 AM",
         },
         {
