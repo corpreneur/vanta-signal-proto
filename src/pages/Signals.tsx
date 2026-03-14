@@ -169,6 +169,16 @@ const Signals = () => {
       items = items.filter((s) => s.priority === "high");
     }
 
+    // Priority Lens filtering
+    if (priorityLens === "time") {
+      items = items.filter((s) => LENS_CONFIG.time.types.includes(s.signalType) || s.dueDate);
+    } else if (priorityLens === "money") {
+      items = items.filter((s) => LENS_CONFIG.money.types.includes(s.signalType));
+    } else if (priorityLens === "urgency") {
+      const today = new Date().toISOString().split("T")[0];
+      items = items.filter((s) => s.priority === "high" || (s.dueDate && s.dueDate <= today) || s.riskLevel === "high" || s.riskLevel === "critical");
+    }
+
     // Overdue filter
     if (showOverdueOnly) {
       const today = new Date().toISOString().split("T")[0];
@@ -185,7 +195,7 @@ const Signals = () => {
       });
     }
     return items.sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime());
-  }, [signals, sortMode, showOverdueOnly, isExecutive]);
+  }, [signals, sortMode, showOverdueOnly, isExecutive, priorityLens]);
 
   const noiseSignals = useMemo(
     () => [...signals].filter((s) => s.signalType === "NOISE").sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()),
