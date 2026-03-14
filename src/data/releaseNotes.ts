@@ -10,6 +10,17 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "0.9.8",
+    date: "2026-03-14",
+    title: "Tech Debt Cleanup & Logging Standardization",
+    changes: [
+      { type: "fix", text: "Removed all unsafe `as any` casts for pinned property across Signal Feed, Morning Context, and Signals page" },
+      { type: "fix", text: "Contact Hub now correctly maps `pinned` field from database rows" },
+      { type: "improvement", text: "Standardized error logging with `logError` across all 6 remaining edge functions" },
+      { type: "fix", text: "Cleaned inappropriate language from mock data and case study content" },
+    ],
+  },
+  {
     version: "0.9.7",
     date: "2026-03-14",
     title: "Signal Feed Curation & Contact Hub",
