@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import type { Signal, SignalStatus, MeetingArtifact } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { Video, FileText, MessageSquare, Sparkles, Image, Film, Mic, Paperclip, Download, ExternalLink, Mail, CalendarPlus, Flag, ListChecks } from "lucide-react";
+import { Video, FileText, MessageSquare, Sparkles, Image, Film, Mic, Paperclip, Download, ExternalLink, Mail, CalendarPlus, Flag, ListChecks, User } from "lucide-react";
 
 const STATUSES: SignalStatus[] = ["Captured", "In Progress", "Complete"];
 
@@ -43,6 +44,7 @@ interface SignalDetailDrawerProps {
 }
 
 const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) => {
+  const navigate = useNavigate();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [replyOpen, setReplyOpen] = useState(false);
   const [replyTo, setReplyTo] = useState("");
@@ -374,9 +376,21 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
               ))}
             </select>
           </div>
-          <SheetTitle className="font-mono text-[12px] uppercase tracking-[0.12em] text-vanta-text-mid text-left">
-            {signal.sender}
-          </SheetTitle>
+          <div className="flex items-center gap-2">
+            <SheetTitle className="font-mono text-[12px] uppercase tracking-[0.12em] text-vanta-text-mid text-left">
+              {signal.sender}
+            </SheetTitle>
+            <button
+              onClick={() => {
+                onClose();
+                navigate(`/contact/${encodeURIComponent(signal.sender)}`);
+              }}
+              className="flex items-center gap-1 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent transition-colors"
+            >
+              <User className="w-3 h-3" />
+              View Contact
+            </button>
+          </div>
           <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-vanta-text-muted">
             {formatTimestamp(signal.capturedAt)}
           </p>

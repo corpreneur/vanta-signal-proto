@@ -10,6 +10,20 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "0.9.7",
+    date: "2026-03-14",
+    title: "Signal Feed Curation & Contact Hub",
+    changes: [
+      { type: "feature", text: "Signal Feed temporal grouping — Today / Yesterday / This Week section headers" },
+      { type: "feature", text: "Morning Context strip — date, meeting count, high-priority signals at a glance" },
+      { type: "feature", text: "Inline quick-actions on signal cards — Done, Snooze, and Pin without opening drawer" },
+      { type: "feature", text: "Contact Hub — redesigned contact timeline with relationship strength, suggested actions, and By-Type view" },
+      { type: "feature", text: "Cross-link from Signal Detail Drawer to sender's Contact Hub page" },
+      { type: "improvement", text: "Source priority weights in Settings — control which channels surface first" },
+      { type: "improvement", text: "Pinned signals section at top of feed with dedicated visual treatment" },
+    ],
+  },
+  {
     version: "0.9.6",
     date: "2026-03-13",
     title: "Q2 Strategic Features & Tech Debt Sprint",

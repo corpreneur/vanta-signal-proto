@@ -131,6 +131,7 @@ export type Database = {
           id: string
           linq_message_id: string | null
           meeting_id: string | null
+          pinned: boolean
           priority: Database["public"]["Enums"]["signal_priority"]
           raw_payload: Json | null
           risk_level: Database["public"]["Enums"]["signal_risk_level"] | null
@@ -151,6 +152,7 @@ export type Database = {
           id?: string
           linq_message_id?: string | null
           meeting_id?: string | null
+          pinned?: boolean
           priority?: Database["public"]["Enums"]["signal_priority"]
           raw_payload?: Json | null
           risk_level?: Database["public"]["Enums"]["signal_risk_level"] | null
@@ -171,6 +173,7 @@ export type Database = {
           id?: string
           linq_message_id?: string | null
           meeting_id?: string | null
+          pinned?: boolean
           priority?: Database["public"]["Enums"]["signal_priority"]
           raw_payload?: Json | null
           risk_level?: Database["public"]["Enums"]["signal_risk_level"] | null

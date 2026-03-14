@@ -4,6 +4,7 @@ import SignalFeed from "@/components/SignalFeed";
 import SignalFilters from "@/components/SignalFilters";
 import TagBrowser from "@/components/TagBrowser";
 import PreMeetingBriefCard from "@/components/PreMeetingBriefCard";
+import MorningContext from "@/components/MorningContext";
 import type { FilterState } from "@/components/SignalFilters";
 import type { SignalType } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,6 +44,7 @@ const fetchSignals = async (): Promise<Signal[]> => {
     riskLevel: (row as Record<string, unknown>).risk_level as Signal["riskLevel"] || null,
     dueDate: (row as Record<string, unknown>).due_date as string | null,
     callPointer: (row as Record<string, unknown>).call_pointer as string | null,
+    pinned: (row as Record<string, unknown>).pinned as boolean || false,
   }));
 };
 
@@ -315,6 +317,7 @@ const Signals = () => {
 
       {activeTab === "feed" && (
         <>
+          <MorningContext signals={feedSignals} />
           <TagBrowser tagCounts={tagCounts} activeType={filters.type} onSelect={handleTagSelect} />
           <SignalFilters filters={filters} onChange={setFilters} senders={senders} />
 
