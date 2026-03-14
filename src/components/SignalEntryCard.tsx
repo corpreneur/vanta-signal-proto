@@ -504,6 +504,7 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
             </button>
           )}
 
+          <button
             onClick={handleExpand}
             className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent transition-colors ml-auto"
           >
