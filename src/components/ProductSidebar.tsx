@@ -23,6 +23,7 @@ import {
   LogOut,
   Zap,
   Users,
+  Shield,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -235,6 +236,18 @@ export function ProductSidebar() {
               >
                 <FileText className="h-3.5 w-3.5 shrink-0" />
                 {!collapsed && <span>Release Notes</span>}
+              </NavLink>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <NavLink
+                to="/admin"
+                className="group/nav flex items-center gap-2 px-2 py-2 border-l-2 border-transparent font-mono text-[11px] uppercase tracking-wider text-vanta-text-muted hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200"
+                activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
+              >
+                <Shield className="h-3.5 w-3.5 shrink-0" />
+                {!collapsed && <span>Admin</span>}
               </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
