@@ -6,9 +6,9 @@ export const mockSignals: Signal[] = [
     signalType: 'INTRO',
     sender: 'Steve Stoute',
     summary:
-      'Introduction to Kristina Windham, Head of Business Development at Maximum Effort. Steve framed William as CBO and "spirit animal." High-value BD contact being evaluated for partnerships team.',
+      'Introduction to Kristina Windham, Head of Business Development at Maximum Effort. Steve framed William as CBO. High-value BD contact being evaluated for partnerships team.',
     sourceMessage:
-      'William pls meet Kristina Windham.. Kristina as discussed William is our Chief Business Officer and my spirit animal',
+      'William pls meet Kristina Windham.. Kristina as discussed William is our Chief Business Officer. You guys should connect',
     priority: 'high',
     capturedAt: '2026-03-11T07:16:00Z',
     actionsTaken: ['BIO_RESEARCH', 'MEETING_PREP', 'EMAIL_DRAFT', 'AGENT_BUILD'],
