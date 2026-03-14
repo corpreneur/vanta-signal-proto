@@ -345,10 +345,10 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
             onClick={async (e) => {
               e.stopPropagation();
               setPinning(true);
-              const newPinned = !(signal as any).pinned;
+              const newPinned = !signal.pinned;
               const { error } = await supabase
                 .from("signals")
-                .update({ pinned: newPinned } as any)
+                .update({ pinned: newPinned })
                 .eq("id", signal.id);
               setPinning(false);
               if (error) {
