@@ -376,9 +376,21 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
               ))}
             </select>
           </div>
-          <SheetTitle className="font-mono text-[12px] uppercase tracking-[0.12em] text-vanta-text-mid text-left">
-            {signal.sender}
-          </SheetTitle>
+          <div className="flex items-center gap-2">
+            <SheetTitle className="font-mono text-[12px] uppercase tracking-[0.12em] text-vanta-text-mid text-left">
+              {signal.sender}
+            </SheetTitle>
+            <button
+              onClick={() => {
+                onClose();
+                navigate(`/contact/${encodeURIComponent(signal.sender)}`);
+              }}
+              className="flex items-center gap-1 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent transition-colors"
+            >
+              <User className="w-3 h-3" />
+              View Contact
+            </button>
+          </div>
           <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-vanta-text-muted">
             {formatTimestamp(signal.capturedAt)}
           </p>
