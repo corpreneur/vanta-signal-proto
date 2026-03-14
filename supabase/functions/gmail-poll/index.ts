@@ -366,6 +366,8 @@ Deno.serve(async (req) => {
     );
   } catch (err) {
     console.error("Gmail poll error:", err);
+    const { logError } = await import("../_shared/log-error.ts");
+    await logError("gmail-poll", err);
     return new Response(
       JSON.stringify({ error: String(err) }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

@@ -360,14 +360,14 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
             }}
             disabled={pinning}
             className={`flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] border transition-colors disabled:opacity-50 ${
-              (signal as any).pinned
+              signal.pinned
                 ? "text-vanta-accent border-vanta-accent-border bg-vanta-accent-faint"
                 : "text-vanta-text-low border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent"
             }`}
-            title={(signal as any).pinned ? "Unpin" : "Pin to top"}
+            title={signal.pinned ? "Unpin" : "Pin to top"}
           >
             <Pin className="w-3 h-3" />
-            {(signal as any).pinned ? "Pinned" : "Pin"}
+            {signal.pinned ? "Pinned" : "Pin"}
           </button>
           <button
             onClick={handleCopyInsight}

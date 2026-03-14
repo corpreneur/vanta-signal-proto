@@ -44,7 +44,7 @@ const fetchSignals = async (): Promise<Signal[]> => {
     riskLevel: (row as Record<string, unknown>).risk_level as Signal["riskLevel"] || null,
     dueDate: (row as Record<string, unknown>).due_date as string | null,
     callPointer: (row as Record<string, unknown>).call_pointer as string | null,
-    pinned: (row as Record<string, unknown>).pinned as boolean || false,
+    pinned: row.pinned ?? false,
   }));
 };
 
