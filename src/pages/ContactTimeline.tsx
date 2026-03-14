@@ -50,6 +50,7 @@ async function fetchContactSignals(name: string): Promise<Signal[]> {
     riskLevel: (row as Record<string, unknown>).risk_level as Signal["riskLevel"],
     dueDate: (row as Record<string, unknown>).due_date as string | null,
     callPointer: (row as Record<string, unknown>).call_pointer as string | null,
+    pinned: row.pinned ?? false,
   }));
 }
 

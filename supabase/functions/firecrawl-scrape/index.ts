@@ -67,6 +67,8 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error("Error scraping:", error);
+    const { logError } = await import("../_shared/log-error.ts");
+    await logError("firecrawl-scrape", error);
     const errorMessage = error instanceof Error ? error.message : "Failed to scrape";
     return new Response(
       JSON.stringify({ success: false, error: errorMessage }),
