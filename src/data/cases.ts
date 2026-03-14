@@ -77,7 +77,7 @@ export const cases: CaseData[] = [
     standaloneHref: "/case-01",
     heroQuote: {
       label: "The Intro",
-      text: "William pls meet Kristina Windham.. Kristina as discussed William is our Chief Business Officer and my spirit animal",
+      text: "William pls meet Kristina Windham.. Kristina as discussed William is our Chief Business Officer. You guys should connect",
       attr: "Steve Stoute · Vanta Founder · iMessage · 7:16 AM",
     },
     situation: [
