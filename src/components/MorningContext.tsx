@@ -44,7 +44,7 @@ export default function MorningContext({ signals }: MorningContextProps) {
     const overdue = signals.filter(
       (s) => s.dueDate && s.dueDate < today && s.status !== "Complete"
     );
-    const pinnedCount = signals.filter((s) => (s as any).pinned).length;
+    const pinnedCount = signals.filter((s) => s.pinned).length;
 
     // Generate a contextual one-liner
     let contextLine = "";

@@ -69,9 +69,9 @@ export const SIGNAL_TYPE_COLORS: Record<SignalType, { text: string; bg: string; 
     border: 'border-vanta-border',
   },
   NOISE: {
-    text: 'text-vanta-text-muted',
-    bg: 'bg-vanta-bg-elevated',
-    border: 'border-vanta-border',
+    text: 'text-vanta-text-mid',
+    bg: 'bg-vanta-accent-faint',
+    border: 'border-vanta-accent-border',
   },
   MEETING: {
     text: 'text-vanta-signal-blue',
