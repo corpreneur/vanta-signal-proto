@@ -9,7 +9,7 @@ import type { FilterState } from "@/components/SignalFilters";
 import type { SignalType } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
-import { ShieldOff, BarChart3, ArrowUpDown, AlertTriangle, Users, Briefcase, BellOff } from "lucide-react";
+import { ShieldOff, BarChart3, ArrowUpDown, AlertTriangle, Users, Briefcase, BellOff, Clock, DollarSign, Flame } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { useUserMode } from "@/hooks/use-user-mode";
@@ -52,12 +52,21 @@ const SIGNAL_TYPES_ORDER: SignalType[] = ["INTRO", "INSIGHT", "INVESTMENT", "DEC
 
 type Tab = "feed" | "filtered";
 type SortMode = "captured" | "due_date";
+type PriorityLens = "all" | "time" | "money" | "urgency";
+
+const LENS_CONFIG: Record<PriorityLens, { label: string; icon: typeof BarChart3; description: string; types: SignalType[] }> = {
+  all: { label: "All Signals", icon: BarChart3, description: "Full curated feed", types: [] },
+  time: { label: "Time", icon: ArrowUpDown, description: "Meetings, follow-ups, deadlines", types: ["MEETING", "PHONE_CALL", "DECISION"] },
+  money: { label: "Money", icon: BarChart3, description: "Investments, deals, opportunities", types: ["INVESTMENT", "INTRO", "INSIGHT"] },
+  urgency: { label: "Urgency", icon: AlertTriangle, description: "High-priority, overdue, at-risk", types: [] },
+};
 
 const Signals = () => {
   const { mode, isExecutive, isDnd } = useUserMode();
   const [activeTab, setActiveTab] = useState<Tab>("feed");
   const [sortMode, setSortMode] = useState<SortMode>("captured");
   const [showOverdueOnly, setShowOverdueOnly] = useState(false);
+  const [priorityLens, setPriorityLens] = useState<PriorityLens>("all");
   const [filters, setFilters] = useState<FilterState>({
     type: "ALL",
     sender: "ALL",
@@ -160,6 +169,16 @@ const Signals = () => {
       items = items.filter((s) => s.priority === "high");
     }
 
+    // Priority Lens filtering
+    if (priorityLens === "time") {
+      items = items.filter((s) => LENS_CONFIG.time.types.includes(s.signalType) || s.dueDate);
+    } else if (priorityLens === "money") {
+      items = items.filter((s) => LENS_CONFIG.money.types.includes(s.signalType));
+    } else if (priorityLens === "urgency") {
+      const today = new Date().toISOString().split("T")[0];
+      items = items.filter((s) => s.priority === "high" || (s.dueDate && s.dueDate <= today) || s.riskLevel === "high" || s.riskLevel === "critical");
+    }
+
     // Overdue filter
     if (showOverdueOnly) {
       const today = new Date().toISOString().split("T")[0];
@@ -176,7 +195,7 @@ const Signals = () => {
       });
     }
     return items.sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime());
-  }, [signals, sortMode, showOverdueOnly, isExecutive]);
+  }, [signals, sortMode, showOverdueOnly, isExecutive, priorityLens]);
 
   const noiseSignals = useMemo(
     () => [...signals].filter((s) => s.signalType === "NOISE").sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()),
@@ -317,6 +336,29 @@ const Signals = () => {
 
       {activeTab === "feed" && (
         <>
+          {/* Priority Lens */}
+          <div className="flex items-center gap-2 mb-5">
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mr-1">Lens</span>
+            {(["all", "time", "money", "urgency"] as PriorityLens[]).map((lens) => {
+              const active = priorityLens === lens;
+              const Icon = lens === "time" ? Clock : lens === "money" ? DollarSign : lens === "urgency" ? Flame : BarChart3;
+              return (
+                <button
+                  key={lens}
+                  onClick={() => setPriorityLens(lens)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] border transition-colors ${
+                    active
+                      ? "border-vanta-accent text-vanta-accent bg-vanta-accent-faint"
+                      : "border-vanta-border text-vanta-text-low hover:border-vanta-accent-border hover:text-foreground"
+                  }`}
+                >
+                  <Icon className="w-3 h-3" />
+                  {lens === "all" ? "All" : lens.charAt(0).toUpperCase() + lens.slice(1)}
+                </button>
+              );
+            })}
+          </div>
+
           <MorningContext signals={feedSignals} />
           <TagBrowser tagCounts={tagCounts} activeType={filters.type} onSelect={handleTagSelect} />
           <SignalFilters filters={filters} onChange={setFilters} senders={senders} />
