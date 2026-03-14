@@ -251,6 +251,52 @@ export default function Settings() {
               </div>
             </div>
 
+            {/* Source Priority Weights */}
+            <div>
+              <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-vanta-text-low mb-1 border-b border-vanta-border pb-2">
+                Source Priority Weights
+              </h2>
+              <p className="font-mono text-[11px] text-vanta-text-muted mb-4 mt-2">
+                Higher weight = signals from this source appear higher in your feed. Default is 1.
+              </p>
+              <div className="space-y-2">
+                {SOURCE_CHANNELS.map((channel) => {
+                  const weightKey = `priority_weight_${channel.key.replace("source_", "").replace("_enabled", "")}`;
+                  const currentWeight = typeof editedValues[weightKey] === "number" ? editedValues[weightKey] as number : 1;
+                  const Icon = channel.icon;
+                  return (
+                    <div
+                      key={weightKey}
+                      className="flex items-center justify-between p-3 border border-vanta-border bg-vanta-bg-elevated"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Icon className={`w-4 h-4 ${channel.iconColor}`} />
+                        <span className="font-mono text-[12px] text-foreground">{channel.label}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {[1, 2, 3].map((w) => (
+                          <button
+                            key={w}
+                            onClick={() => {
+                              setEditedValues((p) => ({ ...p, [weightKey]: w }));
+                              handleSourceToggle(weightKey, w as any);
+                            }}
+                            className={`w-7 h-7 font-mono text-[11px] border transition-colors ${
+                              currentWeight === w
+                                ? "border-vanta-accent text-vanta-accent bg-vanta-accent-faint"
+                                : "border-vanta-border text-vanta-text-low hover:border-vanta-accent-border"
+                            }`}
+                          >
+                            {w}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* General settings sections */}
             {Object.entries(sections).map(([sectionName, sectionSettings]) => (
               <div key={sectionName}>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, Copy, Check, CheckCircle, Video, Phone, ArrowUpFromLine, Shield, CalendarClock, Pointer, Users, Reply, Bell, Calendar, Image, Film, FileText, Mic, Paperclip } from "lucide-react";
+import { ChevronDown, Copy, Check, CheckCircle, Video, Phone, ArrowUpFromLine, Shield, CalendarClock, Pointer, Users, Reply, Bell, Calendar, Image, Film, FileText, Mic, Paperclip, Pin, Clock } from "lucide-react";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS, PHONE_CALL_TAGS, PHONE_TAG_LABELS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
@@ -73,6 +73,8 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
   const [markingReviewed, setMarkingReviewed] = useState(false);
   const [promoting, setPromoting] = useState(false);
   const [settingReminder, setSettingReminder] = useState(false);
+  const [pinning, setPinning] = useState(false);
+  const [snoozing, setSnoozing] = useState(false);
   const queryClient = useQueryClient();
   const colors = SIGNAL_TYPE_COLORS[signal.signalType];
 
@@ -295,7 +297,78 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
         )}
 
         {/* Inline actions row */}
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {/* Quick Complete */}
+          {signal.status !== "Complete" && (
+            <button
+              onClick={handleMarkReviewed}
+              disabled={markingReviewed}
+              className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-signal-green border border-vanta-signal-green-border hover:bg-vanta-signal-green-faint transition-colors disabled:opacity-50"
+              title="Mark Complete"
+            >
+              <CheckCircle className="w-3 h-3" />
+              Done
+            </button>
+          )}
+
+          {/* Snooze */}
+          {signal.status !== "Complete" && (
+            <button
+              onClick={async (e) => {
+                e.stopPropagation();
+                setSnoozing(true);
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const { error } = await supabase
+                  .from("signals")
+                  .update({ due_date: tomorrow.toISOString().split("T")[0] })
+                  .eq("id", signal.id);
+                setSnoozing(false);
+                if (error) {
+                  toast.error("Failed to snooze");
+                } else {
+                  queryClient.invalidateQueries({ queryKey: ["signals"] });
+                  toast.success("Snoozed until tomorrow");
+                }
+              }}
+              disabled={snoozing}
+              className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent transition-colors disabled:opacity-50"
+              title="Snooze until tomorrow"
+            >
+              <Clock className="w-3 h-3" />
+              Snooze
+            </button>
+          )}
+
+          {/* Pin */}
+          <button
+            onClick={async (e) => {
+              e.stopPropagation();
+              setPinning(true);
+              const newPinned = !(signal as any).pinned;
+              const { error } = await supabase
+                .from("signals")
+                .update({ pinned: newPinned } as any)
+                .eq("id", signal.id);
+              setPinning(false);
+              if (error) {
+                toast.error("Failed to pin");
+              } else {
+                queryClient.invalidateQueries({ queryKey: ["signals"] });
+                toast.success(newPinned ? "Signal pinned" : "Signal unpinned");
+              }
+            }}
+            disabled={pinning}
+            className={`flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] border transition-colors disabled:opacity-50 ${
+              (signal as any).pinned
+                ? "text-vanta-accent border-vanta-accent-border bg-vanta-accent-faint"
+                : "text-vanta-text-low border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent"
+            }`}
+            title={(signal as any).pinned ? "Unpin" : "Pin to top"}
+          >
+            <Pin className="w-3 h-3" />
+            {(signal as any).pinned ? "Pinned" : "Pin"}
+          </button>
           <button
             onClick={handleCopyInsight}
             className="flex items-center gap-1.5 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent transition-colors"
@@ -304,16 +377,6 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
             {copied ? "Copied" : "Copy Insight"}
           </button>
 
-          {signal.status !== "Complete" && (
-            <button
-              onClick={handleMarkReviewed}
-              disabled={markingReviewed}
-              className="flex items-center gap-1.5 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent transition-colors disabled:opacity-50"
-            >
-              <CheckCircle className="w-3 h-3" />
-              {markingReviewed ? "Saving…" : "Mark Reviewed"}
-            </button>
-          )}
 
           {showPromote && (
             <button
