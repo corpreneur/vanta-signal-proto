@@ -205,7 +205,7 @@ const Signals = () => {
       });
     }
     return items.sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime());
-  }, [signals, sortMode, showOverdueOnly, isExecutive, priorityLens]);
+  }, [signals, sortMode, showOverdueOnly, isExecutive, priorityLens, showQuickTasks]);
 
   const noiseSignals = useMemo(
     () => [...signals].filter((s) => s.signalType === "NOISE").sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()),
