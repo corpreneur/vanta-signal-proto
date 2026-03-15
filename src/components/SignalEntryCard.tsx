@@ -71,7 +71,7 @@ interface SignalEntryCardProps {
   contactContext?: ContactContext;
 }
 
-const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps) => {
+const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: SignalEntryCardProps) => {
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
   const [markingReviewed, setMarkingReviewed] = useState(false);
