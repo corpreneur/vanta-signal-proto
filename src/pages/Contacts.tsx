@@ -66,26 +66,12 @@ function recencyLabel(days: number): string {
 }
 
 /** Compute a 0–100 relationship strength score */
-function computeStrength(c: Omit<ContactSummary, "strength" | "strengthLabel">): { strength: number; strengthLabel: string } {
-  // Frequency: log-scaled, capped contribution of 40
-  const freqScore = Math.min(40, (Math.log2(c.signalCount + 1) / Math.log2(50)) * 40);
-
-  // Recency: exponential decay, max 35
-  const recencyScore = Math.max(0, 35 * Math.exp(-c.daysSinceLast / 14));
-
-  // Priority weight: high-priority ratio, max 25
-  const priorityRatio = c.signalCount > 0 ? c.highPriority / c.signalCount : 0;
-  const priorityScore = priorityRatio * 25;
-
-  const raw = Math.round(freqScore + recencyScore + priorityScore);
-  const strength = Math.min(100, Math.max(0, raw));
-
-  let strengthLabel = "Cold";
-  if (strength >= 75) strengthLabel = "Strong";
-  else if (strength >= 50) strengthLabel = "Warm";
-  else if (strength >= 25) strengthLabel = "Cooling";
-
-  return { strength, strengthLabel };
+function computeContactStrength(c: Omit<ContactSummary, "strength" | "strengthLabel">): { strength: number; strengthLabel: string } {
+  return computeStrength({
+    signalCount: c.signalCount,
+    highPriority: c.highPriority,
+    daysSinceLast: c.daysSinceLast,
+  });
 }
 
 function buildContacts(signals: Signal[]): ContactSummary[] {
