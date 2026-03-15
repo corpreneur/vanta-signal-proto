@@ -422,7 +422,7 @@ const Signals = () => {
             </div>
           )}
 
-          <SignalFeed signals={feedSignals} filters={filters} />
+          <SignalFeed signals={feedSignals} filters={filters} allSignals={signals} />
         </>
       )}
 
