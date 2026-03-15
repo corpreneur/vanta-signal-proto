@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { ChevronDown, Copy, Check, CheckCircle, Video, Phone, ArrowUpFromLine, Shield, CalendarClock, Pointer, Users, Reply, Bell, Calendar, Image, Film, FileText, Mic, Paperclip, Pin, Clock, Mail, FileOutput, Flag } from "lucide-react";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS, PHONE_CALL_TAGS, PHONE_TAG_LABELS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import type { ContactContext } from "@/lib/contactStrength";
+import { recencyLabel } from "@/lib/contactStrength";
 
 function formatTimestamp(iso: string): string {
   const d = new Date(iso);
