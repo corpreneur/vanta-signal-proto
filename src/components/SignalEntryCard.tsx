@@ -68,6 +68,7 @@ interface SignalEntryCardProps {
   signal: Signal;
   onClick?: () => void;
   showPromote?: boolean;
+  contactContext?: ContactContext;
 }
 
 const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps) => {
