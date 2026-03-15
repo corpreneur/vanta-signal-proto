@@ -3,11 +3,13 @@ import type { Signal } from "@/data/signals";
 import type { FilterState } from "@/components/SignalFilters";
 import SignalEntryCard from "@/components/SignalEntryCard";
 import SignalDetailDrawer from "@/components/SignalDetailDrawer";
+import { buildContactContextMap } from "@/lib/contactStrength";
 
 interface SignalFeedProps {
   signals: Signal[];
   filters: FilterState;
   showPromote?: boolean;
+  allSignals?: Signal[]; // full signal set for computing contact context
 }
 
 function getTemporalGroup(iso: string): string {
