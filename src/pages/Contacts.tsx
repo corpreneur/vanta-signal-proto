@@ -97,7 +97,7 @@ function buildContacts(signals: Signal[]): ContactSummary[] {
     for (const [type, count] of Object.entries(node.signalTypes)) {
       if (count > max) { max = count; node.dominantType = type; }
     }
-    results.push({ ...node, ...computeStrength(node) });
+    results.push({ ...node, ...computeContactStrength(node) });
   }
   return results;
 }
