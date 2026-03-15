@@ -180,6 +180,15 @@ const Signals = () => {
       items = items.filter((s) => s.priority === "high" || (s.dueDate && s.dueDate <= today) || s.riskLevel === "high" || s.riskLevel === "critical");
     }
 
+    // Quick Tasks filter: short, actionable items
+    if (showQuickTasks) {
+      items = items.filter((s) =>
+        (s.priority === "low" || s.priority === "medium") &&
+        (s.signalType === "CONTEXT" || s.signalType === "INTRO") &&
+        s.summary.length < 120
+      );
+    }
+
     // Overdue filter
     if (showOverdueOnly) {
       const today = new Date().toISOString().split("T")[0];
