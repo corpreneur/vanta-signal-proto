@@ -53,17 +53,6 @@ interface ContactSummary {
   strengthLabel: string;
 }
 
-function daysBetween(iso: string): number {
-  return Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 86400000));
-}
-
-function recencyLabel(days: number): string {
-  if (days === 0) return "Today";
-  if (days === 1) return "Yesterday";
-  if (days <= 7) return `${days}d ago`;
-  if (days <= 30) return `${Math.floor(days / 7)}w ago`;
-  return `${Math.floor(days / 30)}mo ago`;
-}
 
 /** Compute a 0–100 relationship strength score */
 function computeContactStrength(c: Omit<ContactSummary, "strength" | "strengthLabel">): { strength: number; strengthLabel: string } {
