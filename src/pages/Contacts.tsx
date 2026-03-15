@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
+import { computeStrength, daysBetween, recencyLabel } from "@/lib/contactStrength";
 import { Motion } from "@/components/ui/motion";
 import { Input } from "@/components/ui/input";
 import { MessageSquare, Phone, Video, Mail, StickyNote, Search, ArrowUpDown } from "lucide-react";
