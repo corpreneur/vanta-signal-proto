@@ -27,8 +27,13 @@ function getTemporalGroup(iso: string): string {
   return d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 }
 
-const SignalFeed = ({ signals, filters, showPromote }: SignalFeedProps) => {
+const SignalFeed = ({ signals, filters, showPromote, allSignals }: SignalFeedProps) => {
   const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
+
+  const contactContextMap = useMemo(
+    () => buildContactContextMap(allSignals || signals),
+    [allSignals, signals]
+  );
 
   const filtered = signals.filter((s) => {
     if (filters.type !== "ALL" && s.signalType !== filters.type) return false;
