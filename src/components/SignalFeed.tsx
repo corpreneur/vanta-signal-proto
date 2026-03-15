@@ -98,6 +98,7 @@ const SignalFeed = ({ signals, filters, showPromote, allSignals }: SignalFeedPro
                 key={signal.id}
                 signal={signal}
                 onClick={() => setSelectedSignal(signal)}
+                contactContext={contactContextMap.get(signal.sender)}
               />
             ))}
           </div>
