@@ -66,6 +66,7 @@ const Signals = () => {
   const [activeTab, setActiveTab] = useState<Tab>("feed");
   const [sortMode, setSortMode] = useState<SortMode>("captured");
   const [showOverdueOnly, setShowOverdueOnly] = useState(false);
+  const [priorityLens, setPriorityLens] = useState<PriorityLens>("all");
   const [showQuickTasks, setShowQuickTasks] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     type: "ALL",
