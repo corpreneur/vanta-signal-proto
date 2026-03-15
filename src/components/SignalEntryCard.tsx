@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { ChevronDown, Copy, Check, CheckCircle, Video, Phone, ArrowUpFromLine, Shield, CalendarClock, Pointer, Users, Reply, Bell, Calendar, Image, Film, FileText, Mic, Paperclip, Pin, Clock, Mail, FileOutput, Flag } from "lucide-react";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS, PHONE_CALL_TAGS, PHONE_TAG_LABELS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import type { ContactContext } from "@/lib/contactStrength";
+import { recencyLabel } from "@/lib/contactStrength";
 
 function formatTimestamp(iso: string): string {
   const d = new Date(iso);
@@ -65,9 +68,10 @@ interface SignalEntryCardProps {
   signal: Signal;
   onClick?: () => void;
   showPromote?: boolean;
+  contactContext?: ContactContext;
 }
 
-const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps) => {
+const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: SignalEntryCardProps) => {
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
   const [markingReviewed, setMarkingReviewed] = useState(false);
@@ -271,9 +275,26 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
         </div>
 
         {/* Sender */}
-        <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-vanta-text-mid mb-2">
+        <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-vanta-text-mid mb-1">
           {signal.sender}
         </p>
+
+        {/* Relationship context chip */}
+        {contactContext && contactContext.signalCount > 1 && (
+          <Link
+            to={`/contact/${encodeURIComponent(signal.sender)}`}
+            onClick={(e) => e.stopPropagation()}
+            className="inline-flex items-center gap-1.5 mb-2 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.15em] border border-vanta-border bg-vanta-bg-elevated text-vanta-text-low hover:border-vanta-accent-border hover:text-vanta-accent transition-colors"
+          >
+            <span className={`w-1.5 h-1.5 rounded-full ${
+              contactContext.strengthLabel === "Strong" ? "bg-vanta-accent" :
+              contactContext.strengthLabel === "Warm" ? "bg-vanta-signal-yellow" :
+              contactContext.strengthLabel === "Cooling" ? "bg-vanta-signal-blue" :
+              "bg-vanta-text-muted"
+            }`} />
+            {contactContext.strengthLabel} · {contactContext.signalCount} signals · {recencyLabel(contactContext.daysSinceLast)}
+          </Link>
+        )}
 
         {/* Summary, the extracted insight headline */}
         <p className="font-sans text-[14px] leading-[1.6] text-vanta-text mb-3">

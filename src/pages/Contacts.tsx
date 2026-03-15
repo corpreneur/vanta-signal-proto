@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
+import { computeStrength, daysBetween, recencyLabel } from "@/lib/contactStrength";
 import { Motion } from "@/components/ui/motion";
 import { Input } from "@/components/ui/input";
 import { MessageSquare, Phone, Video, Mail, StickyNote, Search, ArrowUpDown } from "lucide-react";
@@ -52,39 +53,14 @@ interface ContactSummary {
   strengthLabel: string;
 }
 
-function daysBetween(iso: string): number {
-  return Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 86400000));
-}
-
-function recencyLabel(days: number): string {
-  if (days === 0) return "Today";
-  if (days === 1) return "Yesterday";
-  if (days <= 7) return `${days}d ago`;
-  if (days <= 30) return `${Math.floor(days / 7)}w ago`;
-  return `${Math.floor(days / 30)}mo ago`;
-}
 
 /** Compute a 0–100 relationship strength score */
-function computeStrength(c: Omit<ContactSummary, "strength" | "strengthLabel">): { strength: number; strengthLabel: string } {
-  // Frequency: log-scaled, capped contribution of 40
-  const freqScore = Math.min(40, (Math.log2(c.signalCount + 1) / Math.log2(50)) * 40);
-
-  // Recency: exponential decay, max 35
-  const recencyScore = Math.max(0, 35 * Math.exp(-c.daysSinceLast / 14));
-
-  // Priority weight: high-priority ratio, max 25
-  const priorityRatio = c.signalCount > 0 ? c.highPriority / c.signalCount : 0;
-  const priorityScore = priorityRatio * 25;
-
-  const raw = Math.round(freqScore + recencyScore + priorityScore);
-  const strength = Math.min(100, Math.max(0, raw));
-
-  let strengthLabel = "Cold";
-  if (strength >= 75) strengthLabel = "Strong";
-  else if (strength >= 50) strengthLabel = "Warm";
-  else if (strength >= 25) strengthLabel = "Cooling";
-
-  return { strength, strengthLabel };
+function computeContactStrength(c: Omit<ContactSummary, "strength" | "strengthLabel">): { strength: number; strengthLabel: string } {
+  return computeStrength({
+    signalCount: c.signalCount,
+    highPriority: c.highPriority,
+    daysSinceLast: c.daysSinceLast,
+  });
 }
 
 function buildContacts(signals: Signal[]): ContactSummary[] {
@@ -121,7 +97,7 @@ function buildContacts(signals: Signal[]): ContactSummary[] {
     for (const [type, count] of Object.entries(node.signalTypes)) {
       if (count > max) { max = count; node.dominantType = type; }
     }
-    results.push({ ...node, ...computeStrength(node) });
+    results.push({ ...node, ...computeContactStrength(node) });
   }
   return results;
 }

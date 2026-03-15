@@ -9,7 +9,7 @@ import type { FilterState } from "@/components/SignalFilters";
 import type { SignalType } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
-import { ShieldOff, BarChart3, ArrowUpDown, AlertTriangle, Users, Briefcase, BellOff, Clock, DollarSign, Flame } from "lucide-react";
+import { ShieldOff, BarChart3, ArrowUpDown, AlertTriangle, Users, Briefcase, BellOff, Clock, DollarSign, Flame, Zap } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { useUserMode } from "@/hooks/use-user-mode";
@@ -67,6 +67,7 @@ const Signals = () => {
   const [sortMode, setSortMode] = useState<SortMode>("captured");
   const [showOverdueOnly, setShowOverdueOnly] = useState(false);
   const [priorityLens, setPriorityLens] = useState<PriorityLens>("all");
+  const [showQuickTasks, setShowQuickTasks] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     type: "ALL",
     sender: "ALL",
@@ -179,6 +180,15 @@ const Signals = () => {
       items = items.filter((s) => s.priority === "high" || (s.dueDate && s.dueDate <= today) || s.riskLevel === "high" || s.riskLevel === "critical");
     }
 
+    // Quick Tasks filter: short, actionable items
+    if (showQuickTasks) {
+      items = items.filter((s) =>
+        (s.priority === "low" || s.priority === "medium") &&
+        (s.signalType === "CONTEXT" || s.signalType === "INTRO") &&
+        s.summary.length < 120
+      );
+    }
+
     // Overdue filter
     if (showOverdueOnly) {
       const today = new Date().toISOString().split("T")[0];
@@ -195,7 +205,7 @@ const Signals = () => {
       });
     }
     return items.sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime());
-  }, [signals, sortMode, showOverdueOnly, isExecutive, priorityLens]);
+  }, [signals, sortMode, showOverdueOnly, isExecutive, priorityLens, showQuickTasks]);
 
   const noiseSignals = useMemo(
     () => [...signals].filter((s) => s.signalType === "NOISE").sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()),
@@ -377,6 +387,18 @@ const Signals = () => {
               {sortMode === "due_date" ? "Sort: Due Date" : "Sort: Recent"}
             </button>
 
+            <button
+              onClick={() => setShowQuickTasks(!showQuickTasks)}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.15em] border transition-colors ${
+                showQuickTasks
+                  ? "border-vanta-accent text-vanta-accent bg-vanta-accent-faint"
+                  : "border-vanta-border text-vanta-text-low hover:border-vanta-accent-border hover:text-vanta-accent"
+              }`}
+            >
+              <Zap className="w-3 h-3" />
+              Quick Tasks
+            </button>
+
             {overdueCount > 0 && (
               <button
                 onClick={() => setShowOverdueOnly(!showOverdueOnly)}
@@ -400,7 +422,7 @@ const Signals = () => {
             </div>
           )}
 
-          <SignalFeed signals={feedSignals} filters={filters} />
+          <SignalFeed signals={feedSignals} filters={filters} allSignals={signals} />
         </>
       )}
 
