@@ -387,6 +387,18 @@ const Signals = () => {
               {sortMode === "due_date" ? "Sort: Due Date" : "Sort: Recent"}
             </button>
 
+            <button
+              onClick={() => setShowQuickTasks(!showQuickTasks)}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.15em] border transition-colors ${
+                showQuickTasks
+                  ? "border-vanta-accent text-vanta-accent bg-vanta-accent-faint"
+                  : "border-vanta-border text-vanta-text-low hover:border-vanta-accent-border hover:text-vanta-accent"
+              }`}
+            >
+              <Zap className="w-3 h-3" />
+              Quick Tasks
+            </button>
+
             {overdueCount > 0 && (
               <button
                 onClick={() => setShowOverdueOnly(!showOverdueOnly)}
