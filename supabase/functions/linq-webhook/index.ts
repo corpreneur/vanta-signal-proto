@@ -16,6 +16,7 @@ interface Classification {
   priority: string;
   summary: string;
   actionsTaken: string[];
+  confidence?: number;
 }
 
 interface ParsedMessage {
