@@ -188,12 +188,8 @@ export default function Settings() {
             General
           </TabsTrigger>
           <TabsTrigger value="noise" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
-            <Filter className="w-3.5 h-3.5" />
+            <Shield className="w-3.5 h-3.5" />
             Noise Queue
-          </TabsTrigger>
-          <TabsTrigger value="modes" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
-            <SlidersHorizontal className="w-3.5 h-3.5" />
-            User Modes
           </TabsTrigger>
           <TabsTrigger value="audit" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
             <ShieldCheck className="w-3.5 h-3.5" />
@@ -202,14 +198,6 @@ export default function Settings() {
           <TabsTrigger value="workflows" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
             <Zap className="w-3.5 h-3.5" />
             Workflows
-          </TabsTrigger>
-          <TabsTrigger value="types" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
-            <Palette className="w-3.5 h-3.5" />
-            Signal Types
-          </TabsTrigger>
-          <TabsTrigger value="rules" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
-            <BookOpen className="w-3.5 h-3.5" />
-            My Rules
           </TabsTrigger>
           <TabsTrigger value="calendar" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
             <Calendar className="w-3.5 h-3.5" />
