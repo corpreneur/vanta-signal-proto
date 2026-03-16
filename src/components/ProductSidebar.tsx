@@ -141,37 +141,34 @@ export function ProductSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="border-r border-vanta-border bg-vanta-bg">
-      <SidebarHeader className="px-3 py-5">
+      <SidebarHeader className="px-3 py-3 space-y-1">
         <a href="/" className="flex items-center gap-2">
           <span className="font-sans text-[17px] font-extrabold tracking-[0.2em] uppercase text-foreground">
             {collapsed ? "V" : "VANTA"}
           </span>
         </a>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <NavLink
+                to="/"
+                end
+                className="group/nav flex items-center gap-2 px-2 py-1.5 border-l-2 border-transparent font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5"
+                activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
+              >
+                <LayoutDashboard className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover/nav:scale-110" />
+                {!collapsed && <span>Dashboard</span>}
+              </NavLink>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Dashboard + Fab Five — single top section */}
-        <SidebarGroup className="py-2">
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <NavLink
-                    to="/"
-                    end
-                    className="group/nav flex items-center gap-2 px-2 py-2 border-l-2 border-transparent font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5"
-                    activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
-                  >
-                    <LayoutDashboard className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover/nav:scale-110" />
-                    {!collapsed && <span>Dashboard</span>}
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-
+        {/* Fab Five */}
+        <SidebarGroup className="py-1">
           {!collapsed && (
-            <p className="px-2 pt-4 pb-1 font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent">
+            <p className="px-2 pb-1 font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent">
               Fab Five
             </p>
           )}
@@ -230,51 +227,59 @@ export function ProductSidebar() {
             </CollapsibleContent>
           </SidebarGroup>
         </Collapsible>
+        {/* Admin links — scrollable */}
+        <div className="mx-3 border-t border-vanta-border" />
+        <SidebarGroup className="py-1">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink
+                    to="/settings"
+                    className="group/nav flex items-center gap-2 px-2 py-1.5 border-l-2 border-transparent font-mono text-[11px] uppercase tracking-wider text-vanta-text-muted hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200"
+                    activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
+                  >
+                    <Settings2 className="h-3.5 w-3.5 shrink-0" />
+                    {!collapsed && <span>Settings</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink
+                    to="/releases"
+                    className="group/nav flex items-center gap-2 px-2 py-1.5 border-l-2 border-transparent font-mono text-[11px] uppercase tracking-wider text-vanta-text-muted hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200"
+                    activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
+                  >
+                    <FileText className="h-3.5 w-3.5 shrink-0" />
+                    {!collapsed && <span>Release Notes</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink
+                    to="/admin"
+                    className="group/nav flex items-center gap-2 px-2 py-1.5 border-l-2 border-transparent font-mono text-[11px] uppercase tracking-wider text-vanta-text-muted hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200"
+                    activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
+                  >
+                    <Shield className="h-3.5 w-3.5 shrink-0" />
+                    {!collapsed && <span>Admin</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="px-3 py-3 space-y-2 border-t border-vanta-border">
+      <SidebarFooter className="px-3 py-2 flex flex-row items-center justify-between border-t border-vanta-border">
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <NavLink
-                to="/settings"
-                className="group/nav flex items-center gap-2 px-2 py-2 border-l-2 border-transparent font-mono text-[11px] uppercase tracking-wider text-vanta-text-muted hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200"
-                activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
-              >
-                <Settings2 className="h-3.5 w-3.5 shrink-0" />
-                {!collapsed && <span>Settings</span>}
-              </NavLink>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <NavLink
-                to="/releases"
-                className="group/nav flex items-center gap-2 px-2 py-2 border-l-2 border-transparent font-mono text-[11px] uppercase tracking-wider text-vanta-text-muted hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200"
-                activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
-              >
-                <FileText className="h-3.5 w-3.5 shrink-0" />
-                {!collapsed && <span>Release Notes</span>}
-              </NavLink>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <NavLink
-                to="/admin"
-                className="group/nav flex items-center gap-2 px-2 py-2 border-l-2 border-transparent font-mono text-[11px] uppercase tracking-wider text-vanta-text-muted hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200"
-                activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
-              >
-                <Shield className="h-3.5 w-3.5 shrink-0" />
-                {!collapsed && <span>Admin</span>}
-              </NavLink>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <button
                 onClick={handleLogout}
-                className="group/nav flex items-center gap-2 px-2 py-2 border-l-2 border-transparent font-mono text-[11px] uppercase tracking-wider text-vanta-text-muted hover:text-destructive hover:bg-destructive/10 transition-all duration-200 w-full"
+                className="group/nav flex items-center gap-2 px-2 py-1.5 font-mono text-[11px] uppercase tracking-wider text-vanta-text-muted hover:text-destructive hover:bg-destructive/10 transition-all duration-200 w-full"
               >
                 <LogOut className="h-3.5 w-3.5 shrink-0" />
                 {!collapsed && <span>Sign Out</span>}
@@ -283,11 +288,6 @@ export function ProductSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
         <ThemeToggle />
-        {!collapsed && (
-          <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-vanta-text-muted">
-            © 2026 Vanta Wireless
-          </p>
-        )}
       </SidebarFooter>
     </Sidebar>
   );
