@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { PenLine, Link2, FileText, Loader2, ArrowRight, Plus, Clock, Zap } from "lucide-react";
+import { PenLine, Link2, FileText, Loader2, ArrowRight, Plus, Clock, Zap, Image, Mail, Mic } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +8,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { SIGNAL_TYPE_COLORS, type SignalType, type Signal } from "@/data/signals";
 import NoteCapture from "@/components/NoteCapture";
+import ImageCapture from "@/components/ImageCapture";
+import EmailCapture from "@/components/EmailCapture";
+import VoiceMemoCapture from "@/components/VoiceMemoCapture";
 import { Motion } from "@/components/ui/motion";
 
 const SIGNAL_TYPE_LABELS: Record<string, string> = {
@@ -21,7 +24,7 @@ const SIGNAL_TYPE_LABELS: Record<string, string> = {
   PHONE_CALL: "Phone Call",
 };
 
-type InputMode = "note" | "link" | "notion";
+type InputMode = "note" | "link" | "image" | "email" | "voice" | "notion";
 
 /* ── Fetch recent brain dump captures ── */
 async function fetchRecentCaptures(): Promise<Signal[]> {
@@ -180,7 +183,10 @@ export default function BrainDump() {
         <div className="flex gap-1.5">
           {([
             { key: "note" as const, label: "Note", icon: PenLine },
-            { key: "link" as const, label: "Paste Link", icon: Link2 },
+            { key: "image" as const, label: "Image", icon: Image },
+            { key: "link" as const, label: "Link", icon: Link2 },
+            { key: "email" as const, label: "Email", icon: Mail },
+            { key: "voice" as const, label: "Voice Memo", icon: Mic },
             { key: "notion" as const, label: "Notion", icon: FileText },
           ]).map(({ key, label, icon: Icon }) => (
             <button
