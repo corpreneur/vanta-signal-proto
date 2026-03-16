@@ -502,7 +502,7 @@ Calendar    Sync          Brief Gen       Alerts      Pre-Briefs`}</Code>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {[
+                  {[
                       ["id", "uuid", "gen_random_uuid()"],
                       ["sender", "text", "—"],
                       ["source_message", "text", "—"],
@@ -518,6 +518,12 @@ Calendar    Sync          Brief Gen       Alerts      Pre-Briefs`}</Code>
                       ["meeting_id", "text", "null"],
                       ["email_metadata", "jsonb", "null"],
                       ["raw_payload", "jsonb", "null"],
+                      ["confidence_score", "numeric", "null"],
+                      ["classification_reasoning", "text", "null"],
+                      ["due_date", "date", "null"],
+                      ["pinned", "boolean", "false"],
+                      ["risk_level", "signal_risk_level enum", "null"],
+                      ["call_pointer", "text", "null"],
                     ].map(([col, type, def]) => (
                       <TableRow key={col}>
                         <TableCell className="font-mono text-[11px]">{col}</TableCell>
