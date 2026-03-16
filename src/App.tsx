@@ -31,6 +31,7 @@ import Command from "./pages/Command";
 import Contacts from "./pages/Contacts";
 import NoiseQueue from "./pages/NoiseQueue";
 import UserModes from "./pages/UserModes";
+import Focus from "./pages/Focus";
 import Admin from "./pages/Admin";
 import QuickCapture from "./components/QuickCapture";
 import type { Session } from "@supabase/supabase-js";

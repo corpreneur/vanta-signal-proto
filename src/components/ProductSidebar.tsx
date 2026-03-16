@@ -54,7 +54,7 @@ import {
 const fabFiveItems = [
   { title: "Connectivity", url: "/connectivity", icon: Radio },
   { title: "Signal Feed", url: "/signals", icon: BarChart3 },
-  { title: "Modes", url: "/user-modes", icon: SlidersHorizontal },
+  { title: "Focus", url: "/focus", icon: SlidersHorizontal },
   { title: "Brain Dump", url: "/brain-dump", icon: PenLine },
   { title: "Easy Actions", url: "/command", icon: CheckSquare },
 ];
