@@ -122,7 +122,7 @@ export default function Architecture() {
       <div className="mb-6">
         <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Documentation</p>
         <h1 className="font-mono text-2xl font-bold text-foreground">Tech Architecture</h1>
-        <p className="text-[13px] text-vanta-text-low mt-1">System-level documentation for the Vanta Signal intelligence pipeline.</p>
+        <p className="text-[13px] text-vanta-text-low mt-1">System-level documentation for the Vanta Signal intelligence pipeline. Updated to reflect all current platform capabilities.</p>
       </div>
 
       {/* Mobile TOC — outside the flex so it spans full width */}
