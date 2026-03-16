@@ -49,6 +49,24 @@ interface DailyTimelineProps {
 }
 
 export default function DailyTimeline({ signals, onSignalClick, highOnly = false }: DailyTimelineProps) {
+  const queryClient = useQueryClient();
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeleting(id);
+    const { error } = await supabase.from("signals").delete().eq("id", id);
+    setDeleting(null);
+    if (error) {
+      toast.error("Failed to delete");
+    } else {
+      queryClient.invalidateQueries({ queryKey: ["signals-dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["signals"] });
+      queryClient.invalidateQueries({ queryKey: ["action-items-enhanced"] });
+      toast.success("Signal deleted");
+    }
+  };
+
   const today = useMemo(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
