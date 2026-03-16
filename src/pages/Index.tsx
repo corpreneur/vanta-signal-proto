@@ -214,8 +214,17 @@ const Index = () => {
           {/* Cooling Alerts — creative & executive */}
           <CoolingAlerts />
 
-          {/* Stats Strip */}
+          {/* Daily Timeline — top of dashboard */}
           <Motion delay={80}>
+            <DailyTimeline
+              signals={activeSignals}
+              onSignalClick={(s) => setDrawerSignal(s)}
+              highOnly={isExecutive}
+            />
+          </Motion>
+
+          {/* Stats Strip */}
+          <Motion delay={120}>
             <div className="flex flex-wrap gap-6 mb-8 pb-6 border-b border-vanta-border">
               <Link to="/signals" className="group">
                 <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Signals Captured</p>
@@ -249,7 +258,7 @@ const Index = () => {
 
           {/* Channel Grid — creative only (hidden in executive) */}
           {!isExecutive && (
-            <Motion delay={120}>
+            <Motion delay={160}>
               <section className="mb-10">
                 <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-4">Channels</p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -293,15 +302,6 @@ const Index = () => {
               </section>
             </Motion>
           )}
-
-          {/* Daily Timeline — replaces flat Recent Signals list */}
-          <Motion delay={160}>
-            <DailyTimeline
-              signals={activeSignals}
-              onSignalClick={(s) => setDrawerSignal(s)}
-              highOnly={isExecutive}
-            />
-          </Motion>
 
           {/* Noise Footer — creative only */}
           {!isExecutive && noiseCount > 0 && (
