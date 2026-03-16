@@ -46,7 +46,7 @@ export default function Focus() {
           <div className="flex items-center gap-2 mb-3">
             <span className="w-1.5 h-1.5 bg-primary animate-pulse-dot" />
             <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-low">
-              Focus · Signal Control
+              Filter Modes · Signal Control
             </span>
           </div>
           <h1 className="font-display text-2xl md:text-3xl text-foreground tracking-tight">
