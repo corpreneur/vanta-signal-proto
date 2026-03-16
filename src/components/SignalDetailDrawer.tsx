@@ -328,7 +328,7 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
         className="w-full sm:max-w-[520px] bg-background border-l border-vanta-border p-0 overflow-y-auto"
       >
         <SheetHeader className="px-6 pt-6 pb-4 border-b border-vanta-border">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3 mb-2 flex-wrap">
             <span
               className={`inline-block px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.15em] border ${colors.text} ${colors.bg} ${colors.border}`}
             >
@@ -337,6 +337,20 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
             <span className="inline-block px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.15em] border border-vanta-border text-vanta-text-low bg-transparent">
               {signal.priority}
             </span>
+            {typeof signal.confidenceScore === "number" && (
+              <span
+                className={`inline-block px-2 py-0.5 font-mono text-[10px] tracking-[0.12em] border ${
+                  signal.confidenceScore >= 0.85
+                    ? "text-vanta-signal-green border-vanta-signal-green-border bg-vanta-signal-green-faint"
+                    : signal.confidenceScore >= 0.6
+                    ? "text-vanta-signal-yellow border-vanta-signal-yellow-border bg-vanta-signal-yellow-faint"
+                    : "text-vanta-signal-red border-vanta-signal-red-border bg-vanta-signal-red-faint"
+                }`}
+                title="AI classification confidence"
+              >
+                {Math.round(signal.confidenceScore * 100)}% conf
+              </span>
+            )}
             {isMeeting && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.15em] border border-vanta-accent-zoom-border text-vanta-accent-zoom bg-vanta-accent-zoom-faint">
                 <Video className="w-3 h-3" />

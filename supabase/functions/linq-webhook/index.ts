@@ -16,6 +16,7 @@ interface Classification {
   priority: string;
   summary: string;
   actionsTaken: string[];
+  confidence?: number;
 }
 
 interface ParsedMessage {
@@ -244,7 +245,10 @@ Action rules:
 - INVESTMENT: THESIS_ANALYSIS, NOTION_LOG
 - DECISION: NOTION_LOG, optionally BRIEF_COMPILE
 - CONTEXT: NOTION_LOG
-- NOISE: empty array []`;
+- NOISE: empty array []
+
+Also return:
+- confidence: a number from 0.0 to 1.0 indicating how certain you are about the classification. 1.0 = highly certain, 0.5 = uncertain.`;
 
   const res = await fetch(LOVABLE_AI_URL, {
     method: "POST",
@@ -261,7 +265,7 @@ Action rules:
 
   if (!res.ok) {
     console.error("AI classification failed:", await res.text());
-    return { signalType: "CONTEXT", priority: "low", summary: `Unclassified message from ${sender}.`, actionsTaken: ["NOTION_LOG"] };
+    return { signalType: "CONTEXT", priority: "low", summary: `Unclassified message from ${sender}.`, actionsTaken: ["NOTION_LOG"], confidence: 0.0 };
   }
 
   const data = await res.json();
@@ -270,7 +274,7 @@ Action rules:
     return JSON.parse(content.replace(/```json\n?|\n?```/g, "").trim());
   } catch {
     console.error("Failed to parse AI classification:", content);
-    return { signalType: "CONTEXT", priority: "low", summary: `Unclassified message from ${sender}.`, actionsTaken: ["NOTION_LOG"] };
+    return { signalType: "CONTEXT", priority: "low", summary: `Unclassified message from ${sender}.`, actionsTaken: ["NOTION_LOG"], confidence: 0.0 };
   }
 }
 
@@ -645,6 +649,7 @@ Deno.serve(async (req) => {
         _vanta_reactions: [], // initialized empty, populated by reaction events
       },
       captured_at: parsed.timestamp,
+      confidence_score: typeof classification.confidence === "number" ? classification.confidence : null,
     };
 
     const { data, error } = await supabase.from("signals").insert(signalPayload).select().single();

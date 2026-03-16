@@ -16,6 +16,7 @@ interface PhoneClassification {
   summary: string;
   tags: string[];       // phone-specific tags
   actionsTaken: string[];
+  confidence: number;
 }
 
 // ─── AI: Classify phone call transcript ────────────────────────────────────
@@ -50,8 +51,11 @@ Return ONLY valid JSON with these fields:
 - actionsTaken: array of action codes. Choose from: "NOTION_LOG", "COMMITMENT_TRACK", "FOLLOW_UP_QUEUE", "RELATIONSHIP_UPDATE", "DEAL_PIPELINE_UPDATE", "BRIEF_COMPILE"
   Always include "NOTION_LOG".
   If commitment detected, include "COMMITMENT_TRACK".
-  If open_question detected, include "FOLLOW_UP_QUEUE".
-  If deal_signal detected, include "DEAL_PIPELINE_UPDATE".`;
+   If open_question detected, include "FOLLOW_UP_QUEUE".
+   If deal_signal detected, include "DEAL_PIPELINE_UPDATE".
+
+Also return:
+- confidence: a number from 0.0 to 1.0 indicating how certain you are about the classification. 1.0 = highly certain, 0.5 = uncertain.`;
 
   const truncated = transcript.length > 8000
     ? transcript.slice(0, 8000) + "\n[…transcript truncated]"
@@ -91,6 +95,7 @@ Return ONLY valid JSON with these fields:
       summary: parsed.summary || `Call between ${caller} and ${callee}.`,
       tags: Array.isArray(parsed.tags) ? parsed.tags.filter((t: string) => validTags.includes(t)) : [],
       actionsTaken: Array.isArray(parsed.actionsTaken) ? parsed.actionsTaken : ["NOTION_LOG"],
+      confidence: typeof parsed.confidence === "number" ? parsed.confidence : 0.5,
     };
   } catch (err) {
     console.error("Classification error:", err);
@@ -105,6 +110,7 @@ function fallback(caller: string, callee: string, durationSec: number): PhoneCla
     summary: `Phone call between ${caller} and ${callee} (${Math.floor(durationSec / 60)}m). Auto-classification unavailable.`,
     tags: [],
     actionsTaken: ["NOTION_LOG"],
+    confidence: 0.0,
   };
 }
 
@@ -223,6 +229,7 @@ Deno.serve(async (req) => {
         meeting_id: callId,
         raw_payload: payload,
         captured_at: startedAt,
+        confidence_score: typeof classification.confidence === "number" ? classification.confidence : null,
       })
       .select()
       .single();

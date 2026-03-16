@@ -15,6 +15,7 @@ interface Classification {
   priority: string;
   summary: string;
   actionsTaken: string[];
+  confidence?: number;
 }
 
 interface TranscriptTurn {
@@ -48,7 +49,10 @@ Additional meeting-specific classification rules:
 - Look for: decisions made, action items committed, frameworks articulated, investment angles, positioning language, and open questions.
 - Always include "NOTION_LOG" in actionsTaken.
 - If decisions were made, include "BRIEF_COMPILE".
-- If investment was discussed, include "THESIS_ANALYSIS".`;
+- If investment was discussed, include "THESIS_ANALYSIS".
+
+Also return:
+- confidence: a number from 0.0 to 1.0 indicating how certain you are about the classification. 1.0 = highly certain, 0.5 = uncertain.`;
 
   const condensedTranscript = transcript
     .map((t) => `[${t.speaker}${t.timestamp ? ` @ ${t.timestamp}` : ""}]: ${t.text}`)
@@ -82,6 +86,7 @@ Additional meeting-specific classification rules:
         priority: "medium",
         summary: `Meeting "${meetingTitle}" with ${attendees.length} participants. Auto-classification failed.`,
         actionsTaken: ["NOTION_LOG"],
+        confidence: 0.0,
       };
     }
 
@@ -95,6 +100,7 @@ Additional meeting-specific classification rules:
       priority: "medium",
       summary: `Meeting "${meetingTitle}" with ${attendees.length} participants.`,
       actionsTaken: ["NOTION_LOG"],
+      confidence: 0.0,
     };
   }
 }
@@ -215,6 +221,7 @@ Deno.serve(async (req) => {
         meeting_id: meetingId,
         raw_payload: payload,
         captured_at: botData.ended_at || new Date().toISOString(),
+        confidence_score: typeof classification.confidence === "number" ? classification.confidence : null,
       })
       .select()
       .single();

@@ -1,0 +1,1 @@
+ALTER TABLE public.signals ADD COLUMN confidence_score real DEFAULT NULL;

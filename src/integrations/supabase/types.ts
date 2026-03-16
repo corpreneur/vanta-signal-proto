@@ -125,6 +125,7 @@ export type Database = {
           actions_taken: string[]
           call_pointer: string | null
           captured_at: string
+          confidence_score: number | null
           created_at: string
           due_date: string | null
           email_metadata: Json | null
@@ -146,6 +147,7 @@ export type Database = {
           actions_taken?: string[]
           call_pointer?: string | null
           captured_at?: string
+          confidence_score?: number | null
           created_at?: string
           due_date?: string | null
           email_metadata?: Json | null
@@ -167,6 +169,7 @@ export type Database = {
           actions_taken?: string[]
           call_pointer?: string | null
           captured_at?: string
+          confidence_score?: number | null
           created_at?: string
           due_date?: string | null
           email_metadata?: Json | null

@@ -21,6 +21,7 @@ interface Classification {
   suggestedTags: string[];
   suggestedContacts: string[];
   accelerators: string[];
+  confidence: number;
 }
 
 async function classifySignal(text: string, apiKey: string): Promise<Classification> {
@@ -84,8 +85,9 @@ Also assign:
                 suggestedTags: { type: "array", items: { type: "string" }, description: "2-5 topic/keyword tags" },
                 suggestedContacts: { type: "array", items: { type: "string" }, description: "Names/initials of people mentioned" },
                 accelerators: { type: "array", items: { type: "string" }, description: "2-5 specific actionable next steps parsed from intent" },
+                confidence: { type: "number", description: "Classification confidence score from 0.0 to 1.0. 1.0 = highly certain, 0.5 = uncertain." },
               },
-              required: ["signalType", "priority", "summary", "actionsTaken", "riskLevel", "dueDate", "callPointer", "suggestedTitle", "suggestedTags", "suggestedContacts", "accelerators"],
+              required: ["signalType", "priority", "summary", "actionsTaken", "riskLevel", "dueDate", "callPointer", "suggestedTitle", "suggestedTags", "suggestedContacts", "accelerators", "confidence"],
               additionalProperties: false,
             },
           },
@@ -292,6 +294,7 @@ serve(async (req) => {
         risk_level: classification.riskLevel || null,
         due_date: (classification.dueDate && classification.dueDate !== "null") ? classification.dueDate : null,
         call_pointer: (classification.callPointer && classification.callPointer !== "null") ? classification.callPointer : null,
+        confidence_score: typeof classification.confidence === "number" ? classification.confidence : null,
       })
       .select()
       .single();
