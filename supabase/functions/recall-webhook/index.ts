@@ -100,6 +100,7 @@ Also return:
       priority: "medium",
       summary: `Meeting "${meetingTitle}" with ${attendees.length} participants.`,
       actionsTaken: ["NOTION_LOG"],
+      confidence: 0.0,
     };
   }
 }
