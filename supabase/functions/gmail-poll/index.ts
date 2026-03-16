@@ -216,7 +216,7 @@ ${email.body || email.snippet}`;
     return JSON.parse(content.replace(/```json\n?|\n?```/g, "").trim());
   } catch {
     console.error("Failed to parse AI classification:", content);
-    return { signalType: "CONTEXT", priority: "low", summary: `Unclassified email from ${email.from}.`, actionsTaken: ["NOTION_LOG"] };
+    return { signalType: "CONTEXT", priority: "low", summary: `Unclassified email from ${email.from}.`, actionsTaken: ["NOTION_LOG"], confidence: 0.0 };
   }
 }
 
