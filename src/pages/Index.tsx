@@ -188,6 +188,12 @@ const Index = () => {
         </header>
       </Motion>
 
+      {/* Inline Brain Dump — capture → act flow */}
+      <InlineBrainDump />
+
+      {/* Action Items — the action layer */}
+      <ActionItems onSignalClick={(s) => setDrawerSignal(s)} />
+
       {/* 1. Today Context Row */}
       <Motion delay={40}>
         <div className="flex flex-wrap items-center gap-4 mb-8 pb-5 border-b border-vanta-border">
