@@ -52,7 +52,7 @@ import {
 
 /* ── Fab Five — the 5 core product functions ── */
 const fabFiveItems = [
-  { title: "Connectivity", url: "/phone-fmc", icon: Radio },
+  { title: "Connectivity", url: "/connectivity", icon: Radio },
   { title: "Signal Feed", url: "/signals", icon: BarChart3 },
   { title: "Modes", url: "/user-modes", icon: SlidersHorizontal },
   { title: "Brain Dump", url: "/brain-dump", icon: PenLine },
