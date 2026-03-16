@@ -4,9 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
-import { ArrowLeft, MessageSquare, Phone, Video, Mail, StickyNote, User, TrendingUp, Calendar, ExternalLink } from "lucide-react";
+import { ArrowLeft, MessageSquare, Phone, Video, Mail, StickyNote, User, TrendingUp, Calendar, ExternalLink, HelpCircle, Loader2 } from "lucide-react";
 import { Motion } from "@/components/ui/motion";
 import SignalDetailDrawer from "@/components/SignalDetailDrawer";
+import { toast } from "sonner";
 
 const SOURCE_ICONS: Record<string, React.ElementType> = {
   linq: MessageSquare,
