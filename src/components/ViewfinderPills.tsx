@@ -58,6 +58,7 @@ const DEFAULT_FILTERS: FilterState = {
   sender: "ALL",
   priority: "ALL",
   search: "",
+  chatMode: "ALL",
 };
 
 export default function ViewfinderPills() {
