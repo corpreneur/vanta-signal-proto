@@ -33,6 +33,7 @@ type AcceleratorIntent = "email" | "sms" | "reminder" | "task" | "document";
 
 interface NoteCaptureProps {
   inline?: boolean;
+  onCapture?: (classification: ClassificationResult) => void;
 }
 
 /**
@@ -79,7 +80,7 @@ function intentIcon(intent: AcceleratorIntent) {
   }
 }
 
-export default function NoteCapture({ inline = false }: NoteCaptureProps) {
+export default function NoteCapture({ inline = false, onCapture }: NoteCaptureProps) {
   const { isDnd } = useUserMode();
   const [open, setOpen] = useState(inline);
   const [text, setText] = useState("");
@@ -149,6 +150,9 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
       setEditableTitle(classification.suggestedTitle || "");
       setEditableTags(classification.suggestedTags || []);
       setEditableContacts(classification.suggestedContacts || []);
+
+      // Notify parent of capture
+      onCapture?.(classification);
 
       toast({
         title: `Captured as ${SIGNAL_TYPE_LABELS[classification.signalType] || classification.signalType}`,
