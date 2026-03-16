@@ -167,6 +167,14 @@ export default function ContactTimeline() {
               <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-vanta-text-muted">
                 Contact Hub · {signals.length} signals
               </p>
+              <button
+                onClick={handleFetchBrief}
+                disabled={loadingBrief}
+                className="mt-2 flex items-center gap-1.5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest border border-vanta-accent text-vanta-accent hover:bg-vanta-accent-faint transition-colors disabled:opacity-50"
+              >
+                {loadingBrief ? <Loader2 className="w-3 h-3 animate-spin" /> : <HelpCircle className="w-3 h-3" />}
+                Why this person?
+              </button>
             </div>
             {/* Relationship Strength */}
             <div className="flex flex-col items-end gap-1 shrink-0">
