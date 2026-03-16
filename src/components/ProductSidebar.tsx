@@ -150,8 +150,8 @@ export function ProductSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Fab Five */}
-        <SidebarGroup className="py-2 border-b border-vanta-border">
+        {/* Dashboard + Fab Five — single top section */}
+        <SidebarGroup className="py-2">
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
@@ -169,12 +169,9 @@ export function ProductSidebar() {
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
-        </SidebarGroup>
 
-        {/* Fab Five — 5 core product pillars */}
-        <SidebarGroup className="py-2 border-b border-vanta-border">
           {!collapsed && (
-            <p className="px-2 pb-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent">
+            <p className="px-2 pt-4 pb-1 font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent">
               Fab Five
             </p>
           )}
@@ -197,6 +194,9 @@ export function ProductSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        <div className="mx-3 border-t border-vanta-border" />
+
         <CollapsibleNavGroup label="Channels" items={channelItems} collapsed={collapsed} currentPath={currentPath} />
         <CollapsibleNavGroup label="Platform" items={platformItems} collapsed={collapsed} currentPath={currentPath} />
         <CollapsibleNavGroup label="Product Concepts" items={productItems} collapsed={collapsed} currentPath={currentPath} />
