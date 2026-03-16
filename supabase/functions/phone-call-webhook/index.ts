@@ -110,6 +110,7 @@ function fallback(caller: string, callee: string, durationSec: number): PhoneCla
     summary: `Phone call between ${caller} and ${callee} (${Math.floor(durationSec / 60)}m). Auto-classification unavailable.`,
     tags: [],
     actionsTaken: ["NOTION_LOG"],
+    confidence: 0.0,
   };
 }
 
