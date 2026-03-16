@@ -219,7 +219,7 @@ const Index = () => {
 
           {/* Cooling Alerts — creative & executive */}
           {/* Action Items — middle of dashboard */}
-          <ActionItems onSignalClick={(s) => setDrawerSignal(s)} />
+          <EnhancedActionItems onSignalClick={(s) => setDrawerSignal(s)} />
 
           <CoolingAlerts />
 
