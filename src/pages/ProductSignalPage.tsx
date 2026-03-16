@@ -172,7 +172,7 @@ const PRODUCTS: Record<string, ProductDef> = {
       { step: "eSIM Provisioning", desc: "User is provisioned a Vanta eSIM via ConnectX… native endpoint on Vanta's network." },
       { step: "CDR Trigger", desc: "Call ends → ConnectX generates a CDR event with parties, duration, and timestamp." },
       { step: "Transcription", desc: "Call audio routed through SIP recording layer → Whisper transcription with speaker diarisation." },
-      { step: "Signal Detection", desc: "Transcript processed through two-stage pipeline with phone-specific tag extraction." },
+      { step: "Signal Detection", desc: "Transcript processed through Gemini Flash pipeline with phone-specific tag extraction." },
       { step: "Delivery", desc: "Signal logged, iMessage summary ping sent within 10 minutes of call end." },
     ],
     signalExamples: [
