@@ -101,10 +101,86 @@ A new edge function at `supabase/functions/recall-webhook/index.ts` will be crea
 ## 5. Phasing & Next Steps
 
 *   **Phase 1 (This Plan):** Implement the **Recall.ai + Supabase** pipeline. This validates the end-to-end user experience with minimal external dependencies.
-*   **Phase 2 (Future):** Explore migrating from Recall.ai to Zoom's native **RTMS API** for live, in-meeting signal detection, as recommended in the original brief. This would be a pure engineering swap-out, as the user-facing product will have already been validated.
+*   **Phase 2 (Future):** Migrate from Recall.ai to Zoom's native webhook + RTMS API for direct meeting intelligence. See Section 6 below for the technical specification derived from Zoom's official webhook documentation.
 
-**Immediate Next Steps:**
+## 6. Phase 2: Native Zoom Webhook Specification (from developers.zoom.us)
+
+When we move off Recall.ai and onto Zoom's native API, the edge function must handle three concerns that differ significantly from the Recall.ai integration:
+
+### 6.1 Challenge-Response Check (CRC) — Required for Endpoint Registration
+
+Zoom validates webhook endpoints via a CRC handshake, re-validated every 72 hours. Our edge function must detect and respond to these:
+
+```
+// Zoom sends:
+{ "event": "endpoint.url_validation", "payload": { "plainToken": "qgg8vlvZRS6UYooatFL8Aw" }, "event_ts": 1654503849680 }
+
+// We must respond within 3 seconds with:
+{ "plainToken": "qgg8vlvZRS6UYooatFL8Aw", "encryptedToken": "<HMAC-SHA256 of plainToken using webhook secret>" }
+```
+
+### 6.2 Signature Verification — `x-zm-signature` (NOT `x-recall-signature`)
+
+Zoom's signature scheme differs from Recall.ai:
+- **Header:** `x-zm-signature` (format: `v0={hash}`)
+- **Timestamp Header:** `x-zm-request-timestamp`
+- **Message Construction:** `v0:{x-zm-request-timestamp}:{raw_request_body}`
+- **Hash:** HMAC SHA-256 using the Zoom Webhook Secret Token, output as hex
+- **Comparison:** `v0={hex_hash}` must match `x-zm-signature` header value
+
+```js
+const message = `v0:${headers['x-zm-request-timestamp']}:${rawBody}`;
+const hash = crypto.createHmac('sha256', ZOOM_WEBHOOK_SECRET).update(message).digest('hex');
+const expected = `v0=${hash}`;
+// Compare expected === headers['x-zm-signature']
+```
+
+### 6.3 Zoom Webhook Payload Structure
+
+Zoom events follow a different schema than Recall.ai:
+
+```json
+{
+  "event": "meeting.ended",
+  "event_ts": 1626230691572,
+  "payload": {
+    "account_id": "...",
+    "object": {
+      "id": "1234567890",
+      "uuid": "...",
+      "host_id": "...",
+      "topic": "My Meeting",
+      "type": 8,
+      "start_time": "2021-07-13T21:44:51Z",
+      "duration": 60
+    }
+  }
+}
+```
+
+Relevant Zoom webhook events for our pipeline:
+- `meeting.started` — trigger pre-meeting brief delivery
+- `meeting.ended` — trigger transcript fetch via Recording API
+- `recording.completed` — fetch recording + transcript artifacts
+- `meeting.participant_joined` / `meeting.participant_left` — attendee tracking
+
+### 6.4 New Secret Required
+
+Phase 2 will require a `ZOOM_WEBHOOK_SECRET_TOKEN` secret for HMAC verification. This replaces the Recall.ai signature model.
+
+### 6.5 Edge Function: `zoom-webhook` (Phase 2)
+
+A new edge function `supabase/functions/zoom-webhook/index.ts` will be created (separate from `recall-webhook`) with:
+1. CRC handler for `endpoint.url_validation` events
+2. HMAC signature verification using `x-zm-signature`
+3. Event routing for `recording.completed` → fetch transcript → classify → insert signal + meeting artifact
+4. Stale timestamp rejection (e.g., >5 min drift)
+
+The existing `recall-webhook` will remain operational during the transition and can be deprecated once Zoom native is validated.
+
+## 7. Immediate Next Steps
 
 1.  **Engineering:** Sign up for the Recall.ai free tier. Use their API to have the bot join one internal test meeting. Capture the `transcript.ready` webhook payload to validate the JSON structure against this plan.
 2.  **Product:** Formalize the meeting-specific signal tags (e.g., `decision`, `action_item`, `commitment`) to be added to the classification prompt.
 3.  **All:** Lock this reconciled plan and begin the moment the Recall.ai payload is validated.
+4.  **Phase 2 Prep:** Register a Zoom Marketplace app (General App type) and subscribe to `recording.completed` + `meeting.ended` webhook events to begin native integration development.
