@@ -1,7 +1,8 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Video, Users, MessageSquare, Phone, Mail, StickyNote, TrendingUp } from "lucide-react";
+import { ArrowLeft, Video, Users, MessageSquare, Phone, Mail, StickyNote, TrendingUp, Download, Send } from "lucide-react";
+import { toast } from "sonner";
 import { Motion } from "@/components/ui/motion";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
@@ -131,6 +132,16 @@ export default function Briefing() {
   const { brief, meeting, attendeeSignals } = data;
   const attendees = Object.entries(brief.attendee_context);
 
+  const handleExportPdf = () => {
+    toast.info("PDF export coming soon — brief content will be formatted for print.");
+    window.print();
+  };
+
+  const handleEmailAttendees = () => {
+    const names = Object.keys(brief.attendee_context);
+    toast.info(`Email draft stub for ${names.length} attendee${names.length !== 1 ? "s" : ""}. Integration coming soon.`);
+  };
+
   const meetingTime = meeting?.starts_at
     ? new Date(meeting.starts_at).toLocaleString("en-US", {
         weekday: "short",
@@ -177,6 +188,24 @@ export default function Briefing() {
           <p className="font-sans text-[14px] leading-relaxed text-vanta-text-mid">
             {brief.brief_text}
           </p>
+
+          {/* Export actions */}
+          <div className="flex items-center gap-2 mt-4 pt-4 border-t border-vanta-accent-zoom-border/30">
+            <button
+              onClick={handleExportPdf}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest border border-vanta-border text-vanta-text-mid hover:text-foreground hover:border-foreground/20 transition-colors"
+            >
+              <Download className="w-3 h-3" />
+              Export PDF
+            </button>
+            <button
+              onClick={handleEmailAttendees}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest border border-vanta-accent-zoom-border text-vanta-accent-zoom hover:bg-vanta-accent-zoom/10 transition-colors"
+            >
+              <Send className="w-3 h-3" />
+              Email to Attendees
+            </button>
+          </div>
         </header>
       </Motion>
 

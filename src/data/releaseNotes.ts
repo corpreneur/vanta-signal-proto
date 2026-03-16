@@ -10,6 +10,17 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "1.1.0",
+    date: "2026-03-16",
+    title: "Phase 3 — Ontology & Integration Layer",
+    changes: [
+      { type: "feature", text: "My Rules unified settings — Automation Rules, Custom Signal Types, and Source Weights in one personal ontology UI" },
+      { type: "feature", text: "Calendar Sync settings — Google Calendar OAuth flow UI stub with sync direction and permissions preview" },
+      { type: "feature", text: "Exportable Pre-Meeting Brief — Export to PDF and Email to Attendees actions on dossier pages" },
+      { type: "improvement", text: "Settings tabs expanded with My Rules and Calendar tabs" },
+    ],
+  },
+  {
     version: "1.0.0",
     date: "2026-03-16",
     title: "The Action Layer: Phase 2 — Temporal & Identity",

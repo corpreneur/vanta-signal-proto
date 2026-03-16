@@ -5,12 +5,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Save, RotateCcw, Settings2, MessageSquare, Users, Bell, Shield, Smartphone, Phone, Video, Mail, Calendar, Filter, SlidersHorizontal, ShieldCheck, Zap, Palette } from "lucide-react";
+import { Save, RotateCcw, Settings2, MessageSquare, Users, Bell, Shield, Smartphone, Phone, Video, Mail, Calendar, Filter, SlidersHorizontal, ShieldCheck, Zap, Palette, BookOpen } from "lucide-react";
 import UserModes from "./UserModes";
 import NoiseQueue from "./NoiseQueue";
 import ClassificationAudit from "./ClassificationAudit";
 import WorkflowBuilder from "@/components/WorkflowBuilder";
 import CustomSignalTypes from "@/components/CustomSignalTypes";
+import MyRules from "@/components/MyRules";
+import CalendarSyncSettings from "@/components/CalendarSyncSettings";
 
 interface SettingRow {
   key: string;
@@ -72,7 +74,7 @@ const SOURCE_CHANNELS: Array<{
 
 const SOURCE_KEYS = new Set(SOURCE_CHANNELS.map((c) => c.key));
 
-const TAB_MAP: Record<string, string> = { noise: "noise", modes: "modes", audit: "audit", workflows: "workflows", types: "types" };
+const TAB_MAP: Record<string, string> = { noise: "noise", modes: "modes", audit: "audit", workflows: "workflows", types: "types", rules: "rules", calendar: "calendar" };
 
 export default function Settings() {
   const queryClient = useQueryClient();
@@ -207,6 +209,14 @@ export default function Settings() {
           <TabsTrigger value="types" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
             <Palette className="w-3.5 h-3.5" />
             Signal Types
+          </TabsTrigger>
+          <TabsTrigger value="rules" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
+            <BookOpen className="w-3.5 h-3.5" />
+            My Rules
+          </TabsTrigger>
+          <TabsTrigger value="calendar" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
+            <Calendar className="w-3.5 h-3.5" />
+            Calendar
           </TabsTrigger>
         </TabsList>
 
@@ -434,6 +444,16 @@ export default function Settings() {
         {/* Custom Signal Types Tab */}
         <TabsContent value="types">
           <CustomSignalTypes />
+        </TabsContent>
+
+        {/* My Rules Tab */}
+        <TabsContent value="rules">
+          <MyRules />
+        </TabsContent>
+
+        {/* Calendar Sync Tab */}
+        <TabsContent value="calendar">
+          <CalendarSyncSettings />
         </TabsContent>
       </Tabs>
     </div>
