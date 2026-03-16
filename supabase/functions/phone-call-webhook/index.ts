@@ -51,8 +51,11 @@ Return ONLY valid JSON with these fields:
 - actionsTaken: array of action codes. Choose from: "NOTION_LOG", "COMMITMENT_TRACK", "FOLLOW_UP_QUEUE", "RELATIONSHIP_UPDATE", "DEAL_PIPELINE_UPDATE", "BRIEF_COMPILE"
   Always include "NOTION_LOG".
   If commitment detected, include "COMMITMENT_TRACK".
-  If open_question detected, include "FOLLOW_UP_QUEUE".
-  If deal_signal detected, include "DEAL_PIPELINE_UPDATE".`;
+   If open_question detected, include "FOLLOW_UP_QUEUE".
+   If deal_signal detected, include "DEAL_PIPELINE_UPDATE".
+
+Also return:
+- confidence: a number from 0.0 to 1.0 indicating how certain you are about the classification. 1.0 = highly certain, 0.5 = uncertain.`;
 
   const truncated = transcript.length > 8000
     ? transcript.slice(0, 8000) + "\n[…transcript truncated]"
