@@ -445,6 +445,16 @@ export default function Settings() {
         <TabsContent value="types">
           <CustomSignalTypes />
         </TabsContent>
+
+        {/* My Rules Tab */}
+        <TabsContent value="rules">
+          <MyRules />
+        </TabsContent>
+
+        {/* Calendar Sync Tab */}
+        <TabsContent value="calendar">
+          <CalendarSyncSettings />
+        </TabsContent>
       </Tabs>
     </div>
   );
