@@ -9,6 +9,7 @@ const SECTIONS = [
   { id: "gmail", label: "Gmail Integration" },
   { id: "zoom", label: "Zoom / Recall.ai" },
   { id: "phone", label: "Phone FMC" },
+  { id: "braindump", label: "Brain Dump" },
   { id: "gemini", label: "Gemini AI Pipeline" },
   { id: "schema", label: "Database Schema" },
   { id: "functions", label: "Edge Functions" },
@@ -121,7 +122,7 @@ export default function Architecture() {
       <div className="mb-6">
         <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Documentation</p>
         <h1 className="font-mono text-2xl font-bold text-foreground">Tech Architecture</h1>
-        <p className="text-[13px] text-vanta-text-low mt-1">System-level documentation for the Vanta Signal intelligence pipeline.</p>
+        <p className="text-[13px] text-vanta-text-low mt-1">System-level documentation for the Vanta Signal intelligence pipeline. Updated to reflect all current platform capabilities.</p>
       </div>
 
       {/* Mobile TOC — outside the flex so it spans full width */}
@@ -137,19 +138,21 @@ export default function Architecture() {
             <SectionHeader id="overview" title="System Overview" sub="§ 01" />
             <div className="mt-6 space-y-4">
               <Prose>
-                <p>Vanta Signal ingests communications from five channels, classifies them through a Gemini AI pipeline, and surfaces actionable intelligence on the dashboard.</p>
+                <p>Vanta is an MVNO-first Connectivity OS that ingests communications from six sources, classifies them through a Gemini AI pipeline, and surfaces actionable intelligence across a unified dashboard with Focus controls, pre-meeting briefs, relationship alerts, and automated workflows.</p>
               </Prose>
               <div className="space-y-3 mt-4">
-                <FlowStep n={1} label="Channels" detail="iMessage (Linq), Gmail, Zoom, Phone, Calendar" />
-                <FlowStep n={2} label="Edge Functions" detail="Channel-specific webhooks parse & normalize payloads" />
-                <FlowStep n={3} label="Gemini AI Gateway" detail="Classify signal type, priority, summary, and actions" />
-                <FlowStep n={4} label="Database" detail="Signals table + meeting_artifacts for rich media" />
-                <FlowStep n={5} label="Dashboard" detail="Real-time feed, relationship graph, pre-meeting briefs" />
+                <FlowStep n={1} label="Sources" detail="iMessage (Linq), Gmail, Zoom (Recall.ai), Phone (MVNO/ConnectX), Calendar, Brain Dump (manual + voice + URL scrape)" />
+                <FlowStep n={2} label="Edge Functions" detail="Channel-specific webhooks parse, normalize & deduplicate payloads" />
+                <FlowStep n={3} label="Gemini AI Gateway" detail="Classify signal type, priority, summary, risk level, due dates, confidence scores, and actions" />
+                <FlowStep n={4} label="Database" detail="Signals table + meeting_artifacts + relationship_alerts + pre_meeting_briefs + workflows + system_settings" />
+                <FlowStep n={5} label="Dashboard" detail="Daily timeline, action items, What's Ahead with meeting briefs, cooling alerts, Focus controls, Brain Dump, relationship graph" />
               </div>
-              <Code>{`Channel → Edge Function → Gemini Flash → Supabase → Dashboard
+              <Code>{`Source → Edge Function → Gemini Flash → Database → Dashboard
   ↓           ↓               ↓              ↓           ↓
 Linq/Gmail  Parse+HMAC    Classify        Insert      Render
-Phone/Zoom  Normalize     Prioritize      Deduplicate Filter+Sort`}</Code>
+Phone/Zoom  Normalize     Prioritize      Deduplicate Filter+Sort
+BrainDump   Firecrawl     Risk+DueDate    Workflows   Focus Modes
+Calendar    Sync          Brief Gen       Alerts      Pre-Briefs`}</Code>
             </div>
           </section>
 
@@ -372,6 +375,35 @@ Phone/Zoom  Normalize     Prioritize      Deduplicate Filter+Sort`}</Code>
             </div>
           </section>
 
+          {/* ── 5b. Brain Dump ──────────────────────────────────────── */}
+          <section>
+            <SectionHeader id="braindump" title="Brain Dump" sub="§ 05b · Manual + Voice + URL Channel" />
+            <div className="mt-6 space-y-6">
+              <Prose>
+                <p>Brain Dump is the manual ingestion hub — a three-tab interface for capturing notes (text or voice dictation), pasting URLs (scraped via Firecrawl), and Notion integration. All inputs are processed through the same Gemini pipeline with extended extraction for risk levels, due dates, and call pointers.</p>
+              </Prose>
+
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-wider text-vanta-text-muted mb-2">Input Modes</p>
+                <div className="space-y-3">
+                  <FlowStep n={1} label="Note / Voice" detail="Free-text or speech-to-text dictation → brain-dump edge function → Gemini classification" />
+                  <FlowStep n={2} label="Paste Link" detail="URL submitted → firecrawl-scrape edge function → page content extracted → Gemini classification" />
+                  <FlowStep n={3} label="Notion" detail="Workspace integration for structured content ingestion" />
+                </div>
+              </div>
+
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-wider text-vanta-text-muted mb-2">Extended Extraction</p>
+                <Code>{`// Brain Dump adds these fields beyond standard classification:
+{
+  risk_level: "low" | "medium" | "high" | "critical",
+  due_date: "ISO 8601 date or null",
+  call_pointer: "string reference or null"
+}`}</Code>
+              </div>
+            </div>
+          </section>
+
           {/* ── 6. Gemini AI Pipeline ──────────────────────────────────── */}
           <section>
             <SectionHeader id="gemini" title="Gemini AI Pipeline" sub="§ 06 · Classification Engine" />
@@ -470,7 +502,7 @@ Phone/Zoom  Normalize     Prioritize      Deduplicate Filter+Sort`}</Code>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {[
+                  {[
                       ["id", "uuid", "gen_random_uuid()"],
                       ["sender", "text", "—"],
                       ["source_message", "text", "—"],
@@ -486,6 +518,12 @@ Phone/Zoom  Normalize     Prioritize      Deduplicate Filter+Sort`}</Code>
                       ["meeting_id", "text", "null"],
                       ["email_metadata", "jsonb", "null"],
                       ["raw_payload", "jsonb", "null"],
+                      ["confidence_score", "numeric", "null"],
+                      ["classification_reasoning", "text", "null"],
+                      ["due_date", "date", "null"],
+                      ["pinned", "boolean", "false"],
+                      ["risk_level", "signal_risk_level enum", "null"],
+                      ["call_pointer", "text", "null"],
                     ].map(([col, type, def]) => (
                       <TableRow key={col}>
                         <TableCell className="font-mono text-[11px]">{col}</TableCell>
@@ -526,6 +564,38 @@ Phone/Zoom  Normalize     Prioritize      Deduplicate Filter+Sort`}</Code>
               </div>
 
               <div>
+                <p className="font-mono text-[10px] uppercase tracking-wider text-vanta-text-muted mb-2">Additional Tables</p>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="font-mono text-[11px]">Table</TableHead>
+                      <TableHead className="font-mono text-[11px]">Purpose</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {[
+                      ["upcoming_meetings", "Calendar events with attendees, Zoom meeting IDs, and brief status"],
+                      ["pre_meeting_briefs", "AI-generated dossiers linked to meetings with attendee context and matched signals"],
+                      ["relationship_alerts", "Cooling relationship warnings with strength deltas and dismissal state"],
+                      ["relationship_briefs", "AI-generated narrative briefs per contact"],
+                      ["contact_tags", "User-defined tags on contacts with custom colors"],
+                      ["engagement_sequences", "Recurring touchpoint schedules per contact"],
+                      ["signal_corrections", "User feedback on misclassified signals for training"],
+                      ["custom_signal_types", "User-defined signal categories with training examples"],
+                      ["workflows", "Rule-based automation triggers and action steps"],
+                      ["system_settings", "Key-value store for global config (modes, weights, toggles)"],
+                      ["error_logs", "Edge function error tracking with context"],
+                    ].map(([table, purpose]) => (
+                      <TableRow key={table}>
+                        <TableCell className="font-mono text-[11px] text-vanta-accent">{table}</TableCell>
+                        <TableCell className="text-[11px]">{purpose}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              <div>
                 <p className="font-mono text-[10px] uppercase tracking-wider text-vanta-text-muted mb-2">Enums</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
@@ -533,6 +603,7 @@ Phone/Zoom  Normalize     Prioritize      Deduplicate Filter+Sort`}</Code>
                     { name: "signal_priority", values: ["high", "medium", "low"] },
                     { name: "signal_status", values: ["Captured", "In Progress", "Complete"] },
                     { name: "signal_source", values: ["linq", "gmail", "manual", "recall", "phone"] },
+                    { name: "signal_risk_level", values: ["low", "medium", "high", "critical"] },
                   ].map((e) => (
                     <div key={e.name} className="bg-vanta-bg-elevated border border-vanta-border rounded-md p-3">
                       <p className="font-mono text-[11px] font-bold text-foreground mb-2">{e.name}</p>
@@ -567,6 +638,16 @@ Phone/Zoom  Normalize     Prioritize      Deduplicate Filter+Sort`}</Code>
                     ["gmail-poll", "Scheduled / Manual", "Gmail API", "Poll inbox, classify emails, insert signals"],
                     ["recall-webhook", "Webhook (POST)", "Recall.ai", "Process meeting transcripts, store artifacts"],
                     ["phone-call-webhook", "Webhook (POST)", "ConnectX CDR", "Classify phone calls, extract tags, store artifacts"],
+                    ["brain-dump", "Manual (POST)", "Dashboard", "Classify free-text/voice notes, extract risk + due dates"],
+                    ["firecrawl-scrape", "Manual (POST)", "Brain Dump", "Scrape URLs via Firecrawl, classify extracted content"],
+                    ["daily-digest", "Scheduled", "Internal", "Generate morning digest of top signals + overdue items via iMessage"],
+                    ["cooling-alerts", "Scheduled", "Internal", "Detect declining relationship strengths and create alerts"],
+                    ["relationship-brief", "Manual (POST)", "Dashboard", "Generate AI narrative briefs for contacts"],
+                    ["create-reminder", "Manual (POST)", "Dashboard", "Create due-dated signal reminders"],
+                    ["workflow-engine", "Event-driven", "Internal", "Execute rule-based workflow triggers and actions"],
+                    ["apply-corrections", "Manual (POST)", "Dashboard", "Apply user corrections to misclassified signals"],
+                    ["intro-helper", "Manual (POST)", "Dashboard", "Generate contextual intro response suggestions"],
+                    ["admin-users", "Manual (POST)", "Admin", "User management operations"],
                     ["linq-register-webhook", "Manual (POST)", "Internal", "Register/list/delete Linq webhook subscriptions"],
                     ["linq-send", "Manual (POST)", "Internal", "Send messages via Linq API (new thread or existing chat)"],
                   ].map(([fn, trigger, source, desc]) => (

@@ -122,7 +122,7 @@ const PRODUCTS: Record<string, ProductDef> = {
       "Vanta captures context signals silently. They don't trigger alerts or actions. But they're indexed, searchable, and automatically surfaced when the person or topic comes up again in a higher-priority signal.",
     ],
     howItWorks: [
-      { step: "Triage", desc: "Haiku classifies the message as context… valuable but not actionable." },
+      { step: "Triage", desc: "Gemini Flash classifies the message as context… valuable but not actionable." },
       { step: "Silent Log", desc: "Stored with full attribution and source metadata." },
       { step: "Cross-Reference", desc: "Linked to the sender's profile in the relationship graph." },
       { step: "Resurface", desc: "Appears in pre-meeting briefs and contact profiles when relevant." },
@@ -172,7 +172,7 @@ const PRODUCTS: Record<string, ProductDef> = {
       { step: "eSIM Provisioning", desc: "User is provisioned a Vanta eSIM via ConnectX… native endpoint on Vanta's network." },
       { step: "CDR Trigger", desc: "Call ends → ConnectX generates a CDR event with parties, duration, and timestamp." },
       { step: "Transcription", desc: "Call audio routed through SIP recording layer → Whisper transcription with speaker diarisation." },
-      { step: "Signal Detection", desc: "Transcript processed through two-stage pipeline with phone-specific tag extraction." },
+      { step: "Signal Detection", desc: "Transcript processed through Gemini Flash pipeline with phone-specific tag extraction." },
       { step: "Delivery", desc: "Signal logged, iMessage summary ping sent within 10 minutes of call end." },
     ],
     signalExamples: [
@@ -190,10 +190,10 @@ const PRODUCTS: Record<string, ProductDef> = {
     channels: ["All channels"],
     narrative: [
       "The hardest problem in intelligence isn't capture… it's discrimination. The difference between a system that helps and one that overwhelms is the ability to identify noise and suppress it without losing anything that matters.",
-      "Vanta's Haiku triage stage classifies low-signal content as NOISE within milliseconds. These messages are silently logged but never surfaced in the feed, never trigger alerts, and never create action items. They exist in the archive for completeness, but they don't compete for your attention.",
+      "Vanta's Gemini Flash triage classifies low-signal content as NOISE within milliseconds. These messages are silently logged but never surfaced in the feed, never trigger alerts, and never create action items. They exist in the archive for completeness, but they don't compete for your attention.",
     ],
     howItWorks: [
-      { step: "Haiku Triage", desc: "First-pass classification identifies low-signal content… greetings, status confirmations, social pleasantries." },
+      { step: "Gemini Triage", desc: "First-pass classification identifies low-signal content… greetings, status confirmations, social pleasantries." },
       { step: "Silent Log", desc: "Noise is stored with full metadata but flagged as suppressed." },
       { step: "No Surface", desc: "Does not appear in the signal feed, briefs, or alerts." },
       { step: "Recoverable", desc: "If a future signal from the same sender references this conversation, the context can be recovered." },
