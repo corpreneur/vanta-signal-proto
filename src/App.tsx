@@ -23,6 +23,7 @@ import DecisionCapture from "./pages/DecisionCapture";
 import Architecture from "./pages/Architecture";
 import BrainDump from "./pages/BrainDump";
 import ReleaseNotes from "./pages/ReleaseNotes";
+import Command from "./pages/Command";
 
 import Settings from "./pages/Settings";
 import ContactTimeline from "./pages/ContactTimeline";
