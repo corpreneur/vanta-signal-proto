@@ -12,13 +12,13 @@ import CoolingAlerts from "@/components/CoolingAlerts";
 import InlineBrainDump from "@/components/InlineBrainDump";
 import WhatsAhead from "@/components/WhatsAhead";
 import ActionItems from "@/components/ActionItems";
+import DailyTimeline from "@/components/DailyTimeline";
 import {
   MessageSquare,
   Phone,
   Video,
   Mail,
   Calendar,
-  ArrowRight,
   ChevronRight,
   Shield,
   Sparkles,
@@ -50,6 +50,11 @@ const fetchSignals = async (): Promise<Signal[]> => {
     linqMessageId: row.linq_message_id,
     emailMetadata: (row as Record<string, unknown>).email_metadata as Signal["emailMetadata"] || null,
     meetingId: (row as Record<string, unknown>).meeting_id as string | null,
+    confidenceScore: row.confidence_score ?? null,
+    classificationReasoning: row.classification_reasoning ?? null,
+    dueDate: row.due_date ?? null,
+    pinned: row.pinned ?? false,
+    riskLevel: row.risk_level ?? null,
   }));
 };
 
@@ -76,24 +81,6 @@ const CHANNELS = [
   { key: "calendar", label: "Calendar", icon: Calendar, color: "text-vanta-accent-amber", bg: "bg-vanta-accent-amber/10", ring: "ring-vanta-accent-amber/20", barColor: "bg-vanta-accent-amber", href: "/product/calendar" },
   { key: "manual", label: "Brain Dump", icon: StickyNote, color: "text-vanta-accent-violet", bg: "bg-vanta-accent-violet/10", ring: "ring-vanta-accent-violet/20", barColor: "bg-vanta-accent-violet", href: "/brain-dump" },
 ];
-
-const SOURCE_ICONS: Record<string, typeof MessageSquare> = {
-  linq: MessageSquare,
-  phone: Phone,
-  recall: Video,
-  gmail: Mail,
-  manual: StickyNote,
-};
-
-const SIGNAL_LEFT_BORDER: Record<string, string> = {
-  INTRO: "border-l-[hsl(var(--vanta-accent))]",
-  INSIGHT: "border-l-[hsl(var(--vanta-signal-blue))]",
-  INVESTMENT: "border-l-[hsl(var(--vanta-signal-yellow))]",
-  DECISION: "border-l-[hsl(var(--vanta-signal-yellow))]",
-  CONTEXT: "border-l-[hsl(var(--vanta-text-low))]",
-  MEETING: "border-l-[hsl(var(--vanta-signal-blue))]",
-  PHONE_CALL: "border-l-[hsl(var(--vanta-accent-phone))]",
-};
 
 const MODE_META: Record<string, { label: string; icon: typeof Shield; color: string }> = {
   executive: { label: "Executive", icon: Shield, color: "text-vanta-accent-amber" },
@@ -158,19 +145,16 @@ const Index = () => {
     return { counts, latest };
   }, [activeSignals]);
 
-  const recentSignals = useMemo(
-    () => [...activeSignals].sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()).slice(0, 8),
-    [activeSignals]
-  );
-
   const modeMeta = MODE_META[mode] || MODE_META.creative;
+  const isDnd = mode === "dnd";
+  const isExecutive = mode === "executive";
 
   return (
     <div className="max-w-[960px] mx-auto px-5 py-10 md:px-10 relative overflow-hidden">
       {/* Geometric background motif */}
       <div className="absolute top-[-80px] right-[-120px] w-[400px] h-[400px] rounded-full border border-foreground/[0.04] pointer-events-none" />
 
-      {/* 7. Greeting Hero */}
+      {/* Greeting Hero — all modes */}
       <Motion>
         <header className="mb-6 relative">
           <div className="flex items-center gap-2 mb-3">
@@ -182,184 +166,157 @@ const Index = () => {
           <h1 className="font-display text-[clamp(32px,5vw,48px)] leading-[1.05] text-foreground mb-2">
             {greeting()}
           </h1>
-          <p className="font-sans text-[15px] text-vanta-text-mid max-w-[520px] leading-relaxed">
-            So you can focus, decide, and move.
-          </p>
+          {!isDnd && (
+            <p className="font-sans text-[15px] text-vanta-text-mid max-w-[520px] leading-relaxed">
+              So you can focus, decide, and move.
+            </p>
+          )}
         </header>
       </Motion>
 
-      {/* Inline Brain Dump — capture → act flow */}
-      <InlineBrainDump />
+      {/* Inline Brain Dump — creative & executive only */}
+      {!isDnd && <InlineBrainDump />}
 
-      {/* Action Items — the action layer */}
+      {/* Action Items — all modes (the action layer) */}
       <ActionItems onSignalClick={(s) => setDrawerSignal(s)} />
 
-      {/* 1. Today Context Row */}
-      <Motion delay={40}>
-        <div className="flex flex-wrap items-center gap-4 mb-8 pb-5 border-b border-vanta-border">
-          <span className="font-mono text-[11px] text-vanta-text-low">
-            {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
-          </span>
-          <span className="w-px h-4 bg-vanta-border" />
-          <span className="font-mono text-[11px] text-vanta-text-low flex items-center gap-1.5">
-            <Calendar className="w-3.5 h-3.5 text-vanta-accent-amber" />
-            {meetingCount} meeting{meetingCount !== 1 ? "s" : ""} today
-          </span>
-          <span className="w-px h-4 bg-vanta-border" />
-          <span className={`font-mono text-[10px] uppercase tracking-wider flex items-center gap-1.5 ${modeMeta.color}`}>
-            <modeMeta.icon className="w-3.5 h-3.5" />
-            {modeMeta.label} Mode
-          </span>
-        </div>
-      </Motion>
-
-      {/* Cooling Alerts */}
-      <CoolingAlerts />
-
-      {/* 3. Stats Strip (clickable + today delta) */}
-      <Motion delay={80}>
-        <div className="flex flex-wrap gap-6 mb-8 pb-6 border-b border-vanta-border">
-          <Link to="/signals" className="group">
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Signals Captured</p>
-            <div className="flex items-baseline gap-2">
-              <p className="font-display text-[28px] text-foreground group-hover:text-primary transition-colors">{activeSignals.length}</p>
-              {todayNew > 0 && (
-                <span className="font-mono text-[10px] text-vanta-accent">+{todayNew} today</span>
-              )}
-            </div>
-          </Link>
-          <Link to="/signals" className="group">
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">High Strength</p>
-            <p className="font-display text-[28px] text-vanta-accent group-hover:text-primary transition-colors">{highCount}</p>
-          </Link>
-          <Link to="/signals" className="group">
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Actions Fired</p>
-            <p className="font-display text-[28px] text-foreground group-hover:text-primary transition-colors">{actionCount}</p>
-          </Link>
-          <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Pipeline</p>
-            <div className="flex items-center gap-2 mt-2 px-2.5 py-1 bg-vanta-accent-faint border border-vanta-accent-border">
-              <div className="w-1.5 h-1.5 bg-vanta-accent animate-pulse-dot" />
-              <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-vanta-accent">Active</p>
-            </div>
-          </div>
-        </div>
-      </Motion>
-
-      {/* What's Ahead — forward-looking intelligence */}
-      <WhatsAhead />
-
-      {/* 4. Channel Grid (polish) */}
-      <Motion delay={120}>
-        <section className="mb-10">
-          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-4">Channels</p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {CHANNELS.map((ch) => {
-              const count = channelData.counts[ch.key] || 0;
-              const maxCount = Math.max(...Object.values(channelData.counts), 1);
-              const barWidth = count > 0 ? Math.max(12, (count / maxCount) * 100) : 0;
-              const freshness = channelData.latest[ch.key] ? formatRelative(channelData.latest[ch.key]) : null;
-
-              return (
-                <Link
-                  key={ch.key}
-                  to={ch.href}
-                  className="group relative flex flex-col justify-between p-5 bg-card border border-vanta-border rounded-sm hover:border-foreground/10 transition-all duration-300 hover:shadow-md overflow-hidden"
-                >
-                  {/* Top: icon badge + freshness */}
-                  <div className="flex items-start justify-between mb-5">
-                    <div className={`w-9 h-9 rounded-lg ${ch.bg} flex items-center justify-center ring-1 ${ch.ring} transition-transform duration-300 group-hover:scale-110`}>
-                      <ch.icon className={`w-4 h-4 ${ch.color}`} />
-                    </div>
-                    {freshness ? (
-                      <span className="font-mono text-[8px] text-vanta-text-muted mt-1">{freshness}</span>
-                    ) : (
-                      <span className="font-mono text-[8px] text-vanta-text-muted mt-1 italic">idle</span>
-                    )}
-                  </div>
-
-                  {/* Count + label */}
-                  <div>
-                    <p className="font-display text-[32px] leading-none text-foreground mb-1 tracking-tight">{count}</p>
-                    <p className="font-mono text-[10px] uppercase tracking-wider text-vanta-text-low">{ch.label}</p>
-                  </div>
-
-                  {/* Signal strength bar */}
-                  <div className="mt-4 h-1 w-full bg-vanta-border/50 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full ${ch.barColor} rounded-full transition-all duration-700 ease-out opacity-50 group-hover:opacity-100`}
-                      style={{ width: `${barWidth}%` }}
-                    />
-                  </div>
-
-                  {/* Hover arrow */}
-                  <ChevronRight className="w-3.5 h-3.5 text-vanta-text-muted absolute right-3 top-5 opacity-0 group-hover:opacity-60 transition-all duration-200 translate-x-1 group-hover:translate-x-0" />
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-      </Motion>
-
-      {/* 5. Recent Signals (enhanced) */}
-      <Motion delay={160}>
-        <section className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted">Recent Signals</p>
-            <Link
-              to="/signals"
-              className="font-mono text-[9px] uppercase tracking-wider text-primary hover:text-vanta-accent transition-colors flex items-center gap-1"
-            >
-              View All <ArrowRight className="w-3 h-3" />
-            </Link>
-          </div>
-          <div className="border border-vanta-border divide-y divide-vanta-border">
-            {recentSignals.length === 0 ? (
-              <div className="p-6 text-center">
-                <p className="font-mono text-[10px] uppercase tracking-wider text-vanta-text-muted">No signals captured yet</p>
-              </div>
-            ) : (
-              recentSignals.map((s) => {
-                const SourceIcon = SOURCE_ICONS[s.source] || MessageSquare;
-                const leftBorder = SIGNAL_LEFT_BORDER[s.signalType] || "border-l-transparent";
-                return (
-                  <button
-                    key={s.id}
-                    onClick={() => setDrawerSignal(s)}
-                    className={`flex items-start gap-3 p-4 bg-card hover:bg-vanta-bg-elevated transition-colors w-full text-left border-l-2 ${leftBorder}`}
-                  >
-                    <SourceIcon className="w-3.5 h-3.5 text-vanta-text-muted shrink-0 mt-1" />
-                    <div className="min-w-0 flex-1">
-                      <p className="font-sans text-[13px] text-foreground truncate">{s.summary}</p>
-                      <p className="font-mono text-[9px] text-vanta-text-low mt-0.5">
-                        {s.sender} · {formatRelative(s.capturedAt)}
-                      </p>
-                    </div>
-                    {s.priority === "high" && (
-                      <span className="font-mono text-[8px] uppercase tracking-wider text-vanta-accent px-1.5 py-0.5 border border-vanta-accent-border bg-vanta-accent-faint shrink-0">
-                        High
-                      </span>
-                    )}
-                  </button>
-                );
-              })
-            )}
-          </div>
-        </section>
-      </Motion>
-
-      {/* 6. Noise Footer */}
-      {noiseCount > 0 && (
-        <Motion delay={200}>
-          <div className="mb-12 text-center">
-            <Link
-              to="/settings?tab=noise"
-              className="font-mono text-[10px] text-vanta-text-muted hover:text-vanta-text-low transition-colors"
-            >
-              {noiseCount} item{noiseCount !== 1 ? "s" : ""} filtered as noise · Review queue →
-            </Link>
+      {/* DND mode stops here — minimal view */}
+      {isDnd ? (
+        <Motion delay={40}>
+          <div className="flex items-center gap-2 py-6 text-center justify-center">
+            <Moon className="w-4 h-4 text-destructive" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-vanta-text-muted">
+              Do Not Disturb — only action items shown
+            </span>
           </div>
         </Motion>
+      ) : (
+        <>
+          {/* Today Context Row */}
+          <Motion delay={40}>
+            <div className="flex flex-wrap items-center gap-4 mb-8 pb-5 border-b border-vanta-border">
+              <span className="font-mono text-[11px] text-vanta-text-low">
+                {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+              </span>
+              <span className="w-px h-4 bg-vanta-border" />
+              <span className="font-mono text-[11px] text-vanta-text-low flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-vanta-accent-amber" />
+                {meetingCount} meeting{meetingCount !== 1 ? "s" : ""} today
+              </span>
+              <span className="w-px h-4 bg-vanta-border" />
+              <span className={`font-mono text-[10px] uppercase tracking-wider flex items-center gap-1.5 ${modeMeta.color}`}>
+                <modeMeta.icon className="w-3.5 h-3.5" />
+                {modeMeta.label} Mode
+              </span>
+            </div>
+          </Motion>
+
+          {/* Cooling Alerts — creative & executive */}
+          <CoolingAlerts />
+
+          {/* Stats Strip */}
+          <Motion delay={80}>
+            <div className="flex flex-wrap gap-6 mb-8 pb-6 border-b border-vanta-border">
+              <Link to="/signals" className="group">
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Signals Captured</p>
+                <div className="flex items-baseline gap-2">
+                  <p className="font-display text-[28px] text-foreground group-hover:text-primary transition-colors">{activeSignals.length}</p>
+                  {todayNew > 0 && (
+                    <span className="font-mono text-[10px] text-vanta-accent">+{todayNew} today</span>
+                  )}
+                </div>
+              </Link>
+              <Link to="/signals" className="group">
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">High Strength</p>
+                <p className="font-display text-[28px] text-vanta-accent group-hover:text-primary transition-colors">{highCount}</p>
+              </Link>
+              <Link to="/signals" className="group">
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Actions Fired</p>
+                <p className="font-display text-[28px] text-foreground group-hover:text-primary transition-colors">{actionCount}</p>
+              </Link>
+              <div>
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Pipeline</p>
+                <div className="flex items-center gap-2 mt-2 px-2.5 py-1 bg-vanta-accent-faint border border-vanta-accent-border">
+                  <div className="w-1.5 h-1.5 bg-vanta-accent animate-pulse-dot" />
+                  <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-vanta-accent">Active</p>
+                </div>
+              </div>
+            </div>
+          </Motion>
+
+          {/* What's Ahead — creative & executive */}
+          <WhatsAhead />
+
+          {/* Channel Grid — creative only (hidden in executive) */}
+          {!isExecutive && (
+            <Motion delay={120}>
+              <section className="mb-10">
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-4">Channels</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {CHANNELS.map((ch) => {
+                    const count = channelData.counts[ch.key] || 0;
+                    const maxCount = Math.max(...Object.values(channelData.counts), 1);
+                    const barWidth = count > 0 ? Math.max(12, (count / maxCount) * 100) : 0;
+                    const freshness = channelData.latest[ch.key] ? formatRelative(channelData.latest[ch.key]) : null;
+
+                    return (
+                      <Link
+                        key={ch.key}
+                        to={ch.href}
+                        className="group relative flex flex-col justify-between p-5 bg-card border border-vanta-border rounded-sm hover:border-foreground/10 transition-all duration-300 hover:shadow-md overflow-hidden"
+                      >
+                        <div className="flex items-start justify-between mb-5">
+                          <div className={`w-9 h-9 rounded-lg ${ch.bg} flex items-center justify-center ring-1 ${ch.ring} transition-transform duration-300 group-hover:scale-110`}>
+                            <ch.icon className={`w-4 h-4 ${ch.color}`} />
+                          </div>
+                          {freshness ? (
+                            <span className="font-mono text-[8px] text-vanta-text-muted mt-1">{freshness}</span>
+                          ) : (
+                            <span className="font-mono text-[8px] text-vanta-text-muted mt-1 italic">idle</span>
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-display text-[32px] leading-none text-foreground mb-1 tracking-tight">{count}</p>
+                          <p className="font-mono text-[10px] uppercase tracking-wider text-vanta-text-low">{ch.label}</p>
+                        </div>
+                        <div className="mt-4 h-1 w-full bg-vanta-border/50 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full ${ch.barColor} rounded-full transition-all duration-700 ease-out opacity-50 group-hover:opacity-100`}
+                            style={{ width: `${barWidth}%` }}
+                          />
+                        </div>
+                        <ChevronRight className="w-3.5 h-3.5 text-vanta-text-muted absolute right-3 top-5 opacity-0 group-hover:opacity-60 transition-all duration-200 translate-x-1 group-hover:translate-x-0" />
+                      </Link>
+                    );
+                  })}
+                </div>
+              </section>
+            </Motion>
+          )}
+
+          {/* Daily Timeline — replaces flat Recent Signals list */}
+          <Motion delay={160}>
+            <DailyTimeline
+              signals={activeSignals}
+              onSignalClick={(s) => setDrawerSignal(s)}
+              highOnly={isExecutive}
+            />
+          </Motion>
+
+          {/* Noise Footer — creative only */}
+          {!isExecutive && noiseCount > 0 && (
+            <Motion delay={200}>
+              <div className="mb-12 text-center">
+                <Link
+                  to="/settings?tab=noise"
+                  className="font-mono text-[10px] text-vanta-text-muted hover:text-vanta-text-low transition-colors"
+                >
+                  {noiseCount} item{noiseCount !== 1 ? "s" : ""} filtered as noise · Review queue →
+                </Link>
+              </div>
+            </Motion>
+          )}
+        </>
       )}
 
       {/* Signal Detail Drawer */}
