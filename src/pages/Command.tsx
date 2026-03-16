@@ -48,6 +48,23 @@ async function fetchActionableSignals(): Promise<Signal[]> {
   }));
 }
 
+function getMockReminders() {
+  return [
+    { id: "mock-r1", contact_name: "Marcus Chen", sequence_type: "check-in", interval_days: 14, note: "Portfolio co-invest discussion", enabled: true, next_due_at: new Date(Date.now() - 86400000).toISOString(), last_fired_at: null, created_at: new Date().toISOString() },
+    { id: "mock-r2", contact_name: "Sarah Kim", sequence_type: "follow-up", interval_days: 7, note: "Fundraise deck feedback", enabled: true, next_due_at: new Date(Date.now() - 3600000).toISOString(), last_fired_at: null, created_at: new Date().toISOString() },
+    { id: "mock-r3", contact_name: "Elena Voss", sequence_type: "reminder", interval_days: 30, note: "Board prep materials", enabled: true, next_due_at: new Date(Date.now() - 172800000).toISOString(), last_fired_at: null, created_at: new Date().toISOString() },
+    { id: "mock-r4", contact_name: "James Whitfield", sequence_type: "nurture", interval_days: 21, note: null, enabled: true, next_due_at: new Date(Date.now() - 7200000).toISOString(), last_fired_at: null, created_at: new Date().toISOString() },
+  ];
+}
+
+function getMockCoolingAlerts() {
+  return [
+    { id: "mock-c1", contact_name: "David Okafor", alert_type: "cooling", previous_strength: 82, current_strength: 54, dismissed: false, created_at: new Date(Date.now() - 86400000).toISOString() },
+    { id: "mock-c2", contact_name: "Priya Sharma", alert_type: "cooling", previous_strength: 71, current_strength: 38, dismissed: false, created_at: new Date(Date.now() - 172800000).toISOString() },
+    { id: "mock-c3", contact_name: "Leo Park", alert_type: "cooling", previous_strength: 65, current_strength: 41, dismissed: false, created_at: new Date(Date.now() - 259200000).toISOString() },
+  ];
+}
+
 async function fetchDueReminders() {
   const now = new Date().toISOString();
   const { data } = await supabase
@@ -57,7 +74,8 @@ async function fetchDueReminders() {
     .lte("next_due_at", now)
     .order("next_due_at")
     .limit(10);
-  return data || [];
+  const dbData = data || [];
+  return dbData.length > 0 ? dbData : getMockReminders();
 }
 
 async function fetchCoolingAlerts() {
@@ -67,7 +85,8 @@ async function fetchCoolingAlerts() {
     .eq("dismissed", false)
     .order("created_at", { ascending: false })
     .limit(5);
-  return data || [];
+  const dbData = data || [];
+  return dbData.length > 0 ? dbData : getMockCoolingAlerts();
 }
 
 /* ── Helpers ────────────────────────────────────────────── */
