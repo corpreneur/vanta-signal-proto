@@ -190,7 +190,7 @@ const PRODUCTS: Record<string, ProductDef> = {
     channels: ["All channels"],
     narrative: [
       "The hardest problem in intelligence isn't capture… it's discrimination. The difference between a system that helps and one that overwhelms is the ability to identify noise and suppress it without losing anything that matters.",
-      "Vanta's Haiku triage stage classifies low-signal content as NOISE within milliseconds. These messages are silently logged but never surfaced in the feed, never trigger alerts, and never create action items. They exist in the archive for completeness, but they don't compete for your attention.",
+      "Vanta's Gemini Flash triage classifies low-signal content as NOISE within milliseconds. These messages are silently logged but never surfaced in the feed, never trigger alerts, and never create action items. They exist in the archive for completeness, but they don't compete for your attention.",
     ],
     howItWorks: [
       { step: "Haiku Triage", desc: "First-pass classification identifies low-signal content… greetings, status confirmations, social pleasantries." },
