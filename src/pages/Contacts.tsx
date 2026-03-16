@@ -110,9 +110,22 @@ type SortMode = "signals" | "recency" | "alpha" | "high" | "strength";
 export default function Contacts() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  // Fetch engagement sequences for enrichment
+  const { data: sequences = [] } = useQuery({
+    queryKey: ["engagement-sequences"],
+    queryFn: async () => {
+      const { data } = await supabase.from("engagement_sequences").select("*").eq("enabled", true);
+      return data || [];
+    },
+  });
+
+  const sequenceMap = useMemo(() => {
+    const map = new Map<string, { intervalDays: number; nextDueAt: string; note: string | null }>();
+    sequences.forEach((s: any) => map.set(s.contact_name, { intervalDays: s.interval_days, nextDueAt: s.next_due_at, note: s.note }));
+    return map;
+  }, [sequences]);
+
   const [sort, setSort] = useState<SortMode>("strength");
-  const [filterTag, setFilterTag] = useState<string | null>(null);
-  const { data: allTags } = useAllContactTags();
 
   const { data: signals = [], isLoading } = useQuery({
     queryKey: ["contacts-signals"],
