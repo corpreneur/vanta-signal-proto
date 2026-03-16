@@ -5,13 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Save, RotateCcw, Settings2, MessageSquare, Users, Bell, Shield, Smartphone, Phone, Video, Mail, Calendar, Filter, SlidersHorizontal, ShieldCheck, Zap, Palette, BookOpen } from "lucide-react";
-import UserModes from "./UserModes";
+import { Save, RotateCcw, Settings2, MessageSquare, Users, Bell, Shield, Smartphone, Phone, Video, Mail, Calendar, ShieldCheck, Zap } from "lucide-react";
 import NoiseQueue from "./NoiseQueue";
 import ClassificationAudit from "./ClassificationAudit";
 import WorkflowBuilder from "@/components/WorkflowBuilder";
-import CustomSignalTypes from "@/components/CustomSignalTypes";
-import MyRules from "@/components/MyRules";
 import CalendarSyncSettings from "@/components/CalendarSyncSettings";
 
 interface SettingRow {
@@ -74,7 +71,7 @@ const SOURCE_CHANNELS: Array<{
 
 const SOURCE_KEYS = new Set(SOURCE_CHANNELS.map((c) => c.key));
 
-const TAB_MAP: Record<string, string> = { noise: "noise", modes: "modes", audit: "audit", workflows: "workflows", types: "types", rules: "rules", calendar: "calendar" };
+const TAB_MAP: Record<string, string> = { noise: "noise", audit: "audit", workflows: "workflows", calendar: "calendar" };
 
 export default function Settings() {
   const queryClient = useQueryClient();
@@ -191,12 +188,8 @@ export default function Settings() {
             General
           </TabsTrigger>
           <TabsTrigger value="noise" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
-            <Filter className="w-3.5 h-3.5" />
+            <Shield className="w-3.5 h-3.5" />
             Noise Queue
-          </TabsTrigger>
-          <TabsTrigger value="modes" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
-            <SlidersHorizontal className="w-3.5 h-3.5" />
-            User Modes
           </TabsTrigger>
           <TabsTrigger value="audit" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
             <ShieldCheck className="w-3.5 h-3.5" />
@@ -205,14 +198,6 @@ export default function Settings() {
           <TabsTrigger value="workflows" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
             <Zap className="w-3.5 h-3.5" />
             Workflows
-          </TabsTrigger>
-          <TabsTrigger value="types" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
-            <Palette className="w-3.5 h-3.5" />
-            Signal Types
-          </TabsTrigger>
-          <TabsTrigger value="rules" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
-            <BookOpen className="w-3.5 h-3.5" />
-            My Rules
           </TabsTrigger>
           <TabsTrigger value="calendar" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
             <Calendar className="w-3.5 h-3.5" />
@@ -426,10 +411,6 @@ export default function Settings() {
           <NoiseQueue />
         </TabsContent>
 
-        {/* User Modes Tab */}
-        <TabsContent value="modes">
-          <UserModes />
-        </TabsContent>
 
         {/* Classification Audit Tab */}
         <TabsContent value="audit">
@@ -441,14 +422,9 @@ export default function Settings() {
           <WorkflowBuilder />
         </TabsContent>
 
-        {/* Custom Signal Types Tab */}
-        <TabsContent value="types">
-          <CustomSignalTypes />
-        </TabsContent>
-
-        {/* My Rules Tab */}
-        <TabsContent value="rules">
-          <MyRules />
+        {/* Calendar Sync Tab */}
+        <TabsContent value="calendar">
+          <CalendarSyncSettings />
         </TabsContent>
 
         {/* Calendar Sync Tab */}

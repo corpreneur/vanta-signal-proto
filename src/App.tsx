@@ -94,7 +94,7 @@ const AppRoutes = () => {
       <Route path="/command" element={<ProtectedRoute session={session}><ProductLayout><Command /></ProductLayout></ProtectedRoute>} />
       <Route path="/contacts" element={<ProtectedRoute session={session}><ProductLayout><Contacts /></ProductLayout></ProtectedRoute>} />
       <Route path="/admin" element={<ProtectedRoute session={session}><ProductLayout><Admin /></ProductLayout></ProtectedRoute>} />
-      <Route path="/noise-queue" element={<Navigate to="/settings?tab=noise" replace />} />
+      <Route path="/noise-queue" element={<Navigate to="/focus?tab=noise" replace />} />
       <Route path="/focus" element={<ProtectedRoute session={session}><ProductLayout><Focus /></ProductLayout></ProtectedRoute>} />
       <Route path="/user-modes" element={<Navigate to="/focus" replace />} />
       <Route path="/case-01" element={<Navigate to="/case/01" replace />} />
