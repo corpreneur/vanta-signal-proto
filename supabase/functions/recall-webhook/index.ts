@@ -86,6 +86,7 @@ Also return:
         priority: "medium",
         summary: `Meeting "${meetingTitle}" with ${attendees.length} participants. Auto-classification failed.`,
         actionsTaken: ["NOTION_LOG"],
+        confidence: 0.0,
       };
     }
 
