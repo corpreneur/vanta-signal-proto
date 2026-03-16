@@ -117,6 +117,24 @@ export default function EnhancedActionItems({ onSignalClick }: EnhancedActionIte
     }
   };
 
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeleting(id);
+    const { error } = await supabase
+      .from("signals")
+      .delete()
+      .eq("id", id);
+    setDeleting(null);
+    if (error) {
+      toast.error("Failed to delete");
+    } else {
+      queryClient.invalidateQueries({ queryKey: ["action-items-enhanced"] });
+      queryClient.invalidateQueries({ queryKey: ["signals-dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["signals"] });
+      toast.success("Signal deleted");
+    }
+  };
+
   if (items.length === 0) return null;
 
   return (
