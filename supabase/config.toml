@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.intro-helper]
 verify_jwt = false
+
+[functions.brain-dump-image]
+verify_jwt = false
