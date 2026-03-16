@@ -358,6 +358,16 @@ const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: Signa
             </button>
           )}
 
+          {/* Delete */}
+          <button
+            onClick={handleDelete}
+            className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-destructive border border-destructive/30 hover:bg-destructive/10 transition-colors"
+            title="Delete signal"
+          >
+            <Trash2 className="w-3 h-3" />
+            Delete
+          </button>
+
           {/* Snooze */}
           {signal.status !== "Complete" && (
             <button
