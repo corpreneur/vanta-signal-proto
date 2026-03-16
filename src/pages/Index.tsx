@@ -8,6 +8,7 @@ import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { useUserMode } from "@/hooks/use-user-mode";
 import { Motion } from "@/components/ui/motion";
 import SignalDetailDrawer from "@/components/SignalDetailDrawer";
+import CoolingAlerts from "@/components/CoolingAlerts";
 import {
   MessageSquare,
   Phone,
