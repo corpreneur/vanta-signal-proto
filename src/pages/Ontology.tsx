@@ -58,9 +58,9 @@ const CHANNELS: ChannelDef[] = [
 
 const PIPELINE_STAGES = [
   { id: "01", label: "Ingest", desc: "Raw signal arrives from any channel", icon: Database },
-  { id: "02", label: "Triage", desc: "Haiku classifies: signal or noise? Route or discard.", icon: Zap },
-  { id: "03", label: "Detection", desc: "Sonnet extracts type, entities, priority, actionable insight", icon: Brain },
-  { id: "04", label: "Action", desc: "Automated response, brief generation, or silent capture", icon: Send },
+  { id: "02", label: "Triage", desc: "Gemini Flash classifies: signal or noise? Route or discard.", icon: Zap },
+  { id: "03", label: "Detection", desc: "Gemini extracts type, entities, priority, risk level, due dates, and actionable insight", icon: Brain },
+  { id: "04", label: "Action", desc: "Automated response, brief generation, workflow trigger, or silent capture", icon: Send },
 ];
 
 const SIGNAL_TYPES = [
