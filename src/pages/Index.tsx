@@ -192,8 +192,17 @@ const Index = () => {
         </Motion>
       ) : (
         <>
-          {/* Today Context Row */}
+          {/* Daily Timeline — top of dashboard */}
           <Motion delay={40}>
+            <DailyTimeline
+              signals={activeSignals}
+              onSignalClick={(s) => setDrawerSignal(s)}
+              highOnly={isExecutive}
+            />
+          </Motion>
+
+          {/* Today Context Row */}
+          <Motion delay={60}>
             <div className="flex flex-wrap items-center gap-4 mb-8 pb-5 border-b border-vanta-border">
               <span className="font-mono text-[11px] text-vanta-text-low">
                 {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
@@ -213,15 +222,6 @@ const Index = () => {
 
           {/* Cooling Alerts — creative & executive */}
           <CoolingAlerts />
-
-          {/* Daily Timeline — top of dashboard */}
-          <Motion delay={80}>
-            <DailyTimeline
-              signals={activeSignals}
-              onSignalClick={(s) => setDrawerSignal(s)}
-              highOnly={isExecutive}
-            />
-          </Motion>
 
           {/* Stats Strip */}
           <Motion delay={120}>
