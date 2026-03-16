@@ -73,6 +73,35 @@ function relativeTime(iso: string) {
   return `In ${Math.round(mins / 60)}h`;
 }
 
+/* ── mock meetings for demo ─────────────────────────────── */
+function getMockMeetings() {
+  const today = new Date();
+  const make = (h: number, m: number, title: string, attendees: string[]) => {
+    const starts = new Date(today);
+    starts.setHours(h, m, 0, 0);
+    const ends = new Date(starts);
+    ends.setHours(h + 1);
+    return {
+      id: `mock-${h}-${m}`,
+      title,
+      starts_at: starts.toISOString(),
+      ends_at: ends.toISOString(),
+      attendees,
+      briefed: false,
+      zoom_meeting_id: null,
+      calendar_event_id: null,
+      created_at: new Date().toISOString(),
+    };
+  };
+  return [
+    make(9, 0, "Portfolio Review — Series B Pipeline", ["Marcus Chen", "Elena Voss"]),
+    make(10, 30, "1:1 with Sarah Kim — Fundraise Update", ["Sarah Kim"]),
+    make(13, 0, "LP Advisory Board Prep", ["James Whitfield", "Priya Sharma", "David Okafor"]),
+    make(15, 0, "Intro Call — Astra Robotics (via Marcus)", ["Leo Park", "Marcus Chen"]),
+    make(16, 30, "Weekly Partner Sync", ["Elena Voss", "James Whitfield"]),
+  ];
+}
+
 export default function Command() {
   const { data: topSignals = [] } = useQuery({
     queryKey: ["command-signals"],
@@ -86,8 +115,9 @@ export default function Command() {
     refetchInterval: 60_000,
   });
 
-  const meetings = briefData?.meetings || [];
+  const dbMeetings = briefData?.meetings || [];
   const briefs = briefData?.briefs || [];
+  const meetings = dbMeetings.length > 0 ? dbMeetings : getMockMeetings();
 
   const meetingBriefMap = useMemo(() => {
     const map = new Map<string, typeof briefs[0]>();
@@ -135,6 +165,7 @@ export default function Command() {
             <div className="space-y-2">
               {meetings.map((m: any) => {
                 const brief = meetingBriefMap.get(m.id);
+                const attendees = Array.isArray(m.attendees) ? m.attendees : [];
                 return (
                   <div key={m.id} className="border border-vanta-border bg-vanta-bg-elevated p-4">
                     <div className="flex items-start justify-between gap-3 mb-2">
@@ -146,6 +177,18 @@ export default function Command() {
                         {relativeTime(m.starts_at)}
                       </span>
                     </div>
+                    {attendees.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {attendees.map((a: string, i: number) => (
+                          <span
+                            key={i}
+                            className="inline-block px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider border border-vanta-border text-vanta-text-low bg-card"
+                          >
+                            {a}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                     {brief && (
                       <Link
                         to={`/briefing/${brief.id}`}
