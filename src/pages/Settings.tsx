@@ -198,7 +198,15 @@ export default function Settings() {
           </TabsTrigger>
           <TabsTrigger value="audit" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
             <ShieldCheck className="w-3.5 h-3.5" />
-            Classification Audit
+            Audit
+          </TabsTrigger>
+          <TabsTrigger value="workflows" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
+            <Zap className="w-3.5 h-3.5" />
+            Workflows
+          </TabsTrigger>
+          <TabsTrigger value="types" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
+            <Palette className="w-3.5 h-3.5" />
+            Signal Types
           </TabsTrigger>
         </TabsList>
 
