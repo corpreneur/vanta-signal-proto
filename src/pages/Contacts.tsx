@@ -126,6 +126,8 @@ export default function Contacts() {
   }, [sequences]);
 
   const [sort, setSort] = useState<SortMode>("strength");
+  const [filterTag, setFilterTag] = useState<string | null>(null);
+  const { data: allTags } = useAllContactTags();
 
   const { data: signals = [], isLoading } = useQuery({
     queryKey: ["contacts-signals"],
