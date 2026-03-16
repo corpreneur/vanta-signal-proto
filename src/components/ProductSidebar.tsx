@@ -197,9 +197,9 @@ export function ProductSidebar() {
 
         <div className="mx-3 border-t border-vanta-border" />
 
+        <CollapsibleNavGroup label="Product Concepts" items={productItems} collapsed={collapsed} currentPath={currentPath} />
         <CollapsibleNavGroup label="Channels" items={channelItems} collapsed={collapsed} currentPath={currentPath} />
         <CollapsibleNavGroup label="Platform" items={platformItems} collapsed={collapsed} currentPath={currentPath} />
-        <CollapsibleNavGroup label="Product Concepts" items={productItems} collapsed={collapsed} currentPath={currentPath} />
 
         {/* Cases */}
         <Collapsible defaultOpen={currentPath.startsWith("/case/")}>
