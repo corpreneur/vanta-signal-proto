@@ -23,6 +23,7 @@ const TAB_MAP: Record<string, string> = {
   noise: "noise",
   types: "types",
   rules: "rules",
+  workflows: "workflows",
 };
 
 export default function Focus() {
