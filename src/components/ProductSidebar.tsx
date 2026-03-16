@@ -53,9 +53,9 @@ import {
 /* ── Fab Five — the 5 core product functions ── */
 const fabFiveItems = [
   { title: "Connectivity", url: "/connectivity", icon: Radio },
-  { title: "Brain Dump", url: "/brain-dump", icon: PenLine },
   { title: "Signal Feed", url: "/signals", icon: BarChart3 },
-  { title: "Focus", url: "/focus", icon: SlidersHorizontal },
+  { title: "Filter Modes", url: "/focus", icon: SlidersHorizontal },
+  { title: "Idea Capture", url: "/brain-dump", icon: PenLine },
   { title: "Easy Actions", url: "/command", icon: Zap },
 ];
 

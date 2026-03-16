@@ -21,7 +21,7 @@ export default function SmartNoteFAB() {
   const [mode, setMode] = useState<InputMode>("note");
   const location = useLocation();
 
-  // Suppress on Brain Dump page (it already has full capture UI)
+  // Suppress on Idea Capture page (it already has full capture UI)
   if (location.pathname === "/brain-dump") return null;
 
   return (

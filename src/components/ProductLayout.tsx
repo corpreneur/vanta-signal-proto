@@ -13,9 +13,9 @@ const BREADCRUMB_MAP: Record<string, string> = {
   "/": "Dashboard",
   // Fab Five
   "/connectivity": "Fab Five · Connectivity",
-  "/brain-dump": "Fab Five · Brain Dump",
   "/signals": "Fab Five · Signal Feed",
-  "/focus": "Fab Five · Focus",
+  "/focus": "Fab Five · Filter Modes",
+  "/brain-dump": "Fab Five · Idea Capture",
   "/command": "Fab Five · Easy Actions",
   // Product Concepts
   "/contacts": "Product · Smart Contacts",

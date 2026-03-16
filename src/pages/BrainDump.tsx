@@ -144,7 +144,7 @@ export default function BrainDump() {
           <div className="flex items-center gap-2">
             <PenLine className="h-5 w-5 text-vanta-accent" />
             <h1 className="font-mono text-lg uppercase tracking-widest text-foreground">
-              Brain Dump
+              Idea Capture
             </h1>
           </div>
           <p className="font-mono text-xs text-muted-foreground leading-relaxed max-w-md">
