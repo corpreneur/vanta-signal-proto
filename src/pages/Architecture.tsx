@@ -138,19 +138,21 @@ export default function Architecture() {
             <SectionHeader id="overview" title="System Overview" sub="§ 01" />
             <div className="mt-6 space-y-4">
               <Prose>
-                <p>Vanta Signal ingests communications from five channels, classifies them through a Gemini AI pipeline, and surfaces actionable intelligence on the dashboard.</p>
+                <p>Vanta is an MVNO-first Connectivity OS that ingests communications from six sources, classifies them through a Gemini AI pipeline, and surfaces actionable intelligence across a unified dashboard with Focus controls, pre-meeting briefs, relationship alerts, and automated workflows.</p>
               </Prose>
               <div className="space-y-3 mt-4">
-                <FlowStep n={1} label="Channels" detail="iMessage (Linq), Gmail, Zoom, Phone, Calendar" />
-                <FlowStep n={2} label="Edge Functions" detail="Channel-specific webhooks parse & normalize payloads" />
-                <FlowStep n={3} label="Gemini AI Gateway" detail="Classify signal type, priority, summary, and actions" />
-                <FlowStep n={4} label="Database" detail="Signals table + meeting_artifacts for rich media" />
-                <FlowStep n={5} label="Dashboard" detail="Real-time feed, relationship graph, pre-meeting briefs" />
+                <FlowStep n={1} label="Sources" detail="iMessage (Linq), Gmail, Zoom (Recall.ai), Phone (MVNO/ConnectX), Calendar, Brain Dump (manual + voice + URL scrape)" />
+                <FlowStep n={2} label="Edge Functions" detail="Channel-specific webhooks parse, normalize & deduplicate payloads" />
+                <FlowStep n={3} label="Gemini AI Gateway" detail="Classify signal type, priority, summary, risk level, due dates, confidence scores, and actions" />
+                <FlowStep n={4} label="Database" detail="Signals table + meeting_artifacts + relationship_alerts + pre_meeting_briefs + workflows + system_settings" />
+                <FlowStep n={5} label="Dashboard" detail="Daily timeline, action items, What's Ahead with meeting briefs, cooling alerts, Focus controls, Brain Dump, relationship graph" />
               </div>
-              <Code>{`Channel → Edge Function → Gemini Flash → Supabase → Dashboard
+              <Code>{`Source → Edge Function → Gemini Flash → Database → Dashboard
   ↓           ↓               ↓              ↓           ↓
 Linq/Gmail  Parse+HMAC    Classify        Insert      Render
-Phone/Zoom  Normalize     Prioritize      Deduplicate Filter+Sort`}</Code>
+Phone/Zoom  Normalize     Prioritize      Deduplicate Filter+Sort
+BrainDump   Firecrawl     Risk+DueDate    Workflows   Focus Modes
+Calendar    Sync          Brief Gen       Alerts      Pre-Briefs`}</Code>
             </div>
           </section>
 
