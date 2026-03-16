@@ -203,6 +203,35 @@ export default function Contacts() {
               </button>
             ))}
           </div>
+
+          {/* Tag filter */}
+          {allTags && allTags.size > 0 && (
+            <div className="flex flex-wrap gap-1 items-center">
+              <Filter className="w-3 h-3 text-vanta-text-muted mr-1" />
+              {Array.from(allTags.keys()).map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setFilterTag(filterTag === tag ? null : tag)}
+                  className={`px-2 py-1 font-mono text-[9px] uppercase tracking-wider border rounded-sm transition-colors ${
+                    filterTag === tag
+                      ? "border-primary text-primary bg-primary/10"
+                      : "border-vanta-border text-vanta-text-low hover:text-foreground"
+                  }`}
+                >
+                  <Tag className="w-2.5 h-2.5 inline mr-0.5" />
+                  {tag} ({allTags.get(tag)?.length})
+                </button>
+              ))}
+              {filterTag && (
+                <button
+                  onClick={() => setFilterTag(null)}
+                  className="px-2 py-1 font-mono text-[9px] text-vanta-text-muted hover:text-foreground"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </Motion>
 
