@@ -49,7 +49,10 @@ Additional meeting-specific classification rules:
 - Look for: decisions made, action items committed, frameworks articulated, investment angles, positioning language, and open questions.
 - Always include "NOTION_LOG" in actionsTaken.
 - If decisions were made, include "BRIEF_COMPILE".
-- If investment was discussed, include "THESIS_ANALYSIS".`;
+- If investment was discussed, include "THESIS_ANALYSIS".
+
+Also return:
+- confidence: a number from 0.0 to 1.0 indicating how certain you are about the classification. 1.0 = highly certain, 0.5 = uncertain.`;
 
   const condensedTranscript = transcript
     .map((t) => `[${t.speaker}${t.timestamp ? ` @ ${t.timestamp}` : ""}]: ${t.text}`)
