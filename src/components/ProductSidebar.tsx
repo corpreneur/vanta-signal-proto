@@ -71,9 +71,9 @@ const productItems = [
   { title: "Daily Command", url: "/command", icon: Zap },
   { title: "Smart Contacts", url: "/contacts", icon: Users },
   { title: "Relationship Graph", url: "/graph", icon: Network },
-  { title: "Insight Engine", url: "/product/insight", icon: Lightbulb },
-  { title: "Investment Intel", url: "/product/investment", icon: TrendingUp },
-  { title: "Decision Capture", url: "/product/decision", icon: Gavel },
+  { title: "Insight Engine", url: "/insights", icon: Lightbulb },
+  { title: "Investment Intel", url: "/investments", icon: TrendingUp },
+  { title: "Decision Capture", url: "/decisions", icon: Gavel },
 ];
 
 const platformItems = [

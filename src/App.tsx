@@ -17,6 +17,9 @@ import PhoneFMC from "./pages/PhoneFMC";
 import Connectivity from "./pages/Connectivity";
 import Ontology from "./pages/Ontology";
 import ProductSignalPage from "./pages/ProductSignalPage";
+import InsightEngine from "./pages/InsightEngine";
+import InvestmentIntel from "./pages/InvestmentIntel";
+import DecisionCapture from "./pages/DecisionCapture";
 import Architecture from "./pages/Architecture";
 import BrainDump from "./pages/BrainDump";
 import ReleaseNotes from "./pages/ReleaseNotes";
@@ -76,6 +79,9 @@ const AppRoutes = () => {
       <Route path="/connectivity" element={<ProtectedRoute session={session}><ProductLayout><Connectivity /></ProductLayout></ProtectedRoute>} />
       <Route path="/phone-fmc" element={<ProtectedRoute session={session}><ProductLayout><PhoneFMC /></ProductLayout></ProtectedRoute>} />
       <Route path="/ontology" element={<ProtectedRoute session={session}><ProductLayout><Ontology /></ProductLayout></ProtectedRoute>} />
+      <Route path="/insights" element={<ProtectedRoute session={session}><ProductLayout><InsightEngine /></ProductLayout></ProtectedRoute>} />
+      <Route path="/investments" element={<ProtectedRoute session={session}><ProductLayout><InvestmentIntel /></ProductLayout></ProtectedRoute>} />
+      <Route path="/decisions" element={<ProtectedRoute session={session}><ProductLayout><DecisionCapture /></ProductLayout></ProtectedRoute>} />
       <Route path="/product/:signalType" element={<ProtectedRoute session={session}><ProductLayout><ProductSignalPage /></ProductLayout></ProtectedRoute>} />
       <Route path="/architecture" element={<ProtectedRoute session={session}><ProductLayout><Architecture /></ProductLayout></ProtectedRoute>} />
       <Route path="/brain-dump" element={<ProtectedRoute session={session}><ProductLayout><BrainDump /></ProductLayout></ProtectedRoute>} />
