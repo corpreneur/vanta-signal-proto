@@ -87,7 +87,7 @@ const Login = () => {
         style={{ animation: "fadeUp 1.2s ease-out 0.1s forwards" }}
       >
         <img src={heroImage} alt="" className="w-full h-full object-cover object-top" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background from-35% via-background/95 via-50% to-background/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background from-25% via-background/60 via-50% to-transparent" />
       </div>
 
       {/* Content */}
