@@ -24,7 +24,7 @@ const SIGNAL_TYPE_LABELS: Record<string, string> = {
   PHONE_CALL: "Phone Call",
 };
 
-type InputMode = "note" | "link" | "notion";
+type InputMode = "note" | "link" | "image" | "email" | "voice" | "notion";
 
 /* ── Fetch recent brain dump captures ── */
 async function fetchRecentCaptures(): Promise<Signal[]> {
