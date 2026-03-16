@@ -246,6 +246,9 @@ const Index = () => {
         </div>
       </Motion>
 
+      {/* What's Ahead — forward-looking intelligence */}
+      <WhatsAhead />
+
       {/* 4. Channel Grid (polish) */}
       <Motion delay={120}>
         <section className="mb-10">

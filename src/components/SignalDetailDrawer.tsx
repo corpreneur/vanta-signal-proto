@@ -577,6 +577,94 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
                       Flag for Review
                     </button>
                   )}
+
+                  {/* Pin / Unpin — always available */}
+                  <button
+                    onClick={async () => {
+                      const newPinned = !signal.pinned;
+                      const { error } = await supabase
+                        .from("signals")
+                        .update({ pinned: newPinned })
+                        .eq("id", signal.id);
+                      if (error) {
+                        toast.error("Failed to update pin");
+                      } else {
+                        queryClient.invalidateQueries({ queryKey: ["signals"] });
+                        queryClient.invalidateQueries({ queryKey: ["signals-dashboard"] });
+                        toast.success(newPinned ? "Pinned" : "Unpinned");
+                      }
+                    }}
+                    className={`flex items-center gap-1.5 h-8 px-3 border font-mono text-[10px] uppercase tracking-[0.15em] transition-colors ${
+                      signal.pinned
+                        ? "border-primary/30 text-primary bg-primary/5"
+                        : "border-vanta-border text-vanta-text-mid hover:border-primary/30 hover:text-primary"
+                    }`}
+                  >
+                    <Pin className="w-3 h-3" />
+                    {signal.pinned ? "Pinned" : "Pin"}
+                  </button>
+
+                  {/* Mark Done — always available */}
+                  {currentStatus !== "Complete" && (
+                    <button
+                      onClick={async () => {
+                        setUpdatingStatus(true);
+                        const { error } = await supabase
+                          .from("signals")
+                          .update({ status: "Complete" as const })
+                          .eq("id", signal.id);
+                        setUpdatingStatus(false);
+                        if (error) {
+                          toast.error("Failed to complete");
+                        } else {
+                          setCurrentStatus("Complete");
+                          queryClient.invalidateQueries({ queryKey: ["signals"] });
+                          queryClient.invalidateQueries({ queryKey: ["signals-dashboard"] });
+                          queryClient.invalidateQueries({ queryKey: ["action-items"] });
+                          toast.success("Marked complete");
+                        }
+                      }}
+                      disabled={updatingStatus}
+                      className="flex items-center gap-1.5 h-8 px-3 border border-vanta-border text-vanta-text-mid font-mono text-[10px] uppercase tracking-[0.15em] hover:border-primary/30 hover:text-primary transition-colors disabled:opacity-50"
+                    >
+                      <CheckCircle2 className="w-3 h-3" />
+                      Done
+                    </button>
+                  )}
+
+                  {/* Set Reminder — always available */}
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="flex items-center gap-1.5 h-8 px-3 border border-vanta-border text-vanta-text-mid font-mono text-[10px] uppercase tracking-[0.15em] hover:border-vanta-accent-amber/30 hover:text-vanta-accent-amber transition-colors">
+                        <Clock className="w-3 h-3" />
+                        Remind
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <CalendarComponent
+                        mode="single"
+                        selected={undefined}
+                        onSelect={async (date) => {
+                          if (!date) return;
+                          try {
+                            const { error } = await supabase.functions.invoke("create-reminder", {
+                              body: {
+                                signal_id: signal.id,
+                                due_date: format(date, "yyyy-MM-dd"),
+                              },
+                            });
+                            if (error) throw error;
+                            queryClient.invalidateQueries({ queryKey: ["action-items"] });
+                            toast.success(`Reminder set for ${format(date, "MMM d")}`);
+                          } catch {
+                            toast.error("Failed to set reminder");
+                          }
+                        }}
+                        disabled={(date) => date < new Date()}
+                        className="p-3 pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </section>
 
