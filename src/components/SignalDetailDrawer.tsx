@@ -6,7 +6,11 @@ import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { Video, FileText, MessageSquare, Sparkles, Image, Film, Mic, Paperclip, Download, ExternalLink, Mail, CalendarPlus, Flag, ListChecks, User } from "lucide-react";
+import { Video, FileText, MessageSquare, Sparkles, Image, Film, Mic, Paperclip, Download, ExternalLink, Mail, CalendarPlus, Flag, ListChecks, User, ChevronDown, Brain, Edit3 } from "lucide-react";
+import type { SignalType, SignalPriority } from "@/data/signals";
+
+const SIGNAL_TYPES: SignalType[] = ["INTRO", "INSIGHT", "INVESTMENT", "DECISION", "CONTEXT", "NOISE", "MEETING", "PHONE_CALL"];
+const PRIORITIES: SignalPriority[] = ["high", "medium", "low"];
 
 const STATUSES: SignalStatus[] = ["Captured", "In Progress", "Complete"];
 
