@@ -131,6 +131,20 @@ export default function ContactTimeline() {
   const pendingHigh = signals.filter((s) => s.priority === "high" && s.status !== "Complete");
   const unreplied = signals.filter((s) => s.signalType === "INTRO" && s.status === "Captured");
 
+  const handleFetchBrief = async () => {
+    setLoadingBrief(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("relationship-brief", {
+        body: { contact_name: decodedName },
+      });
+      if (error) throw error;
+      setRelationshipBrief(data?.brief || "No brief available.");
+    } catch {
+      toast.error("Failed to generate relationship brief");
+    }
+    setLoadingBrief(false);
+  };
+
   return (
     <div className="max-w-[720px] mx-auto px-5 py-8 md:py-12">
       {/* Back link */}
