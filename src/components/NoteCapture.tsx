@@ -33,6 +33,7 @@ type AcceleratorIntent = "email" | "sms" | "reminder" | "task" | "document";
 
 interface NoteCaptureProps {
   inline?: boolean;
+  onCapture?: (classification: ClassificationResult) => void;
 }
 
 /**
