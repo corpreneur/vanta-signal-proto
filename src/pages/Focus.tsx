@@ -50,7 +50,7 @@ export default function Focus() {
             </span>
           </div>
           <h1 className="font-display text-2xl md:text-3xl text-foreground tracking-tight">
-            Focus
+            Filter Modes
           </h1>
           <p className="text-vanta-text-low text-xs font-mono mt-2 max-w-xl">
             Control how signals are filtered, weighted, and classified. Set your operating mode, tune source priorities, manage noise rules, and define custom signal types.
