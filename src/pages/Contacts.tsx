@@ -110,6 +110,8 @@ export default function Contacts() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortMode>("strength");
+  const [filterTag, setFilterTag] = useState<string | null>(null);
+  const { data: allTags } = useAllContactTags();
 
   const { data: signals = [], isLoading } = useQuery({
     queryKey: ["contacts-signals"],
