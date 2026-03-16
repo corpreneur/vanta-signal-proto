@@ -14,6 +14,7 @@ import Signals from "./pages/Signals";
 import CasePage from "./pages/CasePage";
 import Graph from "./pages/Graph";
 import PhoneFMC from "./pages/PhoneFMC";
+import Connectivity from "./pages/Connectivity";
 import Ontology from "./pages/Ontology";
 import ProductSignalPage from "./pages/ProductSignalPage";
 import Architecture from "./pages/Architecture";
@@ -72,6 +73,7 @@ const AppRoutes = () => {
       <Route path="/signals" element={<ProtectedRoute session={session}><ProductLayout><Signals /></ProductLayout></ProtectedRoute>} />
       <Route path="/case/:id" element={<ProtectedRoute session={session}><ProductLayout><CasePage /></ProductLayout></ProtectedRoute>} />
       <Route path="/graph" element={<ProtectedRoute session={session}><ProductLayout><Graph /></ProductLayout></ProtectedRoute>} />
+      <Route path="/connectivity" element={<ProtectedRoute session={session}><ProductLayout><Connectivity /></ProductLayout></ProtectedRoute>} />
       <Route path="/phone-fmc" element={<ProtectedRoute session={session}><ProductLayout><PhoneFMC /></ProductLayout></ProtectedRoute>} />
       <Route path="/ontology" element={<ProtectedRoute session={session}><ProductLayout><Ontology /></ProductLayout></ProtectedRoute>} />
       <Route path="/product/:signalType" element={<ProtectedRoute session={session}><ProductLayout><ProductSignalPage /></ProductLayout></ProtectedRoute>} />
