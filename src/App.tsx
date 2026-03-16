@@ -27,6 +27,7 @@ import Command from "./pages/Command";
 import Contacts from "./pages/Contacts";
 import NoiseQueue from "./pages/NoiseQueue";
 import UserModes from "./pages/UserModes";
+import Admin from "./pages/Admin";
 import type { Session } from "@supabase/supabase-js";
 
 const ProtectedRoute = ({ children, session }: { children: React.ReactNode; session: Session | null }) => {
@@ -82,6 +83,7 @@ const AppRoutes = () => {
       <Route path="/briefing/:id" element={<ProtectedRoute session={session}><ProductLayout><Briefing /></ProductLayout></ProtectedRoute>} />
       <Route path="/command" element={<ProtectedRoute session={session}><ProductLayout><Command /></ProductLayout></ProtectedRoute>} />
       <Route path="/contacts" element={<ProtectedRoute session={session}><ProductLayout><Contacts /></ProductLayout></ProtectedRoute>} />
+      <Route path="/admin" element={<ProtectedRoute session={session}><ProductLayout><Admin /></ProductLayout></ProtectedRoute>} />
       <Route path="/noise-queue" element={<Navigate to="/settings?tab=noise" replace />} />
       <Route path="/user-modes" element={<Navigate to="/settings?tab=modes" replace />} />
       <Route path="/case-01" element={<Navigate to="/case/01" replace />} />

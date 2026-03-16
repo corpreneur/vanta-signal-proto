@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { ChevronDown, Copy, Check, CheckCircle, Video, Phone, ArrowUpFromLine, Shield, CalendarClock, Pointer, Users, Reply, Bell, Calendar, Image, Film, FileText, Mic, Paperclip, Pin, Clock } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ChevronDown, Copy, Check, CheckCircle, Video, Phone, ArrowUpFromLine, Shield, CalendarClock, Pointer, Users, Reply, Bell, Calendar, Image, Film, FileText, Mic, Paperclip, Pin, Clock, Mail, FileOutput, Flag } from "lucide-react";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS, PHONE_CALL_TAGS, PHONE_TAG_LABELS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import type { ContactContext } from "@/lib/contactStrength";
+import { recencyLabel } from "@/lib/contactStrength";
 
 function formatTimestamp(iso: string): string {
   const d = new Date(iso);
@@ -65,9 +68,10 @@ interface SignalEntryCardProps {
   signal: Signal;
   onClick?: () => void;
   showPromote?: boolean;
+  contactContext?: ContactContext;
 }
 
-const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps) => {
+const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: SignalEntryCardProps) => {
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
   const [markingReviewed, setMarkingReviewed] = useState(false);
@@ -249,6 +253,19 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
                 {signal.riskLevel}
               </span>
             )}
+            {typeof signal.confidenceScore === "number" && (
+              <span
+                className={`inline-block px-2 py-0.5 font-mono text-[10px] tracking-[0.12em] border ${
+                  signal.confidenceScore >= 0.85
+                    ? "text-vanta-signal-green border-vanta-signal-green-border bg-vanta-signal-green-faint"
+                    : signal.confidenceScore >= 0.6
+                    ? "text-vanta-signal-yellow border-vanta-signal-yellow-border bg-vanta-signal-yellow-faint"
+                    : "text-vanta-signal-red border-vanta-signal-red-border bg-vanta-signal-red-faint"
+                }`}
+              >
+                {Math.round(signal.confidenceScore * 100)}%
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             {signal.dueDate && (() => {
@@ -271,9 +288,26 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
         </div>
 
         {/* Sender */}
-        <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-vanta-text-mid mb-2">
+        <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-vanta-text-mid mb-1">
           {signal.sender}
         </p>
+
+        {/* Relationship context chip */}
+        {contactContext && contactContext.signalCount > 1 && (
+          <Link
+            to={`/contact/${encodeURIComponent(signal.sender)}`}
+            onClick={(e) => e.stopPropagation()}
+            className="inline-flex items-center gap-1.5 mb-2 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.15em] border border-vanta-border bg-vanta-bg-elevated text-vanta-text-low hover:border-vanta-accent-border hover:text-vanta-accent transition-colors"
+          >
+            <span className={`w-1.5 h-1.5 rounded-full ${
+              contactContext.strengthLabel === "Strong" ? "bg-vanta-accent" :
+              contactContext.strengthLabel === "Warm" ? "bg-vanta-signal-yellow" :
+              contactContext.strengthLabel === "Cooling" ? "bg-vanta-signal-blue" :
+              "bg-vanta-text-muted"
+            }`} />
+            {contactContext.strengthLabel} · {contactContext.signalCount} signals · {recencyLabel(contactContext.daysSinceLast)}
+          </Link>
+        )}
 
         {/* Summary, the extracted insight headline */}
         <p className="font-sans text-[14px] leading-[1.6] text-vanta-text mb-3">
@@ -436,6 +470,73 @@ const SignalEntryCard = ({ signal, onClick, showPromote }: SignalEntryCardProps)
             <Calendar className="w-3 h-3" />
             Cal Hold
           </button>
+
+          {/* Contextual Smart Actions by signal type */}
+          {signal.signalType === "INTRO" && signal.status !== "Complete" && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                const subject = encodeURIComponent(`Re: Introduction — ${signal.sender}`);
+                const body = encodeURIComponent(`Hi,\n\nFollowing up on the introduction from ${signal.sender}.\n\n${signal.summary}\n\nBest regards`);
+                window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
+              }}
+              className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-accent border border-vanta-accent-border hover:bg-vanta-accent-faint transition-colors"
+            >
+              <Mail className="w-3 h-3" />
+              Draft Reply
+            </button>
+          )}
+          {signal.signalType === "MEETING" && signal.status !== "Complete" && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                const nextWeek = new Date();
+                nextWeek.setDate(nextWeek.getDate() + 7);
+                nextWeek.setHours(10, 0, 0, 0);
+                const end = new Date(nextWeek);
+                end.setMinutes(30);
+                const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+                const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Follow-up: ${signal.sender}`)}&details=${encodeURIComponent(signal.summary)}&dates=${fmt(nextWeek)}/${fmt(end)}`;
+                window.open(url, "_blank");
+              }}
+              className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-accent border border-vanta-accent-border hover:bg-vanta-accent-faint transition-colors"
+            >
+              <Calendar className="w-3 h-3" />
+              Follow-Up
+            </button>
+          )}
+          {signal.signalType === "DECISION" && signal.status !== "Complete" && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigator.clipboard.writeText(`TASK: ${signal.summary}\nFrom: ${signal.sender}\nPriority: ${signal.priority}\nContext: ${signal.sourceMessage}`);
+                toast.success("Decision exported as task to clipboard");
+              }}
+              className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-accent border border-vanta-accent-border hover:bg-vanta-accent-faint transition-colors"
+            >
+              <FileOutput className="w-3 h-3" />
+              Create Task
+            </button>
+          )}
+          {signal.signalType === "INVESTMENT" && signal.status !== "Complete" && (
+            <button
+              onClick={async (e) => {
+                e.stopPropagation();
+                const { error } = await supabase
+                  .from("signals")
+                  .update({ pinned: true })
+                  .eq("id", signal.id);
+                if (!error) {
+                  queryClient.invalidateQueries({ queryKey: ["signals"] });
+                  toast.success("Flagged for review");
+                }
+              }}
+              className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-accent border border-vanta-accent-border hover:bg-vanta-accent-faint transition-colors"
+            >
+              <Flag className="w-3 h-3" />
+              Flag Review
+            </button>
+          )}
 
           <button
             onClick={handleExpand}

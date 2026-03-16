@@ -4,9 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
-import { ArrowLeft, MessageSquare, Phone, Video, Mail, StickyNote, User, TrendingUp, Calendar, ExternalLink } from "lucide-react";
+import { ArrowLeft, MessageSquare, Phone, Video, Mail, StickyNote, User, TrendingUp, Calendar, ExternalLink, HelpCircle, Loader2 } from "lucide-react";
 import { Motion } from "@/components/ui/motion";
 import SignalDetailDrawer from "@/components/SignalDetailDrawer";
+import { toast } from "sonner";
 
 const SOURCE_ICONS: Record<string, React.ElementType> = {
   linq: MessageSquare,
@@ -51,6 +52,8 @@ async function fetchContactSignals(name: string): Promise<Signal[]> {
     dueDate: (row as Record<string, unknown>).due_date as string | null,
     callPointer: (row as Record<string, unknown>).call_pointer as string | null,
     pinned: row.pinned ?? false,
+    confidenceScore: (row as Record<string, unknown>).confidence_score as number | null,
+    classificationReasoning: (row as Record<string, unknown>).classification_reasoning as string | null,
   }));
 }
 
@@ -103,6 +106,8 @@ export default function ContactTimeline() {
   const decodedName = decodeURIComponent(name || "");
   const [viewMode, setViewMode] = useState<ViewMode>("timeline");
   const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
+  const [loadingBrief, setLoadingBrief] = useState(false);
+  const [relationshipBrief, setRelationshipBrief] = useState<string | null>(null);
 
   const { data: signals = [], isLoading } = useQuery({
     queryKey: ["contact-timeline", decodedName],
@@ -126,6 +131,20 @@ export default function ContactTimeline() {
   const pendingHigh = signals.filter((s) => s.priority === "high" && s.status !== "Complete");
   const unreplied = signals.filter((s) => s.signalType === "INTRO" && s.status === "Captured");
 
+  const handleFetchBrief = async () => {
+    setLoadingBrief(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("relationship-brief", {
+        body: { contact_name: decodedName },
+      });
+      if (error) throw error;
+      setRelationshipBrief(data?.brief || "No brief available.");
+    } catch {
+      toast.error("Failed to generate relationship brief");
+    }
+    setLoadingBrief(false);
+  };
+
   return (
     <div className="max-w-[720px] mx-auto px-5 py-8 md:py-12">
       {/* Back link */}
@@ -148,6 +167,14 @@ export default function ContactTimeline() {
               <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-vanta-text-muted">
                 Contact Hub · {signals.length} signals
               </p>
+              <button
+                onClick={handleFetchBrief}
+                disabled={loadingBrief}
+                className="mt-2 flex items-center gap-1.5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest border border-vanta-accent text-vanta-accent hover:bg-vanta-accent-faint transition-colors disabled:opacity-50"
+              >
+                {loadingBrief ? <Loader2 className="w-3 h-3 animate-spin" /> : <HelpCircle className="w-3 h-3" />}
+                Why this person?
+              </button>
             </div>
             {/* Relationship Strength */}
             <div className="flex flex-col items-end gap-1 shrink-0">
@@ -181,6 +208,19 @@ export default function ContactTimeline() {
           </div>
         </header>
       </Motion>
+
+      {/* Relationship Brief */}
+      {relationshipBrief && (
+        <Motion delay={70}>
+          <div className="border border-vanta-accent-border bg-vanta-accent-faint p-5 mb-6">
+            <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent mb-2 flex items-center gap-1.5">
+              <HelpCircle className="w-3 h-3" />
+              Why Am I Talking To This Person?
+            </h3>
+            <p className="font-sans text-[13px] leading-relaxed text-foreground">{relationshipBrief}</p>
+          </div>
+        </Motion>
+      )}
 
       {/* Stats strip */}
       <Motion delay={60}>

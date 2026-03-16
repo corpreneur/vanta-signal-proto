@@ -8,6 +8,7 @@ import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { useUserMode } from "@/hooks/use-user-mode";
 import { Motion } from "@/components/ui/motion";
 import SignalDetailDrawer from "@/components/SignalDetailDrawer";
+import CoolingAlerts from "@/components/CoolingAlerts";
 import {
   MessageSquare,
   Phone,
@@ -202,6 +203,9 @@ const Index = () => {
           </span>
         </div>
       </Motion>
+
+      {/* Cooling Alerts */}
+      <CoolingAlerts />
 
       {/* 3. Stats Strip (clickable + today delta) */}
       <Motion delay={80}>

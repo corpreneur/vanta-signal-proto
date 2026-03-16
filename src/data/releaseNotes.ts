@@ -10,6 +10,18 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "0.9.9",
+    date: "2026-03-16",
+    title: "Interactive Network Graph & Release Notes",
+    changes: [
+      { type: "feature", text: "Interactive d3-force directed graph — canvas-based with zoom, pan, and click-to-focus" },
+      { type: "feature", text: "Co-mention edge detection — contacts linked by shared signals and meeting co-attendance" },
+      { type: "feature", text: "Mini contact cards on node click with signal breakdown and timeline link" },
+      { type: "improvement", text: "Cluster-based layout grouping contacts by dominant signal type" },
+      { type: "improvement", text: "Recency rings on graph nodes — accent, teal, amber, muted by last interaction age" },
+    ],
+  },
+  {
     version: "0.9.8",
     date: "2026-03-14",
     title: "Tech Debt Cleanup & Logging Standardization",

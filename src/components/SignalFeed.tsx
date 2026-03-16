@@ -3,11 +3,13 @@ import type { Signal } from "@/data/signals";
 import type { FilterState } from "@/components/SignalFilters";
 import SignalEntryCard from "@/components/SignalEntryCard";
 import SignalDetailDrawer from "@/components/SignalDetailDrawer";
+import { buildContactContextMap } from "@/lib/contactStrength";
 
 interface SignalFeedProps {
   signals: Signal[];
   filters: FilterState;
   showPromote?: boolean;
+  allSignals?: Signal[]; // full signal set for computing contact context
 }
 
 function getTemporalGroup(iso: string): string {
@@ -25,8 +27,13 @@ function getTemporalGroup(iso: string): string {
   return d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 }
 
-const SignalFeed = ({ signals, filters, showPromote }: SignalFeedProps) => {
+const SignalFeed = ({ signals, filters, showPromote, allSignals }: SignalFeedProps) => {
   const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
+
+  const contactContextMap = useMemo(
+    () => buildContactContextMap(allSignals || signals),
+    [allSignals, signals]
+  );
 
   const filtered = signals.filter((s) => {
     if (filters.type !== "ALL" && s.signalType !== filters.type) return false;
@@ -91,6 +98,7 @@ const SignalFeed = ({ signals, filters, showPromote }: SignalFeedProps) => {
                 key={signal.id}
                 signal={signal}
                 onClick={() => setSelectedSignal(signal)}
+                contactContext={contactContextMap.get(signal.sender)}
               />
             ))}
           </div>
@@ -110,6 +118,7 @@ const SignalFeed = ({ signals, filters, showPromote }: SignalFeedProps) => {
                 signal={signal}
                 onClick={() => setSelectedSignal(signal)}
                 showPromote={showPromote}
+                contactContext={contactContextMap.get(signal.sender)}
               />
             ))}
           </div>

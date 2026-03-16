@@ -49,3 +49,26 @@ Based on this unified research, the product roadmap should be adjusted as follow
     *   Focused Brief (Cut)
     *   Accelerator Library (De-prioritize in favor of in-context actions)
     *   MySpace / Personal Profile Dashboard (Cut)
+
+---
+
+## 5. Addendum: Ongoing Interview Observations (March 14, 2026)
+
+**Source:** Remaining user interview sessions (pre-synthesis notes)
+
+### Theme A: Relationship Context as a Core Need
+
+Every participant mentioned the challenge of meeting people and losing the context around those connections. They write names in notes apps or try to remember from memory. The **Syncing Contacts** concept landed well, but the real need is **proactive surfacing of relationship context at the right moment** — before a call, during a follow-up, when a connection goes cold.
+
+**Implication:** The Smart Contact List and Pre-Meeting Briefs are validated, but relationship context should also surface *inline* on signal cards in the main feed, not only in dedicated views. Implemented as an inline relationship chip on `SignalEntryCard`.
+
+### Theme B: Time as a Multi-Dimensional Organizing Principle
+
+The "under 5 minutes" filter on tasks continues to be one of the strongest signals — participants light up when they see it. But each participant has a distinct work rhythm:
+- One reserves full days for creative work
+- Another blocks mornings for high-cognitive tasks, saves admin for later
+- Another works around a retail schedule
+
+The common thread: they want the system to **understand their rhythm and surface tasks accordingly**. Not just "what's urgent" but "what fits right now" — e.g., "show me boring tasks in the evening, reserve creative tasks for my morning."
+
+**Implication:** Extends the Priority Lens concept from type-based filtering toward *temporal fitness* filtering. Implemented as a "Quick Tasks" toggle that surfaces short, low-friction items suitable for micro-windows between meetings. Future iteration: user-defined time blocks and rhythm-aware scheduling.

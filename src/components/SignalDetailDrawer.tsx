@@ -6,7 +6,11 @@ import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { Video, FileText, MessageSquare, Sparkles, Image, Film, Mic, Paperclip, Download, ExternalLink, Mail, CalendarPlus, Flag, ListChecks, User } from "lucide-react";
+import { Video, FileText, MessageSquare, Sparkles, Image, Film, Mic, Paperclip, Download, ExternalLink, Mail, CalendarPlus, Flag, ListChecks, User, ChevronDown, Brain, Edit3 } from "lucide-react";
+import type { SignalType, SignalPriority } from "@/data/signals";
+
+const SIGNAL_TYPES: SignalType[] = ["INTRO", "INSIGHT", "INVESTMENT", "DECISION", "CONTEXT", "NOISE", "MEETING", "PHONE_CALL"];
+const PRIORITIES: SignalPriority[] = ["high", "medium", "low"];
 
 const STATUSES: SignalStatus[] = ["Captured", "In Progress", "Complete"];
 
@@ -287,6 +291,69 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
         </p>
       </section>
 
+      {/* XAI: Why this classification? */}
+      {signal.classificationReasoning && (
+        <section>
+          <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-2 flex items-center gap-1.5">
+            <Brain className="w-3 h-3" />
+            Why This Classification?
+          </h3>
+          <div className="border border-vanta-border bg-vanta-bg-elevated p-3">
+            <p className="font-mono text-[11px] leading-[1.6] text-vanta-text-low">
+              {signal.classificationReasoning}
+            </p>
+          </div>
+        </section>
+      )}
+
+      {/* Signal Correction — E6.1 */}
+      <section>
+        <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-2 flex items-center gap-1.5">
+          <Edit3 className="w-3 h-3" />
+          Correct Classification
+        </h3>
+        <div className="flex gap-2 flex-wrap">
+          <select
+            defaultValue={signal.signalType}
+            onChange={async (e) => {
+              const newType = e.target.value;
+              if (newType === signal.signalType) return;
+              await supabase.from("signal_corrections").insert({
+                signal_id: signal.id,
+                original_type: signal.signalType,
+                corrected_type: newType,
+                original_priority: signal.priority,
+              } as any);
+              await supabase.from("signals").update({ signal_type: newType as any }).eq("id", signal.id);
+              queryClient.invalidateQueries({ queryKey: ["signals"] });
+              toast.success(`Type corrected to ${newType}`);
+            }}
+            className="bg-background border border-vanta-border px-2 py-1 font-mono text-[10px] text-foreground focus:outline-none"
+          >
+            {SIGNAL_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+          </select>
+          <select
+            defaultValue={signal.priority}
+            onChange={async (e) => {
+              const newPriority = e.target.value;
+              if (newPriority === signal.priority) return;
+              await supabase.from("signal_corrections").insert({
+                signal_id: signal.id,
+                original_type: signal.signalType,
+                original_priority: signal.priority,
+                corrected_priority: newPriority,
+              } as any);
+              await supabase.from("signals").update({ priority: newPriority as any }).eq("id", signal.id);
+              queryClient.invalidateQueries({ queryKey: ["signals"] });
+              toast.success(`Priority corrected to ${newPriority}`);
+            }}
+            className="bg-background border border-vanta-border px-2 py-1 font-mono text-[10px] text-foreground focus:outline-none"
+          >
+            {PRIORITIES.map((p) => <option key={p} value={p}>{p}</option>)}
+          </select>
+        </div>
+      </section>
+
       {/* Full Source Message */}
       <section>
         <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-2">
@@ -328,7 +395,7 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
         className="w-full sm:max-w-[520px] bg-background border-l border-vanta-border p-0 overflow-y-auto"
       >
         <SheetHeader className="px-6 pt-6 pb-4 border-b border-vanta-border">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3 mb-2 flex-wrap">
             <span
               className={`inline-block px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.15em] border ${colors.text} ${colors.bg} ${colors.border}`}
             >
@@ -337,6 +404,20 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
             <span className="inline-block px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.15em] border border-vanta-border text-vanta-text-low bg-transparent">
               {signal.priority}
             </span>
+            {typeof signal.confidenceScore === "number" && (
+              <span
+                className={`inline-block px-2 py-0.5 font-mono text-[10px] tracking-[0.12em] border ${
+                  signal.confidenceScore >= 0.85
+                    ? "text-vanta-signal-green border-vanta-signal-green-border bg-vanta-signal-green-faint"
+                    : signal.confidenceScore >= 0.6
+                    ? "text-vanta-signal-yellow border-vanta-signal-yellow-border bg-vanta-signal-yellow-faint"
+                    : "text-vanta-signal-red border-vanta-signal-red-border bg-vanta-signal-red-faint"
+                }`}
+                title="AI classification confidence"
+              >
+                {Math.round(signal.confidenceScore * 100)}% conf
+              </span>
+            )}
             {isMeeting && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.15em] border border-vanta-accent-zoom-border text-vanta-accent-zoom bg-vanta-accent-zoom-faint">
                 <Video className="w-3 h-3" />
