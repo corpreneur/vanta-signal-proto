@@ -17,6 +17,7 @@ import {
   StickyNote,
   CheckCircle2,
   ArrowRight,
+  Trash2,
 } from "lucide-react";
 
 const SOURCE_ICONS: Record<string, typeof MessageSquare> = {
