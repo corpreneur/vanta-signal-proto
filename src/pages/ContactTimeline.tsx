@@ -166,9 +166,10 @@ export default function ContactTimeline() {
               <h1 className="font-display text-[clamp(24px,4vw,36px)] leading-tight text-foreground mb-2">
                 {decodedName}
               </h1>
-              <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-vanta-text-muted">
+              <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-vanta-text-muted mb-2">
                 Contact Hub · {signals.length} signals
               </p>
+              <ContactTagManager contactName={decodedName} />
               <button
                 onClick={handleFetchBrief}
                 disabled={loadingBrief}
