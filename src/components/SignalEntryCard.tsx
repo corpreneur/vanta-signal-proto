@@ -106,6 +106,19 @@ const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: Signa
     }
   };
 
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const { error } = await supabase.from("signals").delete().eq("id", signal.id);
+    if (error) {
+      toast.error("Failed to delete");
+    } else {
+      queryClient.invalidateQueries({ queryKey: ["signals"] });
+      queryClient.invalidateQueries({ queryKey: ["signals-dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["action-items-enhanced"] });
+      toast.success("Signal deleted");
+    }
+  };
+
   const handleExpand = (e: React.MouseEvent) => {
     e.stopPropagation();
     setExpanded((prev) => !prev);
