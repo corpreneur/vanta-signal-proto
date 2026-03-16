@@ -183,7 +183,10 @@ export default function BrainDump() {
         <div className="flex gap-1.5">
           {([
             { key: "note" as const, label: "Note", icon: PenLine },
-            { key: "link" as const, label: "Paste Link", icon: Link2 },
+            { key: "image" as const, label: "Image", icon: Image },
+            { key: "link" as const, label: "Link", icon: Link2 },
+            { key: "email" as const, label: "Email", icon: Mail },
+            { key: "voice" as const, label: "Voice Memo", icon: Mic },
             { key: "notion" as const, label: "Notion", icon: FileText },
           ]).map(({ key, label, icon: Icon }) => (
             <button
