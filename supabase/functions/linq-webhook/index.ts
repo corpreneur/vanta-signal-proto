@@ -265,7 +265,7 @@ Also return:
 
   if (!res.ok) {
     console.error("AI classification failed:", await res.text());
-    return { signalType: "CONTEXT", priority: "low", summary: `Unclassified message from ${sender}.`, actionsTaken: ["NOTION_LOG"] };
+    return { signalType: "CONTEXT", priority: "low", summary: `Unclassified message from ${sender}.`, actionsTaken: ["NOTION_LOG"], confidence: 0.0 };
   }
 
   const data = await res.json();
@@ -274,7 +274,7 @@ Also return:
     return JSON.parse(content.replace(/```json\n?|\n?```/g, "").trim());
   } catch {
     console.error("Failed to parse AI classification:", content);
-    return { signalType: "CONTEXT", priority: "low", summary: `Unclassified message from ${sender}.`, actionsTaken: ["NOTION_LOG"] };
+    return { signalType: "CONTEXT", priority: "low", summary: `Unclassified message from ${sender}.`, actionsTaken: ["NOTION_LOG"], confidence: 0.0 };
   }
 }
 
