@@ -14,6 +14,7 @@ import UserModes from "./UserModes";
 import NoiseQueue from "./NoiseQueue";
 import CustomSignalTypes from "@/components/CustomSignalTypes";
 import MyRules from "@/components/MyRules";
+import WorkflowBuilder from "@/components/WorkflowBuilder";
 import SourcePriorityWeights from "@/components/SourcePriorityWeights";
 
 const TAB_MAP: Record<string, string> = {
@@ -22,6 +23,7 @@ const TAB_MAP: Record<string, string> = {
   noise: "noise",
   types: "types",
   rules: "rules",
+  workflows: "workflows",
 };
 
 export default function Focus() {
@@ -93,6 +95,13 @@ export default function Focus() {
             <BookOpen className="w-3.5 h-3.5" />
             My Rules
           </TabsTrigger>
+          <TabsTrigger
+            value="workflows"
+            className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated"
+          >
+            <Zap className="w-3.5 h-3.5" />
+            Workflows
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="modes">
@@ -109,6 +118,9 @@ export default function Focus() {
         </TabsContent>
         <TabsContent value="rules">
           <MyRules />
+        </TabsContent>
+        <TabsContent value="workflows">
+          <WorkflowBuilder />
         </TabsContent>
       </Tabs>
     </div>

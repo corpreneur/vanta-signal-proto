@@ -5,10 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Save, RotateCcw, Settings2, MessageSquare, Users, Bell, Shield, Smartphone, Phone, Video, Mail, Calendar, ShieldCheck, Zap } from "lucide-react";
-import NoiseQueue from "./NoiseQueue";
+import { Save, RotateCcw, Settings2, MessageSquare, Users, Bell, Shield, Smartphone, Phone, Video, Mail, Calendar, ShieldCheck } from "lucide-react";
 import ClassificationAudit from "./ClassificationAudit";
-import WorkflowBuilder from "@/components/WorkflowBuilder";
 import CalendarSyncSettings from "@/components/CalendarSyncSettings";
 
 interface SettingRow {
@@ -71,7 +69,7 @@ const SOURCE_CHANNELS: Array<{
 
 const SOURCE_KEYS = new Set(SOURCE_CHANNELS.map((c) => c.key));
 
-const TAB_MAP: Record<string, string> = { noise: "noise", audit: "audit", workflows: "workflows", calendar: "calendar" };
+const TAB_MAP: Record<string, string> = { audit: "audit", calendar: "calendar" };
 
 export default function Settings() {
   const queryClient = useQueryClient();
@@ -187,17 +185,9 @@ export default function Settings() {
             <Settings2 className="w-3.5 h-3.5" />
             General
           </TabsTrigger>
-          <TabsTrigger value="noise" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
-            <Shield className="w-3.5 h-3.5" />
-            Noise Queue
-          </TabsTrigger>
           <TabsTrigger value="audit" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
             <ShieldCheck className="w-3.5 h-3.5" />
             Audit
-          </TabsTrigger>
-          <TabsTrigger value="workflows" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
-            <Zap className="w-3.5 h-3.5" />
-            Workflows
           </TabsTrigger>
           <TabsTrigger value="calendar" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
             <Calendar className="w-3.5 h-3.5" />
@@ -406,25 +396,10 @@ export default function Settings() {
           </div>
         </TabsContent>
 
-        {/* Noise Queue Tab */}
-        <TabsContent value="noise">
-          <NoiseQueue />
-        </TabsContent>
-
 
         {/* Classification Audit Tab */}
         <TabsContent value="audit">
           <ClassificationAudit />
-        </TabsContent>
-
-        {/* Workflows Tab */}
-        <TabsContent value="workflows">
-          <WorkflowBuilder />
-        </TabsContent>
-
-        {/* Calendar Sync Tab */}
-        <TabsContent value="calendar">
-          <CalendarSyncSettings />
         </TabsContent>
 
         {/* Calendar Sync Tab */}
