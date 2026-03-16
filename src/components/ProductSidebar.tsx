@@ -18,12 +18,14 @@ import {
   FileCode,
   ChevronRight,
   PenLine,
-  
   Settings2,
   LogOut,
   Zap,
   Users,
   Shield,
+  Radio,
+  SlidersHorizontal,
+  CheckSquare,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -48,6 +50,15 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
+/* ── Fab Five — the 5 core product functions ── */
+const fabFiveItems = [
+  { title: "Connectivity", url: "/phone-fmc", icon: Radio },
+  { title: "Signal Feed", url: "/signals", icon: BarChart3 },
+  { title: "Modes", url: "/user-modes", icon: SlidersHorizontal },
+  { title: "Brain Dump", url: "/brain-dump", icon: PenLine },
+  { title: "Easy Actions", url: "/command", icon: CheckSquare },
+];
+
 const channelItems = [
   { title: "iMessage", url: "/product/intro", icon: MessageSquare },
   { title: "Phone", url: "/product/phone-call", icon: Phone },
@@ -60,13 +71,9 @@ const productItems = [
   { title: "Daily Command", url: "/command", icon: Zap },
   { title: "Smart Contacts", url: "/contacts", icon: Users },
   { title: "Relationship Graph", url: "/graph", icon: Network },
-  { title: "Brain Dump", url: "/brain-dump", icon: PenLine },
   { title: "Insight Engine", url: "/product/insight", icon: Lightbulb },
   { title: "Investment Intel", url: "/product/investment", icon: TrendingUp },
   { title: "Decision Capture", url: "/product/decision", icon: Gavel },
-];
-const coreItems = [
-  { title: "Signal Feed", url: "/signals", icon: BarChart3 },
 ];
 
 const platformItems = [
@@ -143,7 +150,7 @@ export function ProductSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Dashboard + Core */}
+        {/* Fab Five */}
         <SidebarGroup className="py-2 border-b border-vanta-border">
           <SidebarGroupContent>
             <SidebarMenu>
@@ -160,7 +167,20 @@ export function ProductSidebar() {
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              {coreItems.map((item) => (
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Fab Five — 5 core product pillars */}
+        <SidebarGroup className="py-2 border-b border-vanta-border">
+          {!collapsed && (
+            <p className="px-2 pb-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent">
+              Fab Five
+            </p>
+          )}
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {fabFiveItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink
@@ -177,7 +197,6 @@ export function ProductSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
         <CollapsibleNavGroup label="Channels" items={channelItems} collapsed={collapsed} currentPath={currentPath} />
         <CollapsibleNavGroup label="Platform" items={platformItems} collapsed={collapsed} currentPath={currentPath} />
         <CollapsibleNavGroup label="Product Concepts" items={productItems} collapsed={collapsed} currentPath={currentPath} />
