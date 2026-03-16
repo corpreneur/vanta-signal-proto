@@ -67,7 +67,6 @@ const channelItems = [
 ];
 
 const productItems = [
-  { title: "Daily Command", url: "/command", icon: Zap },
   { title: "Smart Contacts", url: "/contacts", icon: Users },
   { title: "Relationship Graph", url: "/graph", icon: Network },
   { title: "Insight Engine", url: "/insights", icon: Lightbulb },

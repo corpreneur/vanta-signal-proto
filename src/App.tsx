@@ -27,7 +27,6 @@ import ReleaseNotes from "./pages/ReleaseNotes";
 import Settings from "./pages/Settings";
 import ContactTimeline from "./pages/ContactTimeline";
 import Briefing from "./pages/Briefing";
-import Command from "./pages/Command";
 import Contacts from "./pages/Contacts";
 import NoiseQueue from "./pages/NoiseQueue";
 import UserModes from "./pages/UserModes";
