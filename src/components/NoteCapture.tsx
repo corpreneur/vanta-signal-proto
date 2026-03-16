@@ -80,7 +80,7 @@ function intentIcon(intent: AcceleratorIntent) {
   }
 }
 
-export default function NoteCapture({ inline = false }: NoteCaptureProps) {
+export default function NoteCapture({ inline = false, onCapture }: NoteCaptureProps) {
   const { isDnd } = useUserMode();
   const [open, setOpen] = useState(inline);
   const [text, setText] = useState("");
