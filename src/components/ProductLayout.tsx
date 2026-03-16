@@ -73,7 +73,7 @@ export default function ProductLayout({ children }: ProductLayoutProps) {
           <main className="flex-1">
             {children}
           </main>
-          <NoteCapture />
+          <SmartNoteFAB />
         </div>
       </div>
     </SidebarProvider>
