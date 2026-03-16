@@ -9,6 +9,9 @@ import { useUserMode } from "@/hooks/use-user-mode";
 import { Motion } from "@/components/ui/motion";
 import SignalDetailDrawer from "@/components/SignalDetailDrawer";
 import CoolingAlerts from "@/components/CoolingAlerts";
+import InlineBrainDump from "@/components/InlineBrainDump";
+import WhatsAhead from "@/components/WhatsAhead";
+import ActionItems from "@/components/ActionItems";
 import {
   MessageSquare,
   Phone,
