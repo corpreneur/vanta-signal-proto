@@ -1,10 +1,11 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Video, Users, MessageSquare, Phone, Mail, StickyNote } from "lucide-react";
+import { ArrowLeft, Video, Users, MessageSquare, Phone, Mail, StickyNote, TrendingUp } from "lucide-react";
 import { Motion } from "@/components/ui/motion";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
+import { computeStrength, daysBetween } from "@/lib/contactStrength";
 
 interface MatchedSignal {
   id: string;
