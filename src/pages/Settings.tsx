@@ -210,6 +210,14 @@ export default function Settings() {
             <Palette className="w-3.5 h-3.5" />
             Signal Types
           </TabsTrigger>
+          <TabsTrigger value="rules" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
+            <BookOpen className="w-3.5 h-3.5" />
+            My Rules
+          </TabsTrigger>
+          <TabsTrigger value="calendar" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
+            <Calendar className="w-3.5 h-3.5" />
+            Calendar
+          </TabsTrigger>
         </TabsList>
 
         {/* General Settings Tab */}
