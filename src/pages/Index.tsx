@@ -204,6 +204,9 @@ const Index = () => {
         </div>
       </Motion>
 
+      {/* Cooling Alerts */}
+      <CoolingAlerts />
+
       {/* 3. Stats Strip (clickable + today delta) */}
       <Motion delay={80}>
         <div className="flex flex-wrap gap-6 mb-8 pb-6 border-b border-vanta-border">
