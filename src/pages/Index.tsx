@@ -177,9 +177,6 @@ const Index = () => {
       {/* Inline Brain Dump — creative & executive only */}
       {!isDnd && <InlineBrainDump />}
 
-      {/* Action Items — all modes (the action layer) */}
-      <ActionItems onSignalClick={(s) => setDrawerSignal(s)} />
-
       {/* DND mode stops here — minimal view */}
       {isDnd ? (
         <Motion delay={40}>
