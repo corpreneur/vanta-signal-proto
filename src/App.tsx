@@ -101,6 +101,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AppRoutes />
+        <QuickCapture />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
