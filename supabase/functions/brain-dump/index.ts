@@ -22,6 +22,7 @@ interface Classification {
   suggestedContacts: string[];
   accelerators: string[];
   confidence: number;
+  reasoning: string;
 }
 
 async function classifySignal(text: string, apiKey: string): Promise<Classification> {
