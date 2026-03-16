@@ -397,25 +397,10 @@ export default function Settings() {
           </div>
         </TabsContent>
 
-        {/* Noise Queue Tab */}
-        <TabsContent value="noise">
-          <NoiseQueue />
-        </TabsContent>
-
 
         {/* Classification Audit Tab */}
         <TabsContent value="audit">
           <ClassificationAudit />
-        </TabsContent>
-
-        {/* Workflows Tab */}
-        <TabsContent value="workflows">
-          <WorkflowBuilder />
-        </TabsContent>
-
-        {/* Calendar Sync Tab */}
-        <TabsContent value="calendar">
-          <CalendarSyncSettings />
         </TabsContent>
 
         {/* Calendar Sync Tab */}
