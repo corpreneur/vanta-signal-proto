@@ -50,7 +50,7 @@ export default function WorkflowBuilder() {
     queryFn: async () => {
       const { data, error } = await supabase.from("workflows").select("*").order("created_at", { ascending: false });
       if (error) throw error;
-      return (data || []) as Workflow[];
+      return (data || []) as unknown as Workflow[];
     },
   });
 
