@@ -127,6 +127,10 @@ export default function Contacts() {
       const q = search.toLowerCase();
       list = list.filter((c) => c.name.toLowerCase().includes(q));
     }
+    if (filterTag && allTags) {
+      const tagContacts = allTags.get(filterTag) || [];
+      list = list.filter((c) => tagContacts.includes(c.name));
+    }
     const sortFns: Record<SortMode, (a: ContactSummary, b: ContactSummary) => number> = {
       strength: (a, b) => b.strength - a.strength,
       signals: (a, b) => b.signalCount - a.signalCount,
@@ -135,7 +139,7 @@ export default function Contacts() {
       high: (a, b) => b.highPriority - a.highPriority,
     };
     return [...list].sort(sortFns[sort]);
-  }, [contacts, search, sort]);
+  }, [contacts, search, sort, filterTag, allTags]);
 
   const totalContacts = contacts.length;
   const activeContacts = contacts.filter((c) => c.daysSinceLast <= 7).length;
