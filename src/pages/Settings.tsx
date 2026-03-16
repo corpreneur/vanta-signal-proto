@@ -425,6 +425,16 @@ export default function Settings() {
         <TabsContent value="audit">
           <ClassificationAudit />
         </TabsContent>
+
+        {/* Workflows Tab */}
+        <TabsContent value="workflows">
+          <WorkflowBuilder />
+        </TabsContent>
+
+        {/* Custom Signal Types Tab */}
+        <TabsContent value="types">
+          <CustomSignalTypes />
+        </TabsContent>
       </Tabs>
     </div>
   );
