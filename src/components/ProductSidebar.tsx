@@ -56,6 +56,7 @@ const fabFiveItems = [
   { title: "Brain Dump", url: "/brain-dump", icon: PenLine },
   { title: "Signal Feed", url: "/signals", icon: BarChart3 },
   { title: "Focus", url: "/focus", icon: SlidersHorizontal },
+  { title: "Easy Actions", url: "/command", icon: Zap },
 ];
 
 const channelItems = [

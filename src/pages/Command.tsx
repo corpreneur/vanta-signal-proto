@@ -1,22 +1,30 @@
-import { useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useMemo } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
-import { Video, ArrowRight, Zap, Calendar } from "lucide-react";
+import {
+  Zap, Check, Clock, Pin, ArrowRight, Send, AlarmClock,
+  CheckCircle2, Inbox, AlertTriangle, CalendarClock, PinOff,
+} from "lucide-react";
 import { Motion } from "@/components/ui/motion";
 import NoteCapture from "@/components/NoteCapture";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 
-async function fetchTopSignals(): Promise<Signal[]> {
+/* ── Data fetching ──────────────────────────────────────── */
+
+async function fetchActionableSignals(): Promise<Signal[]> {
   const { data, error } = await supabase
     .from("signals")
     .select("*")
     .neq("signal_type", "NOISE")
     .neq("status", "Complete")
-    .eq("priority", "high")
+    .order("pinned", { ascending: false })
+    .order("priority", { ascending: true })
     .order("captured_at", { ascending: false })
-    .limit(3);
+    .limit(25);
 
   if (error) return [];
   return (data || []).map((row) => ({
@@ -32,233 +40,412 @@ async function fetchTopSignals(): Promise<Signal[]> {
     source: (row as Record<string, unknown>).source as Signal["source"] || "linq",
     rawPayload: row.raw_payload as Record<string, unknown> | null,
     linqMessageId: row.linq_message_id,
+    meetingId: (row as Record<string, unknown>).meeting_id as string | null,
     riskLevel: (row as Record<string, unknown>).risk_level as Signal["riskLevel"],
     dueDate: (row as Record<string, unknown>).due_date as string | null,
+    pinned: row.pinned,
+    confidenceScore: row.confidence_score,
   }));
 }
 
-async function fetchTodayBriefs() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
-  const { data: meetings } = await supabase
-    .from("upcoming_meetings")
+async function fetchDueReminders() {
+  const now = new Date().toISOString();
+  const { data } = await supabase
+    .from("engagement_sequences")
     .select("*")
-    .gte("starts_at", today.toISOString())
-    .lt("starts_at", tomorrow.toISOString())
-    .order("starts_at");
+    .eq("enabled", true)
+    .lte("next_due_at", now)
+    .order("next_due_at")
+    .limit(10);
+  return data || [];
+}
 
-  const { data: briefs } = await supabase
-    .from("pre_meeting_briefs")
+async function fetchCoolingAlerts() {
+  const { data } = await supabase
+    .from("relationship_alerts")
     .select("*")
-    .eq("dismissed", false);
-
-  return {
-    meetings: meetings || [],
-    briefs: briefs || [],
-  };
+    .eq("dismissed", false)
+    .order("created_at", { ascending: false })
+    .limit(5);
+  return data || [];
 }
 
-function formatTime(iso: string) {
-  return new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+/* ── Helpers ────────────────────────────────────────────── */
+
+function timeAgo(iso: string) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
 }
 
-function relativeTime(iso: string) {
-  const diff = new Date(iso).getTime() - Date.now();
-  const mins = Math.round(diff / 60000);
-  if (mins <= 0) return "Now";
-  if (mins < 60) return `In ${mins}m`;
-  return `In ${Math.round(mins / 60)}h`;
-}
+type TabKey = "inbox" | "pinned" | "due" | "cooling";
 
-/* ── mock meetings for demo ─────────────────────────────── */
-function getMockMeetings() {
-  const today = new Date();
-  const make = (h: number, m: number, title: string, attendees: string[]) => {
-    const starts = new Date(today);
-    starts.setHours(h, m, 0, 0);
-    const ends = new Date(starts);
-    ends.setHours(h + 1);
-    return {
-      id: `mock-${h}-${m}`,
-      title,
-      starts_at: starts.toISOString(),
-      ends_at: ends.toISOString(),
-      attendees,
-      briefed: false,
-      zoom_meeting_id: null,
-      calendar_event_id: null,
-      created_at: new Date().toISOString(),
-    };
-  };
-  return [
-    make(9, 0, "Portfolio Review — Series B Pipeline", ["Marcus Chen", "Elena Voss"]),
-    make(10, 30, "1:1 with Sarah Kim — Fundraise Update", ["Sarah Kim"]),
-    make(13, 0, "LP Advisory Board Prep", ["James Whitfield", "Priya Sharma", "David Okafor"]),
-    make(15, 0, "Intro Call — Astra Robotics (via Marcus)", ["Leo Park", "Marcus Chen"]),
-    make(16, 30, "Weekly Partner Sync", ["Elena Voss", "James Whitfield"]),
-  ];
-}
+/* ── Component ──────────────────────────────────────────── */
 
 export default function Command() {
-  const { data: topSignals = [] } = useQuery({
-    queryKey: ["command-signals"],
-    queryFn: fetchTopSignals,
+  const queryClient = useQueryClient();
+  const [tab, setTab] = useState<TabKey>("inbox");
+
+  const { data: signals = [] } = useQuery({
+    queryKey: ["easy-actions-signals"],
+    queryFn: fetchActionableSignals,
+    refetchInterval: 15_000,
+  });
+
+  const { data: reminders = [] } = useQuery({
+    queryKey: ["easy-actions-reminders"],
+    queryFn: fetchDueReminders,
     refetchInterval: 30_000,
   });
 
-  const { data: briefData } = useQuery({
-    queryKey: ["command-briefs"],
-    queryFn: fetchTodayBriefs,
+  const { data: coolingAlerts = [] } = useQuery({
+    queryKey: ["easy-actions-cooling"],
+    queryFn: fetchCoolingAlerts,
     refetchInterval: 60_000,
   });
 
-  const dbMeetings = briefData?.meetings || [];
-  const briefs = briefData?.briefs || [];
-  const meetings = dbMeetings.length > 0 ? dbMeetings : getMockMeetings();
+  /* ── Mutations ── */
 
-  const meetingBriefMap = useMemo(() => {
-    const map = new Map<string, typeof briefs[0]>();
-    for (const b of briefs) {
-      map.set(b.meeting_id, b);
-    }
-    return map;
-  }, [briefs]);
+  const markDone = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("signals")
+        .update({ status: "Complete" as const })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["easy-actions-signals"] });
+      toast.success("Signal marked complete");
+    },
+  });
+
+  const togglePin = useMutation({
+    mutationFn: async ({ id, pinned }: { id: string; pinned: boolean }) => {
+      const { error } = await supabase
+        .from("signals")
+        .update({ pinned: !pinned })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["easy-actions-signals"] });
+      toast.success("Pin updated");
+    },
+  });
+
+  const snooze = useMutation({
+    mutationFn: async (id: string) => {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(9, 0, 0, 0);
+      const { error } = await supabase
+        .from("signals")
+        .update({ due_date: tomorrow.toISOString().split("T")[0] })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["easy-actions-signals"] });
+      toast.success("Snoozed until tomorrow 9am");
+    },
+  });
+
+  const dismissAlert = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("relationship_alerts")
+        .update({ dismissed: true })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["easy-actions-cooling"] });
+      toast.success("Alert dismissed");
+    },
+  });
+
+  /* ── Derived lists ── */
+
+  const inboxSignals = useMemo(
+    () => signals.filter((s) => s.status === "Captured" && !s.pinned),
+    [signals]
+  );
+
+  const pinnedSignals = useMemo(
+    () => signals.filter((s) => s.pinned),
+    [signals]
+  );
+
+  const highPriorityCount = inboxSignals.filter((s) => s.priority === "high").length;
+
+  const tabs: { key: TabKey; label: string; count: number; icon: React.ElementType }[] = [
+    { key: "inbox", label: "Inbox", count: inboxSignals.length, icon: Inbox },
+    { key: "pinned", label: "Pinned", count: pinnedSignals.length, icon: Pin },
+    { key: "due", label: "Due", count: reminders.length, icon: CalendarClock },
+    { key: "cooling", label: "Cooling", count: coolingAlerts.length, icon: AlertTriangle },
+  ];
 
   return (
-    <div className="max-w-[480px] mx-auto px-5 py-8">
+    <div className="max-w-2xl mx-auto px-5 py-8">
       {/* Header */}
       <Motion>
-        <header className="mb-8">
+        <header className="mb-6">
           <div className="flex items-center gap-2 mb-2">
             <Zap className="w-4 h-4 text-vanta-accent" />
             <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-low">
-              Command
+              Easy Actions
             </span>
           </div>
           <h1 className="font-display text-[28px] leading-tight text-foreground">
-            Today
+            Action Queue
           </h1>
           <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-vanta-text-muted mt-1">
-            {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+            {inboxSignals.length} open · {highPriorityCount} high priority · {pinnedSignals.length} pinned
           </p>
         </header>
       </Motion>
 
-      {/* Meetings */}
-      <Motion delay={60}>
-        <section className="mb-8">
-          <div className="flex items-center gap-2 mb-3">
-            <Calendar className="w-3.5 h-3.5 text-vanta-text-muted" />
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted">
-              Meetings ({meetings.length})
-            </p>
-          </div>
-
-          {meetings.length === 0 ? (
-            <div className="border border-vanta-border p-5 text-center">
-              <p className="font-mono text-[10px] text-vanta-text-muted uppercase tracking-widest">No meetings today</p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {meetings.map((m: any) => {
-                const brief = meetingBriefMap.get(m.id);
-                const attendees = Array.isArray(m.attendees) ? m.attendees : [];
-                return (
-                  <div key={m.id} className="border border-vanta-border bg-vanta-bg-elevated p-4">
-                    <div className="flex items-start justify-between gap-3 mb-2">
-                      <div>
-                        <p className="font-sans text-[14px] text-foreground font-medium">{m.title}</p>
-                        <p className="font-mono text-[10px] text-vanta-text-low mt-0.5">{formatTime(m.starts_at)}</p>
-                      </div>
-                      <span className="font-mono text-[10px] uppercase tracking-wider text-vanta-accent-zoom shrink-0">
-                        {relativeTime(m.starts_at)}
-                      </span>
-                    </div>
-                    {attendees.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {attendees.map((a: string, i: number) => (
-                          <span
-                            key={i}
-                            className="inline-block px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider border border-vanta-border text-vanta-text-low bg-card"
-                          >
-                            {a}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    {brief && (
-                      <Link
-                        to={`/briefing/${brief.id}`}
-                        className="inline-flex items-center gap-1.5 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] border border-vanta-accent-zoom-border text-vanta-accent-zoom hover:bg-vanta-accent-zoom-faint transition-colors mt-1"
-                      >
-                        <Video className="w-3 h-3" />
-                        View Brief
-                      </Link>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </section>
-      </Motion>
-
-      {/* Top signals */}
-      <Motion delay={120}>
-        <section className="mb-8">
-          <div className="flex items-center justify-between mb-3">
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted">
-              Top Signals
-            </p>
-            <Link
-              to="/signals"
-              className="font-mono text-[9px] uppercase tracking-wider text-primary hover:text-vanta-accent transition-colors flex items-center gap-1"
-            >
-              All <ArrowRight className="w-3 h-3" />
-            </Link>
-          </div>
-
-          {topSignals.length === 0 ? (
-            <div className="border border-vanta-border p-5 text-center">
-              <p className="font-mono text-[10px] text-vanta-text-muted uppercase tracking-widest">All clear</p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {topSignals.map((s) => {
-                const colors = SIGNAL_TYPE_COLORS[s.signalType];
-                return (
-                  <Link
-                    key={s.id}
-                    to="/signals"
-                    className="block border border-vanta-border bg-vanta-bg-elevated p-4 hover:border-vanta-border-mid transition-colors"
-                  >
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className={`px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider border ${colors.text} ${colors.bg} ${colors.border}`}>
-                        {s.signalType}
-                      </span>
-                      <span className="font-mono text-[9px] text-vanta-text-muted ml-auto">{s.sender}</span>
-                    </div>
-                    <p className="font-sans text-[13px] text-foreground leading-relaxed">{s.summary}</p>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
-        </section>
-      </Motion>
-
-      {/* Quick capture */}
-      <Motion delay={180}>
-        <section>
-          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-3">
-            Quick Capture
-          </p>
+      {/* Quick Capture */}
+      <Motion delay={40}>
+        <section className="mb-6">
           <NoteCapture inline />
         </section>
       </Motion>
+
+      {/* Tabs */}
+      <Motion delay={80}>
+        <div className="flex gap-1 mb-4 border-b border-vanta-border pb-px">
+          {tabs.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              className={`flex items-center gap-1.5 px-3 py-2 font-mono text-[10px] uppercase tracking-wider transition-colors border-b-2 -mb-px ${
+                tab === t.key
+                  ? "border-foreground text-foreground"
+                  : "border-transparent text-vanta-text-low hover:text-foreground"
+              }`}
+            >
+              <t.icon className="w-3.5 h-3.5" />
+              {t.label}
+              {t.count > 0 && (
+                <span className={`ml-1 px-1.5 py-0.5 text-[9px] rounded-sm ${
+                  t.key === "cooling" && t.count > 0
+                    ? "bg-destructive/15 text-destructive"
+                    : "bg-vanta-bg-elevated text-vanta-text-mid"
+                }`}>
+                  {t.count}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+      </Motion>
+
+      {/* Tab content */}
+      <Motion delay={120}>
+        {tab === "inbox" && (
+          <div className="space-y-2">
+            {inboxSignals.length === 0 ? (
+              <EmptyState icon={CheckCircle2} text="Inbox zero — all clear" />
+            ) : (
+              inboxSignals.map((s) => (
+                <SignalActionRow
+                  key={s.id}
+                  signal={s}
+                  onDone={() => markDone.mutate(s.id)}
+                  onPin={() => togglePin.mutate({ id: s.id, pinned: !!s.pinned })}
+                  onSnooze={() => snooze.mutate(s.id)}
+                />
+              ))
+            )}
+          </div>
+        )}
+
+        {tab === "pinned" && (
+          <div className="space-y-2">
+            {pinnedSignals.length === 0 ? (
+              <EmptyState icon={Pin} text="No pinned signals" />
+            ) : (
+              pinnedSignals.map((s) => (
+                <SignalActionRow
+                  key={s.id}
+                  signal={s}
+                  onDone={() => markDone.mutate(s.id)}
+                  onPin={() => togglePin.mutate({ id: s.id, pinned: !!s.pinned })}
+                  onSnooze={() => snooze.mutate(s.id)}
+                />
+              ))
+            )}
+          </div>
+        )}
+
+        {tab === "due" && (
+          <div className="space-y-2">
+            {reminders.length === 0 ? (
+              <EmptyState icon={CalendarClock} text="No due reminders" />
+            ) : (
+              reminders.map((r) => (
+                <div
+                  key={r.id}
+                  className="border border-vanta-border bg-vanta-bg-elevated p-4 flex items-center justify-between gap-3"
+                >
+                  <div>
+                    <p className="font-sans text-[14px] text-foreground font-medium">{r.contact_name}</p>
+                    <p className="font-mono text-[10px] text-vanta-text-low mt-0.5">
+                      {r.sequence_type} · every {r.interval_days}d
+                      {r.note && <span className="ml-2 text-vanta-text-muted">— {r.note}</span>}
+                    </p>
+                  </div>
+                  <Link
+                    to={`/contact/${encodeURIComponent(r.contact_name)}`}
+                    className="shrink-0 font-mono text-[9px] uppercase tracking-wider text-primary hover:text-vanta-accent transition-colors flex items-center gap-1"
+                  >
+                    View <ArrowRight className="w-3 h-3" />
+                  </Link>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {tab === "cooling" && (
+          <div className="space-y-2">
+            {coolingAlerts.length === 0 ? (
+              <EmptyState icon={AlertTriangle} text="No cooling relationships" />
+            ) : (
+              coolingAlerts.map((a) => (
+                <div
+                  key={a.id}
+                  className="border border-destructive/30 bg-destructive/5 p-4 flex items-center justify-between gap-3"
+                >
+                  <div>
+                    <p className="font-sans text-[14px] text-foreground font-medium">{a.contact_name}</p>
+                    <p className="font-mono text-[10px] text-destructive mt-0.5">
+                      Strength dropped {a.previous_strength}% → {a.current_strength}%
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Link
+                      to={`/contact/${encodeURIComponent(a.contact_name)}`}
+                      className="font-mono text-[9px] uppercase tracking-wider text-primary hover:text-vanta-accent transition-colors flex items-center gap-1"
+                    >
+                      View <ArrowRight className="w-3 h-3" />
+                    </Link>
+                    <button
+                      onClick={() => dismissAlert.mutate(a.id)}
+                      className="font-mono text-[9px] uppercase tracking-wider text-vanta-text-muted hover:text-foreground transition-colors"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </Motion>
     </div>
+  );
+}
+
+/* ── Sub-components ─────────────────────────────────────── */
+
+function EmptyState({ icon: Icon, text }: { icon: React.ElementType; text: string }) {
+  return (
+    <div className="border border-vanta-border p-8 text-center">
+      <Icon className="w-5 h-5 text-vanta-text-muted mx-auto mb-2" />
+      <p className="font-mono text-[10px] text-vanta-text-muted uppercase tracking-widest">{text}</p>
+    </div>
+  );
+}
+
+function SignalActionRow({
+  signal,
+  onDone,
+  onPin,
+  onSnooze,
+}: {
+  signal: Signal;
+  onDone: () => void;
+  onPin: () => void;
+  onSnooze: () => void;
+}) {
+  const colors = SIGNAL_TYPE_COLORS[signal.signalType];
+
+  return (
+    <div className={`border bg-vanta-bg-elevated p-4 group transition-colors ${
+      signal.pinned ? "border-vanta-accent/40" : "border-vanta-border"
+    }`}>
+      <div className="flex items-start gap-3">
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <span className={`px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider border ${colors.text} ${colors.bg} ${colors.border}`}>
+              {signal.signalType}
+            </span>
+            {signal.priority === "high" && (
+              <span className="px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider bg-destructive/10 text-destructive border border-destructive/20">
+                High
+              </span>
+            )}
+            {signal.pinned && <Pin className="w-3 h-3 text-vanta-accent" />}
+            <span className="font-mono text-[9px] text-vanta-text-muted ml-auto shrink-0">
+              {signal.sender} · {timeAgo(signal.capturedAt)}
+            </span>
+          </div>
+          <p className="font-sans text-[13px] text-foreground leading-relaxed line-clamp-2">{signal.summary}</p>
+          {signal.dueDate && (
+            <p className="font-mono text-[9px] text-vanta-text-low mt-1 flex items-center gap-1">
+              <AlarmClock className="w-3 h-3" /> Due {signal.dueDate}
+            </p>
+          )}
+        </div>
+
+        {/* Quick actions */}
+        <div className="flex items-center gap-1 shrink-0 opacity-60 group-hover:opacity-100 transition-opacity">
+          <ActionButton icon={Check} label="Done" onClick={onDone} className="hover:text-green-500" />
+          <ActionButton icon={Clock} label="Snooze" onClick={onSnooze} className="hover:text-amber-500" />
+          <ActionButton
+            icon={signal.pinned ? PinOff : Pin}
+            label={signal.pinned ? "Unpin" : "Pin"}
+            onClick={onPin}
+            className="hover:text-vanta-accent"
+          />
+          <Link
+            to="/signals"
+            className="p-1.5 text-vanta-text-muted hover:text-foreground transition-colors"
+            title="Open in feed"
+          >
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ActionButton({
+  icon: Icon,
+  label,
+  onClick,
+  className = "",
+}: {
+  icon: React.ElementType;
+  label: string;
+  onClick: () => void;
+  className?: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      title={label}
+      className={`p-1.5 text-vanta-text-muted transition-colors ${className}`}
+    >
+      <Icon className="w-3.5 h-3.5" />
+    </button>
   );
 }

@@ -23,6 +23,7 @@ import DecisionCapture from "./pages/DecisionCapture";
 import Architecture from "./pages/Architecture";
 import BrainDump from "./pages/BrainDump";
 import ReleaseNotes from "./pages/ReleaseNotes";
+import Command from "./pages/Command";
 
 import Settings from "./pages/Settings";
 import ContactTimeline from "./pages/ContactTimeline";
@@ -90,7 +91,7 @@ const AppRoutes = () => {
       <Route path="/settings" element={<ProtectedRoute session={session}><ProductLayout><Settings /></ProductLayout></ProtectedRoute>} />
       <Route path="/contact/:name" element={<ProtectedRoute session={session}><ProductLayout><ContactTimeline /></ProductLayout></ProtectedRoute>} />
       <Route path="/briefing/:id" element={<ProtectedRoute session={session}><ProductLayout><Briefing /></ProductLayout></ProtectedRoute>} />
-      <Route path="/command" element={<Navigate to="/" replace />} />
+      <Route path="/command" element={<ProtectedRoute session={session}><ProductLayout><Command /></ProductLayout></ProtectedRoute>} />
       <Route path="/contacts" element={<ProtectedRoute session={session}><ProductLayout><Contacts /></ProductLayout></ProtectedRoute>} />
       <Route path="/admin" element={<ProtectedRoute session={session}><ProductLayout><Admin /></ProductLayout></ProtectedRoute>} />
       <Route path="/noise-queue" element={<Navigate to="/focus?tab=noise" replace />} />
