@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      contact_tags: {
+        Row: {
+          color: string
+          contact_name: string
+          created_at: string
+          id: string
+          tag: string
+        }
+        Insert: {
+          color?: string
+          contact_name: string
+          created_at?: string
+          id?: string
+          tag: string
+        }
+        Update: {
+          color?: string
+          contact_name?: string
+          created_at?: string
+          id?: string
+          tag?: string
+        }
+        Relationships: []
+      }
       custom_signal_types: {
         Row: {
           color_bg: string
@@ -44,6 +68,42 @@ export type Database = {
           id?: string
           training_examples?: Json
           type_name?: string
+        }
+        Relationships: []
+      }
+      engagement_sequences: {
+        Row: {
+          contact_name: string
+          created_at: string
+          enabled: boolean
+          id: string
+          interval_days: number
+          last_fired_at: string | null
+          next_due_at: string
+          note: string | null
+          sequence_type: string
+        }
+        Insert: {
+          contact_name: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          interval_days?: number
+          last_fired_at?: string | null
+          next_due_at?: string
+          note?: string | null
+          sequence_type?: string
+        }
+        Update: {
+          contact_name?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          interval_days?: number
+          last_fired_at?: string | null
+          next_due_at?: string
+          note?: string | null
+          sequence_type?: string
         }
         Relationships: []
       }
