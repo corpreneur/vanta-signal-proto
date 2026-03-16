@@ -10,6 +10,30 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "1.0.0",
+    date: "2026-03-16",
+    title: "The Action Layer: Phase 2 — Temporal & Identity",
+    changes: [
+      { type: "feature", text: "Mode-driven dashboard layouts — Executive, Creative, and DND reshape the dashboard dynamically" },
+      { type: "feature", text: "Daily Timeline replaces flat Recent Signals — Prep / Active / Review time blocks" },
+      { type: "feature", text: "Confidence indicators on signal cards — color-coded AI classification scores" },
+      { type: "improvement", text: "Executive mode filters timeline to high-priority signals only" },
+      { type: "improvement", text: "DND mode shows minimal greeting + Action Items only" },
+    ],
+  },
+  {
+    version: "0.9.10",
+    date: "2026-03-16",
+    title: "The Action Layer: Phase 1 — Dashboard Intelligence",
+    changes: [
+      { type: "feature", text: "Inline Brain Dump on dashboard — 'What's on your mind?' input with edge function processing" },
+      { type: "feature", text: "Action Items checklist — AI-derived tasks from high-priority and due-date signals" },
+      { type: "feature", text: "What's Ahead block — upcoming meetings cross-referenced with cooling alerts" },
+      { type: "feature", text: "Quick Actions in Signal Detail Drawer — functional Pin, Mark Done, and Set Reminder" },
+      { type: "improvement", text: "Strategic docs stored in project (CMO Brief, Roadmap v2, PI-2 Plan, CPO Assessment)" },
+    ],
+  },
+  {
     version: "0.9.9",
     date: "2026-03-16",
     title: "Interactive Network Graph & Release Notes",
