@@ -178,7 +178,10 @@ Action rules:
 - INVESTMENT: THESIS_ANALYSIS, NOTION_LOG
 - DECISION: NOTION_LOG, optionally BRIEF_COMPILE
 - CONTEXT: NOTION_LOG
-- NOISE: empty array []`;
+- NOISE: empty array []
+
+Also return:
+- confidence: a number from 0.0 to 1.0 indicating how certain you are about the classification. 1.0 = highly certain, 0.5 = uncertain.`;
 
   const userContent = `From: ${email.from}
 To: ${email.to}
