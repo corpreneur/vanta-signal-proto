@@ -818,6 +818,11 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
             </>
           )}
 
+          {/* File Attachments */}
+          <section>
+            <FileAttachments signalId={signal.id} />
+          </section>
+
           {/* Signal ID */}
           <section className="pt-4 border-t border-vanta-border">
             <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-muted">
