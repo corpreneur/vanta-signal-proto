@@ -197,6 +197,8 @@ export function ProductSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        <CollapsibleNavGroup label="Channels" items={channelItems} collapsed={collapsed} currentPath={currentPath} />
+        <CollapsibleNavGroup label="Platform" items={platformItems} collapsed={collapsed} currentPath={currentPath} />
         <CollapsibleNavGroup label="Product Concepts" items={productItems} collapsed={collapsed} currentPath={currentPath} />
 
         {/* Cases */}
