@@ -1,7 +1,4 @@
-import type { SimulationNodeDatum, SimulationLinkDatum } from "d3-force";
-import type { Signal, SignalType } from "@/data/signals";
-
-export interface GraphNode extends SimulationNodeDatum {
+export interface GraphNode {
   id: string;
   name: string;
   signalCount: number;
@@ -10,13 +7,24 @@ export interface GraphNode extends SimulationNodeDatum {
   daysSinceLast: number;
   sources: string[];
   signalTypes: Record<string, number>;
-  dominantType: SignalType;
+  dominantType: string;
   cluster: number;
+  // d3-force mutable fields
+  x?: number;
+  y?: number;
+  vx?: number;
+  vy?: number;
+  fx?: number | null;
+  fy?: number | null;
+  index?: number;
 }
 
-export interface GraphEdge extends SimulationLinkDatum<GraphNode> {
+export interface GraphEdge {
+  source: string | GraphNode;
+  target: string | GraphNode;
   weight: number;
   sharedSignalTypes: string[];
+  index?: number;
 }
 
 export interface FocusedNode {
