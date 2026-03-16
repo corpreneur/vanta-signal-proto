@@ -9,6 +9,9 @@ import { useUserMode } from "@/hooks/use-user-mode";
 import { Motion } from "@/components/ui/motion";
 import SignalDetailDrawer from "@/components/SignalDetailDrawer";
 import CoolingAlerts from "@/components/CoolingAlerts";
+import InlineBrainDump from "@/components/InlineBrainDump";
+import WhatsAhead from "@/components/WhatsAhead";
+import ActionItems from "@/components/ActionItems";
 import {
   MessageSquare,
   Phone,
@@ -185,6 +188,12 @@ const Index = () => {
         </header>
       </Motion>
 
+      {/* Inline Brain Dump — capture → act flow */}
+      <InlineBrainDump />
+
+      {/* Action Items — the action layer */}
+      <ActionItems onSignalClick={(s) => setDrawerSignal(s)} />
+
       {/* 1. Today Context Row */}
       <Motion delay={40}>
         <div className="flex flex-wrap items-center gap-4 mb-8 pb-5 border-b border-vanta-border">
@@ -236,6 +245,9 @@ const Index = () => {
           </div>
         </div>
       </Motion>
+
+      {/* What's Ahead — forward-looking intelligence */}
+      <WhatsAhead />
 
       {/* 4. Channel Grid (polish) */}
       <Motion delay={120}>
