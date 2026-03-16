@@ -375,6 +375,35 @@ Calendar    Sync          Brief Gen       Alerts      Pre-Briefs`}</Code>
             </div>
           </section>
 
+          {/* ── 5b. Brain Dump ──────────────────────────────────────── */}
+          <section>
+            <SectionHeader id="braindump" title="Brain Dump" sub="§ 05b · Manual + Voice + URL Channel" />
+            <div className="mt-6 space-y-6">
+              <Prose>
+                <p>Brain Dump is the manual ingestion hub — a three-tab interface for capturing notes (text or voice dictation), pasting URLs (scraped via Firecrawl), and Notion integration. All inputs are processed through the same Gemini pipeline with extended extraction for risk levels, due dates, and call pointers.</p>
+              </Prose>
+
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-wider text-vanta-text-muted mb-2">Input Modes</p>
+                <div className="space-y-3">
+                  <FlowStep n={1} label="Note / Voice" detail="Free-text or speech-to-text dictation → brain-dump edge function → Gemini classification" />
+                  <FlowStep n={2} label="Paste Link" detail="URL submitted → firecrawl-scrape edge function → page content extracted → Gemini classification" />
+                  <FlowStep n={3} label="Notion" detail="Workspace integration for structured content ingestion" />
+                </div>
+              </div>
+
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-wider text-vanta-text-muted mb-2">Extended Extraction</p>
+                <Code>{`// Brain Dump adds these fields beyond standard classification:
+{
+  risk_level: "low" | "medium" | "high" | "critical",
+  due_date: "ISO 8601 date or null",
+  call_pointer: "string reference or null"
+}`}</Code>
+              </div>
+            </div>
+          </section>
+
           {/* ── 6. Gemini AI Pipeline ──────────────────────────────────── */}
           <section>
             <SectionHeader id="gemini" title="Gemini AI Pipeline" sub="§ 06 · Classification Engine" />
