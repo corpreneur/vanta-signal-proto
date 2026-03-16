@@ -28,6 +28,7 @@ import Contacts from "./pages/Contacts";
 import NoiseQueue from "./pages/NoiseQueue";
 import UserModes from "./pages/UserModes";
 import Admin from "./pages/Admin";
+import QuickCapture from "./components/QuickCapture";
 import type { Session } from "@supabase/supabase-js";
 
 const ProtectedRoute = ({ children, session }: { children: React.ReactNode; session: Session | null }) => {
@@ -101,6 +102,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AppRoutes />
+        <QuickCapture />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

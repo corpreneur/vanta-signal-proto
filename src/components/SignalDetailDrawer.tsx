@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { Video, FileText, MessageSquare, Sparkles, Image, Film, Mic, Paperclip, Download, ExternalLink, Mail, CalendarPlus, Flag, ListChecks, User, ChevronDown, Brain, Edit3, Pin, CheckCircle2, Clock } from "lucide-react";
 import { format } from "date-fns";
+import FileAttachments from "@/components/FileAttachments";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { SignalType, SignalPriority } from "@/data/signals";
@@ -817,6 +818,11 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
               )}
             </>
           )}
+
+          {/* File Attachments */}
+          <section>
+            <FileAttachments signalId={signal.id} />
+          </section>
 
           {/* Signal ID */}
           <section className="pt-4 border-t border-vanta-border">

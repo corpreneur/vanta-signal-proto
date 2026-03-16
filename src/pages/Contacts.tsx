@@ -7,7 +7,8 @@ import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { computeStrength, daysBetween, recencyLabel } from "@/lib/contactStrength";
 import { Motion } from "@/components/ui/motion";
 import { Input } from "@/components/ui/input";
-import { MessageSquare, Phone, Video, Mail, StickyNote, Search, ArrowUpDown } from "lucide-react";
+import { MessageSquare, Phone, Video, Mail, StickyNote, Search, ArrowUpDown, Tag, Filter } from "lucide-react";
+import ContactTagManager, { useAllContactTags } from "@/components/ContactTagManager";
 
 const SOURCE_ICONS: Record<string, React.ElementType> = {
   linq: MessageSquare, phone: Phone, recall: Video, gmail: Mail, manual: StickyNote,
@@ -109,6 +110,8 @@ export default function Contacts() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortMode>("strength");
+  const [filterTag, setFilterTag] = useState<string | null>(null);
+  const { data: allTags } = useAllContactTags();
 
   const { data: signals = [], isLoading } = useQuery({
     queryKey: ["contacts-signals"],
@@ -124,6 +127,10 @@ export default function Contacts() {
       const q = search.toLowerCase();
       list = list.filter((c) => c.name.toLowerCase().includes(q));
     }
+    if (filterTag && allTags) {
+      const tagContacts = allTags.get(filterTag) || [];
+      list = list.filter((c) => tagContacts.includes(c.name));
+    }
     const sortFns: Record<SortMode, (a: ContactSummary, b: ContactSummary) => number> = {
       strength: (a, b) => b.strength - a.strength,
       signals: (a, b) => b.signalCount - a.signalCount,
@@ -132,7 +139,7 @@ export default function Contacts() {
       high: (a, b) => b.highPriority - a.highPriority,
     };
     return [...list].sort(sortFns[sort]);
-  }, [contacts, search, sort]);
+  }, [contacts, search, sort, filterTag, allTags]);
 
   const totalContacts = contacts.length;
   const activeContacts = contacts.filter((c) => c.daysSinceLast <= 7).length;
@@ -196,6 +203,35 @@ export default function Contacts() {
               </button>
             ))}
           </div>
+
+          {/* Tag filter */}
+          {allTags && allTags.size > 0 && (
+            <div className="flex flex-wrap gap-1 items-center">
+              <Filter className="w-3 h-3 text-vanta-text-muted mr-1" />
+              {Array.from(allTags.keys()).map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setFilterTag(filterTag === tag ? null : tag)}
+                  className={`px-2 py-1 font-mono text-[9px] uppercase tracking-wider border rounded-sm transition-colors ${
+                    filterTag === tag
+                      ? "border-primary text-primary bg-primary/10"
+                      : "border-vanta-border text-vanta-text-low hover:text-foreground"
+                  }`}
+                >
+                  <Tag className="w-2.5 h-2.5 inline mr-0.5" />
+                  {tag} ({allTags.get(tag)?.length})
+                </button>
+              ))}
+              {filterTag && (
+                <button
+                  onClick={() => setFilterTag(null)}
+                  className="px-2 py-1 font-mono text-[9px] text-vanta-text-muted hover:text-foreground"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </Motion>
 
@@ -281,6 +317,11 @@ export default function Contacts() {
                         </span>
                       );
                     })}
+                  </div>
+
+                  {/* Contact tags */}
+                  <div className="mb-2" onClick={(e) => e.stopPropagation()}>
+                    <ContactTagManager contactName={contact.name} compact />
                   </div>
 
                   {/* Recent signal previews */}

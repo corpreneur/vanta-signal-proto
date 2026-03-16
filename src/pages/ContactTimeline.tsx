@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { ArrowLeft, MessageSquare, Phone, Video, Mail, StickyNote, User, TrendingUp, Calendar, ExternalLink, HelpCircle, Loader2 } from "lucide-react";
+import ContactTagManager from "@/components/ContactTagManager";
+import EngagementSequences from "@/components/EngagementSequences";
 import { Motion } from "@/components/ui/motion";
 import SignalDetailDrawer from "@/components/SignalDetailDrawer";
 import { toast } from "sonner";
@@ -164,9 +166,10 @@ export default function ContactTimeline() {
               <h1 className="font-display text-[clamp(24px,4vw,36px)] leading-tight text-foreground mb-2">
                 {decodedName}
               </h1>
-              <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-vanta-text-muted">
+              <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-vanta-text-muted mb-2">
                 Contact Hub · {signals.length} signals
               </p>
+              <ContactTagManager contactName={decodedName} />
               <button
                 onClick={handleFetchBrief}
                 disabled={loadingBrief}
@@ -290,6 +293,13 @@ export default function ContactTimeline() {
           </div>
         </Motion>
       )}
+
+      {/* Engagement Sequences */}
+      <Motion delay={90}>
+        <div className="mb-6 border border-vanta-border bg-card p-4">
+          <EngagementSequences contactName={decodedName} />
+        </div>
+      </Motion>
 
       {/* View mode toggle */}
       <Motion delay={100}>
