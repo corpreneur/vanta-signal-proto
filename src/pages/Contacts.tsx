@@ -7,8 +7,9 @@ import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { computeStrength, daysBetween, recencyLabel } from "@/lib/contactStrength";
 import { Motion } from "@/components/ui/motion";
 import { Input } from "@/components/ui/input";
-import { MessageSquare, Phone, Video, Mail, StickyNote, Search, ArrowUpDown, Tag, Filter } from "lucide-react";
-import ContactTagManager, { useAllContactTags } from "@/components/ContactTagManager";
+import { Search, Tag, Filter } from "lucide-react";
+import { useAllContactTags } from "@/components/ContactTagManager";
+import SmartContactCard from "@/components/SmartContactCard";
 
 const SOURCE_ICONS: Record<string, React.ElementType> = {
   linq: MessageSquare, phone: Phone, recall: Video, gmail: Mail, manual: StickyNote,
