@@ -267,7 +267,57 @@ export default function BrainDump() {
         </Motion>
       )}
 
-      {/* ─── Notion mode (placeholder) ─── */}
+      {/* ─── Image mode ─── */}
+      {inputMode === "image" && (
+        <Motion delay={80}>
+          <div className="border border-border rounded-xl p-5 bg-card">
+            <ImageCapture
+              onCapture={(classification) => {
+                setSessionCaptures((prev) => [
+                  { signalType: classification.signalType, summary: classification.summary, timestamp: new Date().toISOString() },
+                  ...prev,
+                ]);
+                queryClient.invalidateQueries({ queryKey: ["brain-dump-recent"] });
+              }}
+            />
+          </div>
+        </Motion>
+      )}
+
+      {/* ─── Email mode ─── */}
+      {inputMode === "email" && (
+        <Motion delay={80}>
+          <div className="border border-border rounded-xl p-5 bg-card">
+            <EmailCapture
+              onCapture={(classification) => {
+                setSessionCaptures((prev) => [
+                  { signalType: classification.signalType, summary: classification.summary, timestamp: new Date().toISOString() },
+                  ...prev,
+                ]);
+                queryClient.invalidateQueries({ queryKey: ["brain-dump-recent"] });
+              }}
+            />
+          </div>
+        </Motion>
+      )}
+
+      {/* ─── Voice Memo mode ─── */}
+      {inputMode === "voice" && (
+        <Motion delay={80}>
+          <div className="border border-border rounded-xl p-5 bg-card">
+            <VoiceMemoCapture
+              onCapture={(classification) => {
+                setSessionCaptures((prev) => [
+                  { signalType: classification.signalType, summary: classification.summary, timestamp: new Date().toISOString() },
+                  ...prev,
+                ]);
+                queryClient.invalidateQueries({ queryKey: ["brain-dump-recent"] });
+              }}
+            />
+          </div>
+        </Motion>
+      )}
+
       {inputMode === "notion" && (
         <Motion delay={80}>
           <div className="border border-dashed border-border rounded-xl p-8 flex flex-col items-center gap-3">
