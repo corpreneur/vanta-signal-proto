@@ -649,6 +649,7 @@ Deno.serve(async (req) => {
         _vanta_reactions: [], // initialized empty, populated by reaction events
       },
       captured_at: parsed.timestamp,
+      confidence_score: typeof classification.confidence === "number" ? classification.confidence : null,
     };
 
     const { data, error } = await supabase.from("signals").insert(signalPayload).select().single();

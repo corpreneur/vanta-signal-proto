@@ -229,6 +229,7 @@ Deno.serve(async (req) => {
         meeting_id: callId,
         raw_payload: payload,
         captured_at: startedAt,
+        confidence_score: typeof classification.confidence === "number" ? classification.confidence : null,
       })
       .select()
       .single();

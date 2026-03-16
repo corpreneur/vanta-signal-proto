@@ -30,6 +30,7 @@ export interface Signal {
   dueDate?: string | null; // ISO date string
   callPointer?: string | null;
   pinned?: boolean;
+  confidenceScore?: number | null;
 }
 
 export interface MeetingArtifact {

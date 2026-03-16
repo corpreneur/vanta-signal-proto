@@ -337,6 +337,7 @@ Deno.serve(async (req) => {
             date: email.date,
           },
           captured_at: email.date ? new Date(email.date).toISOString() : new Date().toISOString(),
+          confidence_score: typeof classification.confidence === "number" ? classification.confidence : null,
         }).select().single();
 
         if (error) {
