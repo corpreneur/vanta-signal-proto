@@ -14,6 +14,7 @@ import UserModes from "./UserModes";
 import NoiseQueue from "./NoiseQueue";
 import CustomSignalTypes from "@/components/CustomSignalTypes";
 import MyRules from "@/components/MyRules";
+import WorkflowBuilder from "@/components/WorkflowBuilder";
 import SourcePriorityWeights from "@/components/SourcePriorityWeights";
 
 const TAB_MAP: Record<string, string> = {
