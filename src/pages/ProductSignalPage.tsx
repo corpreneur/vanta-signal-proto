@@ -193,7 +193,7 @@ const PRODUCTS: Record<string, ProductDef> = {
       "Vanta's Gemini Flash triage classifies low-signal content as NOISE within milliseconds. These messages are silently logged but never surfaced in the feed, never trigger alerts, and never create action items. They exist in the archive for completeness, but they don't compete for your attention.",
     ],
     howItWorks: [
-      { step: "Haiku Triage", desc: "First-pass classification identifies low-signal content… greetings, status confirmations, social pleasantries." },
+      { step: "Gemini Triage", desc: "First-pass classification identifies low-signal content… greetings, status confirmations, social pleasantries." },
       { step: "Silent Log", desc: "Noise is stored with full metadata but flagged as suppressed." },
       { step: "No Surface", desc: "Does not appear in the signal feed, briefs, or alerts." },
       { step: "Recoverable", desc: "If a future signal from the same sender references this conversation, the context can be recovered." },
