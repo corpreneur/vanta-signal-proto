@@ -11,9 +11,6 @@ import { Search, Tag, Filter } from "lucide-react";
 import { useAllContactTags } from "@/components/ContactTagManager";
 import SmartContactCard from "@/components/SmartContactCard";
 
-const SOURCE_ICONS: Record<string, React.ElementType> = {
-  linq: MessageSquare, phone: Phone, recall: Video, gmail: Mail, manual: StickyNote,
-};
 
 async function fetchSignals(): Promise<Signal[]> {
   const { data, error } = await supabase
