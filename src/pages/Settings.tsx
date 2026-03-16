@@ -411,10 +411,6 @@ export default function Settings() {
           <NoiseQueue />
         </TabsContent>
 
-        {/* User Modes Tab */}
-        <TabsContent value="modes">
-          <UserModes />
-        </TabsContent>
 
         {/* Classification Audit Tab */}
         <TabsContent value="audit">
@@ -426,14 +422,9 @@ export default function Settings() {
           <WorkflowBuilder />
         </TabsContent>
 
-        {/* Custom Signal Types Tab */}
-        <TabsContent value="types">
-          <CustomSignalTypes />
-        </TabsContent>
-
-        {/* My Rules Tab */}
-        <TabsContent value="rules">
-          <MyRules />
+        {/* Calendar Sync Tab */}
+        <TabsContent value="calendar">
+          <CalendarSyncSettings />
         </TabsContent>
 
         {/* Calendar Sync Tab */}
