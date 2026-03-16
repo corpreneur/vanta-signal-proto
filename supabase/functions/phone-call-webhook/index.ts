@@ -95,6 +95,7 @@ Also return:
       summary: parsed.summary || `Call between ${caller} and ${callee}.`,
       tags: Array.isArray(parsed.tags) ? parsed.tags.filter((t: string) => validTags.includes(t)) : [],
       actionsTaken: Array.isArray(parsed.actionsTaken) ? parsed.actionsTaken : ["NOTION_LOG"],
+      confidence: typeof parsed.confidence === "number" ? parsed.confidence : 0.5,
     };
   } catch (err) {
     console.error("Classification error:", err);
