@@ -9,6 +9,7 @@ const SECTIONS = [
   { id: "gmail", label: "Gmail Integration" },
   { id: "zoom", label: "Zoom / Recall.ai" },
   { id: "phone", label: "Phone FMC" },
+  { id: "braindump", label: "Brain Dump" },
   { id: "gemini", label: "Gemini AI Pipeline" },
   { id: "schema", label: "Database Schema" },
   { id: "functions", label: "Edge Functions" },
