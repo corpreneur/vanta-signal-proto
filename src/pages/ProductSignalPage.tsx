@@ -122,7 +122,7 @@ const PRODUCTS: Record<string, ProductDef> = {
       "Vanta captures context signals silently. They don't trigger alerts or actions. But they're indexed, searchable, and automatically surfaced when the person or topic comes up again in a higher-priority signal.",
     ],
     howItWorks: [
-      { step: "Triage", desc: "Haiku classifies the message as context… valuable but not actionable." },
+      { step: "Triage", desc: "Gemini Flash classifies the message as context… valuable but not actionable." },
       { step: "Silent Log", desc: "Stored with full attribution and source metadata." },
       { step: "Cross-Reference", desc: "Linked to the sender's profile in the relationship graph." },
       { step: "Resurface", desc: "Appears in pre-meeting briefs and contact profiles when relevant." },
