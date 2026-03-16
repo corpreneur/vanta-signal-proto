@@ -165,6 +165,7 @@ export default function Command() {
             <div className="space-y-2">
               {meetings.map((m: any) => {
                 const brief = meetingBriefMap.get(m.id);
+                const attendees = Array.isArray(m.attendees) ? m.attendees : [];
                 return (
                   <div key={m.id} className="border border-vanta-border bg-vanta-bg-elevated p-4">
                     <div className="flex items-start justify-between gap-3 mb-2">
@@ -176,6 +177,18 @@ export default function Command() {
                         {relativeTime(m.starts_at)}
                       </span>
                     </div>
+                    {attendees.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {attendees.map((a: string, i: number) => (
+                          <span
+                            key={i}
+                            className="inline-block px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider border border-vanta-border text-vanta-text-low bg-card"
+                          >
+                            {a}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                     {brief && (
                       <Link
                         to={`/briefing/${brief.id}`}
