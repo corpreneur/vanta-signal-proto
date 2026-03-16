@@ -119,6 +119,9 @@ export default function Focus() {
         <TabsContent value="rules">
           <MyRules />
         </TabsContent>
+        <TabsContent value="workflows">
+          <WorkflowBuilder />
+        </TabsContent>
       </Tabs>
     </div>
   );
