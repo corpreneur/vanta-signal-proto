@@ -95,6 +95,13 @@ export default function Focus() {
             <BookOpen className="w-3.5 h-3.5" />
             My Rules
           </TabsTrigger>
+          <TabsTrigger
+            value="workflows"
+            className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated"
+          >
+            <Zap className="w-3.5 h-3.5" />
+            Workflows
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="modes">
