@@ -571,6 +571,7 @@ Calendar    Sync          Brief Gen       Alerts      Pre-Briefs`}</Code>
                     { name: "signal_priority", values: ["high", "medium", "low"] },
                     { name: "signal_status", values: ["Captured", "In Progress", "Complete"] },
                     { name: "signal_source", values: ["linq", "gmail", "manual", "recall", "phone"] },
+                    { name: "signal_risk_level", values: ["low", "medium", "high", "critical"] },
                   ].map((e) => (
                     <div key={e.name} className="bg-vanta-bg-elevated border border-vanta-border rounded-md p-3">
                       <p className="font-mono text-[11px] font-bold text-foreground mb-2">{e.name}</p>
