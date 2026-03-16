@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      custom_signal_types: {
+        Row: {
+          color_bg: string
+          color_border: string
+          color_text: string
+          created_at: string
+          description: string | null
+          id: string
+          training_examples: Json
+          type_name: string
+        }
+        Insert: {
+          color_bg?: string
+          color_border?: string
+          color_text?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          training_examples?: Json
+          type_name: string
+        }
+        Update: {
+          color_bg?: string
+          color_border?: string
+          color_text?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          training_examples?: Json
+          type_name?: string
+        }
+        Relationships: []
+      }
       error_logs: {
         Row: {
           created_at: string
@@ -120,11 +153,101 @@ export type Database = {
           },
         ]
       }
+      relationship_alerts: {
+        Row: {
+          alert_type: string
+          contact_name: string
+          created_at: string
+          current_strength: number
+          dismissed: boolean
+          id: string
+          previous_strength: number
+        }
+        Insert: {
+          alert_type?: string
+          contact_name: string
+          created_at?: string
+          current_strength?: number
+          dismissed?: boolean
+          id?: string
+          previous_strength?: number
+        }
+        Update: {
+          alert_type?: string
+          contact_name?: string
+          created_at?: string
+          current_strength?: number
+          dismissed?: boolean
+          id?: string
+          previous_strength?: number
+        }
+        Relationships: []
+      }
+      relationship_briefs: {
+        Row: {
+          brief_text: string
+          contact_name: string
+          generated_at: string
+          id: string
+        }
+        Insert: {
+          brief_text: string
+          contact_name: string
+          generated_at?: string
+          id?: string
+        }
+        Update: {
+          brief_text?: string
+          contact_name?: string
+          generated_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      signal_corrections: {
+        Row: {
+          corrected_at: string
+          corrected_priority: string | null
+          corrected_type: string | null
+          id: string
+          original_priority: string
+          original_type: string
+          signal_id: string
+        }
+        Insert: {
+          corrected_at?: string
+          corrected_priority?: string | null
+          corrected_type?: string | null
+          id?: string
+          original_priority: string
+          original_type: string
+          signal_id: string
+        }
+        Update: {
+          corrected_at?: string
+          corrected_priority?: string | null
+          corrected_type?: string | null
+          id?: string
+          original_priority?: string
+          original_type?: string
+          signal_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signal_corrections_signal_id_fkey"
+            columns: ["signal_id"]
+            isOneToOne: false
+            referencedRelation: "signals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       signals: {
         Row: {
           actions_taken: string[]
           call_pointer: string | null
           captured_at: string
+          classification_reasoning: string | null
           confidence_score: number | null
           created_at: string
           due_date: string | null
@@ -147,6 +270,7 @@ export type Database = {
           actions_taken?: string[]
           call_pointer?: string | null
           captured_at?: string
+          classification_reasoning?: string | null
           confidence_score?: number | null
           created_at?: string
           due_date?: string | null
@@ -169,6 +293,7 @@ export type Database = {
           actions_taken?: string[]
           call_pointer?: string | null
           captured_at?: string
+          classification_reasoning?: string | null
           confidence_score?: number | null
           created_at?: string
           due_date?: string | null
@@ -240,6 +365,33 @@ export type Database = {
           starts_at?: string
           title?: string
           zoom_meeting_id?: string | null
+        }
+        Relationships: []
+      }
+      workflows: {
+        Row: {
+          action_steps: Json
+          created_at: string
+          enabled: boolean
+          id: string
+          name: string
+          trigger_config: Json
+        }
+        Insert: {
+          action_steps?: Json
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          name: string
+          trigger_config?: Json
+        }
+        Update: {
+          action_steps?: Json
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          name?: string
+          trigger_config?: Json
         }
         Relationships: []
       }
