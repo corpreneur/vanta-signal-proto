@@ -3,7 +3,7 @@ import { ProductSidebar } from "@/components/ProductSidebar";
 import { Menu } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import NoteCapture from "@/components/NoteCapture";
+import SmartNoteFAB from "@/components/SmartNoteFAB";
 
 interface ProductLayoutProps {
   children: React.ReactNode;
