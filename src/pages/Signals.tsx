@@ -46,6 +46,7 @@ const fetchSignals = async (): Promise<Signal[]> => {
     callPointer: (row as Record<string, unknown>).call_pointer as string | null,
     pinned: row.pinned ?? false,
     confidenceScore: (row as Record<string, unknown>).confidence_score as number | null,
+    classificationReasoning: (row as Record<string, unknown>).classification_reasoning as string | null,
   }));
 };
 
