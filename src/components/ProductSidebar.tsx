@@ -150,7 +150,7 @@ export function ProductSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Dashboard + Core */}
+        {/* Fab Five */}
         <SidebarGroup className="py-2 border-b border-vanta-border">
           <SidebarGroupContent>
             <SidebarMenu>
@@ -167,7 +167,20 @@ export function ProductSidebar() {
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              {coreItems.map((item) => (
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Fab Five — 5 core product pillars */}
+        <SidebarGroup className="py-2 border-b border-vanta-border">
+          {!collapsed && (
+            <p className="px-2 pb-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent">
+              Fab Five
+            </p>
+          )}
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {fabFiveItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink
@@ -184,9 +197,6 @@ export function ProductSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        <CollapsibleNavGroup label="Channels" items={channelItems} collapsed={collapsed} currentPath={currentPath} />
-        <CollapsibleNavGroup label="Platform" items={platformItems} collapsed={collapsed} currentPath={currentPath} />
         <CollapsibleNavGroup label="Product Concepts" items={productItems} collapsed={collapsed} currentPath={currentPath} />
 
         {/* Cases */}
