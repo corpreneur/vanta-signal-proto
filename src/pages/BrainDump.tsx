@@ -8,6 +8,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { SIGNAL_TYPE_COLORS, type SignalType, type Signal } from "@/data/signals";
 import NoteCapture from "@/components/NoteCapture";
+import ImageCapture from "@/components/ImageCapture";
+import EmailCapture from "@/components/EmailCapture";
+import VoiceMemoCapture from "@/components/VoiceMemoCapture";
 import { Motion } from "@/components/ui/motion";
 
 const SIGNAL_TYPE_LABELS: Record<string, string> = {
