@@ -207,7 +207,7 @@ ${email.body || email.snippet}`;
 
   if (!res.ok) {
     console.error("AI classification failed:", await res.text());
-    return { signalType: "CONTEXT", priority: "low", summary: `Unclassified email from ${email.from}.`, actionsTaken: ["NOTION_LOG"] };
+    return { signalType: "CONTEXT", priority: "low", summary: `Unclassified email from ${email.from}.`, actionsTaken: ["NOTION_LOG"], confidence: 0.0 };
   }
 
   const data = await res.json();
