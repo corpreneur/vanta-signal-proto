@@ -319,6 +319,11 @@ export default function Contacts() {
                     })}
                   </div>
 
+                  {/* Contact tags */}
+                  <div className="mb-2" onClick={(e) => e.stopPropagation()}>
+                    <ContactTagManager contactName={contact.name} compact />
+                  </div>
+
                   {/* Recent signal previews */}
                   <div className="space-y-1">
                     {contact.recentSignals.slice(0, 2).map((s) => (
