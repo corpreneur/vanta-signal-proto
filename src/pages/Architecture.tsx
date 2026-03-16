@@ -564,6 +564,38 @@ Calendar    Sync          Brief Gen       Alerts      Pre-Briefs`}</Code>
               </div>
 
               <div>
+                <p className="font-mono text-[10px] uppercase tracking-wider text-vanta-text-muted mb-2">Additional Tables</p>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="font-mono text-[11px]">Table</TableHead>
+                      <TableHead className="font-mono text-[11px]">Purpose</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {[
+                      ["upcoming_meetings", "Calendar events with attendees, Zoom meeting IDs, and brief status"],
+                      ["pre_meeting_briefs", "AI-generated dossiers linked to meetings with attendee context and matched signals"],
+                      ["relationship_alerts", "Cooling relationship warnings with strength deltas and dismissal state"],
+                      ["relationship_briefs", "AI-generated narrative briefs per contact"],
+                      ["contact_tags", "User-defined tags on contacts with custom colors"],
+                      ["engagement_sequences", "Recurring touchpoint schedules per contact"],
+                      ["signal_corrections", "User feedback on misclassified signals for training"],
+                      ["custom_signal_types", "User-defined signal categories with training examples"],
+                      ["workflows", "Rule-based automation triggers and action steps"],
+                      ["system_settings", "Key-value store for global config (modes, weights, toggles)"],
+                      ["error_logs", "Edge function error tracking with context"],
+                    ].map(([table, purpose]) => (
+                      <TableRow key={table}>
+                        <TableCell className="font-mono text-[11px] text-vanta-accent">{table}</TableCell>
+                        <TableCell className="text-[11px]">{purpose}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              <div>
                 <p className="font-mono text-[10px] uppercase tracking-wider text-vanta-text-muted mb-2">Enums</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
