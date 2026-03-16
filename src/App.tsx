@@ -14,6 +14,7 @@ import Signals from "./pages/Signals";
 import CasePage from "./pages/CasePage";
 import Graph from "./pages/Graph";
 import PhoneFMC from "./pages/PhoneFMC";
+import Connectivity from "./pages/Connectivity";
 import Ontology from "./pages/Ontology";
 import ProductSignalPage from "./pages/ProductSignalPage";
 import Architecture from "./pages/Architecture";
