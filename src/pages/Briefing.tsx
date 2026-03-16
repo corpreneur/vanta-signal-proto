@@ -132,6 +132,16 @@ export default function Briefing() {
   const { brief, meeting, attendeeSignals } = data;
   const attendees = Object.entries(brief.attendee_context);
 
+  const handleExportPdf = () => {
+    toast.info("PDF export coming soon — brief content will be formatted for print.");
+    window.print();
+  };
+
+  const handleEmailAttendees = () => {
+    const names = Object.keys(brief.attendee_context);
+    toast.info(`Email draft stub for ${names.length} attendee${names.length !== 1 ? "s" : ""}. Integration coming soon.`);
+  };
+
   const meetingTime = meeting?.starts_at
     ? new Date(meeting.starts_at).toLocaleString("en-US", {
         weekday: "short",
