@@ -7,12 +7,10 @@ import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { computeStrength, daysBetween, recencyLabel } from "@/lib/contactStrength";
 import { Motion } from "@/components/ui/motion";
 import { Input } from "@/components/ui/input";
-import { MessageSquare, Phone, Video, Mail, StickyNote, Search, ArrowUpDown, Tag, Filter } from "lucide-react";
-import ContactTagManager, { useAllContactTags } from "@/components/ContactTagManager";
+import { Search, Tag, Filter } from "lucide-react";
+import { useAllContactTags } from "@/components/ContactTagManager";
+import SmartContactCard from "@/components/SmartContactCard";
 
-const SOURCE_ICONS: Record<string, React.ElementType> = {
-  linq: MessageSquare, phone: Phone, recall: Video, gmail: Mail, manual: StickyNote,
-};
 
 async function fetchSignals(): Promise<Signal[]> {
   const { data, error } = await supabase
@@ -109,6 +107,21 @@ type SortMode = "signals" | "recency" | "alpha" | "high" | "strength";
 export default function Contacts() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  // Fetch engagement sequences for enrichment
+  const { data: sequences = [] } = useQuery({
+    queryKey: ["engagement-sequences"],
+    queryFn: async () => {
+      const { data } = await supabase.from("engagement_sequences").select("*").eq("enabled", true);
+      return data || [];
+    },
+  });
+
+  const sequenceMap = useMemo(() => {
+    const map = new Map<string, { intervalDays: number; nextDueAt: string; note: string | null }>();
+    sequences.forEach((s: any) => map.set(s.contact_name, { intervalDays: s.interval_days, nextDueAt: s.next_due_at, note: s.note }));
+    return map;
+  }, [sequences]);
+
   const [sort, setSort] = useState<SortMode>("strength");
   const [filterTag, setFilterTag] = useState<string | null>(null);
   const { data: allTags } = useAllContactTags();
@@ -244,102 +257,17 @@ export default function Contacts() {
 
       {/* Contact cards */}
       <div className="space-y-2">
-        {filtered.map((contact, i) => {
-          const colors = SIGNAL_TYPE_COLORS[contact.dominantType as keyof typeof SIGNAL_TYPE_COLORS] || SIGNAL_TYPE_COLORS.CONTEXT;
-          return (
-            <Motion key={contact.name} delay={100 + i * 20}>
-              <div
-                onClick={() => navigate(`/contact/${encodeURIComponent(contact.name)}`)}
-                className="border border-vanta-border bg-vanta-bg-elevated hover:border-vanta-border-mid transition-all cursor-pointer group"
-              >
-                <div className="p-4">
-                  {/* Top row */}
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      {/* Avatar circle */}
-                      <div className={`w-9 h-9 shrink-0 flex items-center justify-center border ${colors.border} ${colors.bg}`} style={{ borderRadius: "50%" }}>
-                        <span className={`${colors.text} font-mono text-[11px] font-bold`}>
-                          {contact.name.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-mono text-[13px] text-foreground font-semibold truncate group-hover:translate-x-0.5 transition-transform">
-                          {contact.name}
-                        </p>
-                        <p className="font-mono text-[9px] text-vanta-text-muted uppercase tracking-wider">
-                          {recencyLabel(contact.daysSinceLast)} · {contact.signalCount} signals
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Strength score */}
-                    <div className="flex items-center gap-2 shrink-0">
-                      <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-all ${
-                            contact.strength >= 75 ? "bg-emerald-500" :
-                            contact.strength >= 50 ? "bg-sky-500" :
-                            contact.strength >= 25 ? "bg-amber-500" : "bg-muted-foreground"
-                          }`}
-                          style={{ width: `${contact.strength}%` }}
-                        />
-                      </div>
-                      <span className={`font-mono text-[9px] uppercase tracking-wider ${
-                        contact.strength >= 75 ? "text-emerald-500" :
-                        contact.strength >= 50 ? "text-sky-500" :
-                        contact.strength >= 25 ? "text-amber-500" : "text-muted-foreground"
-                      }`}>
-                        {contact.strength}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      {contact.highPriority > 0 && (
-                        <span className="px-1.5 py-0.5 font-mono text-[9px] text-vanta-accent border border-vanta-accent-border bg-vanta-accent-faint">
-                          {contact.highPriority} HIGH
-                        </span>
-                      )}
-                      <div className="flex gap-1">
-                        {Array.from(contact.sources).map((src) => {
-                          const Icon = SOURCE_ICONS[src] || MessageSquare;
-                          return <Icon key={src} className="w-3.5 h-3.5 text-vanta-text-low" />;
-                        })}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Signal type chips */}
-                  <div className="flex flex-wrap gap-1 mb-2">
-                    {Object.entries(contact.signalTypes).map(([type, count]) => {
-                      const tc = SIGNAL_TYPE_COLORS[type as keyof typeof SIGNAL_TYPE_COLORS] || SIGNAL_TYPE_COLORS.CONTEXT;
-                      return (
-                        <span key={type} className={`${tc.bg} ${tc.text} text-[8px] font-mono px-1.5 py-0.5 border ${tc.border} uppercase tracking-wider`}>
-                          {type} {count}
-                        </span>
-                      );
-                    })}
-                  </div>
-
-                  {/* Contact tags */}
-                  <div className="mb-2" onClick={(e) => e.stopPropagation()}>
-                    <ContactTagManager contactName={contact.name} compact />
-                  </div>
-
-                  {/* Recent signal previews */}
-                  <div className="space-y-1">
-                    {contact.recentSignals.slice(0, 2).map((s) => (
-                      <p key={s.id} className="font-mono text-[10px] text-vanta-text-low truncate leading-relaxed">
-                        <span className="text-vanta-text-muted mr-1">
-                          {new Date(s.capturedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                        </span>
-                        {s.summary}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </Motion>
-          );
-        })}
+        {filtered.map((contact, i) => (
+          <Motion key={contact.name} delay={100 + i * 20}>
+            <SmartContactCard
+              contact={{
+                ...contact,
+                sources: contact.sources,
+                engagementSequence: sequenceMap.get(contact.name) || null,
+              }}
+            />
+          </Motion>
+        ))}
       </div>
 
       {!isLoading && filtered.length === 0 && (

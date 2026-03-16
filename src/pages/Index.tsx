@@ -11,7 +11,7 @@ import SignalDetailDrawer from "@/components/SignalDetailDrawer";
 import CoolingAlerts from "@/components/CoolingAlerts";
 import InlineBrainDump from "@/components/InlineBrainDump";
 import WhatsAhead from "@/components/WhatsAhead";
-import ActionItems from "@/components/ActionItems";
+import EnhancedActionItems from "@/components/EnhancedActionItems";
 import DailyTimeline from "@/components/DailyTimeline";
 import {
   MessageSquare,
@@ -219,7 +219,7 @@ const Index = () => {
 
           {/* Cooling Alerts — creative & executive */}
           {/* Action Items — middle of dashboard */}
-          <ActionItems onSignalClick={(s) => setDrawerSignal(s)} />
+          <EnhancedActionItems onSignalClick={(s) => setDrawerSignal(s)} />
 
           <CoolingAlerts />
 
