@@ -114,19 +114,7 @@ export default function Briefing() {
   });
 
   if (isLoading) {
-  const handleExportPdf = () => {
-    toast.info("PDF export coming soon — brief content will be formatted for print.");
-    // Stub: In production, calls an edge function to generate PDF
-    window.print();
-  };
-
-  const handleEmailAttendees = () => {
-    const names = Object.keys(brief.attendee_context);
-    toast.info(`Email draft stub for ${names.length} attendee${names.length !== 1 ? "s" : ""}. Integration coming soon.`);
-    // Stub: In production, calls an edge function to send the brief via email
-  };
-
-  return (
+    return (
       <div className="max-w-[720px] mx-auto px-5 py-12">
         <div className="w-2 h-2 bg-primary animate-pulse mx-auto" />
       </div>
