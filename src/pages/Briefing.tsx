@@ -190,6 +190,24 @@ export default function Briefing() {
           <p className="font-sans text-[14px] leading-relaxed text-vanta-text-mid">
             {brief.brief_text}
           </p>
+
+          {/* Export actions */}
+          <div className="flex items-center gap-2 mt-4 pt-4 border-t border-vanta-accent-zoom-border/30">
+            <button
+              onClick={handleExportPdf}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest border border-vanta-border text-vanta-text-mid hover:text-foreground hover:border-foreground/20 transition-colors"
+            >
+              <Download className="w-3 h-3" />
+              Export PDF
+            </button>
+            <button
+              onClick={handleEmailAttendees}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest border border-vanta-accent-zoom-border text-vanta-accent-zoom hover:bg-vanta-accent-zoom/10 transition-colors"
+            >
+              <Send className="w-3 h-3" />
+              Email to Attendees
+            </button>
+          </div>
         </header>
       </Motion>
 
