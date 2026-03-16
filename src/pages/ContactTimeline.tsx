@@ -294,6 +294,13 @@ export default function ContactTimeline() {
         </Motion>
       )}
 
+      {/* Engagement Sequences */}
+      <Motion delay={90}>
+        <div className="mb-6 border border-vanta-border bg-card p-4">
+          <EngagementSequences contactName={decodedName} />
+        </div>
+      </Motion>
+
       {/* View mode toggle */}
       <Motion delay={100}>
         <div className="flex gap-1 mb-6">
