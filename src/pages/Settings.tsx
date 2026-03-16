@@ -5,13 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Save, RotateCcw, Settings2, MessageSquare, Users, Bell, Shield, Smartphone, Phone, Video, Mail, Calendar, Filter, SlidersHorizontal, ShieldCheck, Zap, Palette, BookOpen } from "lucide-react";
-import UserModes from "./UserModes";
+import { Save, RotateCcw, Settings2, MessageSquare, Users, Bell, Shield, Smartphone, Phone, Video, Mail, Calendar, ShieldCheck, Zap } from "lucide-react";
 import NoiseQueue from "./NoiseQueue";
 import ClassificationAudit from "./ClassificationAudit";
 import WorkflowBuilder from "@/components/WorkflowBuilder";
-import CustomSignalTypes from "@/components/CustomSignalTypes";
-import MyRules from "@/components/MyRules";
 import CalendarSyncSettings from "@/components/CalendarSyncSettings";
 
 interface SettingRow {
