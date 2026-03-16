@@ -11,24 +11,34 @@ interface ProductLayoutProps {
 
 const BREADCRUMB_MAP: Record<string, string> = {
   "/": "Dashboard",
-  "/signals": "Platform · Signal Feed",
-  "/graph": "Platform · Relationship Graph",
-  "/ontology": "Platform · Ontology",
-  "/phone-fmc": "Platform · Phone FMC",
+  // Fab Five
+  "/connectivity": "Fab Five · Connectivity",
+  "/brain-dump": "Fab Five · Brain Dump",
+  "/signals": "Fab Five · Signal Feed",
+  "/focus": "Fab Five · Focus",
+  "/command": "Fab Five · Easy Actions",
+  // Product Concepts
+  "/contacts": "Product · Smart Contacts",
+  "/graph": "Product · Relationship Graph",
+  "/insights": "Product · Insight Engine",
+  "/investments": "Product · Investment Intel",
+  "/decisions": "Product · Decision Capture",
+  // Channels
   "/product/intro": "Channel · iMessage",
   "/product/phone-call": "Channel · Phone",
   "/product/meeting": "Channel · Zoom",
   "/product/email": "Channel · Email",
   "/product/calendar": "Channel · Calendar",
-  "/product/insight": "Product · Insight Engine",
-  "/product/investment": "Product · Investment Intel",
-  "/product/decision": "Product · Decision Capture",
+  // Platform
   "/product/context": "Platform · Context Layer",
   "/product/noise": "Platform · Noise Filter",
+  "/ontology": "Platform · Ontology",
+  "/phone-fmc": "Platform · Phone FMC",
   "/architecture": "Platform · Architecture",
-  "/brain-dump": "Brain Dump",
+  // Other
   "/releases": "Release Notes",
-  "/command": "Command",
+  "/settings": "Settings",
+  "/admin": "Admin",
 };
 
 function HamburgerTrigger({ breadcrumb }: { breadcrumb: string }) {
