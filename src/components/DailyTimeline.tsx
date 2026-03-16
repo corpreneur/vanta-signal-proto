@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { Motion } from "@/components/ui/motion";
@@ -16,6 +17,7 @@ import {
   StickyNote,
   CheckCircle2,
   ArrowRight,
+  Trash2,
 } from "lucide-react";
 
 const SOURCE_ICONS: Record<string, typeof MessageSquare> = {
@@ -47,6 +49,24 @@ interface DailyTimelineProps {
 }
 
 export default function DailyTimeline({ signals, onSignalClick, highOnly = false }: DailyTimelineProps) {
+  const queryClient = useQueryClient();
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeleting(id);
+    const { error } = await supabase.from("signals").delete().eq("id", id);
+    setDeleting(null);
+    if (error) {
+      toast.error("Failed to delete");
+    } else {
+      queryClient.invalidateQueries({ queryKey: ["signals-dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["signals"] });
+      queryClient.invalidateQueries({ queryKey: ["action-items-enhanced"] });
+      toast.success("Signal deleted");
+    }
+  };
+
   const today = useMemo(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
@@ -128,19 +148,23 @@ export default function DailyTimeline({ signals, onSignalClick, highOnly = false
                   const SourceIcon = SOURCE_ICONS[s.source] || MessageSquare;
                   const leftBorder = SIGNAL_LEFT_BORDER[s.signalType] || "border-l-transparent";
                   return (
-                    <button
+                    <div
                       key={s.id}
-                      onClick={() => onSignalClick(s)}
-                      className={`flex items-start gap-3 p-4 bg-card hover:bg-vanta-bg-elevated transition-colors w-full text-left border-l-2 ${leftBorder}`}
+                      className={`flex items-start gap-3 p-4 bg-card hover:bg-vanta-bg-elevated transition-colors w-full text-left border-l-2 ${leftBorder} group`}
                     >
-                      <span className="font-mono text-[9px] text-vanta-text-muted shrink-0 mt-1 w-12">
-                        {formatTime(s.capturedAt)}
-                      </span>
-                      <SourceIcon className="w-3.5 h-3.5 text-vanta-text-muted shrink-0 mt-1" />
-                      <div className="min-w-0 flex-1">
-                        <p className="font-sans text-[13px] text-foreground truncate">{s.summary}</p>
-                        <p className="font-mono text-[9px] text-vanta-text-low mt-0.5">{s.sender}</p>
-                      </div>
+                      <button
+                        onClick={() => onSignalClick(s)}
+                        className="flex items-start gap-3 flex-1 min-w-0 text-left"
+                      >
+                        <span className="font-mono text-[9px] text-vanta-text-muted shrink-0 mt-1 w-12">
+                          {formatTime(s.capturedAt)}
+                        </span>
+                        <SourceIcon className="w-3.5 h-3.5 text-vanta-text-muted shrink-0 mt-1" />
+                        <div className="min-w-0 flex-1">
+                          <p className="font-sans text-[13px] text-foreground truncate">{s.summary}</p>
+                          <p className="font-mono text-[9px] text-vanta-text-low mt-0.5">{s.sender}</p>
+                        </div>
+                      </button>
                       {s.priority === "high" && (
                         <span className="font-mono text-[8px] uppercase tracking-wider text-vanta-accent px-1.5 py-0.5 border border-vanta-accent-border bg-vanta-accent-faint shrink-0">
                           High
@@ -159,7 +183,15 @@ export default function DailyTimeline({ signals, onSignalClick, highOnly = false
                           {Math.round(s.confidenceScore * 100)}%
                         </span>
                       )}
-                    </button>
+                      <button
+                        onClick={(e) => handleDelete(s.id, e)}
+                        disabled={deleting === s.id}
+                        className="text-muted-foreground hover:text-destructive transition-colors p-1 opacity-0 group-hover:opacity-100 shrink-0 disabled:opacity-50"
+                        title="Delete signal"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   );
                 })}
               </div>

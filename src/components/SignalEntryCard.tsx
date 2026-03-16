@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown, Copy, Check, CheckCircle, Video, Phone, ArrowUpFromLine, Shield, CalendarClock, Pointer, Users, Reply, Bell, Calendar, Image, Film, FileText, Mic, Paperclip, Pin, Clock, Mail, FileOutput, Flag } from "lucide-react";
+import { ChevronDown, Copy, Check, CheckCircle, Video, Phone, ArrowUpFromLine, Shield, CalendarClock, Pointer, Users, Reply, Bell, Calendar, Image, Film, FileText, Mic, Paperclip, Pin, Clock, Mail, FileOutput, Flag, Trash2 } from "lucide-react";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS, PHONE_CALL_TAGS, PHONE_TAG_LABELS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
@@ -103,6 +103,19 @@ const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: Signa
     } else {
       queryClient.invalidateQueries({ queryKey: ["signals"] });
       toast.success("Marked as reviewed");
+    }
+  };
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const { error } = await supabase.from("signals").delete().eq("id", signal.id);
+    if (error) {
+      toast.error("Failed to delete");
+    } else {
+      queryClient.invalidateQueries({ queryKey: ["signals"] });
+      queryClient.invalidateQueries({ queryKey: ["signals-dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["action-items-enhanced"] });
+      toast.success("Signal deleted");
     }
   };
 
@@ -344,6 +357,16 @@ const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: Signa
               Done
             </button>
           )}
+
+          {/* Delete */}
+          <button
+            onClick={handleDelete}
+            className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-destructive border border-destructive/30 hover:bg-destructive/10 transition-colors"
+            title="Delete signal"
+          >
+            <Trash2 className="w-3 h-3" />
+            Delete
+          </button>
 
           {/* Snooze */}
           {signal.status !== "Complete" && (

@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { CheckCircle2, Circle, Clock, ArrowRight, ChevronDown, ChevronUp, Zap, AlertTriangle, Shield } from "lucide-react";
+import { CheckCircle2, Circle, Clock, ArrowRight, ChevronDown, ChevronUp, Zap, AlertTriangle, Shield, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Motion } from "@/components/ui/motion";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
@@ -77,6 +77,7 @@ interface EnhancedActionItemsProps {
 export default function EnhancedActionItems({ onSignalClick }: EnhancedActionItemsProps) {
   const queryClient = useQueryClient();
   const [completing, setCompleting] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "quick" | "overdue">("all");
 
@@ -113,6 +114,24 @@ export default function EnhancedActionItems({ onSignalClick }: EnhancedActionIte
       queryClient.invalidateQueries({ queryKey: ["signals-dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["action-items"] });
       toast.success("Marked complete");
+    }
+  };
+
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeleting(id);
+    const { error } = await supabase
+      .from("signals")
+      .delete()
+      .eq("id", id);
+    setDeleting(null);
+    if (error) {
+      toast.error("Failed to delete");
+    } else {
+      queryClient.invalidateQueries({ queryKey: ["action-items-enhanced"] });
+      queryClient.invalidateQueries({ queryKey: ["signals-dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["signals"] });
+      toast.success("Signal deleted");
     }
   };
 
@@ -206,12 +225,22 @@ export default function EnhancedActionItems({ onSignalClick }: EnhancedActionIte
                       )}
                     </div>
                   </div>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setExpandedId(isExpanded ? null : item.id); }}
-                    className="shrink-0 text-muted-foreground hover:text-foreground transition-colors p-1"
-                  >
-                    {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                  </button>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      onClick={(e) => handleDelete(item.id, e)}
+                      disabled={deleting === item.id}
+                      className="text-muted-foreground hover:text-destructive transition-colors p-1 opacity-0 group-hover:opacity-100 disabled:opacity-50"
+                      title="Delete signal"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setExpandedId(isExpanded ? null : item.id); }}
+                      className="text-muted-foreground hover:text-foreground transition-colors p-1"
+                    >
+                      {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
                 </button>
 
                 {/* Expanded section with smart actions */}
