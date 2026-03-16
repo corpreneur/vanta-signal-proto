@@ -151,6 +151,9 @@ export default function NoteCapture({ inline = false, onCapture }: NoteCapturePr
       setEditableTags(classification.suggestedTags || []);
       setEditableContacts(classification.suggestedContacts || []);
 
+      // Notify parent of capture
+      onCapture?.(classification);
+
       toast({
         title: `Captured as ${SIGNAL_TYPE_LABELS[classification.signalType] || classification.signalType}`,
         description: classification.summary,
