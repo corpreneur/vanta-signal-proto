@@ -209,6 +209,19 @@ export default function ContactTimeline() {
         </header>
       </Motion>
 
+      {/* Relationship Brief */}
+      {relationshipBrief && (
+        <Motion delay={70}>
+          <div className="border border-vanta-accent-border bg-vanta-accent-faint p-5 mb-6">
+            <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent mb-2 flex items-center gap-1.5">
+              <HelpCircle className="w-3 h-3" />
+              Why Am I Talking To This Person?
+            </h3>
+            <p className="font-sans text-[13px] leading-relaxed text-foreground">{relationshipBrief}</p>
+          </div>
+        </Motion>
+      )}
+
       {/* Stats strip */}
       <Motion delay={60}>
         <div className="flex flex-wrap gap-6 mb-6 pb-6 border-b border-vanta-border">
