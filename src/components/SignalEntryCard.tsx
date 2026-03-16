@@ -253,6 +253,19 @@ const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: Signa
                 {signal.riskLevel}
               </span>
             )}
+            {typeof signal.confidenceScore === "number" && (
+              <span
+                className={`inline-block px-2 py-0.5 font-mono text-[10px] tracking-[0.12em] border ${
+                  signal.confidenceScore >= 0.85
+                    ? "text-vanta-signal-green border-vanta-signal-green-border bg-vanta-signal-green-faint"
+                    : signal.confidenceScore >= 0.6
+                    ? "text-vanta-signal-yellow border-vanta-signal-yellow-border bg-vanta-signal-yellow-faint"
+                    : "text-vanta-signal-red border-vanta-signal-red-border bg-vanta-signal-red-faint"
+                }`}
+              >
+                {Math.round(signal.confidenceScore * 100)}%
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             {signal.dueDate && (() => {
