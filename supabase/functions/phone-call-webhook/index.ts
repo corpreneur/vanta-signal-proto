@@ -16,6 +16,7 @@ interface PhoneClassification {
   summary: string;
   tags: string[];       // phone-specific tags
   actionsTaken: string[];
+  confidence: number;
 }
 
 // ─── AI: Classify phone call transcript ────────────────────────────────────
