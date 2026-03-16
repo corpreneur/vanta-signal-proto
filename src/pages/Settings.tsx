@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Save, RotateCcw, Settings2, MessageSquare, Users, Bell, Shield, Smartphone, Phone, Video, Mail, Calendar, Filter, SlidersHorizontal, ShieldCheck, Zap, Palette, BookOpen, CalendarSync } from "lucide-react";
+import { Save, RotateCcw, Settings2, MessageSquare, Users, Bell, Shield, Smartphone, Phone, Video, Mail, Calendar, Filter, SlidersHorizontal, ShieldCheck, Zap, Palette, BookOpen } from "lucide-react";
 import UserModes from "./UserModes";
 import NoiseQueue from "./NoiseQueue";
 import ClassificationAudit from "./ClassificationAudit";
