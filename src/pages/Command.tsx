@@ -73,6 +73,35 @@ function relativeTime(iso: string) {
   return `In ${Math.round(mins / 60)}h`;
 }
 
+/* ── mock meetings for demo ─────────────────────────────── */
+function getMockMeetings() {
+  const today = new Date();
+  const make = (h: number, m: number, title: string, attendees: string[]) => {
+    const starts = new Date(today);
+    starts.setHours(h, m, 0, 0);
+    const ends = new Date(starts);
+    ends.setHours(h + 1);
+    return {
+      id: `mock-${h}-${m}`,
+      title,
+      starts_at: starts.toISOString(),
+      ends_at: ends.toISOString(),
+      attendees,
+      briefed: false,
+      zoom_meeting_id: null,
+      calendar_event_id: null,
+      created_at: new Date().toISOString(),
+    };
+  };
+  return [
+    make(9, 0, "Portfolio Review — Series B Pipeline", ["Marcus Chen", "Elena Voss"]),
+    make(10, 30, "1:1 with Sarah Kim — Fundraise Update", ["Sarah Kim"]),
+    make(13, 0, "LP Advisory Board Prep", ["James Whitfield", "Priya Sharma", "David Okafor"]),
+    make(15, 0, "Intro Call — Astra Robotics (via Marcus)", ["Leo Park", "Marcus Chen"]),
+    make(16, 30, "Weekly Partner Sync", ["Elena Voss", "James Whitfield"]),
+  ];
+}
+
 export default function Command() {
   const { data: topSignals = [] } = useQuery({
     queryKey: ["command-signals"],
@@ -86,8 +115,9 @@ export default function Command() {
     refetchInterval: 60_000,
   });
 
-  const meetings = briefData?.meetings || [];
+  const dbMeetings = briefData?.meetings || [];
   const briefs = briefData?.briefs || [];
+  const meetings = dbMeetings.length > 0 ? dbMeetings : getMockMeetings();
 
   const meetingBriefMap = useMemo(() => {
     const map = new Map<string, typeof briefs[0]>();
