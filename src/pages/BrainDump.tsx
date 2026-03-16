@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { PenLine, Link2, FileText, Loader2, ArrowRight, Plus, Clock, Zap } from "lucide-react";
+import { PenLine, Link2, FileText, Loader2, ArrowRight, Plus, Clock, Zap, Image, Mail, Mic } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
