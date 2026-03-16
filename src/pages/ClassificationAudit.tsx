@@ -67,6 +67,7 @@ async function fetchSignals(): Promise<Signal[]> {
     riskLevel: r.risk_level as Signal["riskLevel"],
     dueDate: r.due_date,
     callPointer: r.call_pointer,
+    confidenceScore: (r as Record<string, unknown>).confidence_score as number | null,
   }));
 }
 

@@ -51,6 +51,7 @@ async function fetchContactSignals(name: string): Promise<Signal[]> {
     dueDate: (row as Record<string, unknown>).due_date as string | null,
     callPointer: (row as Record<string, unknown>).call_pointer as string | null,
     pinned: row.pinned ?? false,
+    confidenceScore: (row as Record<string, unknown>).confidence_score as number | null,
   }));
 }
 
