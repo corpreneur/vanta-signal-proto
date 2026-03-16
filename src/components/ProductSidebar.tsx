@@ -141,37 +141,34 @@ export function ProductSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="border-r border-vanta-border bg-vanta-bg">
-      <SidebarHeader className="px-3 py-5">
+      <SidebarHeader className="px-3 py-3 space-y-1">
         <a href="/" className="flex items-center gap-2">
           <span className="font-sans text-[17px] font-extrabold tracking-[0.2em] uppercase text-foreground">
             {collapsed ? "V" : "VANTA"}
           </span>
         </a>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <NavLink
+                to="/"
+                end
+                className="group/nav flex items-center gap-2 px-2 py-1.5 border-l-2 border-transparent font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5"
+                activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
+              >
+                <LayoutDashboard className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover/nav:scale-110" />
+                {!collapsed && <span>Dashboard</span>}
+              </NavLink>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Dashboard + Fab Five — single top section */}
-        <SidebarGroup className="py-2">
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <NavLink
-                    to="/"
-                    end
-                    className="group/nav flex items-center gap-2 px-2 py-2 border-l-2 border-transparent font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5"
-                    activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
-                  >
-                    <LayoutDashboard className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover/nav:scale-110" />
-                    {!collapsed && <span>Dashboard</span>}
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-
+        {/* Fab Five */}
+        <SidebarGroup className="py-1">
           {!collapsed && (
-            <p className="px-2 pt-4 pb-1 font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent">
+            <p className="px-2 pb-1 font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent">
               Fab Five
             </p>
           )}
