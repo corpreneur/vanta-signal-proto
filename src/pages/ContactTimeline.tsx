@@ -106,6 +106,8 @@ export default function ContactTimeline() {
   const decodedName = decodeURIComponent(name || "");
   const [viewMode, setViewMode] = useState<ViewMode>("timeline");
   const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
+  const [loadingBrief, setLoadingBrief] = useState(false);
+  const [relationshipBrief, setRelationshipBrief] = useState<string | null>(null);
 
   const { data: signals = [], isLoading } = useQuery({
     queryKey: ["contact-timeline", decodedName],
