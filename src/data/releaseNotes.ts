@@ -10,6 +10,20 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "1.2.0",
+    date: "2026-03-16",
+    title: "PI-2 — Proactive Relationships, Quick Capture & File Storage",
+    changes: [
+      { type: "feature", text: "Contact Tagging & Grouping — tag contacts, filter the contact list by tag" },
+      { type: "feature", text: "Automated Engagement Sequences — time-based outreach reminders per contact" },
+      { type: "feature", text: "Global Quick Capture (⌘K) — universal keyboard shortcut for navigation and instant thought capture" },
+      { type: "feature", text: "File Storage & Surfacing — upload and manage attachments on any signal via cloud storage" },
+      { type: "improvement", text: "Contact cards show inline tags with add/remove controls" },
+      { type: "improvement", text: "Contact timeline includes engagement sequence management" },
+      { type: "improvement", text: "Signal Detail Drawer shows file attachments section with upload/view/delete" },
+    ],
+  },
+  {
     version: "1.1.0",
     date: "2026-03-16",
     title: "Phase 3 — Ontology & Integration Layer",
