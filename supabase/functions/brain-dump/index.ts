@@ -299,6 +299,7 @@ serve(async (req) => {
         due_date: (classification.dueDate && classification.dueDate !== "null") ? classification.dueDate : null,
         call_pointer: (classification.callPointer && classification.callPointer !== "null") ? classification.callPointer : null,
         confidence_score: typeof classification.confidence === "number" ? classification.confidence : null,
+        classification_reasoning: classification.reasoning || null,
       })
       .select()
       .single();
