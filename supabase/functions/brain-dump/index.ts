@@ -52,7 +52,9 @@ Also assign:
   - If user mentions a person → "Send to [person name]"
   - If content is an idea → "Create a one-pager", "Schedule reminder to revisit"
   - If a date is mentioned → "Set reminder for [date]"
-  - Always consider: document creation, follow-ups, reminders, sharing with mentioned people, and surfacing related files`;
+  - Always consider: document creation, follow-ups, reminders, sharing with mentioned people, and surfacing related files
+- confidence: how certain you are about the signal type classification (0.0 = very uncertain, 1.0 = certain)
+- reasoning: 1-2 sentences explaining WHY you chose this signal type and priority level. Reference specific keywords, patterns, or context from the text.`;
 
   const res = await fetch(LOVABLE_AI_URL, {
     method: "POST",
