@@ -31,6 +31,7 @@ export interface Signal {
   callPointer?: string | null;
   pinned?: boolean;
   confidenceScore?: number | null;
+  classificationReasoning?: string | null;
 }
 
 export interface MeetingArtifact {

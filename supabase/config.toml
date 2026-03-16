@@ -26,3 +26,18 @@ verify_jwt = false
 
 [functions.daily-digest]
 verify_jwt = false
+
+[functions.relationship-brief]
+verify_jwt = false
+
+[functions.cooling-alerts]
+verify_jwt = false
+
+[functions.apply-corrections]
+verify_jwt = false
+
+[functions.workflow-engine]
+verify_jwt = false
+
+[functions.intro-helper]
+verify_jwt = false

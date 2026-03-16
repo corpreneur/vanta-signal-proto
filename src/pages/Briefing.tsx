@@ -1,10 +1,11 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Video, Users, MessageSquare, Phone, Mail, StickyNote } from "lucide-react";
+import { ArrowLeft, Video, Users, MessageSquare, Phone, Mail, StickyNote, TrendingUp } from "lucide-react";
 import { Motion } from "@/components/ui/motion";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
+import { computeStrength, daysBetween } from "@/lib/contactStrength";
 
 interface MatchedSignal {
   id: string;
@@ -218,6 +219,34 @@ export default function Briefing() {
                       {ctx.signal_count} signals
                     </span>
                   </div>
+                  {/* V2: Relationship strength bar */}
+                  {(() => {
+                    const highCount = signals.filter((s) => s.priority === "high").length;
+                    const lastSig = signals[0]?.capturedAt;
+                    const dsl = lastSig ? daysBetween(lastSig) : 30;
+                    const { strength, strengthLabel } = computeStrength({ signalCount: signals.length, highPriority: highCount, daysSinceLast: dsl });
+                    return (
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-24 h-1.5 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all ${
+                              strength >= 75 ? "bg-vanta-signal-green" :
+                              strength >= 50 ? "bg-vanta-signal-blue" :
+                              strength >= 25 ? "bg-vanta-signal-yellow" : "bg-vanta-text-muted"
+                            }`}
+                            style={{ width: `${strength}%` }}
+                          />
+                        </div>
+                        <span className={`font-mono text-[9px] uppercase tracking-wider ${
+                          strength >= 75 ? "text-vanta-signal-green" :
+                          strength >= 50 ? "text-vanta-signal-blue" :
+                          strength >= 25 ? "text-vanta-signal-yellow" : "text-vanta-text-muted"
+                        }`}>
+                          {strengthLabel} ({strength})
+                        </span>
+                      </div>
+                    );
+                  })()}
                   <div className="flex flex-wrap gap-1">
                     {ctx.signal_types.map((t) => {
                       const c = SIGNAL_TYPE_COLORS[t as keyof typeof SIGNAL_TYPE_COLORS];

@@ -5,10 +5,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Save, RotateCcw, Settings2, MessageSquare, Users, Bell, Shield, Smartphone, Phone, Video, Mail, Calendar, Filter, SlidersHorizontal, ShieldCheck } from "lucide-react";
+import { Save, RotateCcw, Settings2, MessageSquare, Users, Bell, Shield, Smartphone, Phone, Video, Mail, Calendar, Filter, SlidersHorizontal, ShieldCheck, Zap, Palette } from "lucide-react";
 import UserModes from "./UserModes";
 import NoiseQueue from "./NoiseQueue";
 import ClassificationAudit from "./ClassificationAudit";
+import WorkflowBuilder from "@/components/WorkflowBuilder";
+import CustomSignalTypes from "@/components/CustomSignalTypes";
 
 interface SettingRow {
   key: string;
@@ -70,7 +72,7 @@ const SOURCE_CHANNELS: Array<{
 
 const SOURCE_KEYS = new Set(SOURCE_CHANNELS.map((c) => c.key));
 
-const TAB_MAP: Record<string, string> = { noise: "noise", modes: "modes", audit: "audit" };
+const TAB_MAP: Record<string, string> = { noise: "noise", modes: "modes", audit: "audit", workflows: "workflows", types: "types" };
 
 export default function Settings() {
   const queryClient = useQueryClient();
@@ -196,7 +198,15 @@ export default function Settings() {
           </TabsTrigger>
           <TabsTrigger value="audit" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
             <ShieldCheck className="w-3.5 h-3.5" />
-            Classification Audit
+            Audit
+          </TabsTrigger>
+          <TabsTrigger value="workflows" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
+            <Zap className="w-3.5 h-3.5" />
+            Workflows
+          </TabsTrigger>
+          <TabsTrigger value="types" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
+            <Palette className="w-3.5 h-3.5" />
+            Signal Types
           </TabsTrigger>
         </TabsList>
 
@@ -414,6 +424,16 @@ export default function Settings() {
         {/* Classification Audit Tab */}
         <TabsContent value="audit">
           <ClassificationAudit />
+        </TabsContent>
+
+        {/* Workflows Tab */}
+        <TabsContent value="workflows">
+          <WorkflowBuilder />
+        </TabsContent>
+
+        {/* Custom Signal Types Tab */}
+        <TabsContent value="types">
+          <CustomSignalTypes />
         </TabsContent>
       </Tabs>
     </div>

@@ -22,6 +22,7 @@ interface Classification {
   suggestedContacts: string[];
   accelerators: string[];
   confidence: number;
+  reasoning: string;
 }
 
 async function classifySignal(text: string, apiKey: string): Promise<Classification> {
@@ -51,7 +52,9 @@ Also assign:
   - If user mentions a person → "Send to [person name]"
   - If content is an idea → "Create a one-pager", "Schedule reminder to revisit"
   - If a date is mentioned → "Set reminder for [date]"
-  - Always consider: document creation, follow-ups, reminders, sharing with mentioned people, and surfacing related files`;
+  - Always consider: document creation, follow-ups, reminders, sharing with mentioned people, and surfacing related files
+- confidence: how certain you are about the signal type classification (0.0 = very uncertain, 1.0 = certain)
+- reasoning: 1-2 sentences explaining WHY you chose this signal type and priority level. Reference specific keywords, patterns, or context from the text.`;
 
   const res = await fetch(LOVABLE_AI_URL, {
     method: "POST",
@@ -86,8 +89,9 @@ Also assign:
                 suggestedContacts: { type: "array", items: { type: "string" }, description: "Names/initials of people mentioned" },
                 accelerators: { type: "array", items: { type: "string" }, description: "2-5 specific actionable next steps parsed from intent" },
                 confidence: { type: "number", description: "Classification confidence score from 0.0 to 1.0. 1.0 = highly certain, 0.5 = uncertain." },
+                reasoning: { type: "string", description: "1-2 sentences explaining why this classification was chosen" },
               },
-              required: ["signalType", "priority", "summary", "actionsTaken", "riskLevel", "dueDate", "callPointer", "suggestedTitle", "suggestedTags", "suggestedContacts", "accelerators", "confidence"],
+              required: ["signalType", "priority", "summary", "actionsTaken", "riskLevel", "dueDate", "callPointer", "suggestedTitle", "suggestedTags", "suggestedContacts", "accelerators", "confidence", "reasoning"],
               additionalProperties: false,
             },
           },
@@ -295,6 +299,7 @@ serve(async (req) => {
         due_date: (classification.dueDate && classification.dueDate !== "null") ? classification.dueDate : null,
         call_pointer: (classification.callPointer && classification.callPointer !== "null") ? classification.callPointer : null,
         confidence_score: typeof classification.confidence === "number" ? classification.confidence : null,
+        classification_reasoning: classification.reasoning || null,
       })
       .select()
       .single();
