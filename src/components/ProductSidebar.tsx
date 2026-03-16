@@ -56,7 +56,6 @@ const fabFiveItems = [
   { title: "Brain Dump", url: "/brain-dump", icon: PenLine },
   { title: "Signal Feed", url: "/signals", icon: BarChart3 },
   { title: "Focus", url: "/focus", icon: SlidersHorizontal },
-  { title: "Easy Actions", url: "/command", icon: CheckSquare },
 ];
 
 const channelItems = [
@@ -68,7 +67,6 @@ const channelItems = [
 ];
 
 const productItems = [
-  { title: "Daily Command", url: "/command", icon: Zap },
   { title: "Smart Contacts", url: "/contacts", icon: Users },
   { title: "Relationship Graph", url: "/graph", icon: Network },
   { title: "Insight Engine", url: "/insights", icon: Lightbulb },

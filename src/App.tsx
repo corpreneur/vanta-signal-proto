@@ -27,7 +27,6 @@ import ReleaseNotes from "./pages/ReleaseNotes";
 import Settings from "./pages/Settings";
 import ContactTimeline from "./pages/ContactTimeline";
 import Briefing from "./pages/Briefing";
-import Command from "./pages/Command";
 import Contacts from "./pages/Contacts";
 import NoiseQueue from "./pages/NoiseQueue";
 import UserModes from "./pages/UserModes";
@@ -91,7 +90,7 @@ const AppRoutes = () => {
       <Route path="/settings" element={<ProtectedRoute session={session}><ProductLayout><Settings /></ProductLayout></ProtectedRoute>} />
       <Route path="/contact/:name" element={<ProtectedRoute session={session}><ProductLayout><ContactTimeline /></ProductLayout></ProtectedRoute>} />
       <Route path="/briefing/:id" element={<ProtectedRoute session={session}><ProductLayout><Briefing /></ProductLayout></ProtectedRoute>} />
-      <Route path="/command" element={<ProtectedRoute session={session}><ProductLayout><Command /></ProductLayout></ProtectedRoute>} />
+      <Route path="/command" element={<Navigate to="/" replace />} />
       <Route path="/contacts" element={<ProtectedRoute session={session}><ProductLayout><Contacts /></ProductLayout></ProtectedRoute>} />
       <Route path="/admin" element={<ProtectedRoute session={session}><ProductLayout><Admin /></ProductLayout></ProtectedRoute>} />
       <Route path="/noise-queue" element={<Navigate to="/focus?tab=noise" replace />} />
