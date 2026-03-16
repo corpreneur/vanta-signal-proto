@@ -77,6 +77,7 @@ interface EnhancedActionItemsProps {
 export default function EnhancedActionItems({ onSignalClick }: EnhancedActionItemsProps) {
   const queryClient = useQueryClient();
   const [completing, setCompleting] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "quick" | "overdue">("all");
 
