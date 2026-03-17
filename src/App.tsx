@@ -99,6 +99,7 @@ const AppRoutes = () => {
       <Route path="/command" element={<ProtectedRoute session={session}><ProductLayout><Command /></ProductLayout></ProtectedRoute>} />
       <Route path="/contacts" element={<ProtectedRoute session={session}><ProductLayout><Contacts /></ProductLayout></ProtectedRoute>} />
       <Route path="/admin" element={<ProtectedRoute session={session}><ProductLayout><Admin /></ProductLayout></ProtectedRoute>} />
+      <Route path="/contacts/sync" element={<ProtectedRoute session={session}><ProductLayout><NativeContactSync /></ProductLayout></ProtectedRoute>} />
       <Route path="/noise-queue" element={<Navigate to="/focus?tab=noise" replace />} />
       <Route path="/focus" element={<ProtectedRoute session={session}><ProductLayout><Focus /></ProductLayout></ProtectedRoute>} />
       <Route path="/files" element={<ProtectedRoute session={session}><ProductLayout><FileVault /></ProductLayout></ProtectedRoute>} />

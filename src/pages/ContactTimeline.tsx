@@ -180,14 +180,17 @@ export default function ContactTimeline() {
           <div className="mt-3">
             <ContactTagManager contactName={decodedName} />
           </div>
-          <button
-            onClick={handleFetchBrief}
-            disabled={loadingBrief}
-            className="mt-3 flex items-center gap-1.5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest border border-primary text-primary hover:bg-primary/10 transition-colors disabled:opacity-50"
-          >
-            {loadingBrief ? <Loader2 className="w-3 h-3 animate-spin" /> : <HelpCircle className="w-3 h-3" />}
-            Why this person?
-          </button>
+          <div className="flex gap-2 mt-3">
+            <button
+              onClick={handleFetchBrief}
+              disabled={loadingBrief}
+              className="flex items-center gap-1.5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest border border-primary text-primary hover:bg-primary/10 transition-colors disabled:opacity-50"
+            >
+              {loadingBrief ? <Loader2 className="w-3 h-3 animate-spin" /> : <HelpCircle className="w-3 h-3" />}
+              Why this person?
+            </button>
+            <SaveToContactsButton contactName={decodedName} />
+          </div>
         </header>
       </Motion>
 
