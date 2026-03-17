@@ -54,6 +54,7 @@ export default function CommsPrepCard({ signal, allSignals }: CommsPrepCardProps
     };
   }, [signal, allSignals]);
 
+  if (!isCall && !isText) return null;
   if (contactHistory.signalCount === 0) return null;
 
   const trend = contactHistory.days <= 3 ? "up" : contactHistory.days > 14 ? "down" : "stable";
