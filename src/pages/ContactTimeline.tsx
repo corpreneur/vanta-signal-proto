@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { ArrowLeft, MessageSquare, Phone, Video, Mail, StickyNote, TrendingUp, HelpCircle, Loader2 } from "lucide-react";
+import SaveToContactsButton from "@/components/SaveToContactsButton";
 import ContactTagManager from "@/components/ContactTagManager";
 import EngagementSequences from "@/components/EngagementSequences";
 import ContactProfileHeader from "@/components/contacts/ContactProfileHeader";
