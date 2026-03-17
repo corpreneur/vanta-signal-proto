@@ -22,6 +22,7 @@ import InvestmentIntel from "./pages/InvestmentIntel";
 import DecisionCapture from "./pages/DecisionCapture";
 import Architecture from "./pages/Architecture";
 import BrainDump from "./pages/BrainDump";
+import OrbDemo from "./pages/OrbDemo";
 import ReleaseNotes from "./pages/ReleaseNotes";
 import Command from "./pages/Command";
 
@@ -100,6 +101,7 @@ const AppRoutes = () => {
       <Route path="/case-01" element={<Navigate to="/case/01" replace />} />
       <Route path="/case-02" element={<Navigate to="/case/02" replace />} />
       <Route path="/case-03" element={<Navigate to="/case/03" replace />} />
+      <Route path="/orb-demo" element={<OrbDemo />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
