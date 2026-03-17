@@ -3,6 +3,7 @@ import type { Signal } from "@/data/signals";
 import type { FilterState } from "@/components/SignalFilters";
 import SignalEntryCard from "@/components/SignalEntryCard";
 import SignalDetailDrawer from "@/components/SignalDetailDrawer";
+import CommsPrepCard from "@/components/CommsPrepCard";
 import { buildContactContextMap } from "@/lib/contactStrength";
 
 interface SignalFeedProps {
