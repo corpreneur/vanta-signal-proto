@@ -22,6 +22,7 @@ import InvestmentIntel from "./pages/InvestmentIntel";
 import DecisionCapture from "./pages/DecisionCapture";
 import Architecture from "./pages/Architecture";
 import BrainDump from "./pages/BrainDump";
+import OrbDemo from "./pages/OrbDemo";
 import ReleaseNotes from "./pages/ReleaseNotes";
 import Command from "./pages/Command";
 
