@@ -576,6 +576,96 @@ const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: Signa
       {/* Expandable section */}
       {expanded && (
         <div className="border-t border-vanta-border px-5 md:px-6 py-4 space-y-4 animate-fade-up">
+
+          {/* Inline Accelerators — contextual actions surfaced in-feed */}
+          {signal.status !== "Complete" && (
+            <div>
+              <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent mb-2">
+                Quick Actions
+              </h4>
+              <div className="flex flex-wrap gap-1.5">
+                {signal.signalType === "INTRO" && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const subject = encodeURIComponent(`Re: Introduction — ${signal.sender}`);
+                      const body = encodeURIComponent(`Hi,\n\nFollowing up on the introduction from ${signal.sender}.\n\n${signal.summary}\n\nBest regards`);
+                      window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
+                    }}
+                    className="flex items-center gap-1 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-vanta-accent border border-vanta-accent-border bg-vanta-accent-faint/50 hover:bg-vanta-accent-faint transition-colors"
+                  >
+                    <Mail className="w-3 h-3" /> Draft intro reply
+                  </button>
+                )}
+                {signal.signalType === "MEETING" && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const nextWeek = new Date();
+                      nextWeek.setDate(nextWeek.getDate() + 7);
+                      nextWeek.setHours(10, 0, 0, 0);
+                      const end = new Date(nextWeek);
+                      end.setMinutes(30);
+                      const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+                      const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Follow-up: ${signal.sender}`)}&details=${encodeURIComponent(signal.summary)}&dates=${fmt(nextWeek)}/${fmt(end)}`;
+                      window.open(url, "_blank");
+                    }}
+                    className="flex items-center gap-1 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-vanta-accent border border-vanta-accent-border bg-vanta-accent-faint/50 hover:bg-vanta-accent-faint transition-colors"
+                  >
+                    <Calendar className="w-3 h-3" /> Schedule follow-up
+                  </button>
+                )}
+                {signal.signalType === "DECISION" && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigator.clipboard.writeText(`TASK: ${signal.summary}\nFrom: ${signal.sender}\nPriority: ${signal.priority}\nContext: ${signal.sourceMessage}`);
+                      toast.success("Exported as task");
+                    }}
+                    className="flex items-center gap-1 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-vanta-accent border border-vanta-accent-border bg-vanta-accent-faint/50 hover:bg-vanta-accent-faint transition-colors"
+                  >
+                    <FileOutput className="w-3 h-3" /> Export as task
+                  </button>
+                )}
+                {signal.signalType === "INVESTMENT" && (
+                  <button
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      await supabase.from("signals").update({ pinned: true }).eq("id", signal.id);
+                      queryClient.invalidateQueries({ queryKey: ["signals"] });
+                      toast.success("Flagged for review");
+                    }}
+                    className="flex items-center gap-1 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-vanta-accent border border-vanta-accent-border bg-vanta-accent-faint/50 hover:bg-vanta-accent-faint transition-colors"
+                  >
+                    <Flag className="w-3 h-3" /> Flag for review
+                  </button>
+                )}
+                {/* Universal accelerators */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const subject = encodeURIComponent(`Re: ${signal.summary}`);
+                    const body = encodeURIComponent(`Hi ${signal.sender},\n\nRegarding: ${signal.summary}\n\n`);
+                    window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
+                  }}
+                  className="flex items-center gap-1 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent transition-colors"
+                >
+                  <Mail className="w-3 h-3" /> Email
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigator.clipboard.writeText(`One-pager: ${signal.sender}\n\nContext: ${signal.summary}\n\nSource: ${signal.sourceMessage}\n\nPriority: ${signal.priority}\nStatus: ${signal.status}`);
+                    toast.success("One-pager copied to clipboard");
+                  }}
+                  className="flex items-center gap-1 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent transition-colors"
+                >
+                  <FileText className="w-3 h-3" /> One-Pager
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Raw message */}
           <div>
             <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-2">

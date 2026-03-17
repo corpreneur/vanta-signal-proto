@@ -177,24 +177,80 @@ const Index = () => {
       {/* Inline Brain Dump — creative & executive only */}
       {!isDnd && <InlineBrainDump />}
 
-      {/* DND mode stops here — minimal view */}
+      {/* DND mode — ultra-minimal: only action items + calendar */}
       {isDnd ? (
         <Motion delay={40}>
-          <div className="flex items-center gap-2 py-6 text-center justify-center">
+          <div className="flex items-center gap-2 py-4 mb-6">
             <Moon className="w-4 h-4 text-destructive" />
             <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-vanta-text-muted">
-              Do Not Disturb — only action items shown
+              Do Not Disturb — essentials only
             </span>
           </div>
+          <WhatsAhead />
+          <EnhancedActionItems onSignalClick={(s) => setDrawerSignal(s)} />
+          <CoolingAlerts />
         </Motion>
-      ) : (
+      ) : isExecutive ? (
+        /* Executive mode — tight priority-only view: timeline → actions → cooling → stats */
         <>
-          {/* Daily Timeline — top of dashboard */}
           <Motion delay={40}>
             <DailyTimeline
               signals={activeSignals}
               onSignalClick={(s) => setDrawerSignal(s)}
-              highOnly={isExecutive}
+              highOnly
+            />
+          </Motion>
+
+          {/* Context row */}
+          <Motion delay={60}>
+            <div className="flex flex-wrap items-center gap-4 mb-8 pb-5 border-b border-vanta-border">
+              <span className="font-mono text-[11px] text-vanta-text-low">
+                {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+              </span>
+              <span className="w-px h-4 bg-vanta-border" />
+              <span className="font-mono text-[11px] text-vanta-text-low flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-vanta-accent-amber" />
+                {meetingCount} meeting{meetingCount !== 1 ? "s" : ""} today
+              </span>
+              <span className="w-px h-4 bg-vanta-border" />
+              <span className={`font-mono text-[10px] uppercase tracking-wider flex items-center gap-1.5 ${modeMeta.color}`}>
+                <modeMeta.icon className="w-3.5 h-3.5" />
+                {modeMeta.label} Mode
+              </span>
+            </div>
+          </Motion>
+
+          <EnhancedActionItems onSignalClick={(s) => setDrawerSignal(s)} />
+          <CoolingAlerts />
+
+          {/* Executive stats — compact */}
+          <Motion delay={120}>
+            <div className="flex flex-wrap gap-6 mb-8 pb-6 border-b border-vanta-border">
+              <Link to="/signals" className="group">
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">High Priority</p>
+                <p className="font-display text-[28px] text-vanta-accent group-hover:text-primary transition-colors">{highCount}</p>
+              </Link>
+              <Link to="/signals" className="group">
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Actions Fired</p>
+                <p className="font-display text-[28px] text-foreground group-hover:text-primary transition-colors">{actionCount}</p>
+              </Link>
+              <div>
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Noise Filtered</p>
+                <p className="font-display text-[28px] text-vanta-text-low">{noiseCount}</p>
+              </div>
+            </div>
+          </Motion>
+
+          <WhatsAhead />
+        </>
+      ) : (
+        /* Creative mode — full experience: timeline → context → actions → cooling → stats → channels → noise */
+        <>
+          <Motion delay={40}>
+            <DailyTimeline
+              signals={activeSignals}
+              onSignalClick={(s) => setDrawerSignal(s)}
+              highOnly={false}
             />
           </Motion>
 
@@ -217,13 +273,10 @@ const Index = () => {
             </div>
           </Motion>
 
-          {/* Cooling Alerts — creative & executive */}
-          {/* Action Items — middle of dashboard */}
           <EnhancedActionItems onSignalClick={(s) => setDrawerSignal(s)} />
-
           <CoolingAlerts />
 
-          {/* Stats Strip */}
+          {/* Full Stats Strip */}
           <Motion delay={120}>
             <div className="flex flex-wrap gap-6 mb-8 pb-6 border-b border-vanta-border">
               <Link to="/signals" className="group">
@@ -253,58 +306,55 @@ const Index = () => {
             </div>
           </Motion>
 
-          {/* What's Ahead — creative & executive */}
           <WhatsAhead />
 
-          {/* Channel Grid — creative only (hidden in executive) */}
-          {!isExecutive && (
-            <Motion delay={160}>
-              <section className="mb-10">
-                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-4">Channels</p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {CHANNELS.map((ch) => {
-                    const count = channelData.counts[ch.key] || 0;
-                    const maxCount = Math.max(...Object.values(channelData.counts), 1);
-                    const barWidth = count > 0 ? Math.max(12, (count / maxCount) * 100) : 0;
-                    const freshness = channelData.latest[ch.key] ? formatRelative(channelData.latest[ch.key]) : null;
+          {/* Channel Grid — creative only */}
+          <Motion delay={160}>
+            <section className="mb-10">
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-4">Channels</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {CHANNELS.map((ch) => {
+                  const count = channelData.counts[ch.key] || 0;
+                  const maxCount = Math.max(...Object.values(channelData.counts), 1);
+                  const barWidth = count > 0 ? Math.max(12, (count / maxCount) * 100) : 0;
+                  const freshness = channelData.latest[ch.key] ? formatRelative(channelData.latest[ch.key]) : null;
 
-                    return (
-                      <Link
-                        key={ch.key}
-                        to={ch.href}
-                        className="group relative flex flex-col justify-between p-5 bg-card border border-vanta-border rounded-sm hover:border-foreground/10 transition-all duration-300 hover:shadow-md overflow-hidden"
-                      >
-                        <div className="flex items-start justify-between mb-5">
-                          <div className={`w-9 h-9 rounded-lg ${ch.bg} flex items-center justify-center ring-1 ${ch.ring} transition-transform duration-300 group-hover:scale-110`}>
-                            <ch.icon className={`w-4 h-4 ${ch.color}`} />
-                          </div>
-                          {freshness ? (
-                            <span className="font-mono text-[8px] text-vanta-text-muted mt-1">{freshness}</span>
-                          ) : (
-                            <span className="font-mono text-[8px] text-vanta-text-muted mt-1 italic">idle</span>
-                          )}
+                  return (
+                    <Link
+                      key={ch.key}
+                      to={ch.href}
+                      className="group relative flex flex-col justify-between p-5 bg-card border border-vanta-border rounded-sm hover:border-foreground/10 transition-all duration-300 hover:shadow-md overflow-hidden"
+                    >
+                      <div className="flex items-start justify-between mb-5">
+                        <div className={`w-9 h-9 rounded-lg ${ch.bg} flex items-center justify-center ring-1 ${ch.ring} transition-transform duration-300 group-hover:scale-110`}>
+                          <ch.icon className={`w-4 h-4 ${ch.color}`} />
                         </div>
-                        <div>
-                          <p className="font-display text-[32px] leading-none text-foreground mb-1 tracking-tight">{count}</p>
-                          <p className="font-mono text-[10px] uppercase tracking-wider text-vanta-text-low">{ch.label}</p>
-                        </div>
-                        <div className="mt-4 h-1 w-full bg-vanta-border/50 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full ${ch.barColor} rounded-full transition-all duration-700 ease-out opacity-50 group-hover:opacity-100`}
-                            style={{ width: `${barWidth}%` }}
-                          />
-                        </div>
-                        <ChevronRight className="w-3.5 h-3.5 text-vanta-text-muted absolute right-3 top-5 opacity-0 group-hover:opacity-60 transition-all duration-200 translate-x-1 group-hover:translate-x-0" />
-                      </Link>
-                    );
-                  })}
-                </div>
-              </section>
-            </Motion>
-          )}
+                        {freshness ? (
+                          <span className="font-mono text-[8px] text-vanta-text-muted mt-1">{freshness}</span>
+                        ) : (
+                          <span className="font-mono text-[8px] text-vanta-text-muted mt-1 italic">idle</span>
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-display text-[32px] leading-none text-foreground mb-1 tracking-tight">{count}</p>
+                        <p className="font-mono text-[10px] uppercase tracking-wider text-vanta-text-low">{ch.label}</p>
+                      </div>
+                      <div className="mt-4 h-1 w-full bg-vanta-border/50 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full ${ch.barColor} rounded-full transition-all duration-700 ease-out opacity-50 group-hover:opacity-100`}
+                          style={{ width: `${barWidth}%` }}
+                        />
+                      </div>
+                      <ChevronRight className="w-3.5 h-3.5 text-vanta-text-muted absolute right-3 top-5 opacity-0 group-hover:opacity-60 transition-all duration-200 translate-x-1 group-hover:translate-x-0" />
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          </Motion>
 
-          {/* Noise Footer — creative only */}
-          {!isExecutive && noiseCount > 0 && (
+          {/* Noise Footer */}
+          {noiseCount > 0 && (
             <Motion delay={200}>
               <div className="mb-12 text-center">
                 <Link

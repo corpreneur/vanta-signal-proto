@@ -7,9 +7,10 @@ import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { computeStrength, daysBetween, recencyLabel } from "@/lib/contactStrength";
 import { Motion } from "@/components/ui/motion";
 import { Input } from "@/components/ui/input";
-import { Search, Tag, Filter } from "lucide-react";
+import { Search, Tag, Filter, UserPlus } from "lucide-react";
 import { useAllContactTags } from "@/components/ContactTagManager";
 import SmartContactCard from "@/components/SmartContactCard";
+import AddContactContext from "@/components/AddContactContext";
 
 
 async function fetchSignals(): Promise<Signal[]> {
@@ -107,6 +108,8 @@ type SortMode = "signals" | "recency" | "alpha" | "high" | "strength";
 export default function Contacts() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [addingContact, setAddingContact] = useState(false);
+  const [newContactName, setNewContactName] = useState("");
   // Fetch engagement sequences for enrichment
   const { data: sequences = [] } = useQuery({
     queryKey: ["engagement-sequences"],
@@ -162,12 +165,45 @@ export default function Contacts() {
     <div className="max-w-[960px] mx-auto px-4 pt-8 md:pt-12 pb-16">
       <Motion>
         <header className="mb-6">
-          <h1 className="font-display text-2xl md:text-3xl text-foreground tracking-tight">
-            Smart Contact List
-          </h1>
-          <p className="text-vanta-text-low text-xs font-mono mt-2 max-w-xl">
-            Unified contact intelligence — relationship context, signal density, and interaction history at a glance.
-          </p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="font-display text-2xl md:text-3xl text-foreground tracking-tight">
+                Smart Contact List
+              </h1>
+              <p className="text-vanta-text-low text-xs font-mono mt-2 max-w-xl">
+                Unified contact intelligence — relationship context, signal density, and interaction history at a glance.
+              </p>
+            </div>
+            <button
+              onClick={() => setAddingContact(!addingContact)}
+              className="flex items-center gap-1.5 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.15em] border border-primary text-primary hover:bg-primary/10 transition-colors shrink-0"
+            >
+              <UserPlus className="w-3.5 h-3.5" />
+              Add Contact
+            </button>
+          </div>
+
+          {/* Add Contact Context form */}
+          {addingContact && (
+            <div className="mt-4 space-y-3">
+              <input
+                value={newContactName}
+                onChange={(e) => setNewContactName(e.target.value)}
+                placeholder="Contact name…"
+                className="w-full bg-background border border-border px-3 py-2 font-mono text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
+                autoFocus
+              />
+              {newContactName.trim() && (
+                <AddContactContext
+                  contactName={newContactName.trim()}
+                  onClose={() => {
+                    setAddingContact(false);
+                    setNewContactName("");
+                  }}
+                />
+              )}
+            </div>
+          )}
         </header>
       </Motion>
 
