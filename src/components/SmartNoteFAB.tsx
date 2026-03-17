@@ -24,23 +24,57 @@ export default function SmartNoteFAB() {
   // Suppress on Idea Capture page (it already has full capture UI)
   if (location.pathname === "/brain-dump") return null;
 
+  const [hovered, setHovered] = useState(false);
+
   return (
     <>
-      {/* FAB Button */}
-      <button
-        onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group hover:scale-105 active:scale-95"
-        aria-label="Quick Capture"
-      >
-        <div className="relative">
-          <PenLine className="w-5 h-5 transition-transform group-hover:rotate-[-8deg]" />
-          {/* Breathing aura */}
+      {/* VANTA Orb FAB */}
+      <div className="fixed bottom-6 right-6 z-40 flex items-center justify-center" style={{ width: 80, height: 80 }}>
+        {/* Layer 1: Glow halo */}
+        <div
+          className="absolute inset-0 m-auto w-14 h-14 rounded-full pointer-events-none"
+          style={{ animation: "vanta-glow-pulse 3s ease-in-out infinite" }}
+        />
+
+        {/* Layer 2: Breathing aura ring */}
+        <div
+          className="absolute inset-0 m-auto w-[72px] h-[72px] rounded-full border-2 border-primary/30 pointer-events-none"
+          style={{ animation: "vanta-breathe 3s ease-in-out infinite" }}
+        />
+
+        {/* Layer 3: Orbital dot */}
+        <div
+          className="absolute inset-0 m-auto w-20 h-20 pointer-events-none"
+          style={{ animation: "vanta-orbit 6s linear infinite" }}
+        >
           <div
-            className="absolute inset-0 rounded-full border-2 border-primary/30 pointer-events-none"
-            style={{ animation: "vanta-breathe 3s ease-in-out infinite", margin: "-8px" }}
+            className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-primary"
+            style={{ opacity: 0.9, boxShadow: "0 0 6px 1px hsl(var(--primary) / 0.5)" }}
           />
         </div>
-      </button>
+
+        {/* Layer 4: Core button */}
+        <button
+          onClick={() => setOpen(true)}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+          className="relative z-10 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center transition-transform duration-300 hover:scale-105 active:scale-95"
+          aria-label="Quick Capture"
+        >
+          <PenLine className="w-5 h-5 transition-transform duration-300" style={{ transform: hovered ? "rotate(-8deg)" : "none" }} />
+        </button>
+
+        {/* Layer 5: Hover whisper label */}
+        <span
+          className="absolute -bottom-1 left-1/2 font-mono text-[9px] uppercase tracking-[0.2em] text-primary/70 transition-all duration-300 pointer-events-none whitespace-nowrap"
+          style={{
+            opacity: hovered ? 1 : 0,
+            transform: hovered ? "translateX(-50%) translateY(4px)" : "translateX(-50%) translateY(0)",
+          }}
+        >
+          Capture
+        </span>
+      </div>
 
       {/* Capture Sheet */}
       <Sheet open={open} onOpenChange={setOpen}>
