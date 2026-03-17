@@ -167,13 +167,22 @@ export default function Contacts() {
                 Relationship intelligence — strength scores, interaction history, and proactive engagement.
               </p>
             </div>
-            <button
-              onClick={() => setAddingContact(!addingContact)}
-              className="flex items-center gap-1.5 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.15em] border border-primary text-primary hover:bg-primary/10 transition-colors shrink-0"
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              Add Contact
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <Link
+                to="/contacts/sync"
+                className="flex items-center gap-1.5 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.15em] border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+                iPhone Sync
+              </Link>
+              <button
+                onClick={() => setAddingContact(!addingContact)}
+                className="flex items-center gap-1.5 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.15em] border border-primary text-primary hover:bg-primary/10 transition-colors"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                Add Contact
+              </button>
+            </div>
           </div>
 
           {addingContact && (
