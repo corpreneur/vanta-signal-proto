@@ -7,28 +7,20 @@ import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { computeStrength, daysBetween, recencyLabel } from "@/lib/contactStrength";
 import { Motion } from "@/components/ui/motion";
 import { Input } from "@/components/ui/input";
-import { Search, Tag, Filter, UserPlus } from "lucide-react";
+import { Search, Tag, Filter, UserPlus, LayoutGrid, LayoutList, Phone, Mail, MessageSquare } from "lucide-react";
 import { useAllContactTags } from "@/components/ContactTagManager";
 import SmartContactCard from "@/components/SmartContactCard";
 import AddContactContext from "@/components/AddContactContext";
 
-
 async function fetchSignals(): Promise<Signal[]> {
   const { data, error } = await supabase
-    .from("signals")
-    .select("*")
-    .order("captured_at", { ascending: false })
-    .limit(1000);
+    .from("signals").select("*")
+    .order("captured_at", { ascending: false }).limit(1000);
   if (error) throw error;
   return (data || []).map((row) => ({
-    id: row.id,
-    signalType: row.signal_type,
-    sender: row.sender,
-    summary: row.summary,
-    sourceMessage: row.source_message,
-    priority: row.priority,
-    capturedAt: row.captured_at,
-    actionsTaken: row.actions_taken || [],
+    id: row.id, signalType: row.signal_type, sender: row.sender,
+    summary: row.summary, sourceMessage: row.source_message, priority: row.priority,
+    capturedAt: row.captured_at, actionsTaken: row.actions_taken || [],
     status: row.status,
     source: (row as Record<string, unknown>).source as Signal["source"] || "linq",
     rawPayload: row.raw_payload as Record<string, unknown> | null,
@@ -50,12 +42,10 @@ interface ContactSummary {
   signalTypes: Record<string, number>;
   dominantType: string;
   recentSignals: Signal[];
-  strength: number; // 0–100
+  strength: number;
   strengthLabel: string;
 }
 
-
-/** Compute a 0–100 relationship strength score */
 function computeContactStrength(c: Omit<ContactSummary, "strength" | "strengthLabel">): { strength: number; strengthLabel: string } {
   return computeStrength({
     signalCount: c.signalCount,
@@ -104,13 +94,15 @@ function buildContacts(signals: Signal[]): ContactSummary[] {
 }
 
 type SortMode = "signals" | "recency" | "alpha" | "high" | "strength";
+type ViewMode = "list" | "grid";
 
 export default function Contacts() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [addingContact, setAddingContact] = useState(false);
   const [newContactName, setNewContactName] = useState("");
-  // Fetch engagement sequences for enrichment
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
+
   const { data: sequences = [] } = useQuery({
     queryKey: ["engagement-sequences"],
     queryFn: async () => {
@@ -160,6 +152,7 @@ export default function Contacts() {
   const totalContacts = contacts.length;
   const activeContacts = contacts.filter((c) => c.daysSinceLast <= 7).length;
   const stalledContacts = contacts.filter((c) => c.daysSinceLast > 30).length;
+  const strongContacts = contacts.filter((c) => c.strength >= 75).length;
 
   return (
     <div className="max-w-[960px] mx-auto px-4 pt-8 md:pt-12 pb-16">
@@ -168,10 +161,10 @@ export default function Contacts() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <h1 className="font-display text-2xl md:text-3xl text-foreground tracking-tight">
-                Smart Contact List
+                Smart Contacts
               </h1>
-              <p className="text-vanta-text-low text-xs font-mono mt-2 max-w-xl">
-                Unified contact intelligence — relationship context, signal density, and interaction history at a glance.
+              <p className="text-muted-foreground text-xs font-mono mt-2 max-w-xl">
+                Relationship intelligence — strength scores, interaction history, and proactive engagement.
               </p>
             </div>
             <button
@@ -183,7 +176,6 @@ export default function Contacts() {
             </button>
           </div>
 
-          {/* Add Contact Context form */}
           {addingContact && (
             <div className="mt-4 space-y-3">
               <input
@@ -209,17 +201,21 @@ export default function Contacts() {
 
       {/* Stats */}
       <Motion delay={40}>
-        <div className="flex flex-wrap gap-6 mb-6 pb-4 border-b border-vanta-border">
+        <div className="flex flex-wrap gap-6 mb-6 pb-4 border-b border-border">
           <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Contacts</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">Contacts</p>
             <p className="font-display text-[24px] text-foreground">{totalContacts}</p>
           </div>
           <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Active (7d)</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">Active (7d)</p>
             <p className="font-display text-[24px] text-foreground">{activeContacts}</p>
           </div>
           <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Stalled (30d+)</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">Strong</p>
+            <p className="font-display text-[24px] text-emerald-500">{strongContacts}</p>
+          </div>
+          <div>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">Stalled (30d+)</p>
             <p className="font-display text-[24px] text-destructive">{stalledContacts}</p>
           </div>
         </div>
@@ -229,12 +225,12 @@ export default function Contacts() {
       <Motion delay={80}>
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-vanta-text-muted" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search contacts…"
-              className="pl-9 font-mono text-xs bg-vanta-bg-elevated border-vanta-border"
+              className="pl-9 font-mono text-xs bg-card border-border"
             />
           </div>
           <div className="flex gap-1 flex-wrap">
@@ -244,8 +240,8 @@ export default function Contacts() {
                 onClick={() => setSort(m)}
                 className={`px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider border transition-colors ${
                   sort === m
-                    ? "border-foreground text-foreground bg-vanta-bg-elevated"
-                    : "border-vanta-border text-vanta-text-low hover:text-foreground hover:border-vanta-border-mid"
+                    ? "border-foreground text-foreground bg-card"
+                    : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/20"
                 }`}
               >
                 {m === "high" ? "Priority" : m === "alpha" ? "A–Z" : m === "signals" ? "Density" : m === "strength" ? "Strength" : "Recent"}
@@ -253,10 +249,26 @@ export default function Contacts() {
             ))}
           </div>
 
+          {/* View toggle */}
+          <div className="flex gap-1">
+            <button
+              onClick={() => setViewMode("list")}
+              className={`p-1.5 border transition-colors ${viewMode === "list" ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`}
+            >
+              <LayoutList className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode("grid")}
+              className={`p-1.5 border transition-colors ${viewMode === "grid" ? "border-foreground text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`}
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+          </div>
+
           {/* Tag filter */}
           {allTags && allTags.size > 0 && (
             <div className="flex flex-wrap gap-1 items-center">
-              <Filter className="w-3 h-3 text-vanta-text-muted mr-1" />
+              <Filter className="w-3 h-3 text-muted-foreground mr-1" />
               {Array.from(allTags.keys()).map((tag) => (
                 <button
                   key={tag}
@@ -264,7 +276,7 @@ export default function Contacts() {
                   className={`px-2 py-1 font-mono text-[9px] uppercase tracking-wider border rounded-sm transition-colors ${
                     filterTag === tag
                       ? "border-primary text-primary bg-primary/10"
-                      : "border-vanta-border text-vanta-text-low hover:text-foreground"
+                      : "border-border text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   <Tag className="w-2.5 h-2.5 inline mr-0.5" />
@@ -274,7 +286,7 @@ export default function Contacts() {
               {filterTag && (
                 <button
                   onClick={() => setFilterTag(null)}
-                  className="px-2 py-1 font-mono text-[9px] text-vanta-text-muted hover:text-foreground"
+                  className="px-2 py-1 font-mono text-[9px] text-muted-foreground hover:text-foreground"
                 >
                   Clear
                 </button>
@@ -284,31 +296,108 @@ export default function Contacts() {
         </div>
       </Motion>
 
-      {/* Loading */}
       {isLoading && (
         <div className="py-16 text-center">
           <div className="w-2 h-2 bg-primary animate-pulse mx-auto" />
         </div>
       )}
 
-      {/* Contact cards */}
-      <div className="space-y-2">
-        {filtered.map((contact, i) => (
-          <Motion key={contact.name} delay={100 + i * 20}>
-            <SmartContactCard
-              contact={{
-                ...contact,
-                sources: contact.sources,
-                engagementSequence: sequenceMap.get(contact.name) || null,
-              }}
-            />
-          </Motion>
-        ))}
-      </div>
+      {/* List view */}
+      {viewMode === "list" && (
+        <div className="space-y-2">
+          {filtered.map((contact, i) => (
+            <Motion key={contact.name} delay={100 + i * 20}>
+              <SmartContactCard
+                contact={{
+                  ...contact,
+                  sources: contact.sources,
+                  engagementSequence: sequenceMap.get(contact.name) || null,
+                }}
+              />
+            </Motion>
+          ))}
+        </div>
+      )}
+
+      {/* Grid view */}
+      {viewMode === "grid" && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {filtered.map((contact, i) => {
+            const colors = SIGNAL_TYPE_COLORS[contact.dominantType as keyof typeof SIGNAL_TYPE_COLORS] || SIGNAL_TYPE_COLORS.CONTEXT;
+            const strengthColor =
+              contact.strength >= 75 ? "bg-emerald-500" :
+              contact.strength >= 50 ? "bg-sky-500" :
+              contact.strength >= 25 ? "bg-amber-500" : "bg-muted-foreground";
+            const strengthTextColor =
+              contact.strength >= 75 ? "text-emerald-500" :
+              contact.strength >= 50 ? "text-sky-500" :
+              contact.strength >= 25 ? "text-amber-500" : "text-muted-foreground";
+
+            return (
+              <Motion key={contact.name} delay={100 + i * 30}>
+                <div
+                  onClick={() => navigate(`/contact/${encodeURIComponent(contact.name)}`)}
+                  className="border border-border bg-card hover:border-primary/30 transition-all cursor-pointer p-4 flex flex-col group"
+                >
+                  {/* Avatar + Name */}
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-primary-foreground font-mono text-sm font-bold ${strengthColor}`}>
+                      {contact.name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-mono text-[13px] text-foreground font-semibold truncate group-hover:translate-x-0.5 transition-transform">
+                        {contact.name}
+                      </p>
+                      <p className="font-mono text-[9px] text-muted-foreground">
+                        {recencyLabel(contact.daysSinceLast)} · {contact.signalCount} signals
+                      </p>
+                    </div>
+                    <span className={`font-mono text-lg font-bold ${strengthTextColor}`}>
+                      {contact.strength}
+                    </span>
+                  </div>
+
+                  {/* Signal type chips */}
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {Object.entries(contact.signalTypes).slice(0, 3).map(([type, count]) => {
+                      const tc = SIGNAL_TYPE_COLORS[type as keyof typeof SIGNAL_TYPE_COLORS] || SIGNAL_TYPE_COLORS.CONTEXT;
+                      return (
+                        <span key={type} className={`${tc.bg} ${tc.text} text-[8px] font-mono px-1.5 py-0.5 border ${tc.border} uppercase tracking-wider`}>
+                          {type} {count}
+                        </span>
+                      );
+                    })}
+                  </div>
+
+                  {/* Latest signal preview */}
+                  {contact.recentSignals[0] && (
+                    <p className="font-mono text-[10px] text-muted-foreground line-clamp-2 leading-relaxed mb-3 flex-1">
+                      {contact.recentSignals[0].summary}
+                    </p>
+                  )}
+
+                  {/* Quick action buttons */}
+                  <div className="flex gap-1.5 pt-2 border-t border-border/50" onClick={(e) => e.stopPropagation()}>
+                    <button className="flex items-center gap-1 px-2 py-1 font-mono text-[8px] uppercase tracking-wider border border-border text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-colors flex-1 justify-center">
+                      <MessageSquare className="w-3 h-3" /> Text
+                    </button>
+                    <button className="flex items-center gap-1 px-2 py-1 font-mono text-[8px] uppercase tracking-wider border border-border text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-colors flex-1 justify-center">
+                      <Phone className="w-3 h-3" /> Call
+                    </button>
+                    <button className="flex items-center gap-1 px-2 py-1 font-mono text-[8px] uppercase tracking-wider border border-border text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-colors flex-1 justify-center">
+                      <Mail className="w-3 h-3" /> Email
+                    </button>
+                  </div>
+                </div>
+              </Motion>
+            );
+          })}
+        </div>
+      )}
 
       {!isLoading && filtered.length === 0 && (
-        <div className="py-16 text-center border border-vanta-border">
-          <p className="font-mono text-xs text-vanta-text-muted uppercase tracking-widest">
+        <div className="py-16 text-center border border-border">
+          <p className="font-mono text-xs text-muted-foreground uppercase tracking-widest">
             {search ? "No contacts match your search" : "No contacts in signal history"}
           </p>
         </div>
