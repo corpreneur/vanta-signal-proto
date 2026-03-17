@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import type { Signal } from "@/data/signals";
 import { computeStrength, daysBetween, recencyLabel } from "@/lib/contactStrength";
-import { MessageSquare, Phone, Video, Mail, StickyNote, Clock, Bell, ArrowRight, TrendingDown, TrendingUp } from "lucide-react";
+import { MessageSquare, Phone, Video, Mail, StickyNote, Clock, Bell, ArrowRight, TrendingDown, TrendingUp, Download } from "lucide-react";
+import { downloadVCard } from "@/lib/vcard";
 import ContactTagManager from "@/components/ContactTagManager";
 
 const SOURCE_ICONS: Record<string, React.ElementType> = {
