@@ -37,6 +37,7 @@ import FileVault from "./pages/FileVault";
 import MyRulesHub from "./pages/MyRulesHub";
 import QuickCaptureExtension from "./pages/QuickCaptureExtension";
 import Admin from "./pages/Admin";
+import NativeContactSync from "./pages/NativeContactSync";
 import QuickCapture from "./components/QuickCapture";
 import type { Session } from "@supabase/supabase-js";
 
