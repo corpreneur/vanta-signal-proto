@@ -26,6 +26,9 @@ import {
   Radio,
   SlidersHorizontal,
   CheckSquare,
+  FolderOpen,
+  Bookmark,
+  Crosshair,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { ThemeToggle } from "@/components/ThemeToggle";
