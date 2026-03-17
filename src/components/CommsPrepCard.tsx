@@ -18,7 +18,6 @@ interface CommsPrepCardProps {
 export default function CommsPrepCard({ signal, allSignals }: CommsPrepCardProps) {
   const isCall = signal.signalType === "PHONE_CALL" || signal.source === "phone";
   const isText = signal.source === "linq";
-  if (!isCall && !isText) return null;
 
   const contactHistory = useMemo(() => {
     const history = allSignals
