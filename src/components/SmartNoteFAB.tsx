@@ -21,6 +21,29 @@ export default function SmartNoteFAB() {
   const [mode, setMode] = useState<InputMode>("note");
   const [hovered, setHovered] = useState(false);
   const location = useLocation();
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const didLongPress = useRef(false);
+
+  const handlePointerDown = useCallback(() => {
+    didLongPress.current = false;
+    longPressTimer.current = setTimeout(() => {
+      didLongPress.current = true;
+      setMode("voice");
+      setOpen(true);
+    }, 500);
+  }, []);
+
+  const handlePointerUp = useCallback(() => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  }, []);
+
+  const handleClick = useCallback(() => {
+    if (didLongPress.current) return; // already opened via long-press
+    setOpen(true);
+  }, []);
 
   // Suppress on Idea Capture page (it already has full capture UI)
   if (location.pathname === "/brain-dump") return null;
