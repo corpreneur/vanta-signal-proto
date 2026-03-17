@@ -237,3 +237,21 @@
   from { transform: scale(1); border-radius: 9999px; }
   to { transform: scale(1); border-radius: var(--radius, 0.75rem); }
 }
+
+/* Print styles for briefing export */
+@media print {
+  body.print-brief [data-sidebar],
+  body.print-brief nav,
+  body.print-brief header button,
+  body.print-brief .smart-note-fab {
+    display: none !important;
+  }
+  body.print-brief {
+    background: white !important;
+    color: black !important;
+  }
+  body.print-brief * {
+    color: black !important;
+    border-color: #ddd !important;
+  }
+}
