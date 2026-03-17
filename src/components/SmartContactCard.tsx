@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import type { Signal } from "@/data/signals";
 import { computeStrength, daysBetween, recencyLabel } from "@/lib/contactStrength";
-import { MessageSquare, Phone, Video, Mail, StickyNote, Clock, Bell, ArrowRight, TrendingDown, TrendingUp } from "lucide-react";
+import { MessageSquare, Phone, Video, Mail, StickyNote, Clock, Bell, ArrowRight, TrendingDown, TrendingUp, Download } from "lucide-react";
+import { downloadVCard } from "@/lib/vcard";
 import ContactTagManager from "@/components/ContactTagManager";
 
 const SOURCE_ICONS: Record<string, React.ElementType> = {
@@ -160,10 +161,21 @@ export default function SmartContactCard({ contact }: { contact: SmartContactCar
           })}
         </div>
 
-        {/* View timeline CTA */}
-        <button className="flex items-center gap-1 mt-3 font-mono text-[8px] uppercase tracking-wider text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-          View Timeline <ArrowRight className="w-3 h-3" />
-        </button>
+        {/* CTAs */}
+        <div className="flex items-center gap-3 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button className="flex items-center gap-1 font-mono text-[8px] uppercase tracking-wider text-primary">
+            View Timeline <ArrowRight className="w-3 h-3" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              downloadVCard({ name: contact.name, note: "Exported from Vanta Signal" });
+            }}
+            className="flex items-center gap-1 font-mono text-[8px] uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors"
+          >
+            <Download className="w-3 h-3" /> Save .vcf
+          </button>
+        </div>
       </div>
     </div>
   );
