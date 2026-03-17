@@ -19,12 +19,11 @@ const TABS: { key: InputMode; label: string; icon: React.ElementType }[] = [
 export default function SmartNoteFAB() {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<InputMode>("note");
+  const [hovered, setHovered] = useState(false);
   const location = useLocation();
 
   // Suppress on Idea Capture page (it already has full capture UI)
   if (location.pathname === "/brain-dump") return null;
-
-  const [hovered, setHovered] = useState(false);
 
   return (
     <>
