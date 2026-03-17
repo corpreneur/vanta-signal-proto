@@ -15,21 +15,21 @@ import type { SignalType } from "@/data/signals";
 
 // Color mapping using CSS variable HSL values for canvas rendering
 const TYPE_COLORS: Record<string, string> = {
-  INTRO: "hsl(30, 4%, 75%)",
-  INSIGHT: "hsl(210, 100%, 63%)",
-  INVESTMENT: "hsl(55, 100%, 62%)",
-  DECISION: "hsl(55, 100%, 62%)",
-  CONTEXT: "hsl(0, 0%, 50%)",
-  NOISE: "hsl(0, 0%, 40%)",
-  MEETING: "hsl(210, 100%, 63%)",
-  PHONE_CALL: "hsl(340, 82%, 60%)",
+  INTRO: "hsl(30, 4%, 55%)",
+  INSIGHT: "hsl(210, 100%, 50%)",
+  INVESTMENT: "hsl(45, 100%, 45%)",
+  DECISION: "hsl(280, 60%, 55%)",
+  CONTEXT: "hsl(0, 0%, 45%)",
+  NOISE: "hsl(0, 0%, 55%)",
+  MEETING: "hsl(170, 70%, 40%)",
+  PHONE_CALL: "hsl(340, 82%, 50%)",
 };
 
 const RECENCY_COLORS: [number, string][] = [
-  [1, "hsl(30, 4%, 75%)"],      // accent
-  [7, "hsl(162, 89%, 63%)"],     // teal
-  [30, "hsl(43, 89%, 63%)"],     // amber
-  [Infinity, "hsl(0, 0%, 35%)"], // muted
+  [2, "hsl(30, 10%, 25%)"],       // < 2d  — dark/strong
+  [7, "hsl(170, 70%, 35%)"],      // < 7d  — teal
+  [30, "hsl(43, 90%, 45%)"],      // < 30d — amber
+  [Infinity, "hsl(0, 0%, 60%)"],  // 30d+  — muted
 ];
 
 function getRecencyColor(days: number): string {
