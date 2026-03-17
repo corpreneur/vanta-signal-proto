@@ -108,6 +108,8 @@ type SortMode = "signals" | "recency" | "alpha" | "high" | "strength";
 export default function Contacts() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [addingContact, setAddingContact] = useState(false);
+  const [newContactName, setNewContactName] = useState("");
   // Fetch engagement sequences for enrichment
   const { data: sequences = [] } = useQuery({
     queryKey: ["engagement-sequences"],
