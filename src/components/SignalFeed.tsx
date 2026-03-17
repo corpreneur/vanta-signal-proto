@@ -113,15 +113,22 @@ const SignalFeed = ({ signals, filters, showPromote, allSignals }: SignalFeedPro
             {label}
           </h3>
           <div className="flex flex-col gap-px">
-            {groupSignals.map((signal) => (
-              <SignalEntryCard
-                key={signal.id}
-                signal={signal}
-                onClick={() => setSelectedSignal(signal)}
-                showPromote={showPromote}
-                contactContext={contactContextMap.get(signal.sender)}
-              />
-            ))}
+            {groupSignals.map((signal) => {
+              const isCommsSignal = signal.signalType === "PHONE_CALL" || signal.source === "phone" || signal.source === "linq";
+              return (
+                <div key={signal.id}>
+                  {isCommsSignal && (
+                    <CommsPrepCard signal={signal} allSignals={allSignals || signals} />
+                  )}
+                  <SignalEntryCard
+                    signal={signal}
+                    onClick={() => setSelectedSignal(signal)}
+                    showPromote={showPromote}
+                    contactContext={contactContextMap.get(signal.sender)}
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
       ))}
