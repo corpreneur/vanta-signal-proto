@@ -101,6 +101,7 @@ const AppRoutes = () => {
       <Route path="/case-01" element={<Navigate to="/case/01" replace />} />
       <Route path="/case-02" element={<Navigate to="/case/02" replace />} />
       <Route path="/case-03" element={<Navigate to="/case/03" replace />} />
+      <Route path="/orb-demo" element={<OrbDemo />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
