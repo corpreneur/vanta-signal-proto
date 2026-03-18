@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import VCardImportDialog from "@/components/VCardImportDialog";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
