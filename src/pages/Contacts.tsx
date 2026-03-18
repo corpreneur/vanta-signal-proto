@@ -420,6 +420,8 @@ export default function Contacts() {
           </p>
         </div>
       )}
+
+      <VCardImportDialog open={importOpen} onClose={() => setImportOpen(false)} />
     </div>
   );
 }
