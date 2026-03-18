@@ -102,6 +102,7 @@ export default function Contacts() {
   const [search, setSearch] = useState("");
   const [addingContact, setAddingContact] = useState(false);
   const [newContactName, setNewContactName] = useState("");
+  const [importOpen, setImportOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("list");
 
   const { data: sequences = [] } = useQuery({
