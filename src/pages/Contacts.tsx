@@ -8,7 +8,7 @@ import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { computeStrength, daysBetween, recencyLabel } from "@/lib/contactStrength";
 import { Motion } from "@/components/ui/motion";
 import { Input } from "@/components/ui/input";
-import { Search, Tag, Filter, UserPlus, LayoutGrid, LayoutList, Phone, Mail, MessageSquare, Smartphone } from "lucide-react";
+import { Search, Tag, Filter, UserPlus, LayoutGrid, LayoutList, Phone, Mail, MessageSquare, Smartphone, Upload } from "lucide-react";
 import { useAllContactTags } from "@/components/ContactTagManager";
 import SmartContactCard from "@/components/SmartContactCard";
 import AddContactContext from "@/components/AddContactContext";
