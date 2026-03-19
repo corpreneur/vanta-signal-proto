@@ -80,6 +80,8 @@ export default function EnhancedActionItems({ onSignalClick }: EnhancedActionIte
   const [deleting, setDeleting] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "quick" | "overdue">("all");
+  const COLLAPSED_LIMIT = 4;
+  const [showAll, setShowAll] = useState(false);
 
   const { data: items = [] } = useQuery({
     queryKey: ["action-items-enhanced"],
