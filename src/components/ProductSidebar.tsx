@@ -75,7 +75,6 @@ const productItems = [
   { title: "Relationship Graph", url: "/graph", icon: Network },
   { title: "File Vault", url: "/files", icon: FolderOpen },
   { title: "My Rules", url: "/my-rules", icon: BookOpen },
-  { title: "Quick Capture", url: "/quick-capture", icon: Crosshair },
   { title: "Insight Engine", url: "/insights", icon: Lightbulb },
   { title: "Investment Intel", url: "/investments", icon: TrendingUp },
   { title: "Decision Capture", url: "/decisions", icon: Gavel },
