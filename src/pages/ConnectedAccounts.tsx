@@ -49,6 +49,16 @@ const INITIAL_INTEGRATIONS: Integration[] = [
     status: "active",
   },
   {
+    id: "idea-capture",
+    name: "Idea Capture",
+    description: "Multi-modal signal ingestion — notes, links, images, email, and voice",
+    icon: "✦",
+    connected: true,
+    lastSync: "Just now",
+    account: "Built-in channel",
+    status: "active",
+  },
+  {
     id: "slack",
     name: "Slack",
     description: "Channel monitoring, DM signal capture, and thread intelligence",

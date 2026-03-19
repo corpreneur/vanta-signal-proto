@@ -70,6 +70,13 @@ const OtterLogo = (props: LogoProps) => (
   </svg>
 );
 
+const IdeaCaptureLogo = (props: LogoProps) => (
+  <svg viewBox="0 0 24 24" fill="none" {...props}>
+    <rect width="24" height="24" rx="4" fill="currentColor" className="text-primary" />
+    <path d="M12 4l1.76 5.42h5.7l-4.61 3.35 1.76 5.42L12 14.84l-4.61 3.35 1.76-5.42-4.61-3.35h5.7z" fill="hsl(var(--primary-foreground))" />
+  </svg>
+);
+
 export const PARTNER_LOGOS: Record<string, React.FC<LogoProps>> = {
   google: GoogleLogo,
   zoom: ZoomLogo,
@@ -79,6 +86,7 @@ export const PARTNER_LOGOS: Record<string, React.FC<LogoProps>> = {
   notion: NotionLogo,
   fireflies: FirefliesLogo,
   otter: OtterLogo,
+  "idea-capture": IdeaCaptureLogo,
 };
 
 export default PARTNER_LOGOS;
