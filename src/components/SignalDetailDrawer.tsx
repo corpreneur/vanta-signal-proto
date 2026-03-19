@@ -164,7 +164,9 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   if (!signal) return null;
 
   const colors = SIGNAL_TYPE_COLORS[signal.signalType];
-  const isMeeting = signal.source === "recall";
+  const isMeeting = signal.signalType === "MEETING";
+  const meetingSourceKey = signal.source === "recall" ? "zoom" : signal.source === "fireflies" ? "fireflies" : signal.source === "otter" ? "otter" : null;
+  const MeetingSourceLogo = meetingSourceKey ? PARTNER_LOGOS[meetingSourceKey] : null;
   const helpfulMemory = getHelpfulMemory(signal);
   const furtherConsiderations = getFurtherConsiderations(signal);
 

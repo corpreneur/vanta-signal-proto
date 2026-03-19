@@ -30,7 +30,7 @@ export const releaseNotes: ReleaseEntry[] = [
       { type: "improvement", text: "Global De-Pill — all interactive pills (badges, tags, filters, lenses, template buttons) migrated from rounded-full to rounded-sm for sharper geometry" },
       { type: "feature", text: "LinkedIn Integration — 'View on LinkedIn' search links added to Contact Profile, Meeting Brief attendee dossiers, and Smart Contact Cards" },
       { type: "feature", text: "Fireflies Webhook — dedicated edge function with API key verification, transcription_completed filtering, and AI-powered signal classification" },
-      { type: "improvement", text: "Capture Templates removed from Idea Capture for a cleaner, streamlined input experience" },
+      { type: "improvement", text: "Idea Capture streamlined — cleaner input experience with templates removed" },
     ],
   },
   {

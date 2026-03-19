@@ -163,10 +163,13 @@ const RISK_BADGE: Record<string, string> = {
 /* ── Source indicator ── */
 
 function SourceIndicator({ signal }: { signal: Signal }) {
-  if (signal.source === "recall") {
+  const logoKey = signal.source === "recall" ? "zoom" : signal.source === "fireflies" ? "fireflies" : signal.source === "otter" ? "otter" : null;
+  const Logo = logoKey ? PARTNER_LOGOS[logoKey] : null;
+  if (Logo) {
+    const label = logoKey === "zoom" ? "Zoom" : logoKey === "fireflies" ? "Fireflies" : "Otter";
     return (
-      <span className="inline-flex items-center gap-1 text-vanta-accent-zoom">
-        <Video className="w-3 h-3" /> Zoom
+      <span className="inline-flex items-center gap-1.5">
+        <Logo className="w-4 h-4" /> <span className="text-muted-foreground">{label}</span>
       </span>
     );
   }
@@ -185,7 +188,7 @@ function SourceIndicator({ signal }: { signal: Signal }) {
     );
   }
   return (
-    <span className="text-vanta-text-muted">{signal.source}</span>
+    <span className="text-muted-foreground">{signal.source}</span>
   );
 }
 
