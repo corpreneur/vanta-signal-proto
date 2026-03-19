@@ -149,14 +149,15 @@ export default function Connectivity() {
               Fab Five · Connectivity
             </p>
           </div>
-        <h1 className="font-display text-[clamp(28px,5vw,40px)] leading-[1.05] text-foreground mb-2">
-          Connectivity Hub
-        </h1>
-        <p className="font-sans text-[15px] text-vanta-text-mid max-w-[600px] leading-relaxed mb-10">
-          Vanta is an MVNO-first platform — a dedicated mobile number that captures every voice call, 
-          text, and voicemail at the network level, then aggregates signals across all your communication 
-          channels into a single intelligence feed.
-        </p>
+          <h1 className="font-display text-[clamp(28px,5vw,40px)] leading-[1.05] text-foreground mb-2">
+            Connectivity Hub
+          </h1>
+          <p className="font-sans text-[15px] text-vanta-text-mid max-w-[600px] leading-relaxed mb-10">
+            Vanta is an MVNO-first platform — a dedicated mobile number that captures every voice call, 
+            text, and voicemail at the network level, then aggregates signals across all your communication 
+            channels into a single intelligence feed.
+          </p>
+        </header>
       </Motion>
 
       {/* MVNO Core Product */}
