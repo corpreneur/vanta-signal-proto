@@ -465,7 +465,14 @@ export type Database = {
     Enums: {
       signal_priority: "high" | "medium" | "low"
       signal_risk_level: "low" | "medium" | "high" | "critical"
-      signal_source: "linq" | "gmail" | "manual" | "recall" | "phone"
+      signal_source:
+        | "linq"
+        | "gmail"
+        | "manual"
+        | "recall"
+        | "phone"
+        | "fireflies"
+        | "otter"
       signal_status: "Captured" | "In Progress" | "Complete"
       signal_type:
         | "INTRO"
@@ -605,7 +612,15 @@ export const Constants = {
     Enums: {
       signal_priority: ["high", "medium", "low"],
       signal_risk_level: ["low", "medium", "high", "critical"],
-      signal_source: ["linq", "gmail", "manual", "recall", "phone"],
+      signal_source: [
+        "linq",
+        "gmail",
+        "manual",
+        "recall",
+        "phone",
+        "fireflies",
+        "otter",
+      ],
       signal_status: ["Captured", "In Progress", "Complete"],
       signal_type: [
         "INTRO",
