@@ -181,7 +181,6 @@ export default function Meetings() {
           {filtered.map(({ signal, artifact, sourceKey }) => {
             const Logo = PARTNER_LOGOS[sourceKey] ?? null;
             const attendeeCount = artifact?.attendees?.length ?? 0;
-            const isPhoneCall = signal.signalType === "PHONE_CALL";
             const transcriptPreview = artifact?.summaryText
               ? artifact.summaryText.slice(0, 140) + (artifact.summaryText.length > 140 ? "…" : "")
               : artifact?.transcriptJson?.[0]
@@ -197,7 +196,7 @@ export default function Meetings() {
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
                     <div className="shrink-0 mt-0.5">
-                      {Logo ? <Logo className="w-7 h-7" /> : isPhoneCall ? <Phone className="w-7 h-7 text-muted-foreground" /> : <Video className="w-7 h-7 text-muted-foreground" />}
+                      {Logo ? <Logo className="w-7 h-7" /> : <Video className="w-7 h-7 text-muted-foreground" />}
                     </div>
 
                     <div className="min-w-0 flex-1">
