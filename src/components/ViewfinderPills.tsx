@@ -148,7 +148,7 @@ export default function ViewfinderPills() {
                 key={c}
                 onClick={() => setSelectedContact(c)}
                 className={`
-                  px-3 py-1.5 rounded-full font-mono text-[10px] uppercase tracking-[0.1em] transition-all
+                  px-3 py-1.5 rounded-sm font-mono text-[10px] uppercase tracking-[0.1em] transition-all
                   ${
                     selectedContact === c
                       ? "bg-primary text-primary-foreground"
