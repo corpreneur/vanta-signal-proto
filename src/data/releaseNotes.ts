@@ -10,6 +10,20 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "1.4.0",
+    date: "2026-03-19",
+    title: "MetaLab V3 — Full Design System Overhaul",
+    changes: [
+      { type: "feature", text: "Focus View dashboard — large greeting hero, 'clear until' meeting status, top 3 prioritized signal preview" },
+      { type: "feature", text: "Signal Detail Drawer redesign — Helpful Memory section, AI-proposed replies with inline editing & send" },
+      { type: "feature", text: "Profile Menu Drawer — full account menu with My Plan, Billing History, Connected Accounts, Privacy & Data, Notifications Preferences, Help & Support, Send Feedback" },
+      { type: "feature", text: "Idea Capture redesign — MetaLab-style tabbed capture (Note, Image, Link, Email, Voice) with session streak and recent captures" },
+      { type: "improvement", text: "Signal cards streamlined — single-line header, compact metadata row, tighter action bar to reduce visual clutter" },
+      { type: "improvement", text: "Profile menu organized into Account, Vanta Settings, Appearance, and Support sections" },
+      { type: "improvement", text: "Capture Everywhere tools — Bookmarklet, ⌘K palette, and PWA install instructions in collapsible section" },
+    ],
+  },
+  {
     version: "1.2.0",
     date: "2026-03-16",
     title: "PI-2 — Proactive Relationships, Quick Capture & File Storage",
