@@ -140,7 +140,7 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   useEffect(() => { if (signal?.status) setCurrentStatus(signal.status); }, [signal?.id, signal?.status]);
   useEffect(() => { if (open && scrollRef.current) scrollRef.current.scrollTop = 0; }, [signal?.id, open]);
   useEffect(() => {
-    if (!signal || signal.source !== "recall") { setArtifact(null); setMeetingTab("intelligence"); return; }
+    if (!signal || signal.signalType !== "MEETING") { setArtifact(null); setMeetingTab("intelligence"); return; }
     const fetchArtifact = async () => {
       setLoadingArtifact(true);
       const { data, error } = await supabase.from("meeting_artifacts").select("*").eq("signal_id", signal.id).limit(1).maybeSingle();
@@ -150,7 +150,7 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
       setLoadingArtifact(false);
     };
     fetchArtifact();
-  }, [signal?.id, signal?.source]);
+  }, [signal?.id, signal?.signalType]);
 
   // Initialize proposed reply when signal changes
   useEffect(() => {
