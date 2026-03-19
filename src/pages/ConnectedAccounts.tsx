@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Check, X, ExternalLink, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import PARTNER_LOGOS from "@/components/PartnerLogos";
 import { Motion } from "@/components/ui/motion";
 import { toast } from "sonner";
 
@@ -138,14 +139,18 @@ export default function ConnectedAccounts() {
               return (
                 <div key={int.id} className="border border-border rounded-lg p-4">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center font-display text-sm text-primary font-bold shrink-0">
-                      {int.icon}
+                    <div className="w-10 h-10 rounded-sm bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden">
+                      {PARTNER_LOGOS[int.id] ? (
+                        (() => { const Logo = PARTNER_LOGOS[int.id]; return <Logo className="w-7 h-7" />; })()
+                      ) : (
+                        <span className="font-display text-sm text-primary font-bold">{int.icon}</span>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
                         <span className="font-sans text-[14px] font-medium text-foreground">{int.name}</span>
                         {badge && (
-                          <span className={`px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-wider border rounded-full ${badge.cls}`}>
+                          <span className={`px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-wider border rounded-sm ${badge.cls}`}>
                             {int.status === "syncing" ? (
                               <span className="flex items-center gap-1"><RefreshCw className="w-2.5 h-2.5 animate-spin" />{badge.label}</span>
                             ) : badge.label}
@@ -179,8 +184,12 @@ export default function ConnectedAccounts() {
             {available.map((int) => (
               <div key={int.id} className="border border-border rounded-lg p-4 opacity-80 hover:opacity-100 transition-opacity">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-muted/50 flex items-center justify-center font-display text-sm text-muted-foreground font-bold shrink-0">
-                    {int.icon}
+                   <div className="w-10 h-10 rounded-sm bg-muted/50 flex items-center justify-center shrink-0 overflow-hidden">
+                    {PARTNER_LOGOS[int.id] ? (
+                      (() => { const Logo = PARTNER_LOGOS[int.id]; return <Logo className="w-7 h-7 opacity-60" />; })()
+                    ) : (
+                      <span className="font-display text-sm text-muted-foreground font-bold">{int.icon}</span>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <span className="font-sans text-[14px] font-medium text-foreground">{int.name}</span>

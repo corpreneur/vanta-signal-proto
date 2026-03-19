@@ -378,7 +378,7 @@ export default function NoteCapture({ inline = false, onCapture, onRawText, temp
           <button
             key={tag}
             onClick={() => toggleTag(tag)}
-            className={`font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1 rounded-full border transition-all duration-150 ${
+            className={`font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1 rounded-sm border transition-all duration-150 ${
               selectedTags.includes(tag)
                 ? "bg-primary/15 border-primary/40 text-primary"
                 : "bg-transparent border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground"
@@ -473,7 +473,7 @@ export default function NoteCapture({ inline = false, onCapture, onRawText, temp
                 <button
                   key={tag}
                   onClick={() => removeTag(tag)}
-                  className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive transition-all min-h-[36px]"
+                  className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1.5 rounded-sm border border-primary/30 bg-primary/10 text-primary hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive transition-all min-h-[36px]"
                 >
                   <X className="h-3 w-3" />
                   {tag}

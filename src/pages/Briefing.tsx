@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Video, Users, MessageSquare, Phone, Mail, StickyNote, TrendingUp, Download, Send } from "lucide-react";
+import { ArrowLeft, Video, Users, MessageSquare, Phone, Mail, StickyNote, TrendingUp, Download, Send, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { Motion } from "@/components/ui/motion";
 import type { Signal } from "@/data/signals";
@@ -247,13 +247,24 @@ export default function Briefing() {
               <section className="border border-vanta-border">
                 {/* Attendee header */}
                 <div className="p-5 border-b border-vanta-border bg-vanta-bg-elevated">
-                  <div className="flex items-center justify-between mb-2">
-                    <Link
-                      to={`/contact/${encodeURIComponent(name)}`}
-                      className="font-mono text-sm font-medium text-foreground hover:text-vanta-accent transition-colors"
-                    >
-                      {name}
-                    </Link>
+                   <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Link
+                        to={`/contact/${encodeURIComponent(name)}`}
+                        className="font-mono text-sm font-medium text-foreground hover:text-vanta-accent transition-colors"
+                      >
+                        {name}
+                      </Link>
+                      <a
+                        href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(name)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-wider border border-[#0A66C2]/30 text-[#0A66C2] hover:bg-[#0A66C2]/10 transition-colors rounded-sm"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <ExternalLink className="w-2.5 h-2.5" /> LinkedIn
+                      </a>
+                    </div>
                     <span className="font-mono text-[9px] uppercase tracking-widest text-vanta-text-muted">
                       {ctx.signal_count} signals
                     </span>

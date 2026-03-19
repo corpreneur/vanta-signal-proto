@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Phone, MessageSquare, Mail, Edit3, Check, X, Building2, Briefcase } from "lucide-react";
+import { Phone, MessageSquare, Mail, Edit3, Check, X, Building2, Briefcase, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -260,6 +260,14 @@ export default function ContactProfileHeader({ name, strength, strengthLabel, si
           <button className="flex items-center gap-1.5 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors">
             <MessageSquare className="w-3 h-3" /> Text
           </button>
+          <a
+            href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(name)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest border border-[#0A66C2]/30 text-[#0A66C2] hover:bg-[#0A66C2]/10 transition-colors"
+          >
+            <ExternalLink className="w-3 h-3" /> LinkedIn
+          </a>
         </div>
       </div>
 

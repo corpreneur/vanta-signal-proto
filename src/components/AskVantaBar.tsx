@@ -72,7 +72,7 @@ export default function AskVantaBar({ noteText }: AskVantaBarProps) {
             key={p}
             onClick={() => handleSuggestion(p)}
             disabled={loading}
-            className="font-mono text-[9px] uppercase tracking-[0.1em] px-2.5 py-1 rounded-full border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all disabled:opacity-40"
+            className="font-mono text-[9px] uppercase tracking-[0.1em] px-2.5 py-1 rounded-sm border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all disabled:opacity-40"
           >
             {p}
           </button>

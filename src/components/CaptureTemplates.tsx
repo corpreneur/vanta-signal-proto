@@ -51,7 +51,7 @@ export default function CaptureTemplates({ selected, onSelect }: CaptureTemplate
           <button
             key={t.key}
             onClick={() => onSelect(t)}
-            className={`flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] px-3 py-1.5 rounded-full border transition-all duration-200 ${
+            className={`flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] px-3 py-1.5 rounded-sm border transition-all duration-200 ${
               active
                 ? "bg-primary/10 border-primary text-primary"
                 : "bg-transparent border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"

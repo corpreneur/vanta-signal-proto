@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import type { Signal } from "@/data/signals";
 import { computeStrength, daysBetween, recencyLabel } from "@/lib/contactStrength";
-import { MessageSquare, Phone, Video, Mail, StickyNote, Clock, Bell, ArrowRight, TrendingDown, TrendingUp, Download } from "lucide-react";
+import { MessageSquare, Phone, Video, Mail, StickyNote, Clock, Bell, ArrowRight, TrendingDown, TrendingUp, Download, ExternalLink } from "lucide-react";
 import { downloadVCard } from "@/lib/vcard";
 import ContactTagManager from "@/components/ContactTagManager";
 
@@ -175,6 +175,15 @@ export default function SmartContactCard({ contact }: { contact: SmartContactCar
           >
             <Download className="w-3 h-3" /> Save .vcf
           </button>
+          <a
+            href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(contact.name)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center gap-1 font-mono text-[8px] uppercase tracking-wider text-[#0A66C2] hover:text-[#0A66C2]/80 transition-colors"
+          >
+            <ExternalLink className="w-3 h-3" /> LinkedIn
+          </a>
         </div>
       </div>
     </div>
