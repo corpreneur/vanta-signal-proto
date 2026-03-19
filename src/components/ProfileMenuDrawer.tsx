@@ -6,6 +6,7 @@ import {
 import {
   User, CreditCard, Settings2, LogOut, ChevronRight,
   Bell, Shield, Palette, BookOpen, HelpCircle, Mail,
+  Receipt, Link2, Lock, MessageSquare, Sparkles,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -17,15 +18,35 @@ interface ProfileMenuDrawerProps {
 
 const ACCOUNT_ITEMS = [
   { label: "Personal Info", icon: User, href: "/settings" },
-  { label: "Notifications", icon: Bell, href: "/settings" },
-  { label: "Payment Details", icon: CreditCard, href: "/settings" },
+  { label: "My Plan", icon: Sparkles, href: "/settings" },
+  { label: "Billing History", icon: Receipt, href: "/settings" },
+  { label: "Connected Accounts", icon: Link2, href: "/settings" },
 ];
 
 const VANTA_SETTINGS = [
   { label: "My Rules", icon: BookOpen, href: "/my-rules" },
   { label: "Filter Modes", icon: Settings2, href: "/focus" },
+  { label: "Notifications Preferences", icon: Bell, href: "/settings" },
+  { label: "Privacy & Data", icon: Lock, href: "/settings" },
   { label: "Admin", icon: Shield, href: "/admin" },
 ];
+
+const SUPPORT_ITEMS = [
+  { label: "Help & Support", icon: HelpCircle, href: "/releases" },
+  { label: "Send Feedback", icon: MessageSquare, href: "/releases" },
+  { label: "Release Notes", icon: BookOpen, href: "/releases" },
+];
+
+function MenuRow({ label, icon: Icon, onClick }: { label: string; icon: React.ElementType; onClick: () => void }) {
+  return (
+    <button onClick={onClick}
+      className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-foreground/80 hover:bg-muted/50 hover:text-foreground transition-colors group">
+      <Icon className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+      <span className="flex-1 text-left font-sans text-[14px]">{label}</span>
+      <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+    </button>
+  );
+}
 
 export default function ProfileMenuDrawer({ open, onClose }: ProfileMenuDrawerProps) {
   const navigate = useNavigate();
@@ -55,7 +76,7 @@ export default function ProfileMenuDrawer({ open, onClose }: ProfileMenuDrawerPr
 
   return (
     <Sheet open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
-      <SheetContent side="right" className="w-full sm:max-w-[360px] bg-background border-l border-border p-0">
+      <SheetContent side="right" className="w-full sm:max-w-[360px] bg-background border-l border-border p-0 flex flex-col">
 
         {/* ── User header ── */}
         <SheetHeader className="px-6 pt-8 pb-6 border-b border-border">
@@ -74,14 +95,9 @@ export default function ProfileMenuDrawer({ open, onClose }: ProfileMenuDrawerPr
           {/* Account section */}
           <div className="px-6 py-4">
             <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-3">Account</p>
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {ACCOUNT_ITEMS.map((item) => (
-                <button key={item.label} onClick={() => handleNav(item.href)}
-                  className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-foreground/80 hover:bg-muted/50 hover:text-foreground transition-colors group">
-                  <item.icon className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                  <span className="flex-1 text-left font-sans text-[14px]">{item.label}</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                </button>
+                <MenuRow key={item.label} label={item.label} icon={item.icon} onClick={() => handleNav(item.href)} />
               ))}
             </div>
           </div>
@@ -91,14 +107,9 @@ export default function ProfileMenuDrawer({ open, onClose }: ProfileMenuDrawerPr
           {/* VANTA Settings section */}
           <div className="px-6 py-4">
             <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-3">Vanta Settings</p>
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {VANTA_SETTINGS.map((item) => (
-                <button key={item.label} onClick={() => handleNav(item.href)}
-                  className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-foreground/80 hover:bg-muted/50 hover:text-foreground transition-colors group">
-                  <item.icon className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                  <span className="flex-1 text-left font-sans text-[14px]">{item.label}</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                </button>
+                <MenuRow key={item.label} label={item.label} icon={item.icon} onClick={() => handleNav(item.href)} />
               ))}
             </div>
           </div>
@@ -117,14 +128,14 @@ export default function ProfileMenuDrawer({ open, onClose }: ProfileMenuDrawerPr
 
           <div className="mx-6 border-t border-border" />
 
-          {/* Support + Help */}
+          {/* Support & Help */}
           <div className="px-6 py-4">
-            <button onClick={() => handleNav("/releases")}
-              className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-foreground/80 hover:bg-muted/50 hover:text-foreground transition-colors group">
-              <HelpCircle className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-              <span className="flex-1 text-left font-sans text-[14px]">Release Notes</span>
-              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-            </button>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-3">Support</p>
+            <div className="space-y-0.5">
+              {SUPPORT_ITEMS.map((item) => (
+                <MenuRow key={item.label} label={item.label} icon={item.icon} onClick={() => handleNav(item.href)} />
+              ))}
+            </div>
           </div>
         </div>
 
