@@ -47,3 +47,6 @@ verify_jwt = false
 
 [functions.ask-capture]
 verify_jwt = false
+
+[functions.transcript-ingest]
+verify_jwt = false
