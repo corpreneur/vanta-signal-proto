@@ -10,6 +10,18 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "1.6.0",
+    date: "2026-03-19",
+    title: "Granola-Inspired Capture Enhancements",
+    changes: [
+      { type: "feature", text: "Capture Templates — Free Form, Meeting Notes, Investment Memo, Intro Brief, Decision Log pills pre-populate note skeletons" },
+      { type: "feature", text: "Before/After Split View — side-by-side raw input vs AI-structured output with traffic-light dot headers" },
+      { type: "feature", text: "Ask Vanta bar — chat-over-capture with suggested prompts (Summarize decisions, Next steps, Follow-ups)" },
+      { type: "feature", text: "Quick Share/Export row — copy to clipboard, email to participants, Notion and share link placeholders" },
+      { type: "improvement", text: "Recent Captures upgraded with bolder card format and template type badges" },
+    ],
+  },
+  {
     version: "1.5.0",
     date: "2026-03-19",
     title: "Fab Five Consistency & File Vault Content",

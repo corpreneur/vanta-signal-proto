@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.brain-dump-image]
 verify_jwt = false
+
+[functions.ask-capture]
+verify_jwt = false
