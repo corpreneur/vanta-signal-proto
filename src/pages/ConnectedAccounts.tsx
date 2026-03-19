@@ -150,7 +150,7 @@ export default function ConnectedAccounts() {
                       <div className="flex items-center gap-2 mb-0.5">
                         <span className="font-sans text-[14px] font-medium text-foreground">{int.name}</span>
                         {badge && (
-                          <span className={`px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-wider border rounded-full ${badge.cls}`}>
+                          <span className={`px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-wider border rounded-sm ${badge.cls}`}>
                             {int.status === "syncing" ? (
                               <span className="flex items-center gap-1"><RefreshCw className="w-2.5 h-2.5 animate-spin" />{badge.label}</span>
                             ) : badge.label}
