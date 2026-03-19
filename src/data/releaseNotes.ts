@@ -10,6 +10,18 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "1.7.0",
+    date: "2026-03-19",
+    title: "Visual Refresh — Logos, De-Pill, LinkedIn",
+    changes: [
+      { type: "feature", text: "Partner Logos — SVG brand marks for Google, Zoom, Linq, Slack, LinkedIn, Notion, Fireflies, and Otter replace placeholder letters on Connected Accounts" },
+      { type: "improvement", text: "Global De-Pill — all interactive pills (badges, tags, filters, lenses, template buttons) migrated from rounded-full to rounded-sm for sharper geometry" },
+      { type: "feature", text: "LinkedIn Integration — 'View on LinkedIn' search links added to Contact Profile, Meeting Brief attendee dossiers, and Smart Contact Cards" },
+      { type: "feature", text: "Fireflies Webhook — dedicated edge function with API key verification, transcription_completed filtering, and AI-powered signal classification" },
+      { type: "improvement", text: "Capture Templates removed from Idea Capture for a cleaner, streamlined input experience" },
+    ],
+  },
+  {
     version: "1.6.0",
     date: "2026-03-19",
     title: "Granola-Inspired Capture Enhancements",
