@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { PenLine, Link2, FileText, Loader2, ArrowRight, Plus, Clock, Zap, Image, Mail, Mic, BookmarkPlus, Copy, Check, Smartphone, Globe, Monitor, ExternalLink, ChevronDown } from "lucide-react";
+import {
+  PenLine, Link2, FileText, Loader2, ArrowRight, Plus, Clock, Zap,
+  Image, Mail, Mic, BookmarkPlus, Copy, Check, Smartphone, Globe,
+  Monitor, ExternalLink, ChevronDown, ChevronRight, Send,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,38 +18,32 @@ import VoiceMemoCapture from "@/components/VoiceMemoCapture";
 import { Motion } from "@/components/ui/motion";
 
 const SIGNAL_TYPE_LABELS: Record<string, string> = {
-  INTRO: "Introduction",
-  INSIGHT: "Insight",
-  INVESTMENT: "Investment Intel",
-  DECISION: "Decision",
-  CONTEXT: "Context",
-  NOISE: "Noise",
-  MEETING: "Meeting",
-  PHONE_CALL: "Phone Call",
+  INTRO: "Introduction", INSIGHT: "Insight", INVESTMENT: "Investment Intel",
+  DECISION: "Decision", CONTEXT: "Context", NOISE: "Noise",
+  MEETING: "Meeting", PHONE_CALL: "Phone Call",
 };
 
 type InputMode = "note" | "link" | "image" | "email" | "voice" | "notion";
 
+const INPUT_MODES: { key: InputMode; label: string; icon: React.ElementType }[] = [
+  { key: "note", label: "Note", icon: PenLine },
+  { key: "image", label: "Image", icon: Image },
+  { key: "link", label: "Link", icon: Link2 },
+  { key: "email", label: "Email", icon: Mail },
+  { key: "voice", label: "Voice", icon: Mic },
+];
+
 /* ── Fetch recent brain dump captures ── */
 async function fetchRecentCaptures(): Promise<Signal[]> {
   const { data, error } = await supabase
-    .from("signals")
-    .select("*")
-    .eq("source", "manual")
-    .order("captured_at", { ascending: false })
-    .limit(10);
-
+    .from("signals").select("*").eq("source", "manual")
+    .order("captured_at", { ascending: false }).limit(10);
   if (error) return [];
   return (data || []).map((row) => ({
-    id: row.id,
-    signalType: row.signal_type,
-    sender: row.sender,
-    summary: row.summary,
-    sourceMessage: row.source_message,
-    priority: row.priority,
-    capturedAt: row.captured_at,
-    actionsTaken: row.actions_taken || [],
-    status: row.status,
+    id: row.id, signalType: row.signal_type, sender: row.sender,
+    summary: row.summary, sourceMessage: row.source_message,
+    priority: row.priority, capturedAt: row.captured_at,
+    actionsTaken: row.actions_taken || [], status: row.status,
     source: (row as Record<string, unknown>).source as Signal["source"] || "manual",
     rawPayload: row.raw_payload as Record<string, unknown> | null,
     linqMessageId: row.linq_message_id,
@@ -68,16 +66,9 @@ export default function BrainDump() {
   const [linkUrl, setLinkUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
-  const [linkResult, setLinkResult] = useState<{
-    signalType: string;
-    priority: string;
-    summary: string;
-  } | null>(null);
-
-  // Batch capture: track session captures
-  const [sessionCaptures, setSessionCaptures] = useState<
-    { signalType: string; summary: string; timestamp: string }[]
-  >([]);
+  const [linkResult, setLinkResult] = useState<{ signalType: string; priority: string; summary: string } | null>(null);
+  const [sessionCaptures, setSessionCaptures] = useState<{ signalType: string; summary: string; timestamp: string }[]>([]);
+  const [showTools, setShowTools] = useState(false);
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -91,349 +82,237 @@ export default function BrainDump() {
 
   const handleLinkSubmit = async () => {
     if (!linkUrl.trim() || loading) return;
-    setLoading(true);
-    setLinkResult(null);
-    setStatusMessage("Scraping URL…");
-
+    setLoading(true); setLinkResult(null); setStatusMessage("Scraping URL…");
     try {
-      const { data, error } = await supabase.functions.invoke("brain-dump", {
-        body: { url: linkUrl.trim() },
-      });
+      const { data, error } = await supabase.functions.invoke("brain-dump", { body: { url: linkUrl.trim() } });
       setStatusMessage("");
       if (error) throw error;
-
       const classification = data.classification;
-      setLinkResult(classification);
-      setLinkUrl("");
-
-      // Add to session captures
-      setSessionCaptures((prev) => [
-        { signalType: classification.signalType, summary: classification.summary, timestamp: new Date().toISOString() },
-        ...prev,
-      ]);
-
-      // Refresh recent captures
+      setLinkResult(classification); setLinkUrl("");
+      setSessionCaptures((prev) => [{ signalType: classification.signalType, summary: classification.summary, timestamp: new Date().toISOString() }, ...prev]);
       queryClient.invalidateQueries({ queryKey: ["brain-dump-recent"] });
-
-      toast({
-        title: `Classified as ${SIGNAL_TYPE_LABELS[classification.signalType] || classification.signalType}`,
-        description: classification.summary,
-      });
+      toast({ title: `Classified as ${SIGNAL_TYPE_LABELS[classification.signalType] || classification.signalType}`, description: classification.summary });
     } catch (e: unknown) {
       setStatusMessage("");
-      console.error("Link scrape error:", e);
-      toast({
-        title: "Classification failed",
-        description: e instanceof Error ? e.message : "Something went wrong.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+      toast({ title: "Classification failed", description: e instanceof Error ? e.message : "Something went wrong.", variant: "destructive" });
+    } finally { setLoading(false); }
   };
 
-  const linkColors = linkResult
-    ? SIGNAL_TYPE_COLORS[linkResult.signalType as SignalType]
-    : null;
+  const onCapture = (classification: { signalType: string; summary: string }) => {
+    setSessionCaptures((prev) => [{ ...classification, timestamp: new Date().toISOString() }, ...prev]);
+    queryClient.invalidateQueries({ queryKey: ["brain-dump-recent"] });
+  };
+
+  const linkColors = linkResult ? SIGNAL_TYPE_COLORS[linkResult.signalType as SignalType] : null;
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-10 space-y-8">
-      {/* Header */}
+    <div className="max-w-2xl mx-auto px-4 py-8 md:py-12">
+
+      {/* ══ Hero header (MetaLab style) ══ */}
       <Motion>
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <PenLine className="h-5 w-5 text-vanta-accent" />
-            <h1 className="font-mono text-lg uppercase tracking-widest text-foreground">
-              Idea Capture
-            </h1>
-          </div>
-          <p className="font-mono text-xs text-muted-foreground leading-relaxed max-w-md">
-            Share thoughts, ideas, or notes anytime. Vanta organizes, collects
-            context, and suggests actions.
+        <header className="mb-8">
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-3">
+            Capture a Thought
           </p>
-        </div>
+          <h1 className="font-display text-[clamp(28px,5vw,40px)] leading-[1.05] text-foreground mb-2">
+            What's on your mind?
+          </h1>
+          <p className="font-sans text-[14px] text-muted-foreground leading-relaxed max-w-md">
+            Share thoughts, links, or notes. Vanta organizes, collects context, and suggests actions.
+          </p>
+        </header>
       </Motion>
 
-      {/* Session capture streak */}
+      {/* ══ Session streak ══ */}
       {sessionCaptures.length > 0 && (
-        <Motion delay={40}>
-          <div className="flex items-center gap-2 px-3 py-2 border border-vanta-accent/20 bg-vanta-accent-faint">
-            <Zap className="h-3.5 w-3.5 text-vanta-accent" />
-            <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-vanta-accent">
+        <Motion delay={20}>
+          <div className="flex items-center gap-3 px-4 py-3 mb-6 rounded-lg border border-primary/20 bg-primary/[0.04]">
+            <Zap className="h-4 w-4 text-primary shrink-0" />
+            <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-primary font-medium">
               {sessionCaptures.length} captured this session
             </span>
             <div className="flex gap-1 ml-auto">
               {sessionCaptures.slice(0, 5).map((c, i) => {
                 const colors = SIGNAL_TYPE_COLORS[c.signalType as SignalType];
-                return (
-                  <span
-                    key={i}
-                    className={`w-2 h-2 rounded-full ${colors?.bg || "bg-vanta-bg-elevated"} border ${colors?.border || "border-vanta-border"}`}
-                    title={c.signalType}
-                  />
-                );
+                return <span key={i} className={`w-2 h-2 rounded-full ${colors?.bg || "bg-muted"} border ${colors?.border || "border-border"}`} />;
               })}
             </div>
           </div>
         </Motion>
       )}
 
-      {/* Input mode tabs */}
-      <Motion delay={60}>
-        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1">
-          {([
-            { key: "note" as const, label: "Note", icon: PenLine },
-            { key: "image" as const, label: "Image", icon: Image },
-            { key: "link" as const, label: "Link", icon: Link2 },
-            { key: "email" as const, label: "Email", icon: Mail },
-            { key: "voice" as const, label: "Voice", icon: Mic },
-            { key: "notion" as const, label: "Notion", icon: FileText },
-          ]).map(({ key, label, icon: Icon }) => (
+      {/* ══ Input mode selector (MetaLab tab style) ══ */}
+      <Motion delay={40}>
+        <div className="flex items-center gap-1 mb-6 border-b border-border">
+          {INPUT_MODES.map(({ key, label, icon: Icon }) => (
             <button
               key={key}
               onClick={() => setInputMode(key)}
-              className={`font-mono text-[10px] uppercase tracking-[0.12em] px-3 py-1.5 rounded-full border transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+              className={`flex items-center gap-1.5 px-4 py-3 font-mono text-[10px] uppercase tracking-[0.15em] transition-colors border-b-2 -mb-px ${
                 inputMode === key
-                  ? "bg-primary/10 border-primary text-primary"
-                  : "bg-transparent border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
+                  ? "text-foreground border-foreground font-medium"
+                  : "text-muted-foreground border-transparent hover:text-foreground"
               }`}
             >
-              <Icon className="h-3 w-3" />
-              {label}
+              <Icon className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">{label}</span>
             </button>
           ))}
         </div>
       </Motion>
 
-      {/* ─── Note mode ─── */}
-      {inputMode === "note" && (
-        <Motion delay={80}>
-          <div className="border border-border rounded-xl p-5 bg-card">
-            <NoteCapture
-              inline
-              onCapture={(classification) => {
-                setSessionCaptures((prev) => [
-                  {
-                    signalType: classification.signalType,
-                    summary: classification.summary,
-                    timestamp: new Date().toISOString(),
-                  },
-                  ...prev,
-                ]);
-                queryClient.invalidateQueries({ queryKey: ["brain-dump-recent"] });
-              }}
-            />
-          </div>
-        </Motion>
-      )}
+      {/* ══ Capture surface ══ */}
+      <Motion delay={60}>
+        <div className="mb-8">
 
-      {/* ─── Link mode ─── */}
-      {inputMode === "link" && (
-        <Motion delay={80}>
-          <div className="space-y-3">
-            <Input
-              value={linkUrl}
-              onChange={(e) => setLinkUrl(e.target.value)}
-              placeholder="https://chatgpt.com/share/... or any article URL"
-              className="bg-vanta-bg-elevated border-vanta-border font-mono text-sm"
-              disabled={loading}
-              type="url"
-              onKeyDown={(e) => e.key === "Enter" && handleLinkSubmit()}
-            />
-            <p className="font-mono text-[10px] text-muted-foreground leading-relaxed">
-              Paste a ChatGPT share link, blog post, or any web page. Content
-              will be extracted and classified as a signal.
-            </p>
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
-                {linkUrl ? "URL ready" : "Paste a URL"}
-              </span>
-              <Button
-                onClick={handleLinkSubmit}
-                disabled={!linkUrl.trim() || loading}
-                className="font-mono text-xs uppercase tracking-wider"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    {statusMessage || "Processing…"}
-                  </>
-                ) : (
-                  "Classify & Save"
-                )}
-              </Button>
+          {/* Note */}
+          {inputMode === "note" && (
+            <div className="rounded-lg border border-border bg-card p-5">
+              <NoteCapture inline onCapture={onCapture} />
             </div>
-          </div>
-        </Motion>
-      )}
+          )}
 
-      {/* ─── Image mode ─── */}
-      {inputMode === "image" && (
-        <Motion delay={80}>
-          <div className="border border-border rounded-xl p-5 bg-card">
-            <ImageCapture
-              onCapture={(classification) => {
-                setSessionCaptures((prev) => [
-                  { signalType: classification.signalType, summary: classification.summary, timestamp: new Date().toISOString() },
-                  ...prev,
-                ]);
-                queryClient.invalidateQueries({ queryKey: ["brain-dump-recent"] });
-              }}
-            />
-          </div>
-        </Motion>
-      )}
+          {/* Link */}
+          {inputMode === "link" && (
+            <div className="rounded-lg border border-border bg-card p-5 space-y-4">
+              <div className="flex gap-2">
+                <Input
+                  value={linkUrl}
+                  onChange={(e) => setLinkUrl(e.target.value)}
+                  placeholder="Paste any URL…"
+                  className="flex-1 font-sans text-[14px]"
+                  disabled={loading}
+                  type="url"
+                  onKeyDown={(e) => e.key === "Enter" && handleLinkSubmit()}
+                  autoFocus
+                />
+                <Button onClick={handleLinkSubmit} disabled={!linkUrl.trim() || loading}
+                  className="font-mono text-[10px] uppercase tracking-wider shrink-0">
+                  {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> {statusMessage || "…"}</> : <><Send className="h-3.5 w-3.5" /> Classify</>}
+                </Button>
+              </div>
+              <p className="font-sans text-[12px] text-muted-foreground">
+                Paste a ChatGPT share link, article, or any web page. Content will be extracted and classified.
+              </p>
+            </div>
+          )}
 
-      {/* ─── Email mode ─── */}
-      {inputMode === "email" && (
-        <Motion delay={80}>
-          <div className="border border-border rounded-xl p-5 bg-card">
-            <EmailCapture
-              onCapture={(classification) => {
-                setSessionCaptures((prev) => [
-                  { signalType: classification.signalType, summary: classification.summary, timestamp: new Date().toISOString() },
-                  ...prev,
-                ]);
-                queryClient.invalidateQueries({ queryKey: ["brain-dump-recent"] });
-              }}
-            />
-          </div>
-        </Motion>
-      )}
+          {/* Image */}
+          {inputMode === "image" && (
+            <div className="rounded-lg border border-border bg-card p-5">
+              <ImageCapture onCapture={onCapture} />
+            </div>
+          )}
 
-      {/* ─── Voice Memo mode ─── */}
-      {inputMode === "voice" && (
-        <Motion delay={80}>
-          <div className="border border-border rounded-xl p-5 bg-card">
-            <VoiceMemoCapture
-              onCapture={(classification) => {
-                setSessionCaptures((prev) => [
-                  { signalType: classification.signalType, summary: classification.summary, timestamp: new Date().toISOString() },
-                  ...prev,
-                ]);
-                queryClient.invalidateQueries({ queryKey: ["brain-dump-recent"] });
-              }}
-            />
-          </div>
-        </Motion>
-      )}
+          {/* Email */}
+          {inputMode === "email" && (
+            <div className="rounded-lg border border-border bg-card p-5">
+              <EmailCapture onCapture={onCapture} />
+            </div>
+          )}
 
-      {inputMode === "notion" && (
-        <Motion delay={80}>
-          <div className="border border-dashed border-border rounded-xl p-8 flex flex-col items-center gap-3">
-            <FileText className="h-8 w-8 text-muted-foreground" />
-            <p className="font-mono text-xs text-muted-foreground text-center max-w-xs leading-relaxed">
-              Notion import coming soon. Paste a Notion page URL to pull content
-              directly into your signal pipeline.
-            </p>
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground/60 border border-border rounded-full px-3 py-1">
-              In Development
-            </span>
-          </div>
-        </Motion>
-      )}
+          {/* Voice */}
+          {inputMode === "voice" && (
+            <div className="rounded-lg border border-border bg-card p-5">
+              <VoiceMemoCapture onCapture={onCapture} />
+            </div>
+          )}
+        </div>
+      </Motion>
 
-      {/* Link mode result */}
+      {/* Link result */}
       {inputMode === "link" && linkResult && linkColors && (
-        <Motion delay={100}>
-          <div className={`rounded-md border p-4 space-y-3 ${linkColors.bg} ${linkColors.border}`}>
+        <Motion delay={80}>
+          <div className={`rounded-lg border p-4 mb-8 space-y-3 ${linkColors.bg} ${linkColors.border}`}>
             <div className="flex items-center gap-2">
               <span className={`font-mono text-[10px] uppercase tracking-widest ${linkColors.text}`}>
                 {SIGNAL_TYPE_LABELS[linkResult.signalType] || linkResult.signalType}
               </span>
-              <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                · {linkResult.priority}
-              </span>
+              <span className="font-mono text-[10px] text-muted-foreground">· {linkResult.priority}</span>
             </div>
-            <p className="font-mono text-sm text-foreground">{linkResult.summary}</p>
+            <p className="font-sans text-[13px] text-foreground leading-relaxed">{linkResult.summary}</p>
             <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground p-0 h-auto"
-                onClick={() => navigate("/signals")}
-              >
+              <button onClick={() => navigate("/signals")} className="font-mono text-[10px] uppercase tracking-wider text-primary hover:text-foreground transition-colors">
                 View in Signal Feed →
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="font-mono text-[10px] uppercase tracking-wider text-primary hover:text-foreground p-0 h-auto"
-                onClick={() => { setLinkResult(null); setLinkUrl(""); }}
-              >
-                <Plus className="h-3 w-3 mr-1" /> Paste Another
-              </Button>
+              </button>
+              <button onClick={() => { setLinkResult(null); setLinkUrl(""); }} className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+                <Plus className="h-3 w-3" /> Paste Another
+              </button>
             </div>
           </div>
         </Motion>
       )}
 
-      {/* ─── Quick Capture Everywhere ─── */}
-      <QuickCaptureSection />
-
-      {/* ─── Recent Captures ─── */}
-      <Motion delay={140}>
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Clock className="w-3.5 h-3.5 text-vanta-text-muted" />
-              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted">
-                Recent Captures
-              </p>
+      {/* ══ Capture Tools (collapsible) ══ */}
+      <Motion delay={100}>
+        <section className="mb-8">
+          <button
+            onClick={() => setShowTools(!showTools)}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg border border-border bg-card hover:bg-muted/30 transition-colors"
+          >
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <ExternalLink className="w-4 h-4 text-primary" />
             </div>
-            <Link
-              to="/signals"
-              className="font-mono text-[9px] uppercase tracking-wider text-primary hover:text-vanta-accent transition-colors flex items-center gap-1"
-            >
+            <div className="flex-1 text-left">
+              <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-foreground font-medium">Capture Everywhere</p>
+              <p className="font-mono text-[9px] text-muted-foreground">Bookmarklet · ⌘K · PWA</p>
+            </div>
+            <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showTools ? "rotate-180" : ""}`} />
+          </button>
+
+          {showTools && <CaptureToolsExpanded />}
+        </section>
+      </Motion>
+
+      {/* ══ Recent Captures ══ */}
+      <Motion delay={120}>
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
+              Recent Captures
+            </p>
+            <Link to="/signals" className="font-mono text-[10px] uppercase tracking-wider text-primary hover:text-foreground transition-colors flex items-center gap-1">
               All signals <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
 
           {recentCaptures.length === 0 ? (
-            <div className="border border-dashed border-vanta-border p-6 text-center">
-              <p className="font-mono text-[10px] text-vanta-text-muted uppercase tracking-widest">
-                No captures yet — start dumping
+            <div className="border border-dashed border-border rounded-lg p-8 text-center">
+              <PenLine className="w-6 h-6 text-muted-foreground mx-auto mb-3 opacity-40" />
+              <p className="font-sans text-[13px] text-muted-foreground">
+                No captures yet. Start with a thought above.
               </p>
             </div>
           ) : (
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               {recentCaptures.map((s) => {
                 const colors = SIGNAL_TYPE_COLORS[s.signalType];
                 return (
-                  <Link
-                    key={s.id}
-                    to="/signals"
-                    className="block border border-vanta-border bg-vanta-bg-elevated p-3 hover:border-vanta-border-mid transition-colors group"
-                  >
-                    <div className="flex items-center gap-2 mb-1">
-                      <span
-                        className={`px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-wider border ${colors.text} ${colors.bg} ${colors.border}`}
-                      >
-                        {s.signalType}
-                      </span>
-                      <span className="font-mono text-[8px] uppercase tracking-wider text-vanta-text-muted">
-                        {s.priority}
-                      </span>
-                      {s.confidenceScore != null && (
-                        <span
-                          className={`font-mono text-[8px] ml-auto ${
-                            s.confidenceScore >= 0.85
-                              ? "text-green-600"
-                              : s.confidenceScore >= 0.6
-                              ? "text-amber-600"
-                              : "text-destructive"
-                          }`}
-                        >
-                          {Math.round(s.confidenceScore * 100)}%
-                        </span>
-                      )}
-                      <span className="font-mono text-[8px] text-vanta-text-muted ml-auto">
-                        {timeAgo(s.capturedAt)}
-                      </span>
+                  <Link key={s.id} to="/signals"
+                    className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card hover:border-primary/20 transition-colors group">
+                    {/* Type dot */}
+                    <span className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${colors.bg} border ${colors.border}`} />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-sans text-[13px] text-foreground leading-snug line-clamp-2 group-hover:text-primary transition-colors">
+                        {s.summary}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1 font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+                        <span className={colors.text}>{s.signalType.replace("_", " ")}</span>
+                        <span>·</span>
+                        <span>{s.priority}</span>
+                        {s.confidenceScore != null && (
+                          <>
+                            <span>·</span>
+                            <span className={s.confidenceScore >= 0.85 ? "text-vanta-signal-green" : s.confidenceScore >= 0.6 ? "text-vanta-signal-yellow" : "text-destructive"}>
+                              {Math.round(s.confidenceScore * 100)}%
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </div>
-                    <p className="font-sans text-[12px] text-foreground leading-relaxed line-clamp-2 group-hover:text-primary transition-colors">
-                      {s.summary}
-                    </p>
+                    <span className="font-mono text-[9px] text-muted-foreground whitespace-nowrap mt-1">
+                      {timeAgo(s.capturedAt)}
+                    </span>
                   </Link>
                 );
               })}
@@ -441,17 +320,14 @@ export default function BrainDump() {
           )}
         </section>
       </Motion>
-
     </div>
   );
 }
 
-/* ── Quick Capture Section (merged from standalone page) ── */
+/* ── Capture Tools Expanded ── */
 
-function QuickCaptureSection() {
-  const [expanded, setExpanded] = useState(false);
+function CaptureToolsExpanded() {
   const [copied, setCopied] = useState(false);
-
   const bookmarkletCode = `javascript:void(function(){var t=document.title,u=window.location.href,s=window.getSelection().toString().slice(0,500),p=encodeURIComponent(t+' | '+u+(s?' | '+s:''));window.open('${window.location.origin}/brain-dump?prefill='+p,'_blank','width=480,height=600')})()`;
 
   const handleCopy = () => {
@@ -461,112 +337,47 @@ function QuickCaptureSection() {
   };
 
   return (
-    <Motion delay={160}>
-      <section className="border border-primary/15 bg-gradient-to-br from-primary/[0.03] to-transparent rounded-lg overflow-hidden">
-        <button
-          onClick={() => setExpanded(!expanded)}
-          className="w-full flex items-center justify-between px-5 py-4 hover:bg-primary/[0.04] transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center">
-              <ExternalLink className="w-3.5 h-3.5 text-primary" />
-            </div>
-            <div className="flex flex-col items-start gap-0.5">
-              <span className="font-mono text-[11px] uppercase tracking-[0.15em] text-foreground font-medium">
-                Capture Everywhere
-              </span>
-              <span className="font-mono text-[8px] text-muted-foreground uppercase tracking-[0.1em]">
-                Bookmarklet · ⌘K · PWA
-              </span>
-            </div>
-          </div>
-          <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
+    <div className="mt-3 grid gap-3 sm:grid-cols-3">
+      {/* Bookmarklet */}
+      <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+        <BookmarkPlus className="w-5 h-5 text-primary" />
+        <div>
+          <p className="font-sans text-[13px] font-medium text-foreground">Bookmarklet</p>
+          <p className="font-sans text-[11px] text-muted-foreground mt-1">One-click capture from any webpage.</p>
+        </div>
+        <button onClick={handleCopy}
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-primary/10 text-primary font-mono text-[9px] uppercase tracking-widest hover:bg-primary/20 transition-colors">
+          {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+          {copied ? "Copied!" : "Copy Code"}
         </button>
+      </div>
 
-        {expanded && (
-          <div className="px-5 pb-5 space-y-5 border-t border-primary/10">
-            {/* Methods grid */}
-            <div className="grid gap-3 sm:grid-cols-3 pt-4">
-              {/* Bookmarklet */}
-              <div className="bg-card border border-border rounded-lg p-4 space-y-3">
-                <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
-                  <BookmarkPlus className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <p className="font-mono text-[11px] font-medium text-foreground">Browser Bookmarklet</p>
-                  <p className="font-mono text-[8px] text-muted-foreground leading-relaxed mt-1">
-                    One-click capture from any webpage. Grabs title, URL, and selected text.
-                  </p>
-                </div>
-                <button
-                  onClick={handleCopy}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-primary/10 text-primary font-mono text-[9px] uppercase tracking-widest hover:bg-primary/20 transition-colors"
-                >
-                  {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                  {copied ? "Copied!" : "Copy Bookmarklet"}
-                </button>
-              </div>
+      {/* ⌘K */}
+      <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+        <Zap className="w-5 h-5 text-primary" />
+        <div>
+          <p className="font-sans text-[13px] font-medium text-foreground">⌘K Palette</p>
+          <p className="font-sans text-[11px] text-muted-foreground mt-1">Universal capture from anywhere in Vanta.</p>
+        </div>
+        <div className="flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-muted/50 border border-border font-mono text-[10px] text-muted-foreground">
+          <kbd className="px-1.5 py-0.5 bg-card rounded border border-border text-[9px] shadow-sm">⌘</kbd>
+          <span>+</span>
+          <kbd className="px-1.5 py-0.5 bg-card rounded border border-border text-[9px] shadow-sm">K</kbd>
+        </div>
+      </div>
 
-              {/* ⌘K */}
-              <div className="bg-card border border-border rounded-lg p-4 space-y-3">
-                <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
-                  <Zap className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <p className="font-mono text-[11px] font-medium text-foreground">⌘K Quick Capture</p>
-                  <p className="font-mono text-[8px] text-muted-foreground leading-relaxed mt-1">
-                    Press ⌘K from anywhere in Vanta to open the universal capture palette.
-                  </p>
-                </div>
-                <div className="flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-muted/50 border border-border font-mono text-[10px] text-muted-foreground">
-                  <kbd className="px-1.5 py-0.5 bg-card rounded border border-border text-[9px] shadow-sm">⌘</kbd>
-                  <span>+</span>
-                  <kbd className="px-1.5 py-0.5 bg-card rounded border border-border text-[9px] shadow-sm">K</kbd>
-                </div>
-              </div>
-
-              {/* PWA */}
-              <div className="bg-card border border-border rounded-lg p-4 space-y-3">
-                <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
-                  <Smartphone className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <p className="font-mono text-[11px] font-medium text-foreground">Install as App</p>
-                  <p className="font-mono text-[8px] text-muted-foreground leading-relaxed mt-1">
-                    Add to your dock or home screen for instant access.
-                  </p>
-                </div>
-                <div className="space-y-1.5 font-mono text-[8px] text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <Globe className="w-3 h-3 shrink-0" /> Chrome: Menu → Install app
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Monitor className="w-3 h-3 shrink-0" /> Safari: Share → Add to Home
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Pipeline */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
-              {[
-                { step: "1", label: "Capture", desc: "Text, URL, or selection" },
-                { step: "2", label: "Classify", desc: "AI determines type and priority" },
-                { step: "3", label: "Enrich", desc: "Scraping and context linking" },
-                { step: "4", label: "Surface", desc: "Signal appears with actions" },
-              ].map((s) => (
-                <div key={s.step} className="flex gap-2 items-start">
-                  <span className="font-mono text-[14px] font-bold text-primary/20 shrink-0 leading-none mt-0.5">{s.step}</span>
-                  <div>
-                    <p className="font-mono text-[9px] font-medium text-foreground">{s.label}</p>
-                    <p className="font-mono text-[7px] text-muted-foreground leading-relaxed mt-0.5">{s.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </section>
-    </Motion>
+      {/* PWA */}
+      <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+        <Smartphone className="w-5 h-5 text-primary" />
+        <div>
+          <p className="font-sans text-[13px] font-medium text-foreground">Install as App</p>
+          <p className="font-sans text-[11px] text-muted-foreground mt-1">Add to dock or home screen.</p>
+        </div>
+        <div className="space-y-1 font-sans text-[11px] text-muted-foreground">
+          <div className="flex items-center gap-2"><Globe className="w-3 h-3 shrink-0" /> Chrome: Menu → Install</div>
+          <div className="flex items-center gap-2"><Monitor className="w-3 h-3 shrink-0" /> Safari: Share → Add to Home</div>
+        </div>
+      </div>
+    </div>
   );
 }
