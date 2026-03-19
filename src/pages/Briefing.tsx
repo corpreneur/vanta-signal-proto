@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Video, Users, MessageSquare, Phone, Mail, StickyNote, TrendingUp, Download, Send } from "lucide-react";
+import { ArrowLeft, Video, Users, MessageSquare, Phone, Mail, StickyNote, TrendingUp, Download, Send, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { Motion } from "@/components/ui/motion";
 import type { Signal } from "@/data/signals";
