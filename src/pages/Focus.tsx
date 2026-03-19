@@ -47,18 +47,12 @@ export default function Focus() {
   return (
     <div className="max-w-[960px] mx-auto px-0 pt-0 pb-16">
       <Motion>
-        <header className="mb-8">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="w-1.5 h-1.5 bg-primary animate-pulse-dot" />
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
-              Viewfinder · Signal Control
-            </span>
-          </div>
+        <header className="mb-6">
           <h1 className="font-display text-2xl md:text-3xl text-foreground tracking-tight">
             Filter Modes
           </h1>
-          <p className="text-muted-foreground text-xs font-mono mt-2 max-w-xl">
-            Your viewfinder. Choose how to look at what's most important — then customize how signals are filtered, weighted, and classified below.
+          <p className="text-muted-foreground text-xs font-mono mt-1.5 max-w-md">
+            Your viewfinder. Choose how to slice what matters most.
           </p>
         </header>
       </Motion>
