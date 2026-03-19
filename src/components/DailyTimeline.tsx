@@ -52,6 +52,8 @@ interface DailyTimelineProps {
 export default function DailyTimeline({ signals, onSignalClick, highOnly = false }: DailyTimelineProps) {
   const queryClient = useQueryClient();
   const [deleting, setDeleting] = useState<string | null>(null);
+  const COLLAPSED_LIMIT = 3;
+  const [expandedBlocks, setExpandedBlocks] = useState<Record<string, boolean>>({});
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
