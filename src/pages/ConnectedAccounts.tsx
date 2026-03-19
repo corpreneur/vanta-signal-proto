@@ -69,6 +69,20 @@ const INITIAL_INTEGRATIONS: Integration[] = [
     icon: "N",
     connected: false,
   },
+  {
+    id: "fireflies",
+    name: "Fireflies.ai",
+    description: "AI meeting transcription and dedicated webhook endpoint",
+    icon: "F",
+    connected: false,
+  },
+  {
+    id: "otter",
+    name: "Otter.ai",
+    description: "Real-time meeting transcription and notes",
+    icon: "O",
+    connected: false,
+  },
 ];
 
 const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
