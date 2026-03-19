@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Motion } from "@/components/ui/motion";
 import { toast } from "sonner";
+import QuickActionsGrid from "@/components/quick-actions/QuickActionsGrid";
 
 /* ── Data fetching ──────────────────────────────────────── */
 
@@ -254,8 +255,13 @@ export default function Command() {
         </header>
       </Motion>
 
+      {/* Quick Actions Grid */}
+      <Motion delay={30}>
+        <QuickActionsGrid />
+      </Motion>
+
       {/* Urgency Stats Strip */}
-      <Motion delay={40}>
+      <Motion delay={50}>
         <div className="grid grid-cols-4 gap-2 mb-6">
           <StatChip
             label="Open"

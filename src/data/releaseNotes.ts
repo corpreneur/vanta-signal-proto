@@ -10,6 +10,19 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "1.9.0",
+    date: "2026-03-19",
+    title: "Quick Actions Panel — Initiate from the Action Queue",
+    changes: [
+      { type: "feature", text: "Quick Actions Grid — 6-tile launcher at the top of Easy Actions: New Note, Draft Email, Calendar Invite, Voice Memo, Send Message, Set Reminder" },
+      { type: "feature", text: "Draft Email sheet — compose and send via Linq with To/Subject/Body fields" },
+      { type: "feature", text: "Calendar Invite sheet — create meetings with title, date/time, duration picker, and attendees directly into upcoming_meetings" },
+      { type: "feature", text: "Set Reminder sheet — quick-date presets (Tomorrow, 3 days, 1 week, 2 weeks) with optional contact and note" },
+      { type: "feature", text: "Send Message sheet — compose and send SMS/iMessage via Linq integration" },
+      { type: "improvement", text: "Easy Actions hub now supports both triage (existing signals) and initiation (new actions) in a single surface" },
+    ],
+  },
+  {
     version: "1.8.0",
     date: "2026-03-19",
     title: "Meeting Intelligence Hub — Source Branding & Transcript Browser",
