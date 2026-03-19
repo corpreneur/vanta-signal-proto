@@ -208,6 +208,7 @@ const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: Signa
   const queryClient = useQueryClient();
   const colors = SIGNAL_TYPE_COLORS[signal.signalType];
   const cta = getPrimaryCTA(signal);
+  const deepLinks = useMemo(() => extractDeepLinks(signal), [signal]);
 
   /* ── Actions ── */
 
