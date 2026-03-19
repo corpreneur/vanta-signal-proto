@@ -79,6 +79,77 @@ function getPrimaryCTA(signal: Signal): { label: string; icon: React.ElementType
   return null;
 }
 
+/* ── URL detection for "Open in…" deep-links ── */
+
+interface DetectedLink {
+  label: string;
+  url: string;
+  color: string;
+}
+
+const LINK_PATTERNS: { pattern: RegExp; label: string; color: string }[] = [
+  { pattern: /https?:\/\/([a-z0-9-]+\.)?salesforce\.com\/[^\s)">]+/gi, label: "Salesforce", color: "text-[hsl(210,80%,55%)]" },
+  { pattern: /https?:\/\/app\.hubspot\.com\/[^\s)">]+/gi, label: "HubSpot", color: "text-[hsl(14,90%,55%)]" },
+  { pattern: /https?:\/\/([a-z0-9-]+\.)?pipedrive\.com\/[^\s)">]+/gi, label: "Pipedrive", color: "text-[hsl(145,60%,40%)]" },
+  { pattern: /https?:\/\/([a-z0-9-]+\.)?notion\.so\/[^\s)">]+/gi, label: "Notion", color: "text-foreground" },
+  { pattern: /https?:\/\/docs\.google\.com\/[^\s)">]+/gi, label: "Google Docs", color: "text-[hsl(217,89%,55%)]" },
+  { pattern: /https?:\/\/drive\.google\.com\/[^\s)">]+/gi, label: "Google Drive", color: "text-[hsl(217,89%,55%)]" },
+  { pattern: /https?:\/\/([a-z0-9-]+\.)?linkedin\.com\/in\/[^\s)">]+/gi, label: "LinkedIn", color: "text-[hsl(210,80%,45%)]" },
+  { pattern: /https?:\/\/([a-z0-9-]+\.)?linkedin\.com\/company\/[^\s)">]+/gi, label: "LinkedIn Co.", color: "text-[hsl(210,80%,45%)]" },
+  { pattern: /https?:\/\/([a-z0-9-]+\.)?slack\.com\/[^\s)">]+/gi, label: "Slack", color: "text-[hsl(330,60%,50%)]" },
+  { pattern: /https?:\/\/([a-z0-9-]+\.)?asana\.com\/[^\s)">]+/gi, label: "Asana", color: "text-[hsl(350,70%,55%)]" },
+  { pattern: /https?:\/\/linear\.app\/[^\s)">]+/gi, label: "Linear", color: "text-[hsl(250,60%,60%)]" },
+  { pattern: /https?:\/\/([a-z0-9-]+\.)?atlassian\.net\/[^\s)">]+/gi, label: "Jira", color: "text-[hsl(210,80%,55%)]" },
+  { pattern: /https?:\/\/([a-z0-9-]+\.)?figma\.com\/[^\s)">]+/gi, label: "Figma", color: "text-[hsl(340,70%,55%)]" },
+  { pattern: /https?:\/\/github\.com\/[^\s)">]+/gi, label: "GitHub", color: "text-foreground" },
+  { pattern: /https?:\/\/([a-z0-9-]+\.)?zoom\.us\/[^\s)">]+/gi, label: "Zoom", color: "text-vanta-accent-zoom" },
+];
+
+/** Fallback: catch any remaining URLs not matched by named patterns */
+const GENERIC_URL_RE = /https?:\/\/[^\s)">\]]+/gi;
+
+function extractDeepLinks(signal: Signal): DetectedLink[] {
+  const texts: string[] = [signal.sourceMessage || ""];
+  if (signal.rawPayload && typeof signal.rawPayload === "object") {
+    texts.push(JSON.stringify(signal.rawPayload));
+  }
+  const haystack = texts.join(" ");
+
+  const seen = new Set<string>();
+  const links: DetectedLink[] = [];
+
+  // Named patterns first
+  for (const { pattern, label, color } of LINK_PATTERNS) {
+    pattern.lastIndex = 0;
+    let m: RegExpExecArray | null;
+    while ((m = pattern.exec(haystack)) !== null) {
+      const url = m[0].replace(/[.,;:!?)]+$/, ""); // trim trailing punctuation
+      if (!seen.has(url)) {
+        seen.add(url);
+        links.push({ label: `Open in ${label}`, url, color });
+      }
+    }
+  }
+
+  // Generic URLs (only those not already captured)
+  GENERIC_URL_RE.lastIndex = 0;
+  let gm: RegExpExecArray | null;
+  while ((gm = GENERIC_URL_RE.exec(haystack)) !== null) {
+    const url = gm[0].replace(/[.,;:!?)]+$/, "");
+    if (!seen.has(url) && !url.includes("supabase.co") && !url.includes("lovable.")) {
+      seen.add(url);
+      try {
+        const host = new URL(url).hostname.replace(/^www\./, "");
+        links.push({ label: `Open ${host}`, url, color: "text-muted-foreground" });
+      } catch {
+        // skip invalid URLs
+      }
+    }
+  }
+
+  return links;
+}
+
 /* ── Risk badge styles (filled, high-contrast per Chunk DS) ── */
 
 const RISK_BADGE: Record<string, string> = {
