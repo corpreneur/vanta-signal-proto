@@ -174,8 +174,7 @@ export default function BrainDump() {
         </div>
       </div>
 
-      {/* ══ Capture Templates (Granola-style) ══ */}
-      <CaptureTemplates selected={selectedTemplate.key} onSelect={handleTemplateSelect} />
+      {/* Templates removed — streamlined capture */}
 
       {/* ══ Input mode tabs (underline style matching Signal Feed) ══ */}
       <div className="flex items-center gap-0 mb-6 border-b border-vanta-border">
