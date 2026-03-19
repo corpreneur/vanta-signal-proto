@@ -79,7 +79,7 @@ const CHANNELS = [
   { key: "recall", label: "Zoom", icon: Video, color: "text-vanta-accent-zoom", bg: "bg-vanta-accent-zoom/10", ring: "ring-vanta-accent-zoom/20", barColor: "bg-vanta-accent-zoom", href: "/product/meeting" },
   { key: "gmail", label: "Email", icon: Mail, color: "text-vanta-accent-teal", bg: "bg-vanta-accent-teal/10", ring: "ring-vanta-accent-teal/20", barColor: "bg-vanta-accent-teal", href: "/product/email" },
   { key: "calendar", label: "Calendar", icon: Calendar, color: "text-vanta-accent-amber", bg: "bg-vanta-accent-amber/10", ring: "ring-vanta-accent-amber/20", barColor: "bg-vanta-accent-amber", href: "/product/calendar" },
-  { key: "manual", label: "Brain Dump", icon: StickyNote, color: "text-vanta-accent-violet", bg: "bg-vanta-accent-violet/10", ring: "ring-vanta-accent-violet/20", barColor: "bg-vanta-accent-violet", href: "/brain-dump" },
+  { key: "manual", label: "Idea Capture", icon: StickyNote, color: "text-vanta-accent-violet", bg: "bg-vanta-accent-violet/10", ring: "ring-vanta-accent-violet/20", barColor: "bg-vanta-accent-violet", href: "/brain-dump" },
 ];
 
 const MODE_META: Record<string, { label: string; icon: typeof Shield; color: string }> = {
