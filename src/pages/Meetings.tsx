@@ -4,12 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { PARTNER_LOGOS } from "@/components/PartnerLogos";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Video, Users, FileText, Clock, Phone } from "lucide-react";
+import { Video, Users, FileText, Clock } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import SignalDetailDrawer from "@/components/SignalDetailDrawer";
 import type { Signal, MeetingArtifact } from "@/data/signals";
 
-type SourceFilter = "all" | "zoom" | "fireflies" | "otter" | "google_meet" | "teams" | "webex" | "phone_call";
+type SourceFilter = "all" | "zoom" | "fireflies" | "otter" | "google_meet" | "teams" | "webex";
 
 const SOURCE_FILTERS: { key: SourceFilter; label: string; logoKey?: string; comingSoon?: boolean }[] = [
   { key: "all", label: "All" },
@@ -19,14 +19,12 @@ const SOURCE_FILTERS: { key: SourceFilter; label: string; logoKey?: string; comi
   { key: "webex", label: "Webex", logoKey: "webex", comingSoon: true },
   { key: "fireflies", label: "Fireflies", logoKey: "fireflies" },
   { key: "otter", label: "Otter", logoKey: "otter" },
-  { key: "phone_call", label: "Phone", logoKey: "phone_call" },
 ];
 
 const SOURCE_MAP: Record<string, SourceFilter> = {
   recall: "zoom",
   fireflies: "fireflies",
   otter: "otter",
-  phone: "phone_call",
 };
 
 interface MeetingRow {
@@ -39,7 +37,7 @@ async function fetchMeetings(): Promise<MeetingRow[]> {
   const { data: signals, error } = await supabase
     .from("signals")
     .select("*")
-    .in("signal_type", ["MEETING", "PHONE_CALL"])
+    .eq("signal_type", "MEETING")
     .order("captured_at", { ascending: false })
     .limit(200);
 
@@ -107,7 +105,7 @@ export default function Meetings() {
   );
 
   const counts = useMemo(() => {
-    const c: Record<SourceFilter, number> = { all: meetings.length, zoom: 0, fireflies: 0, otter: 0, google_meet: 0, teams: 0, webex: 0, phone_call: 0 };
+    const c: Record<SourceFilter, number> = { all: meetings.length, zoom: 0, fireflies: 0, otter: 0, google_meet: 0, teams: 0, webex: 0 };
     meetings.forEach((m) => { if (c[m.sourceKey] !== undefined) c[m.sourceKey]++; });
     return c;
   }, [meetings]);
@@ -183,7 +181,6 @@ export default function Meetings() {
           {filtered.map(({ signal, artifact, sourceKey }) => {
             const Logo = PARTNER_LOGOS[sourceKey] ?? null;
             const attendeeCount = artifact?.attendees?.length ?? 0;
-            const isPhoneCall = signal.signalType === "PHONE_CALL";
             const transcriptPreview = artifact?.summaryText
               ? artifact.summaryText.slice(0, 140) + (artifact.summaryText.length > 140 ? "…" : "")
               : artifact?.transcriptJson?.[0]
@@ -199,7 +196,7 @@ export default function Meetings() {
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
                     <div className="shrink-0 mt-0.5">
-                      {Logo ? <Logo className="w-7 h-7" /> : isPhoneCall ? <Phone className="w-7 h-7 text-muted-foreground" /> : <Video className="w-7 h-7 text-muted-foreground" />}
+                      {Logo ? <Logo className="w-7 h-7" /> : <Video className="w-7 h-7 text-muted-foreground" />}
                     </div>
 
                     <div className="min-w-0 flex-1">
@@ -208,7 +205,7 @@ export default function Meetings() {
                           {signal.summary}
                         </span>
                         <Badge variant="outline" className="shrink-0 font-mono text-[9px] tracking-[0.1em] px-1.5 py-0 h-[18px] rounded-sm border border-border">
-                          {isPhoneCall ? "call" : signal.priority}
+                          {signal.priority}
                         </Badge>
                       </div>
 
