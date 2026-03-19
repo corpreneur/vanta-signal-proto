@@ -80,6 +80,8 @@ export default function EnhancedActionItems({ onSignalClick }: EnhancedActionIte
   const [deleting, setDeleting] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "quick" | "overdue">("all");
+  const COLLAPSED_LIMIT = 4;
+  const [showAll, setShowAll] = useState(false);
 
   const { data: items = [] } = useQuery({
     queryKey: ["action-items-enhanced"],
@@ -164,106 +166,125 @@ export default function EnhancedActionItems({ onSignalClick }: EnhancedActionIte
           </div>
         </div>
 
-        <div className="border border-border divide-y divide-border">
-          {filtered.map((item) => {
-            const overdue = isOverdue(item.dueDate);
-            const dueLabel = formatDue(item.dueDate);
-            const colors = SIGNAL_TYPE_COLORS[item.signalType as keyof typeof SIGNAL_TYPE_COLORS];
-            const priorityStyle = PRIORITY_COLORS[item.priority as keyof typeof PRIORITY_COLORS] || PRIORITY_COLORS.low;
-            const isExpanded = expandedId === item.id;
-            const suggestedActions = QUICK_ACTIONS[item.signalType] || [];
+        {(() => {
+          const visibleItems = showAll ? filtered : filtered.slice(0, COLLAPSED_LIMIT);
+          const hasMore = filtered.length > COLLAPSED_LIMIT;
+          return (
+            <>
+              <div className="border border-border divide-y divide-border">
+                {visibleItems.map((item) => {
+                  const overdue = isOverdue(item.dueDate);
+                  const dueLabel = formatDue(item.dueDate);
+                  const colors = SIGNAL_TYPE_COLORS[item.signalType as keyof typeof SIGNAL_TYPE_COLORS];
+                  const priorityStyle = PRIORITY_COLORS[item.priority as keyof typeof PRIORITY_COLORS] || PRIORITY_COLORS.low;
+                  const isExpanded = expandedId === item.id;
+                  const suggestedActions = QUICK_ACTIONS[item.signalType] || [];
 
-            return (
-              <div key={item.id} className={`border-l-2 ${priorityStyle}`}>
-                <button
-                  onClick={() => onSignalClick?.(item)}
-                  className="flex items-start gap-3 px-4 py-3 bg-card hover:bg-accent/5 transition-colors w-full text-left group"
-                >
-                  <button
-                    onClick={(e) => handleComplete(item.id, e)}
-                    disabled={completing === item.id}
-                    className="mt-0.5 shrink-0 text-muted-foreground hover:text-primary transition-colors disabled:opacity-50"
-                  >
-                    {completing === item.id ? (
-                      <CheckCircle2 className="w-4 h-4 text-primary" />
-                    ) : (
-                      <Circle className="w-4 h-4" />
-                    )}
-                  </button>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-sans text-[13px] text-foreground truncate group-hover:text-primary transition-colors">
-                      {item.summary}
-                    </p>
-                    <div className="flex items-center gap-2 mt-1 flex-wrap">
-                      {/* Signal type chip */}
-                      {colors && (
-                        <span className={`${colors.bg} ${colors.text} text-[8px] font-mono px-1.5 py-0.5 border ${colors.border} uppercase tracking-wider`}>
-                          {item.signalType}
-                        </span>
-                      )}
-                      <span className="font-mono text-[9px] text-muted-foreground">{item.sender}</span>
-                      {dueLabel && (
-                        <>
-                          <span className="w-px h-3 bg-border" />
-                          <span className={`font-mono text-[9px] flex items-center gap-1 ${overdue ? "text-destructive font-semibold" : "text-muted-foreground"}`}>
-                            <Clock className="w-3 h-3" />
-                            {overdue ? "Overdue" : dueLabel}
+                  return (
+                    <div key={item.id} className={`border-l-2 ${priorityStyle}`}>
+                      <button
+                        onClick={() => onSignalClick?.(item)}
+                        className="flex items-start gap-3 px-4 py-3 bg-card hover:bg-accent/5 transition-colors w-full text-left group"
+                      >
+                        <button
+                          onClick={(e) => handleComplete(item.id, e)}
+                          disabled={completing === item.id}
+                          className="mt-0.5 shrink-0 text-muted-foreground hover:text-primary transition-colors disabled:opacity-50"
+                        >
+                          {completing === item.id ? (
+                            <CheckCircle2 className="w-4 h-4 text-primary" />
+                          ) : (
+                            <Circle className="w-4 h-4" />
+                          )}
+                        </button>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-sans text-[13px] text-foreground truncate group-hover:text-primary transition-colors">
+                            {item.summary}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1 flex-wrap">
+                            {colors && (
+                              <span className={`${colors.bg} ${colors.text} text-[8px] font-mono px-1.5 py-0.5 border ${colors.border} uppercase tracking-wider`}>
+                                {item.signalType}
+                              </span>
+                            )}
+                            <span className="font-mono text-[9px] text-muted-foreground">{item.sender}</span>
+                            {dueLabel && (
+                              <>
+                                <span className="w-px h-3 bg-border" />
+                                <span className={`font-mono text-[9px] flex items-center gap-1 ${overdue ? "text-destructive font-semibold" : "text-muted-foreground"}`}>
+                                  <Clock className="w-3 h-3" />
+                                  {overdue ? "Overdue" : dueLabel}
+                                </span>
+                              </>
+                            )}
+                            {item.riskLevel && item.riskLevel !== "low" && (
+                              <>
+                                <span className="w-px h-3 bg-border" />
+                                <span className={`font-mono text-[8px] uppercase tracking-wider flex items-center gap-0.5 ${
+                                  item.riskLevel === "critical" ? "text-destructive" :
+                                  item.riskLevel === "high" ? "text-amber-600" : "text-muted-foreground"
+                                }`}>
+                                  <Shield className="w-3 h-3" />
+                                  {item.riskLevel} risk
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            onClick={(e) => handleDelete(item.id, e)}
+                            disabled={deleting === item.id}
+                            className="text-muted-foreground hover:text-destructive transition-colors p-1 opacity-0 group-hover:opacity-100 disabled:opacity-50"
+                            title="Delete signal"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setExpandedId(isExpanded ? null : item.id); }}
+                            className="text-muted-foreground hover:text-foreground transition-colors p-1"
+                          >
+                            {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                          </button>
+                        </div>
+                      </button>
+
+                      {isExpanded && suggestedActions.length > 0 && (
+                        <div className="px-4 pb-3 pt-1 flex gap-2 flex-wrap border-t border-border/50 bg-muted/30">
+                          <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground self-center mr-1">
+                            Suggested:
                           </span>
-                        </>
-                      )}
-                      {item.riskLevel && item.riskLevel !== "low" && (
-                        <>
-                          <span className="w-px h-3 bg-border" />
-                          <span className={`font-mono text-[8px] uppercase tracking-wider flex items-center gap-0.5 ${
-                            item.riskLevel === "critical" ? "text-destructive" :
-                            item.riskLevel === "high" ? "text-amber-600" : "text-muted-foreground"
-                          }`}>
-                            <Shield className="w-3 h-3" />
-                            {item.riskLevel} risk
-                          </span>
-                        </>
+                          {suggestedActions.map((action) => (
+                            <button
+                              key={action}
+                              onClick={() => toast.info(`Action "${action}" coming soon`)}
+                              className="font-mono text-[9px] px-2.5 py-1 border border-primary/30 text-primary hover:bg-primary/10 transition-colors"
+                            >
+                              {action}
+                            </button>
+                          ))}
+                        </div>
                       )}
                     </div>
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button
-                      onClick={(e) => handleDelete(item.id, e)}
-                      disabled={deleting === item.id}
-                      className="text-muted-foreground hover:text-destructive transition-colors p-1 opacity-0 group-hover:opacity-100 disabled:opacity-50"
-                      title="Delete signal"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setExpandedId(isExpanded ? null : item.id); }}
-                      className="text-muted-foreground hover:text-foreground transition-colors p-1"
-                    >
-                      {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                    </button>
-                  </div>
-                </button>
-
-                {/* Expanded section with smart actions */}
-                {isExpanded && suggestedActions.length > 0 && (
-                  <div className="px-4 pb-3 pt-1 flex gap-2 flex-wrap border-t border-border/50 bg-muted/30">
-                    <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground self-center mr-1">
-                      Suggested:
-                    </span>
-                    {suggestedActions.map((action) => (
-                      <button
-                        key={action}
-                        onClick={() => toast.info(`Action "${action}" coming soon`)}
-                        className="font-mono text-[9px] px-2.5 py-1 border border-primary/30 text-primary hover:bg-primary/10 transition-colors"
-                      >
-                        {action}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                  );
+                })}
               </div>
-            );
-          })}
-        </div>
+
+              {hasMore && (
+                <button
+                  onClick={() => setShowAll((prev) => !prev)}
+                  className="flex items-center gap-1 mt-1.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors w-full justify-center py-1.5"
+                >
+                  {showAll ? (
+                    <>Show less <ChevronUp className="w-3 h-3" /></>
+                  ) : (
+                    <>Show {filtered.length - COLLAPSED_LIMIT} more <ChevronDown className="w-3 h-3" /></>
+                  )}
+                </button>
+              )}
+            </>
+          );
+        })()}
 
         <Link
           to="/signals"

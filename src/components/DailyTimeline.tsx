@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
+import { ChevronDown as ChevronDownIcon, ChevronUp as ChevronUpIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -51,6 +52,8 @@ interface DailyTimelineProps {
 export default function DailyTimeline({ signals, onSignalClick, highOnly = false }: DailyTimelineProps) {
   const queryClient = useQueryClient();
   const [deleting, setDeleting] = useState<string | null>(null);
+  const COLLAPSED_LIMIT = 3;
+  const [expandedBlocks, setExpandedBlocks] = useState<Record<string, boolean>>({});
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -130,6 +133,9 @@ export default function DailyTimeline({ signals, onSignalClick, highOnly = false
       <div className="space-y-4">
         {blocks.map((block) => {
           if (block.items.length === 0) return null;
+          const isBlockExpanded = expandedBlocks[block.key] ?? false;
+          const visibleItems = isBlockExpanded ? block.items : block.items.slice(0, COLLAPSED_LIMIT);
+          const hasMore = block.items.length > COLLAPSED_LIMIT;
           return (
             <div key={block.key}>
               {/* Block header */}
@@ -144,7 +150,7 @@ export default function DailyTimeline({ signals, onSignalClick, highOnly = false
 
               {/* Items */}
               <div className="border border-vanta-border divide-y divide-vanta-border">
-                {block.items.map((s) => {
+                {visibleItems.map((s) => {
                   const SourceIcon = SOURCE_ICONS[s.source] || MessageSquare;
                   const leftBorder = SIGNAL_LEFT_BORDER[s.signalType] || "border-l-transparent";
                   return (
@@ -195,6 +201,20 @@ export default function DailyTimeline({ signals, onSignalClick, highOnly = false
                   );
                 })}
               </div>
+
+              {/* Show more / less toggle */}
+              {hasMore && (
+                <button
+                  onClick={() => setExpandedBlocks((prev) => ({ ...prev, [block.key]: !isBlockExpanded }))}
+                  className="flex items-center gap-1 mt-1.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors w-full justify-center py-1.5"
+                >
+                  {isBlockExpanded ? (
+                    <>Show less <ChevronUpIcon className="w-3 h-3" /></>
+                  ) : (
+                    <>Show {block.items.length - COLLAPSED_LIMIT} more <ChevronDownIcon className="w-3 h-3" /></>
+                  )}
+                </button>
+              )}
             </div>
           );
         })}
