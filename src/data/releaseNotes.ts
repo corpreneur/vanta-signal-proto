@@ -10,6 +10,18 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "1.8.0",
+    date: "2026-03-19",
+    title: "Meeting Intelligence Hub — Source Branding & Transcript Browser",
+    changes: [
+      { type: "feature", text: "Meetings Hub — dedicated /meetings page listing all meeting artifacts with source logos, transcript previews, attendee counts, and source filtering" },
+      { type: "feature", text: "Source Branding — Otter, Fireflies, and Zoom SVG logos now appear in Signal Detail Drawer headers and Signal Feed cards for MEETING signals" },
+      { type: "feature", text: "Expanded signal_source enum — 'fireflies' and 'otter' sources added to database for true meeting provenance tracking" },
+      { type: "improvement", text: "Meeting artifact fetch broadened — Detail Drawer now loads transcripts for all MEETING signals regardless of source, not just Recall/Zoom" },
+      { type: "improvement", text: "Capture Templates reference removed from v1.7.0 notes to reflect streamlined Idea Capture experience" },
+    ],
+  },
+  {
     version: "1.7.0",
     date: "2026-03-19",
     title: "Visual Refresh — Logos, De-Pill, LinkedIn",
