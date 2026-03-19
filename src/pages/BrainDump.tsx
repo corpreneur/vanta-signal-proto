@@ -442,8 +442,6 @@ export default function BrainDump() {
         </section>
       </Motion>
 
-      {/* ─── Quick Capture Everywhere ─── */}
-      <QuickCaptureSection />
     </div>
   );
 }
