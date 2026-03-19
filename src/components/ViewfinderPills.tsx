@@ -113,7 +113,7 @@ export default function ViewfinderPills() {
     <Motion>
       <div className="mb-10">
         {/* Lens pills */}
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex flex-wrap gap-2 mb-5">
           {LENSES.map((lens) => {
             const isActive = activeLens === lens.key;
             const Icon = lens.icon;
@@ -125,11 +125,11 @@ export default function ViewfinderPills() {
                   if (lens.key !== "contact") setSelectedContact(null);
                 }}
                 className={`
-                  inline-flex items-center gap-1.5 px-3.5 py-2 border font-mono text-[10px] uppercase tracking-[0.15em] transition-all
+                  inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full font-mono text-[10px] uppercase tracking-[0.12em] transition-all
                   ${
                     isActive
-                      ? "bg-foreground text-background border-foreground"
-                      : "bg-card text-muted-foreground border-border hover:border-foreground/30 hover:text-foreground"
+                      ? "bg-foreground text-background shadow-sm"
+                      : "bg-card text-muted-foreground border border-border hover:border-foreground/30 hover:text-foreground"
                   }
                 `}
               >
@@ -148,11 +148,11 @@ export default function ViewfinderPills() {
                 key={c}
                 onClick={() => setSelectedContact(c)}
                 className={`
-                  px-3 py-1.5 border font-mono text-[10px] uppercase tracking-[0.1em] transition-all
+                  px-3 py-1.5 rounded-full font-mono text-[10px] uppercase tracking-[0.1em] transition-all
                   ${
                     selectedContact === c
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-card text-muted-foreground border-border hover:border-primary/40"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-card text-muted-foreground border border-border hover:border-primary/40"
                   }
                 `}
               >
@@ -162,9 +162,9 @@ export default function ViewfinderPills() {
           </div>
         )}
 
-        {/* Lens description */}
-        <div className="flex items-center gap-2 mb-4">
-          <span className="w-1 h-1 bg-primary rounded-full" />
+        {/* Lens count line */}
+        <div className="flex items-center gap-2 mb-5">
+          <span className="w-1 h-1 bg-foreground rounded-full" />
           <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
             {activeLensConfig.description} · {filtered.length} signal{filtered.length !== 1 ? "s" : ""}
           </span>
