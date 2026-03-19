@@ -25,7 +25,6 @@ const SOURCE_MAP: Record<string, SourceFilter> = {
   recall: "zoom",
   fireflies: "fireflies",
   otter: "otter",
-  phone: "phone_call",
 };
 
 interface MeetingRow {
