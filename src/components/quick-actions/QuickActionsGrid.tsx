@@ -52,7 +52,7 @@ export default function QuickActionsGrid() {
       {/* Note Sheet */}
       <Sheet open={open === "note"} onOpenChange={(v) => !v && close()}>
         <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
-          <NoteCapture inline onCaptured={close} />
+          <NoteCapture inline onCapture={close} />
         </SheetContent>
       </Sheet>
 
