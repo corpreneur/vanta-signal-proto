@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { Upload, FileUp, User, Building, Mail, Phone, Briefcase, Check, X } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Upload, FileUp, User, Building, Mail, Phone, Briefcase, Check, X, AlertTriangle, GitMerge, SkipForward } from "lucide-react";
 import { parseVCards, type VCardData } from "@/lib/vcard";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -10,25 +10,54 @@ interface Props {
   onClose: () => void;
 }
 
+type DuplicateAction = "merge" | "skip" | "new";
+
+interface ContactWithStatus extends VCardData {
+  index: number;
+  duplicateOf?: string; // existing signal sender name
+  action: DuplicateAction;
+}
+
 export default function VCardImportDialog({ open, onClose }: Props) {
-  const [parsed, setParsed] = useState<VCardData[]>([]);
+  const [contacts, setContacts] = useState<ContactWithStatus[]>([]);
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [importing, setImporting] = useState(false);
   const [fileName, setFileName] = useState("");
+  const [checking, setChecking] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   if (!open) return null;
 
-  const handleFile = (file: File) => {
+  const handleFile = async (file: File) => {
     setFileName(file.name);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const text = e.target?.result as string;
-      const cards = parseVCards(text);
-      setParsed(cards);
-      setSelected(new Set(cards.map((_, i) => i)));
-    };
-    reader.readAsText(file);
+    setChecking(true);
+
+    const text = await file.text();
+    const cards = parseVCards(text);
+
+    // Fetch existing contact names from signals
+    const names = cards.map((c) => c.name);
+    const { data: existing } = await supabase
+      .from("signals")
+      .select("sender")
+      .in("sender", names);
+
+    const existingNames = new Set((existing || []).map((r) => r.sender.toLowerCase()));
+
+    const withStatus: ContactWithStatus[] = cards.map((c, i) => {
+      const isDuplicate = existingNames.has(c.name.toLowerCase());
+      return {
+        ...c,
+        index: i,
+        duplicateOf: isDuplicate ? c.name : undefined,
+        action: isDuplicate ? "merge" as const : "new" as const,
+      };
+    });
+
+    setContacts(withStatus);
+    // Select all non-skip contacts
+    setSelected(new Set(withStatus.filter((c) => c.action !== "skip").map((c) => c.index)));
+    setChecking(false);
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -41,7 +70,20 @@ export default function VCardImportDialog({ open, onClose }: Props) {
     }
   };
 
+  const setAction = (index: number, action: DuplicateAction) => {
+    setContacts((prev) =>
+      prev.map((c) => (c.index === index ? { ...c, action } : c))
+    );
+    if (action === "skip") {
+      setSelected((prev) => { const next = new Set(prev); next.delete(index); return next; });
+    } else {
+      setSelected((prev) => new Set(prev).add(index));
+    }
+  };
+
   const toggleSelect = (i: number) => {
+    const contact = contacts.find((c) => c.index === i);
+    if (contact?.action === "skip") return; // Can't select skipped
     setSelected((prev) => {
       const next = new Set(prev);
       next.has(i) ? next.delete(i) : next.add(i);
@@ -50,26 +92,26 @@ export default function VCardImportDialog({ open, onClose }: Props) {
   };
 
   const toggleAll = () => {
-    if (selected.size === parsed.length) {
+    const selectable = contacts.filter((c) => c.action !== "skip");
+    if (selected.size === selectable.length) {
       setSelected(new Set());
     } else {
-      setSelected(new Set(parsed.map((_, i) => i)));
+      setSelected(new Set(selectable.map((c) => c.index)));
     }
   };
 
   const handleImport = async () => {
-    const toImport = parsed.filter((_, i) => selected.has(i));
+    const toImport = contacts.filter((c) => selected.has(c.index) && c.action !== "skip");
     if (!toImport.length) return;
 
     setImporting(true);
     try {
-      // Create a CONTEXT signal for each imported contact
       const rows = toImport.map((c) => ({
         sender: c.name,
         signal_type: "CONTEXT" as const,
         source: "manual" as const,
         priority: "medium" as const,
-        summary: `Contact imported from vCard${c.role ? ` — ${c.role}` : ""}${c.company ? ` at ${c.company}` : ""}`,
+        summary: `Contact ${c.action === "merge" ? "updated" : "imported"} from vCard${c.role ? ` — ${c.role}` : ""}${c.company ? ` at ${c.company}` : ""}`,
         source_message: [
           c.email && `Email: ${c.email}`,
           c.phone && `Phone: ${c.phone}`,
@@ -85,7 +127,13 @@ export default function VCardImportDialog({ open, onClose }: Props) {
       const { error } = await supabase.from("signals").insert(rows);
       if (error) throw error;
 
-      toast.success(`${toImport.length} contact${toImport.length > 1 ? "s" : ""} imported`);
+      const mergeCount = toImport.filter((c) => c.action === "merge").length;
+      const newCount = toImport.filter((c) => c.action === "new").length;
+      const parts = [
+        newCount && `${newCount} new`,
+        mergeCount && `${mergeCount} merged`,
+      ].filter(Boolean).join(", ");
+      toast.success(`Imported: ${parts}`);
       handleClose();
     } catch (err: any) {
       toast.error(err.message || "Import failed");
@@ -95,18 +143,19 @@ export default function VCardImportDialog({ open, onClose }: Props) {
   };
 
   const handleClose = () => {
-    setParsed([]);
+    setContacts([]);
     setSelected(new Set());
     setFileName("");
     onClose();
   };
 
+  const duplicateCount = contacts.filter((c) => c.duplicateOf).length;
+  const skipCount = contacts.filter((c) => c.action === "skip").length;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
       <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={handleClose} />
 
-      {/* Dialog */}
       <Motion>
         <div className="relative w-[90vw] max-w-lg max-h-[80vh] flex flex-col bg-card border border-border shadow-lg">
           {/* Header */}
@@ -121,8 +170,8 @@ export default function VCardImportDialog({ open, onClose }: Props) {
           </div>
 
           <div className="flex-1 overflow-y-auto p-5">
-            {/* File picker / drop zone */}
-            {parsed.length === 0 && (
+            {/* Drop zone */}
+            {contacts.length === 0 && !checking && (
               <div
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleDrop}
@@ -149,70 +198,46 @@ export default function VCardImportDialog({ open, onClose }: Props) {
               </div>
             )}
 
-            {/* Parsed contacts preview */}
-            {parsed.length > 0 && (
+            {/* Checking spinner */}
+            {checking && (
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin mb-3" />
+                <p className="font-mono text-[10px] text-muted-foreground">Checking for duplicates…</p>
+              </div>
+            )}
+
+            {/* Contacts list */}
+            {contacts.length > 0 && !checking && (
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
-                    {fileName} — {parsed.length} contact{parsed.length > 1 ? "s" : ""} found
+                    {fileName} — {contacts.length} contact{contacts.length > 1 ? "s" : ""}
                   </p>
-                  <button
-                    onClick={toggleAll}
-                    className="font-mono text-[9px] text-primary hover:underline"
-                  >
-                    {selected.size === parsed.length ? "Deselect all" : "Select all"}
+                  <button onClick={toggleAll} className="font-mono text-[9px] text-primary hover:underline">
+                    {selected.size === contacts.filter((c) => c.action !== "skip").length ? "Deselect all" : "Select all"}
                   </button>
                 </div>
 
+                {/* Duplicate summary banner */}
+                {duplicateCount > 0 && (
+                  <div className="flex items-center gap-2 px-3 py-2 mb-3 border border-yellow-500/30 bg-yellow-500/5 rounded">
+                    <AlertTriangle className="w-3.5 h-3.5 text-yellow-500 shrink-0" />
+                    <p className="font-mono text-[10px] text-yellow-600 dark:text-yellow-400">
+                      {duplicateCount} duplicate{duplicateCount > 1 ? "s" : ""} found
+                      {skipCount > 0 && ` · ${skipCount} skipped`}
+                    </p>
+                  </div>
+                )}
+
                 <div className="space-y-2 max-h-[40vh] overflow-y-auto">
-                  {parsed.map((c, i) => (
-                    <div
-                      key={i}
-                      onClick={() => toggleSelect(i)}
-                      className={`border p-3 cursor-pointer transition-colors ${
-                        selected.has(i)
-                          ? "border-primary/40 bg-primary/5"
-                          : "border-border bg-card hover:border-border/80"
-                      }`}
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className={`w-5 h-5 border flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
-                          selected.has(i) ? "border-primary bg-primary" : "border-border"
-                        }`}>
-                          {selected.has(i) && <Check className="w-3 h-3 text-primary-foreground" />}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <User className="w-3 h-3 text-muted-foreground shrink-0" />
-                            <p className="font-mono text-[12px] font-semibold text-foreground truncate">
-                              {c.name}
-                            </p>
-                          </div>
-                          <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1">
-                            {c.role && (
-                              <span className="flex items-center gap-1 font-mono text-[9px] text-muted-foreground">
-                                <Briefcase className="w-2.5 h-2.5" /> {c.role}
-                              </span>
-                            )}
-                            {c.company && (
-                              <span className="flex items-center gap-1 font-mono text-[9px] text-muted-foreground">
-                                <Building className="w-2.5 h-2.5" /> {c.company}
-                              </span>
-                            )}
-                            {c.email && (
-                              <span className="flex items-center gap-1 font-mono text-[9px] text-muted-foreground">
-                                <Mail className="w-2.5 h-2.5" /> {c.email}
-                              </span>
-                            )}
-                            {c.phone && (
-                              <span className="flex items-center gap-1 font-mono text-[9px] text-muted-foreground">
-                                <Phone className="w-2.5 h-2.5" /> {c.phone}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                  {contacts.map((c) => (
+                    <ContactRow
+                      key={c.index}
+                      contact={c}
+                      isSelected={selected.has(c.index)}
+                      onToggle={() => toggleSelect(c.index)}
+                      onAction={(a) => setAction(c.index, a)}
+                    />
                   ))}
                 </div>
               </div>
@@ -220,10 +245,10 @@ export default function VCardImportDialog({ open, onClose }: Props) {
           </div>
 
           {/* Footer */}
-          {parsed.length > 0 && (
+          {contacts.length > 0 && !checking && (
             <div className="flex items-center justify-between px-5 py-3 border-t border-border">
               <button
-                onClick={() => { setParsed([]); setFileName(""); }}
+                onClick={() => { setContacts([]); setFileName(""); }}
                 className="font-mono text-[10px] text-muted-foreground hover:text-foreground transition-colors"
               >
                 Choose different file
@@ -240,6 +265,120 @@ export default function VCardImportDialog({ open, onClose }: Props) {
           )}
         </div>
       </Motion>
+    </div>
+  );
+}
+
+/* ── Individual contact row ── */
+
+function ContactRow({
+  contact: c,
+  isSelected,
+  onToggle,
+  onAction,
+}: {
+  contact: ContactWithStatus;
+  isSelected: boolean;
+  onToggle: () => void;
+  onAction: (a: DuplicateAction) => void;
+}) {
+  const isSkipped = c.action === "skip";
+
+  return (
+    <div
+      onClick={isSkipped ? undefined : onToggle}
+      className={`border p-3 transition-colors ${
+        isSkipped
+          ? "border-border/50 bg-muted/30 opacity-60"
+          : isSelected
+          ? "border-primary/40 bg-primary/5 cursor-pointer"
+          : "border-border bg-card hover:border-border/80 cursor-pointer"
+      }`}
+    >
+      <div className="flex items-start gap-3">
+        {/* Checkbox */}
+        <div
+          className={`w-5 h-5 border flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
+            isSkipped
+              ? "border-border/50"
+              : isSelected
+              ? "border-primary bg-primary"
+              : "border-border"
+          }`}
+        >
+          {isSelected && !isSkipped && <Check className="w-3 h-3 text-primary-foreground" />}
+          {isSkipped && <X className="w-3 h-3 text-muted-foreground" />}
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <User className="w-3 h-3 text-muted-foreground shrink-0" />
+            <p className="font-mono text-[12px] font-semibold text-foreground truncate">{c.name}</p>
+          </div>
+
+          {/* Contact details */}
+          <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1">
+            {c.role && (
+              <span className="flex items-center gap-1 font-mono text-[9px] text-muted-foreground">
+                <Briefcase className="w-2.5 h-2.5" /> {c.role}
+              </span>
+            )}
+            {c.company && (
+              <span className="flex items-center gap-1 font-mono text-[9px] text-muted-foreground">
+                <Building className="w-2.5 h-2.5" /> {c.company}
+              </span>
+            )}
+            {c.email && (
+              <span className="flex items-center gap-1 font-mono text-[9px] text-muted-foreground">
+                <Mail className="w-2.5 h-2.5" /> {c.email}
+              </span>
+            )}
+            {c.phone && (
+              <span className="flex items-center gap-1 font-mono text-[9px] text-muted-foreground">
+                <Phone className="w-2.5 h-2.5" /> {c.phone}
+              </span>
+            )}
+          </div>
+
+          {/* Duplicate actions */}
+          {c.duplicateOf && (
+            <div className="flex items-center gap-2 mt-2" onClick={(e) => e.stopPropagation()}>
+              <AlertTriangle className="w-3 h-3 text-yellow-500 shrink-0" />
+              <span className="font-mono text-[9px] text-yellow-600 dark:text-yellow-400 mr-1">Duplicate</span>
+              <button
+                onClick={() => onAction("merge")}
+                className={`flex items-center gap-1 px-2 py-0.5 font-mono text-[9px] border transition-colors ${
+                  c.action === "merge"
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <GitMerge className="w-2.5 h-2.5" /> Merge
+              </button>
+              <button
+                onClick={() => onAction("skip")}
+                className={`flex items-center gap-1 px-2 py-0.5 font-mono text-[9px] border transition-colors ${
+                  c.action === "skip"
+                    ? "border-destructive bg-destructive/10 text-destructive"
+                    : "border-border text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <SkipForward className="w-2.5 h-2.5" /> Skip
+              </button>
+              <button
+                onClick={() => onAction("new")}
+                className={`flex items-center gap-1 px-2 py-0.5 font-mono text-[9px] border transition-colors ${
+                  c.action === "new"
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <User className="w-2.5 h-2.5" /> New
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
