@@ -378,7 +378,7 @@ export default function NoteCapture({ inline = false, onCapture, onRawText, temp
           <button
             key={tag}
             onClick={() => toggleTag(tag)}
-            className={`font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1 rounded-full border transition-all duration-150 ${
+            className={`font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1 rounded-sm border transition-all duration-150 ${
               selectedTags.includes(tag)
                 ? "bg-primary/15 border-primary/40 text-primary"
                 : "bg-transparent border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground"
