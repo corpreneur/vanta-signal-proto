@@ -125,7 +125,7 @@ export default function ViewfinderPills() {
                   if (lens.key !== "contact") setSelectedContact(null);
                 }}
                 className={`
-                  inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full font-mono text-[10px] uppercase tracking-[0.12em] transition-all
+                  inline-flex items-center gap-1.5 px-4 py-2.5 rounded-sm font-mono text-[10px] uppercase tracking-[0.12em] transition-all
                   ${
                     isActive
                       ? "bg-foreground text-background shadow-sm"
