@@ -512,6 +512,28 @@ const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: Signa
             </div>
           )}
 
+          {/* Deep-link "Open in…" buttons */}
+          {deepLinks.length > 0 && (
+            <div>
+              <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Open In…</h4>
+              <div className="flex flex-wrap gap-1.5">
+                {deepLinks.map((link) => (
+                  <a
+                    key={link.url}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md font-mono text-[9px] uppercase tracking-wider border border-border hover:border-primary/30 hover:bg-muted/50 transition-colors ${link.color}`}
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Raw message */}
           <div>
             <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Raw Message</h4>
