@@ -27,6 +27,12 @@ import ReleaseNotes from "./pages/ReleaseNotes";
 import Command from "./pages/Command";
 
 import Settings from "./pages/Settings";
+import PersonalInfo from "./pages/PersonalInfo";
+import MyPlan from "./pages/MyPlan";
+import BillingHistory from "./pages/BillingHistory";
+import ConnectedAccounts from "./pages/ConnectedAccounts";
+import NotificationPreferences from "./pages/NotificationPreferences";
+import PrivacyData from "./pages/PrivacyData";
 import ContactTimeline from "./pages/ContactTimeline";
 import Briefing from "./pages/Briefing";
 import Contacts from "./pages/Contacts";
