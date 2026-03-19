@@ -70,6 +70,39 @@ const OtterLogo = (props: LogoProps) => (
   </svg>
 );
 
+const GoogleMeetLogo = (props: LogoProps) => (
+  <svg viewBox="0 0 24 24" fill="none" {...props}>
+    <rect width="24" height="24" rx="4" fill="#00897B" />
+    <path d="M5 8.5a1.5 1.5 0 0 1 1.5-1.5h6A1.5 1.5 0 0 1 14 8.5v7a1.5 1.5 0 0 1-1.5 1.5h-6A1.5 1.5 0 0 1 5 15.5v-7Z" fill="#fff" />
+    <path d="M14 10l4.5-2.5v9L14 14v-4Z" fill="#fff" />
+  </svg>
+);
+
+const TeamsLogo = (props: LogoProps) => (
+  <svg viewBox="0 0 24 24" fill="none" {...props}>
+    <rect width="24" height="24" rx="4" fill="#6264A7" />
+    <circle cx="14" cy="7.5" r="2.5" fill="#fff" />
+    <rect x="4" y="9" width="11" height="8" rx="1.5" fill="#fff" />
+    <path d="M17 10h2.5a1.5 1.5 0 0 1 1.5 1.5v4a1.5 1.5 0 0 1-1.5 1.5H17V10Z" fill="#fff" opacity="0.7" />
+    <circle cx="18.5" cy="7" r="1.5" fill="#fff" opacity="0.7" />
+  </svg>
+);
+
+const WebexLogo = (props: LogoProps) => (
+  <svg viewBox="0 0 24 24" fill="none" {...props}>
+    <rect width="24" height="24" rx="4" fill="#07C160" />
+    <circle cx="9" cy="12" r="4.5" fill="#fff" opacity="0.9" />
+    <circle cx="15" cy="12" r="4.5" fill="#fff" opacity="0.7" />
+  </svg>
+);
+
+const PhoneCallLogo = (props: LogoProps) => (
+  <svg viewBox="0 0 24 24" fill="none" {...props}>
+    <rect width="24" height="24" rx="4" fill="hsl(142 71% 45%)" />
+    <path d="M8.5 6.5c.3-.5 1-.8 1.5-.5l1.5 1a1 1 0 0 1 .3 1.3l-.8 1.2a8.5 8.5 0 0 0 3.5 3.5l1.2-.8a1 1 0 0 1 1.3.3l1 1.5c.3.5 0 1.2-.5 1.5l-1.5 1c-2 1.2-5.5-.5-8-3s-4.2-6-3-8l1-1.5Z" fill="#fff" />
+  </svg>
+);
+
 const IdeaCaptureLogo = (props: LogoProps) => (
   <svg viewBox="0 0 24 24" fill="none" {...props}>
     <rect width="24" height="24" rx="4" fill="currentColor" className="text-primary" />
