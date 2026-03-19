@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PARTNER_LOGOS } from "@/components/PartnerLogos";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Video, Users, FileText, Clock, Phone } from "lucide-react";
+import { Video, Users, FileText, Clock } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import SignalDetailDrawer from "@/components/SignalDetailDrawer";
 import type { Signal, MeetingArtifact } from "@/data/signals";
