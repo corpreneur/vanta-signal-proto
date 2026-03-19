@@ -24,6 +24,7 @@ import Architecture from "./pages/Architecture";
 import BrainDump from "./pages/BrainDump";
 import OrbDemo from "./pages/OrbDemo";
 import ReleaseNotes from "./pages/ReleaseNotes";
+import Meetings from "./pages/Meetings";
 import Command from "./pages/Command";
 
 import Settings from "./pages/Settings";
@@ -98,6 +99,7 @@ const AppRoutes = () => {
       <Route path="/architecture" element={<ProtectedRoute session={session}><ProductLayout><Architecture /></ProductLayout></ProtectedRoute>} />
       <Route path="/brain-dump" element={<ProtectedRoute session={session}><ProductLayout><BrainDump /></ProductLayout></ProtectedRoute>} />
       <Route path="/releases" element={<ProtectedRoute session={session}><ProductLayout><ReleaseNotes /></ProductLayout></ProtectedRoute>} />
+      <Route path="/meetings" element={<ProtectedRoute session={session}><ProductLayout><Meetings /></ProductLayout></ProtectedRoute>} />
       <Route path="/audit" element={<Navigate to="/settings?tab=audit" replace />} />
       <Route path="/settings" element={<ProtectedRoute session={session}><ProductLayout><Settings /></ProductLayout></ProtectedRoute>} />
       <Route path="/settings/profile" element={<ProtectedRoute session={session}><ProductLayout><PersonalInfo /></ProductLayout></ProtectedRoute>} />

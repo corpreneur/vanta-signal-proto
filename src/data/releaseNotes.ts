@@ -10,6 +10,18 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "1.8.0",
+    date: "2026-03-19",
+    title: "Meeting Intelligence Hub — Source Branding & Transcript Browser",
+    changes: [
+      { type: "feature", text: "Meetings Hub — dedicated /meetings page listing all meeting artifacts with source logos, transcript previews, attendee counts, and source filtering" },
+      { type: "feature", text: "Source Branding — Otter, Fireflies, and Zoom SVG logos now appear in Signal Detail Drawer headers and Signal Feed cards for MEETING signals" },
+      { type: "feature", text: "Expanded signal_source enum — 'fireflies' and 'otter' sources added to database for true meeting provenance tracking" },
+      { type: "improvement", text: "Meeting artifact fetch broadened — Detail Drawer now loads transcripts for all MEETING signals regardless of source, not just Recall/Zoom" },
+      { type: "improvement", text: "Capture Templates reference removed from v1.7.0 notes to reflect streamlined Idea Capture experience" },
+    ],
+  },
+  {
     version: "1.7.0",
     date: "2026-03-19",
     title: "Visual Refresh — Logos, De-Pill, LinkedIn",
@@ -18,7 +30,7 @@ export const releaseNotes: ReleaseEntry[] = [
       { type: "improvement", text: "Global De-Pill — all interactive pills (badges, tags, filters, lenses, template buttons) migrated from rounded-full to rounded-sm for sharper geometry" },
       { type: "feature", text: "LinkedIn Integration — 'View on LinkedIn' search links added to Contact Profile, Meeting Brief attendee dossiers, and Smart Contact Cards" },
       { type: "feature", text: "Fireflies Webhook — dedicated edge function with API key verification, transcription_completed filtering, and AI-powered signal classification" },
-      { type: "improvement", text: "Capture Templates removed from Idea Capture for a cleaner, streamlined input experience" },
+      { type: "improvement", text: "Idea Capture streamlined — cleaner input experience with templates removed" },
     ],
   },
   {

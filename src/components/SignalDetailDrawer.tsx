@@ -4,6 +4,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import type { Signal, SignalStatus, MeetingArtifact } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
+import { PARTNER_LOGOS } from "@/components/PartnerLogos";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -139,7 +140,7 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   useEffect(() => { if (signal?.status) setCurrentStatus(signal.status); }, [signal?.id, signal?.status]);
   useEffect(() => { if (open && scrollRef.current) scrollRef.current.scrollTop = 0; }, [signal?.id, open]);
   useEffect(() => {
-    if (!signal || signal.source !== "recall") { setArtifact(null); setMeetingTab("intelligence"); return; }
+    if (!signal || signal.signalType !== "MEETING") { setArtifact(null); setMeetingTab("intelligence"); return; }
     const fetchArtifact = async () => {
       setLoadingArtifact(true);
       const { data, error } = await supabase.from("meeting_artifacts").select("*").eq("signal_id", signal.id).limit(1).maybeSingle();
@@ -149,7 +150,7 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
       setLoadingArtifact(false);
     };
     fetchArtifact();
-  }, [signal?.id, signal?.source]);
+  }, [signal?.id, signal?.signalType]);
 
   // Initialize proposed reply when signal changes
   useEffect(() => {
@@ -163,7 +164,9 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   if (!signal) return null;
 
   const colors = SIGNAL_TYPE_COLORS[signal.signalType];
-  const isMeeting = signal.source === "recall";
+  const isMeeting = signal.signalType === "MEETING";
+  const meetingSourceKey = signal.source === "recall" ? "zoom" : signal.source === "fireflies" ? "fireflies" : signal.source === "otter" ? "otter" : null;
+  const MeetingSourceLogo = meetingSourceKey ? PARTNER_LOGOS[meetingSourceKey] : null;
   const helpfulMemory = getHelpfulMemory(signal);
   const furtherConsiderations = getFurtherConsiderations(signal);
 

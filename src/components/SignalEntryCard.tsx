@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS, PHONE_CALL_TAGS, PHONE_TAG_LABELS } from "@/data/signals";
+import { PARTNER_LOGOS } from "@/components/PartnerLogos";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -162,10 +163,13 @@ const RISK_BADGE: Record<string, string> = {
 /* ── Source indicator ── */
 
 function SourceIndicator({ signal }: { signal: Signal }) {
-  if (signal.source === "recall") {
+  const logoKey = signal.source === "recall" ? "zoom" : signal.source === "fireflies" ? "fireflies" : signal.source === "otter" ? "otter" : null;
+  const Logo = logoKey ? PARTNER_LOGOS[logoKey] : null;
+  if (Logo) {
+    const label = logoKey === "zoom" ? "Zoom" : logoKey === "fireflies" ? "Fireflies" : "Otter";
     return (
-      <span className="inline-flex items-center gap-1 text-vanta-accent-zoom">
-        <Video className="w-3 h-3" /> Zoom
+      <span className="inline-flex items-center gap-1.5">
+        <Logo className="w-4 h-4" /> <span className="text-muted-foreground">{label}</span>
       </span>
     );
   }
@@ -184,7 +188,7 @@ function SourceIndicator({ signal }: { signal: Signal }) {
     );
   }
   return (
-    <span className="text-vanta-text-muted">{signal.source}</span>
+    <span className="text-muted-foreground">{signal.source}</span>
   );
 }
 
