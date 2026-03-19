@@ -25,10 +25,7 @@ import {
   Shield,
   Radio,
   SlidersHorizontal,
-  CheckSquare,
   FolderOpen,
-  Bookmark,
-  Crosshair,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -75,7 +72,6 @@ const productItems = [
   { title: "Relationship Graph", url: "/graph", icon: Network },
   { title: "File Vault", url: "/files", icon: FolderOpen },
   { title: "My Rules", url: "/my-rules", icon: BookOpen },
-  { title: "Quick Capture", url: "/quick-capture", icon: Crosshair },
   { title: "Insight Engine", url: "/insights", icon: Lightbulb },
   { title: "Investment Intel", url: "/investments", icon: TrendingUp },
   { title: "Decision Capture", url: "/decisions", icon: Gavel },

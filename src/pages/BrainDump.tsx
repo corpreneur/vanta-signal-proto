@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { PenLine, Link2, FileText, Loader2, ArrowRight, Plus, Clock, Zap, Image, Mail, Mic } from "lucide-react";
+import { PenLine, Link2, FileText, Loader2, ArrowRight, Plus, Clock, Zap, Image, Mail, Mic, BookmarkPlus, Copy, Check, Smartphone, Globe, Monitor, ExternalLink, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -438,6 +438,124 @@ export default function BrainDump() {
           )}
         </section>
       </Motion>
+
+      {/* ─── Quick Capture Everywhere ─── */}
+      <QuickCaptureSection />
     </div>
+  );
+}
+
+/* ── Quick Capture Section (merged from standalone page) ── */
+
+function QuickCaptureSection() {
+  const [expanded, setExpanded] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const bookmarkletCode = `javascript:void(function(){var t=document.title,u=window.location.href,s=window.getSelection().toString().slice(0,500),p=encodeURIComponent(t+' | '+u+(s?' | '+s:''));window.open('${window.location.origin}/brain-dump?prefill='+p,'_blank','width=480,height=600')})()`;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(bookmarkletCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <Motion delay={160}>
+      <section className="border border-border bg-card">
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="w-full flex items-center justify-between px-5 py-4 hover:bg-muted/30 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <ExternalLink className="w-4 h-4 text-primary" />
+            <span className="font-mono text-[11px] uppercase tracking-[0.15em] text-foreground">
+              Capture Everywhere
+            </span>
+            <span className="font-mono text-[9px] text-muted-foreground">
+              Bookmarklet · ⌘K · PWA
+            </span>
+          </div>
+          <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
+        </button>
+
+        {expanded && (
+          <div className="px-5 pb-5 space-y-4">
+            {/* Methods grid */}
+            <div className="grid gap-px sm:grid-cols-3 border border-border bg-border">
+              {/* Bookmarklet */}
+              <div className="bg-card p-5">
+                <div className="w-8 h-8 bg-primary/10 flex items-center justify-center ring-1 ring-primary/20 mb-3">
+                  <BookmarkPlus className="w-4 h-4 text-primary" />
+                </div>
+                <p className="font-mono text-[12px] font-medium text-foreground mb-1">Browser Bookmarklet</p>
+                <p className="font-mono text-[9px] text-muted-foreground leading-relaxed mb-3">
+                  One-click capture from any webpage. Grabs the page title, URL, and selected text.
+                </p>
+                <button
+                  onClick={handleCopy}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-1.5 border border-primary/30 text-primary font-mono text-[9px] uppercase tracking-widest hover:bg-primary/10 transition-colors"
+                >
+                  {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                  {copied ? "Copied!" : "Copy Bookmarklet"}
+                </button>
+              </div>
+
+              {/* ⌘K */}
+              <div className="bg-card p-5">
+                <div className="w-8 h-8 bg-primary/10 flex items-center justify-center ring-1 ring-primary/20 mb-3">
+                  <Zap className="w-4 h-4 text-primary" />
+                </div>
+                <p className="font-mono text-[12px] font-medium text-foreground mb-1">⌘K Quick Capture</p>
+                <p className="font-mono text-[9px] text-muted-foreground leading-relaxed mb-3">
+                  Press ⌘K (or Ctrl+K) from anywhere in Vanta to open the universal capture palette.
+                </p>
+                <div className="flex items-center justify-center gap-2 px-3 py-1.5 border border-border font-mono text-[10px] text-muted-foreground">
+                  <kbd className="px-1.5 py-0.5 bg-muted border border-border text-[9px]">⌘</kbd>
+                  <span>+</span>
+                  <kbd className="px-1.5 py-0.5 bg-muted border border-border text-[9px]">K</kbd>
+                </div>
+              </div>
+
+              {/* PWA */}
+              <div className="bg-card p-5">
+                <div className="w-8 h-8 bg-primary/10 flex items-center justify-center ring-1 ring-primary/20 mb-3">
+                  <Smartphone className="w-4 h-4 text-primary" />
+                </div>
+                <p className="font-mono text-[12px] font-medium text-foreground mb-1">Install as App</p>
+                <p className="font-mono text-[9px] text-muted-foreground leading-relaxed mb-3">
+                  Install as a PWA for quick access from your dock or home screen.
+                </p>
+                <div className="space-y-1 font-mono text-[8px] text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <Globe className="w-3 h-3" /> Chrome: Menu → Install app
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Monitor className="w-3 h-3" /> Safari: Share → Add to Home Screen
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Pipeline */}
+            <div className="grid sm:grid-cols-4 gap-3">
+              {[
+                { step: "1", label: "Capture", desc: "Text, URL, or selection sent to Idea Capture" },
+                { step: "2", label: "Classify", desc: "AI determines signal type, priority, and contacts" },
+                { step: "3", label: "Enrich", desc: "URL scraping, entity extraction, context linking" },
+                { step: "4", label: "Surface", desc: "New signal appears in your feed with actions" },
+              ].map((s) => (
+                <div key={s.step} className="flex gap-2">
+                  <span className="font-mono text-[16px] font-bold text-primary/30 shrink-0">{s.step}</span>
+                  <div>
+                    <p className="font-mono text-[10px] font-medium text-foreground">{s.label}</p>
+                    <p className="font-mono text-[8px] text-muted-foreground leading-relaxed mt-0.5">{s.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
+    </Motion>
   );
 }

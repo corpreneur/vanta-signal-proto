@@ -35,7 +35,7 @@ import UserModes from "./pages/UserModes";
 import Focus from "./pages/Focus";
 import FileVault from "./pages/FileVault";
 import MyRulesHub from "./pages/MyRulesHub";
-import QuickCaptureExtension from "./pages/QuickCaptureExtension";
+// QuickCaptureExtension merged into BrainDump
 import Admin from "./pages/Admin";
 import NativeContactSync from "./pages/NativeContactSync";
 import QuickCapture from "./components/QuickCapture";
@@ -104,7 +104,7 @@ const AppRoutes = () => {
       <Route path="/focus" element={<ProtectedRoute session={session}><ProductLayout><Focus /></ProductLayout></ProtectedRoute>} />
       <Route path="/files" element={<ProtectedRoute session={session}><ProductLayout><FileVault /></ProductLayout></ProtectedRoute>} />
       <Route path="/my-rules" element={<ProtectedRoute session={session}><ProductLayout><MyRulesHub /></ProductLayout></ProtectedRoute>} />
-      <Route path="/quick-capture" element={<ProtectedRoute session={session}><ProductLayout><QuickCaptureExtension /></ProductLayout></ProtectedRoute>} />
+      <Route path="/quick-capture" element={<Navigate to="/brain-dump" replace />} />
       <Route path="/user-modes" element={<Navigate to="/focus" replace />} />
       <Route path="/case-01" element={<Navigate to="/case/01" replace />} />
       <Route path="/case-02" element={<Navigate to="/case/02" replace />} />
