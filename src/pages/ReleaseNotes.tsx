@@ -102,7 +102,7 @@ export default function ReleaseNotes() {
           <button
             key={f.key}
             onClick={() => setFilter(f.key)}
-            className={`font-mono text-[10px] uppercase tracking-[0.15em] px-3 py-1.5 rounded-full border transition-all duration-200 ${
+            className={`font-mono text-[10px] uppercase tracking-[0.15em] px-3 py-1.5 rounded-sm border transition-all duration-200 ${
               filter === f.key
                 ? "bg-primary/10 border-primary text-primary"
                 : "bg-transparent border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"

@@ -184,8 +184,12 @@ export default function ConnectedAccounts() {
             {available.map((int) => (
               <div key={int.id} className="border border-border rounded-lg p-4 opacity-80 hover:opacity-100 transition-opacity">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-muted/50 flex items-center justify-center font-display text-sm text-muted-foreground font-bold shrink-0">
-                    {int.icon}
+                   <div className="w-10 h-10 rounded-sm bg-muted/50 flex items-center justify-center shrink-0 overflow-hidden">
+                    {PARTNER_LOGOS[int.id] ? (
+                      (() => { const Logo = PARTNER_LOGOS[int.id]; return <Logo className="w-7 h-7 opacity-60" />; })()
+                    ) : (
+                      <span className="font-display text-sm text-muted-foreground font-bold">{int.icon}</span>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <span className="font-sans text-[14px] font-medium text-foreground">{int.name}</span>
