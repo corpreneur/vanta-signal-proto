@@ -9,7 +9,7 @@ import { format, parseISO } from "date-fns";
 import SignalDetailDrawer from "@/components/SignalDetailDrawer";
 import type { Signal, MeetingArtifact } from "@/data/signals";
 
-type SourceFilter = "all" | "zoom" | "fireflies" | "otter" | "google_meet" | "teams" | "webex" | "phone_call";
+type SourceFilter = "all" | "zoom" | "fireflies" | "otter" | "google_meet" | "teams" | "webex";
 
 const SOURCE_FILTERS: { key: SourceFilter; label: string; logoKey?: string; comingSoon?: boolean }[] = [
   { key: "all", label: "All" },
@@ -19,7 +19,6 @@ const SOURCE_FILTERS: { key: SourceFilter; label: string; logoKey?: string; comi
   { key: "webex", label: "Webex", logoKey: "webex", comingSoon: true },
   { key: "fireflies", label: "Fireflies", logoKey: "fireflies" },
   { key: "otter", label: "Otter", logoKey: "otter" },
-  { key: "phone_call", label: "Phone", logoKey: "phone_call" },
 ];
 
 const SOURCE_MAP: Record<string, SourceFilter> = {
