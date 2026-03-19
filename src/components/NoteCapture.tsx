@@ -163,6 +163,7 @@ export default function NoteCapture({ inline = false, onCapture, onRawText, temp
       setEditableContacts(classification.suggestedContacts || []);
 
       // Notify parent of capture
+      onRawText?.(text.trim());
       onCapture?.(classification);
 
       toast({
