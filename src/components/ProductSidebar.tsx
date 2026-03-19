@@ -83,6 +83,11 @@ const platformItems = [
   { title: "Ontology", url: "/ontology", icon: Layers },
   { title: "Phone FMC", url: "/phone-fmc", icon: BookOpen },
   { title: "Architecture", url: "/architecture", icon: FileCode },
+  { title: "iMessage", url: "/product/intro", icon: MessageSquare },
+  { title: "Phone", url: "/product/phone-call", icon: Phone },
+  { title: "Zoom", url: "/product/meeting", icon: Video },
+  { title: "Email", url: "/product/email", icon: Mail },
+  { title: "Calendar", url: "/product/calendar", icon: Calendar },
 ];
 
 interface CollapsibleNavGroupProps {
