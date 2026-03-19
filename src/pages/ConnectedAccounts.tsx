@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Check, X, ExternalLink, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import PARTNER_LOGOS from "@/components/PartnerLogos";
 import { Motion } from "@/components/ui/motion";
 import { toast } from "sonner";
 
