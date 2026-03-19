@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown, Copy, Check, CheckCircle, Video, Phone, ArrowUpFromLine, Shield, CalendarClock, Pointer, Users, Reply, Bell, Calendar, Image, Film, FileText, Mic, Paperclip, Pin, Clock, Mail, FileOutput, Flag, Trash2 } from "lucide-react";
+import {
+  ChevronDown, Copy, Check, CheckCircle, Video, Phone,
+  ArrowUpFromLine, Shield, CalendarClock, Pointer, Users,
+  Bell, Calendar, Mail, FileOutput, Flag, Trash2, Pin, Clock,
+  Image, Film, FileText, Mic, Paperclip,
+} from "lucide-react";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS, PHONE_CALL_TAGS, PHONE_TAG_LABELS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,60 +14,110 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { ContactContext } from "@/lib/contactStrength";
 import { recencyLabel } from "@/lib/contactStrength";
 
+/* ── Helpers ─────────────────────────────────────────────── */
+
 function formatTimestamp(iso: string): string {
   const d = new Date(iso);
   const now = new Date();
   const diffMs = now.getTime() - d.getTime();
   const diffH = Math.floor(diffMs / (1000 * 60 * 60));
   const diffD = Math.floor(diffH / 24);
-
   if (diffH < 1) return "Just now";
   if (diffH < 24) return `${diffH}h ago`;
   if (diffD < 7) return `${diffD}d ago`;
-
-  return d.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
 function formatAction(action: string): string {
-  return action
-    .replace(/_/g, " ")
-    .toLowerCase()
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+  return action.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
 }
-
-const PRIORITY_STYLES: Record<string, string> = {
-  high: "text-vanta-accent border-vanta-accent-border bg-vanta-accent-faint",
-  medium: "text-vanta-text-mid border-vanta-border bg-transparent",
-  low: "text-vanta-text-muted border-vanta-border bg-transparent",
-};
-
-const RISK_STYLES: Record<string, string> = {
-  critical: "text-vanta-signal-red border-vanta-signal-red-border bg-vanta-signal-red-faint",
-  high: "text-vanta-signal-red border-vanta-signal-red-border bg-vanta-signal-red-faint",
-  medium: "text-vanta-signal-yellow border-vanta-signal-yellow-border bg-vanta-signal-yellow-faint",
-  low: "text-vanta-text-muted border-vanta-border bg-transparent",
-};
 
 function formatDueDate(dateStr: string): { label: string; isOverdue: boolean } {
   const due = new Date(dateStr + "T00:00:00");
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const diffMs = due.getTime() - today.getTime();
-  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
-
+  const diffDays = Math.round((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   if (diffDays < 0) return { label: `${Math.abs(diffDays)}d overdue`, isOverdue: true };
   if (diffDays === 0) return { label: "Due today", isOverdue: true };
   if (diffDays === 1) return { label: "Due tomorrow", isOverdue: false };
   if (diffDays <= 7) return { label: `Due in ${diffDays}d`, isOverdue: false };
-  return {
-    label: due.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-    isOverdue: false,
-  };
+  return { label: due.toLocaleDateString("en-US", { month: "short", day: "numeric" }), isOverdue: false };
 }
+
+/** Get the primary CTA label + action for a signal type */
+function getPrimaryCTA(signal: Signal): { label: string; icon: React.ElementType; action: () => void } | null {
+  if (signal.status === "Complete") return null;
+  if (signal.signalType === "PHONE_CALL" || signal.source === "phone") {
+    return { label: "Call Now", icon: Phone, action: () => window.open(`tel:`, "_blank") };
+  }
+  if (signal.signalType === "INTRO") {
+    const subject = encodeURIComponent(`Re: Introduction, ${signal.sender}`);
+    const body = encodeURIComponent(`Hi,\n\nFollowing up on the introduction from ${signal.sender}.\n\n${signal.summary}\n\nBest regards`);
+    return { label: "Draft Reply", icon: Mail, action: () => window.open(`mailto:?subject=${subject}&body=${body}`, "_blank") };
+  }
+  if (signal.signalType === "MEETING") {
+    return {
+      label: "Follow Up", icon: Calendar, action: () => {
+        const nextWeek = new Date(); nextWeek.setDate(nextWeek.getDate() + 7); nextWeek.setHours(10, 0, 0, 0);
+        const end = new Date(nextWeek); end.setMinutes(30);
+        const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+        window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Follow-up: ${signal.sender}`)}&details=${encodeURIComponent(signal.summary)}&dates=${fmt(nextWeek)}/${fmt(end)}`, "_blank");
+      }
+    };
+  }
+  if (signal.signalType === "DECISION") {
+    return {
+      label: "Create Task", icon: FileOutput, action: () => {
+        navigator.clipboard.writeText(`TASK: ${signal.summary}\nFrom: ${signal.sender}\nPriority: ${signal.priority}\nContext: ${signal.sourceMessage}`);
+        toast.success("Decision exported as task to clipboard");
+      }
+    };
+  }
+  if (signal.signalType === "INVESTMENT") {
+    return { label: "Flag Review", icon: Flag, action: () => {} };
+  }
+  return null;
+}
+
+/* ── Risk badge styles (filled, high-contrast per Chunk DS) ── */
+
+const RISK_BADGE: Record<string, string> = {
+  critical: "bg-vanta-signal-red text-white",
+  high: "bg-vanta-signal-red text-white",
+  medium: "bg-vanta-signal-yellow text-vanta-grey-900",
+  low: "bg-vanta-grey-600 text-white",
+};
+
+/* ── Source indicator ── */
+
+function SourceIndicator({ signal }: { signal: Signal }) {
+  if (signal.source === "recall") {
+    return (
+      <span className="inline-flex items-center gap-1 text-vanta-accent-zoom">
+        <Video className="w-3 h-3" /> Zoom
+      </span>
+    );
+  }
+  if (signal.source === "phone" || signal.signalType === "PHONE_CALL") {
+    return (
+      <span className="inline-flex items-center gap-1 text-vanta-accent-phone">
+        <Phone className="w-3 h-3" /> Phone
+      </span>
+    );
+  }
+  if (signal.source === "gmail") {
+    return (
+      <span className="inline-flex items-center gap-1 text-vanta-text-low">
+        <Mail className="w-3 h-3" /> Gmail
+      </span>
+    );
+  }
+  return (
+    <span className="text-vanta-text-muted">{signal.source}</span>
+  );
+}
+
+/* ── Main component ──────────────────────────────────────── */
 
 interface SignalEntryCardProps {
   signal: Signal;
@@ -81,37 +136,35 @@ const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: Signa
   const [snoozing, setSnoozing] = useState(false);
   const queryClient = useQueryClient();
   const colors = SIGNAL_TYPE_COLORS[signal.signalType];
+  const cta = getPrimaryCTA(signal);
 
-  const handleCopyInsight = (e: React.MouseEvent) => {
+  /* ── Actions ── */
+
+  const handleCopy = (e: React.MouseEvent) => {
     e.stopPropagation();
     navigator.clipboard.writeText(signal.summary);
     setCopied(true);
-    toast.success("Insight copied to clipboard");
+    toast.success("Copied to clipboard");
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleMarkReviewed = async (e: React.MouseEvent) => {
+  const handleMarkDone = async (e: React.MouseEvent) => {
     e.stopPropagation();
     setMarkingReviewed(true);
-    const { error } = await supabase
-      .from("signals")
-      .update({ status: "Complete" as const })
-      .eq("id", signal.id);
+    const { error } = await supabase.from("signals").update({ status: "Complete" as const }).eq("id", signal.id);
     setMarkingReviewed(false);
-    if (error) {
-      toast.error("Failed to mark reviewed");
-    } else {
+    if (error) { toast.error("Failed to complete"); } else {
       queryClient.invalidateQueries({ queryKey: ["signals"] });
-      toast.success("Marked as reviewed");
+      queryClient.invalidateQueries({ queryKey: ["signals-dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["action-items-enhanced"] });
+      toast.success("Marked complete");
     }
   };
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     const { error } = await supabase.from("signals").delete().eq("id", signal.id);
-    if (error) {
-      toast.error("Failed to delete");
-    } else {
+    if (error) { toast.error("Failed to delete"); } else {
       queryClient.invalidateQueries({ queryKey: ["signals"] });
       queryClient.invalidateQueries({ queryKey: ["signals-dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["action-items-enhanced"] });
@@ -119,579 +172,313 @@ const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: Signa
     }
   };
 
-  const handleExpand = (e: React.MouseEvent) => {
+  const handleSnooze = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    setExpanded((prev) => !prev);
+    setSnoozing(true);
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+    const { error } = await supabase.from("signals").update({ due_date: tomorrow.toISOString().split("T")[0] }).eq("id", signal.id);
+    setSnoozing(false);
+    if (error) { toast.error("Failed to snooze"); } else {
+      queryClient.invalidateQueries({ queryKey: ["signals"] });
+      toast.success("Snoozed until tomorrow");
+    }
+  };
+
+  const handlePin = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setPinning(true);
+    const newPinned = !signal.pinned;
+    const { error } = await supabase.from("signals").update({ pinned: newPinned }).eq("id", signal.id);
+    setPinning(false);
+    if (error) { toast.error("Failed to pin"); } else {
+      queryClient.invalidateQueries({ queryKey: ["signals"] });
+      toast.success(newPinned ? "Signal pinned" : "Signal unpinned");
+    }
   };
 
   const handlePromote = async (e: React.MouseEvent) => {
     e.stopPropagation();
     setPromoting(true);
-    const { error } = await supabase
-      .from("signals")
-      .update({ signal_type: "CONTEXT" as const })
-      .eq("id", signal.id);
+    const { error } = await supabase.from("signals").update({ signal_type: "CONTEXT" as const }).eq("id", signal.id);
     setPromoting(false);
-    if (error) {
-      toast.error("Failed to promote signal");
-    } else {
+    if (error) { toast.error("Failed to promote signal"); } else {
       queryClient.invalidateQueries({ queryKey: ["signals"] });
       toast.success("Signal promoted to Context");
     }
   };
 
+  const handleSetReminder = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+    setSettingReminder(true);
+    try {
+      const { error } = await supabase.functions.invoke("create-reminder", { body: { signal_id: signal.id, due_date: tomorrow.toISOString().split("T")[0] } });
+      if (error) throw error;
+      queryClient.invalidateQueries({ queryKey: ["signals"] });
+      toast.success("Reminder set for tomorrow");
+    } catch { toast.error("Failed to set reminder"); }
+    setSettingReminder(false);
+  };
+
+  /* ── Attachment badges ── */
+  const attachmentBadges = (() => {
+    if (!signal.rawPayload || typeof signal.rawPayload !== "object") return null;
+    const rp = signal.rawPayload as Record<string, unknown>;
+    const attachments = rp._vanta_attachments as Array<{ type: string; url?: string; mime?: string }> | undefined;
+    if (!attachments?.length) return null;
+    const getIcon = (type: string, mime?: string) => {
+      if (mime?.startsWith("image") || type === "image") return <Image className="w-3 h-3" />;
+      if (mime?.startsWith("video") || type === "video") return <Film className="w-3 h-3" />;
+      if (mime?.startsWith("audio") || type === "audio") return <Mic className="w-3 h-3" />;
+      if (type === "file" || type === "document") return <FileText className="w-3 h-3" />;
+      return <Paperclip className="w-3 h-3" />;
+    };
+    const groups: Record<string, number> = {};
+    attachments.forEach((a) => {
+      const label = mime2label(a.type, a.mime);
+      groups[label] = (groups[label] || 0) + 1;
+    });
+    return Object.entries(groups).map(([label, count]) => (
+      <span key={label} className="inline-flex items-center gap-1 font-mono text-[9px] uppercase tracking-wider text-vanta-text-muted">
+        {getIcon(label.toLowerCase())} {label}{count > 1 ? ` ×${count}` : ""}
+      </span>
+    ));
+  })();
+
+  const isGroupChat = signal.rawPayload && typeof signal.rawPayload === "object" && (signal.rawPayload as Record<string, unknown>)._vanta_group_chat === true;
+
   return (
-    <div
-      className={`border border-vanta-border bg-vanta-bg-elevated transition-colors hover:border-vanta-border-mid ${
-        signal.status === "Complete" ? "opacity-50" : ""
-      }`}
-    >
-      {/* Clickable header area */}
-      <div className="p-5 md:p-6 cursor-pointer" onClick={onClick}>
-        {/* Header row: badge + timestamp */}
-        <div className="flex items-start justify-between gap-4 mb-3">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span
-              className={`inline-block px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.15em] border ${colors.text} ${colors.bg} ${colors.border}`}
-            >
-              {signal.signalType}
+    <div className={`rounded-lg border transition-all hover:shadow-md ${
+      signal.pinned ? "border-primary/40 bg-primary/[0.03]" : "border-border bg-card"
+    } ${signal.status === "Complete" ? "opacity-50" : ""}`}>
+
+      {/* ── Main clickable area ── */}
+      <div className="p-4 md:p-5 cursor-pointer" onClick={onClick}>
+
+        {/* Row 1: Signal type chip · Source · Timestamp */}
+        <div className="flex items-center justify-between gap-3 mb-2.5">
+          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.15em]">
+            <span className={`px-1.5 py-0.5 rounded ${colors.bg} ${colors.text} ${colors.border} border`}>
+              {signal.signalType.replace("_", " ")}
             </span>
-            <span
-              className={`inline-block px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.15em] border ${PRIORITY_STYLES[signal.priority]}`}
-            >
-              {signal.priority}
-            </span>
-            {signal.status === "Complete" && (
-              <span className="inline-block px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border border-vanta-signal-green-border text-vanta-signal-green bg-vanta-signal-green-faint">
-                ✓ Complete
-              </span>
-            )}
-            {signal.source === "recall" ? (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border border-vanta-accent-zoom-border text-vanta-accent-zoom bg-vanta-accent-zoom-faint">
-                <Video className="w-3 h-3" />
-                Zoom
-              </span>
-            ) : signal.source === "phone" || signal.signalType === "PHONE_CALL" ? (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border border-vanta-accent-phone-border text-vanta-accent-phone bg-vanta-accent-phone-faint">
-                <Phone className="w-3 h-3" />
-                Phone
-              </span>
-            ) : signal.source !== "linq" ? (
-              <span className="inline-block px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border border-vanta-border text-vanta-text-muted">
-                {signal.source}
-              </span>
-            ) : null}
-            {signal.rawPayload && typeof signal.rawPayload === "object" && (signal.rawPayload as Record<string, unknown>)._vanta_group_chat === true && (() => {
-              const participants = (signal.rawPayload as Record<string, unknown>)._vanta_participants as string[] | undefined;
-              const count = participants?.length;
-              return (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border border-vanta-border text-vanta-text-mid bg-vanta-bg-elevated">
-                  <Users className="w-3 h-3" />
-                  Group{count ? ` · ${count}` : ""}
-                </span>
-              );
-            })()}
-            {/* Emoji reactions on this signal */}
-            {signal.rawPayload && typeof signal.rawPayload === "object" && (() => {
-              const rp = signal.rawPayload as Record<string, unknown>;
-              const reactions = rp._vanta_reactions as Array<{ emoji: string; sender: string }> | undefined;
-              const emojis = rp._vanta_emojis as string[] | undefined;
-              const allEmojis = [
-                ...(emojis || []),
-                ...(reactions || []).map((r) => r.emoji),
-              ].filter(Boolean);
-              if (allEmojis.length === 0) return null;
-              // Dedupe and count
-              const counts: Record<string, number> = {};
-              allEmojis.forEach((e) => { counts[e] = (counts[e] || 0) + 1; });
-              return (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs border border-vanta-border bg-vanta-bg-elevated rounded-sm">
-                  {Object.entries(counts).map(([emoji, count]) => (
-                    <span key={emoji} title={`${count} reaction${count > 1 ? "s" : ""}`}>
-                      {emoji}{count > 1 ? <span className="font-mono text-[10px] text-vanta-text-muted ml-0.5">{count}</span> : null}
-                    </span>
-                  ))}
-                </span>
-              );
-            })()}
-            {/* Attachment badges */}
-            {signal.rawPayload && typeof signal.rawPayload === "object" && (() => {
-              const rp = signal.rawPayload as Record<string, unknown>;
-              const attachments = rp._vanta_attachments as Array<{ type: string; url?: string; mime?: string; filename?: string }> | undefined;
-              if (!attachments || attachments.length === 0) return null;
-              const getIcon = (type: string, mime?: string) => {
-                if (mime?.startsWith("image") || type === "image") return <Image className="w-3 h-3" />;
-                if (mime?.startsWith("video") || type === "video") return <Film className="w-3 h-3" />;
-                if (mime?.startsWith("audio") || type === "audio") return <Mic className="w-3 h-3" />;
-                if (type === "file" || type === "document") return <FileText className="w-3 h-3" />;
-                return <Paperclip className="w-3 h-3" />;
-              };
-              const getLabel = (type: string, mime?: string) => {
-                if (mime?.startsWith("image") || type === "image") return "Image";
-                if (mime?.startsWith("video") || type === "video") return "Video";
-                if (mime?.startsWith("audio") || type === "audio") return "Audio";
-                if (type === "file" || type === "document") return "File";
-                return type;
-              };
-              // Group by label
-              const groups: Record<string, number> = {};
-              attachments.forEach((a) => {
-                const label = getLabel(a.type, a.mime);
-                groups[label] = (groups[label] || 0) + 1;
-              });
-              return (
-                <>
-                  {Object.entries(groups).map(([label, count]) => (
-                    <span key={label} className="inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border border-vanta-border text-vanta-text-mid bg-vanta-bg-elevated">
-                      {getIcon(label.toLowerCase())}
-                      {label}{count > 1 ? ` ×${count}` : ""}
-                    </span>
-                  ))}
-                  {/* Thumbnail for first image attachment */}
-                  {attachments.find((a) => (a.mime?.startsWith("image") || a.type === "image") && a.url) && (
-                    <img
-                      src={attachments.find((a) => (a.mime?.startsWith("image") || a.type === "image") && a.url)!.url}
-                      alt="attachment"
-                      className="w-8 h-8 object-cover border border-vanta-border rounded-sm"
-                    />
-                  )}
-                </>
-              );
-            })()}
-            {signal.riskLevel && (
-              <span
-                className={`inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] border ${RISK_STYLES[signal.riskLevel]}`}
-              >
-                <Shield className="w-3 h-3" />
-                {signal.riskLevel}
-              </span>
-            )}
-            {typeof signal.confidenceScore === "number" && (
-              <span
-                className={`inline-block px-2 py-0.5 font-mono text-[10px] tracking-[0.12em] border ${
-                  signal.confidenceScore >= 0.85
-                    ? "text-vanta-signal-green border-vanta-signal-green-border bg-vanta-signal-green-faint"
-                    : signal.confidenceScore >= 0.6
-                    ? "text-vanta-signal-yellow border-vanta-signal-yellow-border bg-vanta-signal-yellow-faint"
-                    : "text-vanta-signal-red border-vanta-signal-red-border bg-vanta-signal-red-faint"
-                }`}
-              >
-                {Math.round(signal.confidenceScore * 100)}%
+            <SourceIndicator signal={signal} />
+            {isGroupChat && (
+              <span className="inline-flex items-center gap-1 text-vanta-text-muted">
+                <Users className="w-3 h-3" /> Group
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2">
-            {signal.dueDate && (() => {
-              const { label, isOverdue } = formatDueDate(signal.dueDate);
-              return (
-                <span
-                  className={`inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.12em] ${
-                    isOverdue ? "text-destructive" : "text-vanta-text-muted"
-                  }`}
-                >
-                  <CalendarClock className="w-3 h-3" />
-                  {label}
-                </span>
-              );
-            })()}
-            <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-vanta-text-muted whitespace-nowrap">
-              {formatTimestamp(signal.capturedAt)}
-            </span>
-          </div>
+          <span className="font-mono text-[10px] text-muted-foreground whitespace-nowrap">
+            {formatTimestamp(signal.capturedAt)}
+          </span>
         </div>
 
-        {/* Sender */}
-        <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-vanta-text-mid mb-1">
-          {signal.sender}
+        {/* Row 2: Bold task title (summary) */}
+        <h3 className="font-display text-[16px] md:text-[17px] font-bold leading-snug text-foreground mb-1.5">
+          {signal.summary}
+        </h3>
+
+        {/* Row 3: Sender + risk badge + due date */}
+        <div className="flex items-center gap-2 flex-wrap mb-3">
+          <Link
+            to={`/contact/${encodeURIComponent(signal.sender)}`}
+            onClick={(e) => e.stopPropagation()}
+            className="font-sans text-[13px] text-muted-foreground hover:text-primary transition-colors"
+          >
+            {signal.sender}
+          </Link>
+
+          {signal.riskLevel && (
+            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded font-mono text-[9px] font-bold uppercase tracking-wider ${RISK_BADGE[signal.riskLevel] || RISK_BADGE.low}`}>
+              <Shield className="w-3 h-3" />
+              {signal.riskLevel}
+            </span>
+          )}
+
+          {signal.priority === "high" && !signal.riskLevel && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded font-mono text-[9px] font-bold uppercase tracking-wider bg-vanta-signal-red text-white">
+              High
+            </span>
+          )}
+          {signal.priority === "medium" && !signal.riskLevel && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded font-mono text-[9px] font-bold uppercase tracking-wider bg-vanta-signal-yellow text-vanta-grey-900">
+              Medium
+            </span>
+          )}
+
+          {signal.dueDate && (() => {
+            const { label, isOverdue } = formatDueDate(signal.dueDate);
+            return (
+              <span className={`inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-wider ${isOverdue ? "text-destructive" : "text-muted-foreground"}`}>
+                <CalendarClock className="w-3 h-3" /> {label}
+              </span>
+            );
+          })()}
+
+          {signal.pinned && <Pin className="w-3 h-3 text-primary" />}
+
+          {typeof signal.confidenceScore === "number" && (
+            <span className={`font-mono text-[10px] tracking-wider ${
+              signal.confidenceScore >= 0.85 ? "text-vanta-signal-green" :
+              signal.confidenceScore >= 0.6 ? "text-vanta-signal-yellow" : "text-vanta-signal-red"
+            }`}>
+              {Math.round(signal.confidenceScore * 100)}%
+            </span>
+          )}
+
+          {signal.status === "Complete" && (
+            <span className="inline-flex items-center gap-1 font-mono text-[9px] uppercase tracking-wider text-vanta-signal-green">
+              <CheckCircle className="w-3 h-3" /> Complete
+            </span>
+          )}
+        </div>
+
+        {/* Row 4: Context summary (source message, truncated) */}
+        <p className="font-sans text-[13px] leading-relaxed text-muted-foreground line-clamp-2 mb-3">
+          {signal.sourceMessage}
         </p>
 
-        {/* Relationship context chip */}
+        {/* Relationship context */}
         {contactContext && contactContext.signalCount > 1 && (
           <Link
             to={`/contact/${encodeURIComponent(signal.sender)}`}
             onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-1.5 mb-2 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.15em] border border-vanta-border bg-vanta-bg-elevated text-vanta-text-low hover:border-vanta-accent-border hover:text-vanta-accent transition-colors"
+            className="inline-flex items-center gap-1.5 mb-3 px-2 py-1 rounded-md font-mono text-[9px] uppercase tracking-wider border border-border bg-muted/50 text-muted-foreground hover:border-primary/30 hover:text-primary transition-colors"
           >
             <span className={`w-1.5 h-1.5 rounded-full ${
-              contactContext.strengthLabel === "Strong" ? "bg-vanta-accent" :
+              contactContext.strengthLabel === "Strong" ? "bg-vanta-signal-green" :
               contactContext.strengthLabel === "Warm" ? "bg-vanta-signal-yellow" :
-              contactContext.strengthLabel === "Cooling" ? "bg-vanta-signal-blue" :
-              "bg-vanta-text-muted"
+              contactContext.strengthLabel === "Cooling" ? "bg-vanta-signal-blue" : "bg-muted-foreground"
             }`} />
             {contactContext.strengthLabel} · {contactContext.signalCount} signals · {recencyLabel(contactContext.daysSinceLast)}
           </Link>
         )}
 
-        {/* Summary, the extracted insight headline */}
-        <p className="font-sans text-[14px] leading-[1.6] text-vanta-text mb-3">
-          {signal.summary}
-        </p>
-
-        {/* Phone-specific tags */}
+        {/* Phone tags */}
         {signal.signalType === "PHONE_CALL" && signal.actionsTaken.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-3">
             {signal.actionsTaken
               .filter((a) => (PHONE_CALL_TAGS as readonly string[]).includes(a))
               .map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-block px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] border border-vanta-accent-phone-border text-vanta-accent-phone bg-vanta-accent-phone-faint"
-                >
+                <span key={tag} className="px-2 py-0.5 rounded font-mono text-[9px] uppercase tracking-wider border border-vanta-accent-phone-border text-vanta-accent-phone bg-vanta-accent-phone-faint">
                   {PHONE_TAG_LABELS[tag as keyof typeof PHONE_TAG_LABELS] || tag}
                 </span>
               ))}
           </div>
         )}
 
-        {/* Inline actions row */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          {/* Quick Complete */}
-          {signal.status !== "Complete" && (
+        {/* Attachment badges */}
+        {attachmentBadges && (
+          <div className="flex items-center gap-2 mb-3">{attachmentBadges}</div>
+        )}
+
+        {/* ── Action bar ── */}
+        <div className="flex items-center gap-2 pt-2 border-t border-border/50">
+          {/* Primary CTA */}
+          {cta && (
             <button
-              onClick={handleMarkReviewed}
-              disabled={markingReviewed}
-              className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-signal-green border border-vanta-signal-green-border hover:bg-vanta-signal-green-faint transition-colors disabled:opacity-50"
-              title="Mark Complete"
+              onClick={(e) => { e.stopPropagation(); cta.action(); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md font-mono text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
             >
-              <CheckCircle className="w-3 h-3" />
-              Done
+              <cta.icon className="w-3.5 h-3.5" />
+              {cta.label}
             </button>
           )}
 
-          {/* Delete */}
-          <button
-            onClick={handleDelete}
-            className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-destructive border border-destructive/30 hover:bg-destructive/10 transition-colors"
-            title="Delete signal"
-          >
-            <Trash2 className="w-3 h-3" />
-            Delete
-          </button>
+          {/* Done */}
+          {signal.status !== "Complete" && (
+            <button onClick={handleMarkDone} disabled={markingReviewed}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-md font-mono text-[10px] uppercase tracking-wider text-vanta-signal-green border border-vanta-signal-green/30 hover:bg-vanta-signal-green/10 transition-colors disabled:opacity-50"
+              title="Mark complete">
+              <CheckCircle className="w-3.5 h-3.5" /> Done
+            </button>
+          )}
 
           {/* Snooze */}
           {signal.status !== "Complete" && (
-            <button
-              onClick={async (e) => {
-                e.stopPropagation();
-                setSnoozing(true);
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                const { error } = await supabase
-                  .from("signals")
-                  .update({ due_date: tomorrow.toISOString().split("T")[0] })
-                  .eq("id", signal.id);
-                setSnoozing(false);
-                if (error) {
-                  toast.error("Failed to snooze");
-                } else {
-                  queryClient.invalidateQueries({ queryKey: ["signals"] });
-                  toast.success("Snoozed until tomorrow");
-                }
-              }}
-              disabled={snoozing}
-              className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent transition-colors disabled:opacity-50"
-              title="Snooze until tomorrow"
-            >
-              <Clock className="w-3 h-3" />
-              Snooze
+            <button onClick={handleSnooze} disabled={snoozing}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-md font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors disabled:opacity-50"
+              title="Snooze until tomorrow">
+              <Clock className="w-3.5 h-3.5" /> Snooze
             </button>
           )}
 
           {/* Pin */}
-          <button
-            onClick={async (e) => {
-              e.stopPropagation();
-              setPinning(true);
-              const newPinned = !signal.pinned;
-              const { error } = await supabase
-                .from("signals")
-                .update({ pinned: newPinned })
-                .eq("id", signal.id);
-              setPinning(false);
-              if (error) {
-                toast.error("Failed to pin");
-              } else {
-                queryClient.invalidateQueries({ queryKey: ["signals"] });
-                toast.success(newPinned ? "Signal pinned" : "Signal unpinned");
-              }
-            }}
-            disabled={pinning}
-            className={`flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] border transition-colors disabled:opacity-50 ${
-              signal.pinned
-                ? "text-vanta-accent border-vanta-accent-border bg-vanta-accent-faint"
-                : "text-vanta-text-low border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent"
+          <button onClick={handlePin} disabled={pinning}
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md font-mono text-[10px] uppercase tracking-wider border transition-colors disabled:opacity-50 ${
+              signal.pinned ? "text-primary border-primary/30 bg-primary/10" : "text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"
             }`}
-            title={signal.pinned ? "Unpin" : "Pin to top"}
-          >
-            <Pin className="w-3 h-3" />
-            {signal.pinned ? "Pinned" : "Pin"}
-          </button>
-          <button
-            onClick={handleCopyInsight}
-            className="flex items-center gap-1.5 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent transition-colors"
-          >
-            {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-            {copied ? "Copied" : "Copy Insight"}
+            title={signal.pinned ? "Unpin" : "Pin"}>
+            <Pin className="w-3.5 h-3.5" /> {signal.pinned ? "Pinned" : "Pin"}
           </button>
 
+          {/* Copy */}
+          <button onClick={handleCopy}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-md font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors">
+            {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? "Copied" : "Copy"}
+          </button>
 
+          {/* Promote */}
           {showPromote && (
-            <button
-              onClick={handlePromote}
-              disabled={promoting}
-              className="flex items-center gap-1.5 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-accent border border-vanta-accent-border hover:bg-vanta-accent-faint transition-colors disabled:opacity-50"
-            >
-              <ArrowUpFromLine className="w-3 h-3" />
-              {promoting ? "Promoting…" : "Promote"}
+            <button onClick={handlePromote} disabled={promoting}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-md font-mono text-[10px] uppercase tracking-wider text-primary border border-primary/30 hover:bg-primary/10 transition-colors disabled:opacity-50">
+              <ArrowUpFromLine className="w-3.5 h-3.5" /> {promoting ? "…" : "Promote"}
             </button>
           )}
 
-          {/* Remind */}
-          {signal.status !== "Complete" && (
-            <button
-              onClick={async (e) => {
-                e.stopPropagation();
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                const dueDate = tomorrow.toISOString().split("T")[0];
-                setSettingReminder(true);
-                try {
-                  const { data, error } = await supabase.functions.invoke("create-reminder", {
-                    body: { signal_id: signal.id, due_date: dueDate },
-                  });
-                  if (error) throw error;
-                  queryClient.invalidateQueries({ queryKey: ["signals"] });
-                  toast.success("Reminder set for tomorrow");
-                } catch {
-                  toast.error("Failed to set reminder");
-                }
-                setSettingReminder(false);
-              }}
-              disabled={settingReminder}
-              className="flex items-center gap-1.5 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent transition-colors disabled:opacity-50"
-            >
-              <Bell className="w-3 h-3" />
-              {settingReminder ? "Setting…" : "Remind"}
-            </button>
-          )}
-
-          {/* Calendar Hold */}
+          {/* Expand toggle */}
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              const tomorrow = new Date();
-              tomorrow.setDate(tomorrow.getDate() + 1);
-              tomorrow.setHours(9, 0, 0, 0);
-              const end = new Date(tomorrow);
-              end.setMinutes(30);
-              const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-              const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Follow up: ${signal.sender}`)}&details=${encodeURIComponent(signal.summary)}&dates=${fmt(tomorrow)}/${fmt(end)}`;
-              window.open(url, "_blank");
-            }}
-            className="flex items-center gap-1.5 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent transition-colors"
+            onClick={(e) => { e.stopPropagation(); setExpanded((p) => !p); }}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-md font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors ml-auto"
           >
-            <Calendar className="w-3 h-3" />
-            Cal Hold
-          </button>
-
-          {/* Contextual Smart Actions by signal type */}
-          {signal.signalType === "INTRO" && signal.status !== "Complete" && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                const subject = encodeURIComponent(`Re: Introduction — ${signal.sender}`);
-                const body = encodeURIComponent(`Hi,\n\nFollowing up on the introduction from ${signal.sender}.\n\n${signal.summary}\n\nBest regards`);
-                window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
-              }}
-              className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-accent border border-vanta-accent-border hover:bg-vanta-accent-faint transition-colors"
-            >
-              <Mail className="w-3 h-3" />
-              Draft Reply
-            </button>
-          )}
-          {signal.signalType === "MEETING" && signal.status !== "Complete" && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                const nextWeek = new Date();
-                nextWeek.setDate(nextWeek.getDate() + 7);
-                nextWeek.setHours(10, 0, 0, 0);
-                const end = new Date(nextWeek);
-                end.setMinutes(30);
-                const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-                const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Follow-up: ${signal.sender}`)}&details=${encodeURIComponent(signal.summary)}&dates=${fmt(nextWeek)}/${fmt(end)}`;
-                window.open(url, "_blank");
-              }}
-              className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-accent border border-vanta-accent-border hover:bg-vanta-accent-faint transition-colors"
-            >
-              <Calendar className="w-3 h-3" />
-              Follow-Up
-            </button>
-          )}
-          {signal.signalType === "DECISION" && signal.status !== "Complete" && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                navigator.clipboard.writeText(`TASK: ${signal.summary}\nFrom: ${signal.sender}\nPriority: ${signal.priority}\nContext: ${signal.sourceMessage}`);
-                toast.success("Decision exported as task to clipboard");
-              }}
-              className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-accent border border-vanta-accent-border hover:bg-vanta-accent-faint transition-colors"
-            >
-              <FileOutput className="w-3 h-3" />
-              Create Task
-            </button>
-          )}
-          {signal.signalType === "INVESTMENT" && signal.status !== "Complete" && (
-            <button
-              onClick={async (e) => {
-                e.stopPropagation();
-                const { error } = await supabase
-                  .from("signals")
-                  .update({ pinned: true })
-                  .eq("id", signal.id);
-                if (!error) {
-                  queryClient.invalidateQueries({ queryKey: ["signals"] });
-                  toast.success("Flagged for review");
-                }
-              }}
-              className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-accent border border-vanta-accent-border hover:bg-vanta-accent-faint transition-colors"
-            >
-              <Flag className="w-3 h-3" />
-              Flag Review
-            </button>
-          )}
-
-          <button
-            onClick={handleExpand}
-            className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent transition-colors ml-auto"
-          >
-            <ChevronDown
-              className={`w-3 h-3 transition-transform ${expanded ? "rotate-180" : ""}`}
-            />
-            {expanded ? "Collapse" : "Details"}
+            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${expanded ? "rotate-180" : ""}`} />
+            {expanded ? "Less" : "More"}
           </button>
         </div>
       </div>
 
-      {/* Expandable section */}
+      {/* ── Expanded details ── */}
       {expanded && (
-        <div className="border-t border-vanta-border px-5 md:px-6 py-4 space-y-4 animate-fade-up">
-
-          {/* Inline Accelerators — contextual actions surfaced in-feed */}
+        <div className="border-t border-border px-4 md:px-5 py-4 space-y-4 animate-fade-up">
+          {/* Quick actions */}
           {signal.status !== "Complete" && (
-            <div>
-              <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent mb-2">
-                Quick Actions
-              </h4>
-              <div className="flex flex-wrap gap-1.5">
-                {signal.signalType === "INTRO" && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const subject = encodeURIComponent(`Re: Introduction — ${signal.sender}`);
-                      const body = encodeURIComponent(`Hi,\n\nFollowing up on the introduction from ${signal.sender}.\n\n${signal.summary}\n\nBest regards`);
-                      window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
-                    }}
-                    className="flex items-center gap-1 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-vanta-accent border border-vanta-accent-border bg-vanta-accent-faint/50 hover:bg-vanta-accent-faint transition-colors"
-                  >
-                    <Mail className="w-3 h-3" /> Draft intro reply
-                  </button>
-                )}
-                {signal.signalType === "MEETING" && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const nextWeek = new Date();
-                      nextWeek.setDate(nextWeek.getDate() + 7);
-                      nextWeek.setHours(10, 0, 0, 0);
-                      const end = new Date(nextWeek);
-                      end.setMinutes(30);
-                      const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-                      const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Follow-up: ${signal.sender}`)}&details=${encodeURIComponent(signal.summary)}&dates=${fmt(nextWeek)}/${fmt(end)}`;
-                      window.open(url, "_blank");
-                    }}
-                    className="flex items-center gap-1 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-vanta-accent border border-vanta-accent-border bg-vanta-accent-faint/50 hover:bg-vanta-accent-faint transition-colors"
-                  >
-                    <Calendar className="w-3 h-3" /> Schedule follow-up
-                  </button>
-                )}
-                {signal.signalType === "DECISION" && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigator.clipboard.writeText(`TASK: ${signal.summary}\nFrom: ${signal.sender}\nPriority: ${signal.priority}\nContext: ${signal.sourceMessage}`);
-                      toast.success("Exported as task");
-                    }}
-                    className="flex items-center gap-1 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-vanta-accent border border-vanta-accent-border bg-vanta-accent-faint/50 hover:bg-vanta-accent-faint transition-colors"
-                  >
-                    <FileOutput className="w-3 h-3" /> Export as task
-                  </button>
-                )}
-                {signal.signalType === "INVESTMENT" && (
-                  <button
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      await supabase.from("signals").update({ pinned: true }).eq("id", signal.id);
-                      queryClient.invalidateQueries({ queryKey: ["signals"] });
-                      toast.success("Flagged for review");
-                    }}
-                    className="flex items-center gap-1 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-vanta-accent border border-vanta-accent-border bg-vanta-accent-faint/50 hover:bg-vanta-accent-faint transition-colors"
-                  >
-                    <Flag className="w-3 h-3" /> Flag for review
-                  </button>
-                )}
-                {/* Universal accelerators */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const subject = encodeURIComponent(`Re: ${signal.summary}`);
-                    const body = encodeURIComponent(`Hi ${signal.sender},\n\nRegarding: ${signal.summary}\n\n`);
-                    window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
-                  }}
-                  className="flex items-center gap-1 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent transition-colors"
-                >
-                  <Mail className="w-3 h-3" /> Email
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigator.clipboard.writeText(`One-pager: ${signal.sender}\n\nContext: ${signal.summary}\n\nSource: ${signal.sourceMessage}\n\nPriority: ${signal.priority}\nStatus: ${signal.status}`);
-                    toast.success("One-pager copied to clipboard");
-                  }}
-                  className="flex items-center gap-1 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-vanta-text-low border border-vanta-border hover:border-vanta-accent-border hover:text-vanta-accent transition-colors"
-                >
-                  <FileText className="w-3 h-3" /> One-Pager
-                </button>
-              </div>
+            <div className="flex flex-wrap gap-1.5">
+              <button onClick={handleSetReminder} disabled={settingReminder}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-md font-mono text-[9px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors disabled:opacity-50">
+                <Bell className="w-3 h-3" /> {settingReminder ? "Setting…" : "Remind"}
+              </button>
+              <button onClick={(e) => {
+                e.stopPropagation();
+                const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1); tomorrow.setHours(9, 0, 0, 0);
+                const end = new Date(tomorrow); end.setMinutes(30);
+                const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+                window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Follow up: ${signal.sender}`)}&details=${encodeURIComponent(signal.summary)}&dates=${fmt(tomorrow)}/${fmt(end)}`, "_blank");
+              }} className="flex items-center gap-1 px-2.5 py-1.5 rounded-md font-mono text-[9px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors">
+                <Calendar className="w-3 h-3" /> Cal Hold
+              </button>
+              <button onClick={handleDelete}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-md font-mono text-[9px] uppercase tracking-wider text-destructive border border-destructive/30 hover:bg-destructive/10 transition-colors">
+                <Trash2 className="w-3 h-3" /> Delete
+              </button>
             </div>
           )}
 
           {/* Raw message */}
           <div>
-            <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-2">
-              Raw Message
-            </h4>
-            <div className="border-l-2 border-vanta-border pl-3">
-              <p className="font-mono text-[11px] leading-[1.6] text-vanta-text-low whitespace-pre-wrap">
-                {signal.sourceMessage}
-              </p>
+            <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Raw Message</h4>
+            <div className="border-l-2 border-border pl-3">
+              <p className="font-mono text-[11px] leading-relaxed text-muted-foreground whitespace-pre-wrap">{signal.sourceMessage}</p>
             </div>
           </div>
 
           {/* Actions taken */}
           {signal.actionsTaken.length > 0 && (
             <div>
-              <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-2">
-                Actions Executed
-              </h4>
+              <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Actions Executed</h4>
               <div className="flex flex-wrap gap-1.5">
-                {signal.actionsTaken.map((action) => (
-                  <span
-                    key={action}
-                    className="font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-muted border border-vanta-border px-1.5 py-0.5"
-                  >
-                    {formatAction(action)}
-                  </span>
+                {signal.actionsTaken.map((a) => (
+                  <span key={a} className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground border border-border rounded px-1.5 py-0.5">{formatAction(a)}</span>
                 ))}
               </div>
             </div>
@@ -700,14 +487,10 @@ const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: Signa
           {/* Call pointer */}
           {signal.callPointer && (
             <div>
-              <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-2">
-                Call Pointer
-              </h4>
+              <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Call Pointer</h4>
               <div className="flex items-center gap-1.5">
-                <Pointer className="w-3 h-3 text-vanta-text-low" />
-                <p className="font-mono text-[11px] leading-[1.6] text-vanta-text-low">
-                  {signal.callPointer}
-                </p>
+                <Pointer className="w-3 h-3 text-muted-foreground" />
+                <p className="font-mono text-[11px] leading-relaxed text-muted-foreground">{signal.callPointer}</p>
               </div>
             </div>
           )}
@@ -715,36 +498,34 @@ const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: Signa
           {/* Source context */}
           <div className="flex items-center gap-4">
             <div>
-              <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">
-                Source
-              </h4>
-              <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-vanta-text-low">
-                {signal.source}
-              </p>
+              <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">Source</h4>
+              <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{signal.source}</p>
             </div>
             {signal.linqMessageId && (
               <div>
-                <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">
-                  Message ID
-                </h4>
-                <p className="font-mono text-[10px] text-vanta-text-muted break-all">
-                  {signal.linqMessageId}
-                </p>
+                <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">Message ID</h4>
+                <p className="font-mono text-[10px] text-muted-foreground break-all">{signal.linqMessageId}</p>
               </div>
             )}
           </div>
 
-          {/* View Full Detail button */}
-          <button
-            onClick={onClick}
-            className="w-full h-8 border border-vanta-border text-vanta-text-low font-mono text-[10px] uppercase tracking-[0.15em] hover:border-vanta-accent-border hover:text-vanta-accent transition-colors"
-          >
-            Open Full Detail →
+          {/* View detail */}
+          <button onClick={onClick}
+            className="w-full flex items-center justify-center gap-1.5 py-2 rounded-md font-mono text-[10px] uppercase tracking-wider text-primary border border-primary/30 hover:bg-primary/10 transition-colors">
+            View Full Detail
           </button>
         </div>
       )}
     </div>
   );
 };
+
+function mime2label(type: string, mime?: string): string {
+  if (mime?.startsWith("image") || type === "image") return "Image";
+  if (mime?.startsWith("video") || type === "video") return "Video";
+  if (mime?.startsWith("audio") || type === "audio") return "Audio";
+  if (type === "file" || type === "document") return "File";
+  return type;
+}
 
 export default SignalEntryCard;
