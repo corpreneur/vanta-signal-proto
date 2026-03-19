@@ -205,7 +205,7 @@ export default function Meetings() {
                           {signal.summary}
                         </span>
                         <Badge variant="outline" className="shrink-0 font-mono text-[9px] tracking-[0.1em] px-1.5 py-0 h-[18px] rounded-sm border border-border">
-                          {isPhoneCall ? "call" : signal.priority}
+                          {signal.priority}
                         </Badge>
                       </div>
 
