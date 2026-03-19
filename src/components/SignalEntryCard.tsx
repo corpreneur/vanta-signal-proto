@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
   ChevronDown, Copy, Check, CheckCircle, Video, Phone,
   ArrowUpFromLine, Shield, CalendarClock, Pointer, Users,
   Bell, Calendar, Mail, FileOutput, Flag, Trash2, Pin, Clock,
-  Image, Film, FileText, Mic, Paperclip,
+  Image, Film, FileText, Mic, Paperclip, ExternalLink,
 } from "lucide-react";
 import type { Signal } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS, PHONE_CALL_TAGS, PHONE_TAG_LABELS } from "@/data/signals";
