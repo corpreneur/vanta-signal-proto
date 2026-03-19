@@ -17,17 +17,17 @@ interface ProfileMenuDrawerProps {
 }
 
 const ACCOUNT_ITEMS = [
-  { label: "Personal Info", icon: User, href: "/settings" },
-  { label: "My Plan", icon: Sparkles, href: "/settings" },
-  { label: "Billing History", icon: Receipt, href: "/settings" },
-  { label: "Connected Accounts", icon: Link2, href: "/settings" },
+  { label: "Personal Info", icon: User, href: "/settings/profile" },
+  { label: "My Plan", icon: Sparkles, href: "/settings/plan" },
+  { label: "Billing History", icon: Receipt, href: "/settings/billing" },
+  { label: "Connected Accounts", icon: Link2, href: "/settings/connected" },
 ];
 
 const VANTA_SETTINGS = [
   { label: "My Rules", icon: BookOpen, href: "/my-rules" },
   { label: "Filter Modes", icon: Settings2, href: "/focus" },
-  { label: "Notifications Preferences", icon: Bell, href: "/settings" },
-  { label: "Privacy & Data", icon: Lock, href: "/settings" },
+  { label: "Notifications Preferences", icon: Bell, href: "/settings/notifications" },
+  { label: "Privacy & Data", icon: Lock, href: "/settings/privacy" },
   { label: "Admin", icon: Shield, href: "/admin" },
 ];
 

@@ -27,6 +27,12 @@ import ReleaseNotes from "./pages/ReleaseNotes";
 import Command from "./pages/Command";
 
 import Settings from "./pages/Settings";
+import PersonalInfo from "./pages/PersonalInfo";
+import MyPlan from "./pages/MyPlan";
+import BillingHistory from "./pages/BillingHistory";
+import ConnectedAccounts from "./pages/ConnectedAccounts";
+import NotificationPreferences from "./pages/NotificationPreferences";
+import PrivacyData from "./pages/PrivacyData";
 import ContactTimeline from "./pages/ContactTimeline";
 import Briefing from "./pages/Briefing";
 import Contacts from "./pages/Contacts";
@@ -94,6 +100,12 @@ const AppRoutes = () => {
       <Route path="/releases" element={<ProtectedRoute session={session}><ProductLayout><ReleaseNotes /></ProductLayout></ProtectedRoute>} />
       <Route path="/audit" element={<Navigate to="/settings?tab=audit" replace />} />
       <Route path="/settings" element={<ProtectedRoute session={session}><ProductLayout><Settings /></ProductLayout></ProtectedRoute>} />
+      <Route path="/settings/profile" element={<ProtectedRoute session={session}><ProductLayout><PersonalInfo /></ProductLayout></ProtectedRoute>} />
+      <Route path="/settings/plan" element={<ProtectedRoute session={session}><ProductLayout><MyPlan /></ProductLayout></ProtectedRoute>} />
+      <Route path="/settings/billing" element={<ProtectedRoute session={session}><ProductLayout><BillingHistory /></ProductLayout></ProtectedRoute>} />
+      <Route path="/settings/connected" element={<ProtectedRoute session={session}><ProductLayout><ConnectedAccounts /></ProductLayout></ProtectedRoute>} />
+      <Route path="/settings/notifications" element={<ProtectedRoute session={session}><ProductLayout><NotificationPreferences /></ProductLayout></ProtectedRoute>} />
+      <Route path="/settings/privacy" element={<ProtectedRoute session={session}><ProductLayout><PrivacyData /></ProductLayout></ProtectedRoute>} />
       <Route path="/contact/:name" element={<ProtectedRoute session={session}><ProductLayout><ContactTimeline /></ProductLayout></ProtectedRoute>} />
       <Route path="/briefing/:id" element={<ProtectedRoute session={session}><ProductLayout><Briefing /></ProductLayout></ProtectedRoute>} />
       <Route path="/command" element={<ProtectedRoute session={session}><ProductLayout><Command /></ProductLayout></ProtectedRoute>} />
