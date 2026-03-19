@@ -142,7 +142,7 @@ export default function Connectivity() {
         <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent mb-1">
           Fab Five · Connectivity
         </p>
-        <h1 className="font-display text-[clamp(28px,5vw,44px)] text-foreground mb-2 leading-tight">
+        <h1 className="font-display text-[clamp(28px,5vw,40px)] leading-[1.05] text-foreground mb-2">
           Connectivity Hub
         </h1>
         <p className="font-sans text-[15px] text-vanta-text-mid max-w-[600px] leading-relaxed mb-10">

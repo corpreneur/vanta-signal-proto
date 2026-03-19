@@ -45,13 +45,16 @@ export default function Focus() {
   };
 
   return (
-    <div className="max-w-[960px] mx-auto px-0 pt-0 pb-16">
+    <div className="max-w-[960px] mx-auto px-5 py-8 md:py-12 pb-16">
       <Motion>
-        <header className="mb-6">
-          <h1 className="font-display text-2xl md:text-3xl text-foreground tracking-tight">
+        <header className="mb-8">
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-3">
+            Fab Five · Filter Modes
+          </p>
+          <h1 className="font-display text-[clamp(28px,5vw,40px)] leading-[1.05] text-foreground mb-2">
             Filter Modes
           </h1>
-          <p className="text-muted-foreground text-xs font-mono mt-1.5 max-w-md">
+          <p className="font-sans text-[14px] text-muted-foreground leading-relaxed max-w-md">
             Your viewfinder. Choose how to slice what matters most.
           </p>
         </header>
