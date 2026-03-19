@@ -100,6 +100,12 @@ const AppRoutes = () => {
       <Route path="/releases" element={<ProtectedRoute session={session}><ProductLayout><ReleaseNotes /></ProductLayout></ProtectedRoute>} />
       <Route path="/audit" element={<Navigate to="/settings?tab=audit" replace />} />
       <Route path="/settings" element={<ProtectedRoute session={session}><ProductLayout><Settings /></ProductLayout></ProtectedRoute>} />
+      <Route path="/settings/profile" element={<ProtectedRoute session={session}><ProductLayout><PersonalInfo /></ProductLayout></ProtectedRoute>} />
+      <Route path="/settings/plan" element={<ProtectedRoute session={session}><ProductLayout><MyPlan /></ProductLayout></ProtectedRoute>} />
+      <Route path="/settings/billing" element={<ProtectedRoute session={session}><ProductLayout><BillingHistory /></ProductLayout></ProtectedRoute>} />
+      <Route path="/settings/connected" element={<ProtectedRoute session={session}><ProductLayout><ConnectedAccounts /></ProductLayout></ProtectedRoute>} />
+      <Route path="/settings/notifications" element={<ProtectedRoute session={session}><ProductLayout><NotificationPreferences /></ProductLayout></ProtectedRoute>} />
+      <Route path="/settings/privacy" element={<ProtectedRoute session={session}><ProductLayout><PrivacyData /></ProductLayout></ProtectedRoute>} />
       <Route path="/contact/:name" element={<ProtectedRoute session={session}><ProductLayout><ContactTimeline /></ProductLayout></ProtectedRoute>} />
       <Route path="/briefing/:id" element={<ProtectedRoute session={session}><ProductLayout><Briefing /></ProductLayout></ProtectedRoute>} />
       <Route path="/command" element={<ProtectedRoute session={session}><ProductLayout><Command /></ProductLayout></ProtectedRoute>} />
