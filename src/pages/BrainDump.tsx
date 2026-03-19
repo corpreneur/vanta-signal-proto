@@ -368,8 +368,11 @@ export default function BrainDump() {
         </Motion>
       )}
 
+      {/* ─── Quick Capture Everywhere ─── */}
+      <QuickCaptureSection />
+
       {/* ─── Recent Captures ─── */}
-      <Motion delay={120}>
+      <Motion delay={140}>
         <section>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
