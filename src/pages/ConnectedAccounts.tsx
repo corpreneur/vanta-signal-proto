@@ -139,8 +139,12 @@ export default function ConnectedAccounts() {
               return (
                 <div key={int.id} className="border border-border rounded-lg p-4">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center font-display text-sm text-primary font-bold shrink-0">
-                      {int.icon}
+                    <div className="w-10 h-10 rounded-sm bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden">
+                      {PARTNER_LOGOS[int.id] ? (
+                        (() => { const Logo = PARTNER_LOGOS[int.id]; return <Logo className="w-7 h-7" />; })()
+                      ) : (
+                        <span className="font-display text-sm text-primary font-bold">{int.icon}</span>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
