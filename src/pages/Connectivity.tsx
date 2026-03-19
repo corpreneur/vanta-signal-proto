@@ -139,9 +139,16 @@ export default function Connectivity() {
     <div className="max-w-[960px] mx-auto px-5 py-12 md:px-10 md:py-20">
       {/* Header */}
       <Motion>
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent mb-1">
-          Fab Five · Connectivity
-        </p>
+        <header className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div
+              className="w-2 h-2 bg-vanta-accent"
+              style={{ animation: "pulse-dot 2s ease-in-out infinite" }}
+            />
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
+              Fab Five · Connectivity
+            </p>
+          </div>
         <h1 className="font-display text-[clamp(28px,5vw,40px)] leading-[1.05] text-foreground mb-2">
           Connectivity Hub
         </h1>

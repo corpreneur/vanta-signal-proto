@@ -213,9 +213,15 @@ export default function Command() {
       {/* Header */}
       <Motion>
         <header className="mb-8">
-          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-3">
-            Fab Five · Easy Actions
-          </p>
+          <div className="flex items-center gap-3 mb-2">
+            <div
+              className="w-2 h-2 bg-vanta-accent"
+              style={{ animation: "pulse-dot 2s ease-in-out infinite" }}
+            />
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
+              Fab Five · Easy Actions
+            </p>
+          </div>
           <h1 className="font-display text-[clamp(28px,5vw,40px)] leading-[1.05] text-foreground mb-2">
             Action Queue
           </h1>
