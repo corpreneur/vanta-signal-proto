@@ -462,39 +462,45 @@ function QuickCaptureSection() {
 
   return (
     <Motion delay={160}>
-      <section className="border border-border bg-card">
+      <section className="border border-primary/15 bg-gradient-to-br from-primary/[0.03] to-transparent rounded-lg overflow-hidden">
         <button
           onClick={() => setExpanded(!expanded)}
-          className="w-full flex items-center justify-between px-5 py-4 hover:bg-muted/30 transition-colors"
+          className="w-full flex items-center justify-between px-5 py-4 hover:bg-primary/[0.04] transition-colors"
         >
-          <div className="flex items-center gap-2">
-            <ExternalLink className="w-4 h-4 text-primary" />
-            <span className="font-mono text-[11px] uppercase tracking-[0.15em] text-foreground">
-              Capture Everywhere
-            </span>
-            <span className="font-mono text-[9px] text-muted-foreground">
-              Bookmarklet · ⌘K · PWA
-            </span>
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center">
+              <ExternalLink className="w-3.5 h-3.5 text-primary" />
+            </div>
+            <div className="flex flex-col items-start gap-0.5">
+              <span className="font-mono text-[11px] uppercase tracking-[0.15em] text-foreground font-medium">
+                Capture Everywhere
+              </span>
+              <span className="font-mono text-[8px] text-muted-foreground uppercase tracking-[0.1em]">
+                Bookmarklet · ⌘K · PWA
+              </span>
+            </div>
           </div>
           <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
         </button>
 
         {expanded && (
-          <div className="px-5 pb-5 space-y-4">
+          <div className="px-5 pb-5 space-y-5 border-t border-primary/10">
             {/* Methods grid */}
-            <div className="grid gap-px sm:grid-cols-3 border border-border bg-border">
+            <div className="grid gap-3 sm:grid-cols-3 pt-4">
               {/* Bookmarklet */}
-              <div className="bg-card p-5">
-                <div className="w-8 h-8 bg-primary/10 flex items-center justify-center ring-1 ring-primary/20 mb-3">
+              <div className="bg-card border border-border rounded-lg p-4 space-y-3">
+                <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
                   <BookmarkPlus className="w-4 h-4 text-primary" />
                 </div>
-                <p className="font-mono text-[12px] font-medium text-foreground mb-1">Browser Bookmarklet</p>
-                <p className="font-mono text-[9px] text-muted-foreground leading-relaxed mb-3">
-                  One-click capture from any webpage. Grabs the page title, URL, and selected text.
-                </p>
+                <div>
+                  <p className="font-mono text-[11px] font-medium text-foreground">Browser Bookmarklet</p>
+                  <p className="font-mono text-[8px] text-muted-foreground leading-relaxed mt-1">
+                    One-click capture from any webpage. Grabs title, URL, and selected text.
+                  </p>
+                </div>
                 <button
                   onClick={handleCopy}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-1.5 border border-primary/30 text-primary font-mono text-[9px] uppercase tracking-widest hover:bg-primary/10 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-primary/10 text-primary font-mono text-[9px] uppercase tracking-widest hover:bg-primary/20 transition-colors"
                 >
                   {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                   {copied ? "Copied!" : "Copy Bookmarklet"}
@@ -502,54 +508,58 @@ function QuickCaptureSection() {
               </div>
 
               {/* ⌘K */}
-              <div className="bg-card p-5">
-                <div className="w-8 h-8 bg-primary/10 flex items-center justify-center ring-1 ring-primary/20 mb-3">
+              <div className="bg-card border border-border rounded-lg p-4 space-y-3">
+                <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
                   <Zap className="w-4 h-4 text-primary" />
                 </div>
-                <p className="font-mono text-[12px] font-medium text-foreground mb-1">⌘K Quick Capture</p>
-                <p className="font-mono text-[9px] text-muted-foreground leading-relaxed mb-3">
-                  Press ⌘K (or Ctrl+K) from anywhere in Vanta to open the universal capture palette.
-                </p>
-                <div className="flex items-center justify-center gap-2 px-3 py-1.5 border border-border font-mono text-[10px] text-muted-foreground">
-                  <kbd className="px-1.5 py-0.5 bg-muted border border-border text-[9px]">⌘</kbd>
+                <div>
+                  <p className="font-mono text-[11px] font-medium text-foreground">⌘K Quick Capture</p>
+                  <p className="font-mono text-[8px] text-muted-foreground leading-relaxed mt-1">
+                    Press ⌘K from anywhere in Vanta to open the universal capture palette.
+                  </p>
+                </div>
+                <div className="flex items-center justify-center gap-2 px-3 py-2 rounded-md bg-muted/50 border border-border font-mono text-[10px] text-muted-foreground">
+                  <kbd className="px-1.5 py-0.5 bg-card rounded border border-border text-[9px] shadow-sm">⌘</kbd>
                   <span>+</span>
-                  <kbd className="px-1.5 py-0.5 bg-muted border border-border text-[9px]">K</kbd>
+                  <kbd className="px-1.5 py-0.5 bg-card rounded border border-border text-[9px] shadow-sm">K</kbd>
                 </div>
               </div>
 
               {/* PWA */}
-              <div className="bg-card p-5">
-                <div className="w-8 h-8 bg-primary/10 flex items-center justify-center ring-1 ring-primary/20 mb-3">
+              <div className="bg-card border border-border rounded-lg p-4 space-y-3">
+                <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
                   <Smartphone className="w-4 h-4 text-primary" />
                 </div>
-                <p className="font-mono text-[12px] font-medium text-foreground mb-1">Install as App</p>
-                <p className="font-mono text-[9px] text-muted-foreground leading-relaxed mb-3">
-                  Install as a PWA for quick access from your dock or home screen.
-                </p>
-                <div className="space-y-1 font-mono text-[8px] text-muted-foreground">
+                <div>
+                  <p className="font-mono text-[11px] font-medium text-foreground">Install as App</p>
+                  <p className="font-mono text-[8px] text-muted-foreground leading-relaxed mt-1">
+                    Add to your dock or home screen for instant access.
+                  </p>
+                </div>
+                <div className="space-y-1.5 font-mono text-[8px] text-muted-foreground">
                   <div className="flex items-center gap-2">
-                    <Globe className="w-3 h-3" /> Chrome: Menu → Install app
+                    <Globe className="w-3 h-3 shrink-0" /> Chrome: Menu → Install app
                   </div>
                   <div className="flex items-center gap-2">
-                    <Monitor className="w-3 h-3" /> Safari: Share → Add to Home Screen
+                    <Monitor className="w-3 h-3 shrink-0" /> Safari: Share → Add to Home
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Pipeline */}
-            <div className="grid sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
               {[
-                { step: "1", label: "Capture", desc: "Text, URL, or selection sent to Idea Capture" },
-                { step: "2", label: "Classify", desc: "AI determines signal type, priority, and contacts" },
-                { step: "3", label: "Enrich", desc: "URL scraping, entity extraction, context linking" },
-                { step: "4", label: "Surface", desc: "New signal appears in your feed with actions" },
+                { step: "1", label: "Capture", desc: "Text, URL, or selection" },
+                { step: "2", label: "Classify", desc: "AI determines type and priority" },
+                { step: "3", label: "Enrich", desc: "Scraping and context linking" },
+                { step: "4", label: "Surface", desc: "Signal appears with actions" },
               ].map((s) => (
-                <div key={s.step} className="flex gap-2">
-                  <span className="font-mono text-[16px] font-bold text-primary/30 shrink-0">{s.step}</span>
+                <div key={s.step} className="flex gap-2 items-start">
+                  <span className="font-mono text-[14px] font-bold text-primary/20 shrink-0 leading-none mt-0.5">{s.step}</span>
                   <div>
-                    <p className="font-mono text-[10px] font-medium text-foreground">{s.label}</p>
-                    <p className="font-mono text-[8px] text-muted-foreground leading-relaxed mt-0.5">{s.desc}</p>
+                    <p className="font-mono text-[9px] font-medium text-foreground">{s.label}</p>
+                    <p className="font-mono text-[7px] text-muted-foreground leading-relaxed mt-0.5">{s.desc}</p>
                   </div>
                 </div>
               ))}
