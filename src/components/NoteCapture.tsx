@@ -86,11 +86,19 @@ function intentIcon(intent: AcceleratorIntent) {
 export default function NoteCapture({ inline = false, onCapture, onRawText, templateSkeleton, templateKey }: NoteCaptureProps) {
   const { isDnd } = useUserMode();
   const [open, setOpen] = useState(inline);
-  const [text, setText] = useState("");
+  const [text, setText] = useState(templateSkeleton || "");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ClassificationResult | null>(null);
   const [firedAccelerators, setFiredAccelerators] = useState<Set<string>>(new Set());
+  const [lastTemplateKey, setLastTemplateKey] = useState(templateKey);
+
+  // Reset text when template changes
+  if (templateKey !== lastTemplateKey) {
+    setLastTemplateKey(templateKey);
+    setText(templateSkeleton || "");
+    setResult(null);
+  }
 
   // Editable result state
   const [editableTitle, setEditableTitle] = useState("");
