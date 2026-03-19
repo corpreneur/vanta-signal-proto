@@ -37,7 +37,7 @@ async function fetchMeetings(): Promise<MeetingRow[]> {
   const { data: signals, error } = await supabase
     .from("signals")
     .select("*")
-    .in("signal_type", ["MEETING", "PHONE_CALL"])
+    .eq("signal_type", "MEETING")
     .order("captured_at", { ascending: false })
     .limit(200);
 
