@@ -253,97 +253,83 @@ const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: Signa
     } ${signal.status === "Complete" ? "opacity-50" : ""}`}>
 
       {/* ── Main clickable area ── */}
-      <div className="p-4 md:p-5 cursor-pointer" onClick={onClick}>
+      <div className="p-4 cursor-pointer" onClick={onClick}>
 
-        {/* Row 1: Signal type chip · Source · Timestamp */}
-        <div className="flex items-center justify-between gap-3 mb-2.5">
-          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.15em]">
-            <span className={`px-1.5 py-0.5 rounded ${colors.bg} ${colors.text} ${colors.border} border`}>
-              {signal.signalType.replace("_", " ")}
-            </span>
-            <SourceIndicator signal={signal} />
-            {isGroupChat && (
-              <span className="inline-flex items-center gap-1 text-vanta-text-muted">
-                <Users className="w-3 h-3" /> Group
-              </span>
-            )}
-          </div>
-          <span className="font-mono text-[10px] text-muted-foreground whitespace-nowrap">
-            {formatTimestamp(signal.capturedAt)}
+        {/* Line 1: Type chip · Source · Priority badge · Timestamp */}
+        <div className="flex items-center gap-2 mb-2 font-mono text-[10px] uppercase tracking-[0.15em]">
+          <span className={`px-1.5 py-0.5 rounded ${colors.bg} ${colors.text} ${colors.border} border`}>
+            {signal.signalType.replace("_", " ")}
           </span>
+          <SourceIndicator signal={signal} />
+          {isGroupChat && (
+            <span className="inline-flex items-center gap-1 text-muted-foreground">
+              <Users className="w-3 h-3" /> Group
+            </span>
+          )}
+
+          {signal.riskLevel && (
+            <span className={`px-2 py-0.5 rounded font-bold text-[9px] ${RISK_BADGE[signal.riskLevel] || RISK_BADGE.low}`}>
+              {signal.riskLevel}
+            </span>
+          )}
+          {signal.priority === "high" && !signal.riskLevel && (
+            <span className="px-2 py-0.5 rounded font-bold text-[9px] bg-destructive text-destructive-foreground">High</span>
+          )}
+          {signal.priority === "medium" && !signal.riskLevel && (
+            <span className="px-2 py-0.5 rounded font-bold text-[9px] bg-vanta-signal-yellow text-foreground">Medium</span>
+          )}
+
+          {signal.pinned && <Pin className="w-3 h-3 text-primary" />}
+          {signal.status === "Complete" && <CheckCircle className="w-3 h-3 text-vanta-signal-green" />}
+
+          <span className="ml-auto text-muted-foreground whitespace-nowrap">{formatTimestamp(signal.capturedAt)}</span>
         </div>
 
-        {/* Row 2: Bold task title (summary) */}
-        <h3 className="font-display text-[16px] md:text-[17px] font-bold leading-snug text-foreground mb-1.5">
+        {/* Title */}
+        <h3 className="font-display text-[15px] md:text-[16px] font-bold leading-snug text-foreground mb-1">
           {signal.summary}
         </h3>
 
-        {/* Row 3: Sender + risk badge + due date */}
-        <div className="flex items-center gap-2 flex-wrap mb-3">
+        {/* Sender + context line */}
+        <div className="flex items-center gap-2 flex-wrap text-[13px] text-muted-foreground mb-2">
           <Link
             to={`/contact/${encodeURIComponent(signal.sender)}`}
             onClick={(e) => e.stopPropagation()}
-            className="font-sans text-[13px] text-muted-foreground hover:text-primary transition-colors"
+            className="hover:text-primary transition-colors"
           >
             {signal.sender}
           </Link>
 
-          {signal.riskLevel && (
-            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded font-mono text-[9px] font-bold uppercase tracking-wider ${RISK_BADGE[signal.riskLevel] || RISK_BADGE.low}`}>
-              <Shield className="w-3 h-3" />
-              {signal.riskLevel}
-            </span>
-          )}
-
-          {signal.priority === "high" && !signal.riskLevel && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded font-mono text-[9px] font-bold uppercase tracking-wider bg-vanta-signal-red text-white">
-              High
-            </span>
-          )}
-          {signal.priority === "medium" && !signal.riskLevel && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded font-mono text-[9px] font-bold uppercase tracking-wider bg-vanta-signal-yellow text-vanta-grey-900">
-              Medium
+          {typeof signal.confidenceScore === "number" && (
+            <span className={`font-mono text-[10px] ${
+              signal.confidenceScore >= 0.85 ? "text-vanta-signal-green" :
+              signal.confidenceScore >= 0.6 ? "text-vanta-signal-yellow" : "text-destructive"
+            }`}>
+              {Math.round(signal.confidenceScore * 100)}%
             </span>
           )}
 
           {signal.dueDate && (() => {
             const { label, isOverdue } = formatDueDate(signal.dueDate);
             return (
-              <span className={`inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-wider ${isOverdue ? "text-destructive" : "text-muted-foreground"}`}>
+              <span className={`inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-wider ${isOverdue ? "text-destructive" : ""}`}>
                 <CalendarClock className="w-3 h-3" /> {label}
               </span>
             );
           })()}
-
-          {signal.pinned && <Pin className="w-3 h-3 text-primary" />}
-
-          {typeof signal.confidenceScore === "number" && (
-            <span className={`font-mono text-[10px] tracking-wider ${
-              signal.confidenceScore >= 0.85 ? "text-vanta-signal-green" :
-              signal.confidenceScore >= 0.6 ? "text-vanta-signal-yellow" : "text-vanta-signal-red"
-            }`}>
-              {Math.round(signal.confidenceScore * 100)}%
-            </span>
-          )}
-
-          {signal.status === "Complete" && (
-            <span className="inline-flex items-center gap-1 font-mono text-[9px] uppercase tracking-wider text-vanta-signal-green">
-              <CheckCircle className="w-3 h-3" /> Complete
-            </span>
-          )}
         </div>
 
-        {/* Row 4: Context summary (source message, truncated) */}
-        <p className="font-sans text-[13px] leading-relaxed text-muted-foreground line-clamp-2 mb-3">
+        {/* Source message (1 line) */}
+        <p className="font-sans text-[13px] leading-relaxed text-muted-foreground line-clamp-1 mb-2">
           {signal.sourceMessage}
         </p>
 
-        {/* Relationship context */}
+        {/* Relationship context chip */}
         {contactContext && contactContext.signalCount > 1 && (
           <Link
             to={`/contact/${encodeURIComponent(signal.sender)}`}
             onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-1.5 mb-3 px-2 py-1 rounded-md font-mono text-[9px] uppercase tracking-wider border border-border bg-muted/50 text-muted-foreground hover:border-primary/30 hover:text-primary transition-colors"
+            className="inline-flex items-center gap-1.5 mb-2 px-2 py-0.5 rounded-md font-mono text-[9px] uppercase tracking-wider border border-border bg-muted/50 text-muted-foreground hover:border-primary/30 hover:text-primary transition-colors"
           >
             <span className={`w-1.5 h-1.5 rounded-full ${
               contactContext.strengthLabel === "Strong" ? "bg-vanta-signal-green" :
@@ -356,7 +342,7 @@ const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: Signa
 
         {/* Phone tags */}
         {signal.signalType === "PHONE_CALL" && signal.actionsTaken.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-3">
+          <div className="flex flex-wrap gap-1.5 mb-2">
             {signal.actionsTaken
               .filter((a) => (PHONE_CALL_TAGS as readonly string[]).includes(a))
               .map((tag) => (
@@ -369,71 +355,61 @@ const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: Signa
 
         {/* Attachment badges */}
         {attachmentBadges && (
-          <div className="flex items-center gap-2 mb-3">{attachmentBadges}</div>
+          <div className="flex items-center gap-2 mb-2">{attachmentBadges}</div>
         )}
 
         {/* ── Action bar ── */}
-        <div className="flex items-center gap-2 pt-2 border-t border-border/50">
-          {/* Primary CTA */}
+        <div className="flex items-center gap-1.5 pt-2 border-t border-border/50">
           {cta && (
             <button
               onClick={(e) => { e.stopPropagation(); cta.action(); }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md font-mono text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+              className="flex items-center gap-1 px-2.5 py-1 rounded-md font-mono text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
             >
-              <cta.icon className="w-3.5 h-3.5" />
+              <cta.icon className="w-3 h-3" />
               {cta.label}
             </button>
           )}
 
-          {/* Done */}
           {signal.status !== "Complete" && (
             <button onClick={handleMarkDone} disabled={markingReviewed}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-md font-mono text-[10px] uppercase tracking-wider text-vanta-signal-green border border-vanta-signal-green/30 hover:bg-vanta-signal-green/10 transition-colors disabled:opacity-50"
-              title="Mark complete">
-              <CheckCircle className="w-3.5 h-3.5" /> Done
+              className="flex items-center gap-1 px-2 py-1 rounded-md font-mono text-[10px] uppercase tracking-wider text-vanta-signal-green border border-vanta-signal-green/30 hover:bg-vanta-signal-green/10 transition-colors disabled:opacity-50">
+              <CheckCircle className="w-3 h-3" /> Done
             </button>
           )}
 
-          {/* Snooze */}
           {signal.status !== "Complete" && (
             <button onClick={handleSnooze} disabled={snoozing}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-md font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors disabled:opacity-50"
-              title="Snooze until tomorrow">
-              <Clock className="w-3.5 h-3.5" /> Snooze
+              className="flex items-center gap-1 px-2 py-1 rounded-md font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 transition-colors disabled:opacity-50">
+              <Clock className="w-3 h-3" /> Snooze
             </button>
           )}
 
-          {/* Pin */}
           <button onClick={handlePin} disabled={pinning}
-            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md font-mono text-[10px] uppercase tracking-wider border transition-colors disabled:opacity-50 ${
-              signal.pinned ? "text-primary border-primary/30 bg-primary/10" : "text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"
-            }`}
-            title={signal.pinned ? "Unpin" : "Pin"}>
-            <Pin className="w-3.5 h-3.5" /> {signal.pinned ? "Pinned" : "Pin"}
+            className={`flex items-center gap-1 px-2 py-1 rounded-md font-mono text-[10px] uppercase tracking-wider border transition-colors disabled:opacity-50 ${
+              signal.pinned ? "text-primary border-primary/30 bg-primary/10" : "text-muted-foreground border-border hover:border-primary/30"
+            }`}>
+            <Pin className="w-3 h-3" /> {signal.pinned ? "Pinned" : "Pin"}
           </button>
 
-          {/* Copy */}
           <button onClick={handleCopy}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-md font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors">
-            {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+            className="flex items-center gap-1 px-2 py-1 rounded-md font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 transition-colors">
+            {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
             {copied ? "Copied" : "Copy"}
           </button>
 
-          {/* Promote */}
           {showPromote && (
             <button onClick={handlePromote} disabled={promoting}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-md font-mono text-[10px] uppercase tracking-wider text-primary border border-primary/30 hover:bg-primary/10 transition-colors disabled:opacity-50">
-              <ArrowUpFromLine className="w-3.5 h-3.5" /> {promoting ? "…" : "Promote"}
+              className="flex items-center gap-1 px-2 py-1 rounded-md font-mono text-[10px] uppercase tracking-wider text-primary border border-primary/30 hover:bg-primary/10 transition-colors disabled:opacity-50">
+              <ArrowUpFromLine className="w-3 h-3" /> {promoting ? "…" : "Promote"}
             </button>
           )}
 
-          {/* Expand toggle */}
           <button
             onClick={(e) => { e.stopPropagation(); setExpanded((p) => !p); }}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-md font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors ml-auto"
+            className="flex items-center gap-1 px-2 py-1 rounded-md font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 transition-colors ml-auto"
           >
-            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${expanded ? "rotate-180" : ""}`} />
-            {expanded ? "Less" : "More"}
+            <ChevronDown className={`w-3 h-3 transition-transform ${expanded ? "rotate-180" : ""}`} />
+            More
           </button>
         </div>
       </div>
