@@ -68,6 +68,7 @@ const channelItems = [
 ];
 
 const productItems = [
+  { title: "Meetings", url: "/meetings", icon: Video },
   { title: "Smart Contacts", url: "/contacts", icon: Users },
   { title: "Relationship Graph", url: "/graph", icon: Network },
   { title: "File Vault", url: "/files", icon: FolderOpen },
