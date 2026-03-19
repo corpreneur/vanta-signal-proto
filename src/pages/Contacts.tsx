@@ -242,15 +242,15 @@ export default function Contacts() {
               className="pl-9 font-mono text-xs bg-card border-border"
             />
           </div>
-          <div className="flex gap-1 flex-wrap">
+          <div className="flex gap-1.5 flex-wrap">
             {(["strength", "recency", "signals", "high", "alpha"] as SortMode[]).map((m) => (
               <button
                 key={m}
                 onClick={() => setSort(m)}
-                className={`px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider border transition-colors ${
+                className={`px-3 py-1.5 rounded-full font-mono text-[10px] uppercase tracking-wider transition-colors ${
                   sort === m
-                    ? "border-foreground text-foreground bg-card"
-                    : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/20"
+                    ? "bg-foreground text-background"
+                    : "border border-border text-muted-foreground hover:text-foreground hover:border-foreground/20"
                 }`}
               >
                 {m === "high" ? "Priority" : m === "alpha" ? "A–Z" : m === "signals" ? "Density" : m === "strength" ? "Strength" : "Recent"}

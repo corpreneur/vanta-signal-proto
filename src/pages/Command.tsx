@@ -209,20 +209,14 @@ export default function Command() {
   ];
 
   return (
-    <div className="max-w-2xl mx-auto px-5 py-8">
+    <div className="max-w-2xl mx-auto px-4 py-6">
       {/* Header */}
       <Motion>
-        <header className="mb-6">
-          <div className="flex items-center gap-2 mb-2">
-            <Zap className="w-4 h-4 text-vanta-accent" />
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-low">
-              Easy Actions
-            </span>
-          </div>
-          <h1 className="font-display text-[28px] leading-tight text-foreground">
+        <header className="mb-5">
+          <h1 className="font-display text-2xl text-foreground tracking-tight">
             Action Queue
           </h1>
-          <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-vanta-text-muted mt-1">
+          <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground mt-1">
             {inboxSignals.length} open · {highPriorityCount} high priority · {pinnedSignals.length} pinned
           </p>
         </header>
@@ -230,31 +224,31 @@ export default function Command() {
 
       {/* Quick Capture */}
       <Motion delay={40}>
-        <section className="mb-6">
+        <section className="mb-5">
           <NoteCapture inline />
         </section>
       </Motion>
 
       {/* Tabs */}
       <Motion delay={80}>
-        <div className="flex gap-1 mb-4 border-b border-vanta-border pb-px">
+        <div className="flex gap-0.5 mb-4 border-b border-border overflow-x-auto scrollbar-none">
           {tabs.map((t) => (
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
-              className={`flex items-center gap-1.5 px-3 py-2 font-mono text-[10px] uppercase tracking-wider transition-colors border-b-2 -mb-px ${
+              className={`flex items-center gap-1 px-3 py-2.5 font-mono text-[10px] uppercase tracking-wider transition-colors border-b-2 -mb-px whitespace-nowrap ${
                 tab === t.key
                   ? "border-foreground text-foreground"
-                  : "border-transparent text-vanta-text-low hover:text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
               <t.icon className="w-3.5 h-3.5" />
               {t.label}
               {t.count > 0 && (
-                <span className={`ml-1 px-1.5 py-0.5 text-[9px] rounded-sm ${
+                <span className={`ml-0.5 px-1.5 py-0.5 text-[9px] rounded-sm ${
                   t.key === "cooling" && t.count > 0
                     ? "bg-destructive/15 text-destructive"
-                    : "bg-vanta-bg-elevated text-vanta-text-mid"
+                    : "bg-muted text-muted-foreground"
                 }`}>
                   {t.count}
                 </span>
