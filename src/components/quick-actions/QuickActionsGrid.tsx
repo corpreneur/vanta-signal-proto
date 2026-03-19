@@ -59,7 +59,7 @@ export default function QuickActionsGrid() {
       {/* Voice Sheet */}
       <Sheet open={open === "voice"} onOpenChange={(v) => !v && close()}>
         <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
-          <VoiceMemoCapture onCaptured={close} />
+          <VoiceMemoCapture onCapture={close} />
         </SheetContent>
       </Sheet>
 

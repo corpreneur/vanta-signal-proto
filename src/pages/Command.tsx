@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Motion } from "@/components/ui/motion";
 import { toast } from "sonner";
+import QuickActionsGrid from "@/components/quick-actions/QuickActionsGrid";
 
 /* ── Data fetching ──────────────────────────────────────── */
 
