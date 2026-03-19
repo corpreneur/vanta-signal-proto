@@ -1,67 +1,64 @@
 
 
-## Granola-Inspired Enhancements for Idea Capture
+## Three-Part Refresh: Partner Logos, De-Pill, LinkedIn Integration
 
-The Granola screenshots showcase several patterns we can adapt to Vanta Signal's Idea Capture hub. Here's what maps well and how to build it.
+### 1. Connected Accounts — Partner Logo Refresh
 
-### What We're Adding
+Replace the single-letter placeholder icons (G, Z, L, in, S, N) on the Connected Accounts page with proper SVG brand logos for each integration partner.
 
-**1. Capture Templates (like Granola's meeting type pills)**
-A row of template pills above the note input: "Free Form", "Meeting Notes", "Investment Memo", "Intro Brief", "Decision Log". Selecting one pre-populates the textarea with a lightweight skeleton (section headers) and adjusts the AI classification prompt context.
+**Files:** `src/pages/ConnectedAccounts.tsx`
+- Add inline SVG components (or a shared `PartnerLogos.tsx` map) for: Google, Zoom, Linq, Slack, LinkedIn, Notion, Otter.ai, Fireflies.ai
+- Replace the `<div>G</div>` icon blocks with the actual SVG mark for each integration
+- Also update `src/pages/Connectivity.tsx` channel cards to use the same logo set instead of Lucide icons where a brand mark exists (Zoom, Gmail/Google, Slack)
 
-**2. Before/After Split View (like Granola's "Your notes" → "AI enhanced")**
-After a note is captured and classified, show a two-panel result: left panel shows the raw input text, right panel shows the AI-structured output (title, sections, tags, contacts, accelerators). Uses the same warm card aesthetic from Granola with the traffic-light dots header.
+**New file:** `src/components/PartnerLogos.tsx` — a single map of `{ [integrationId]: React.FC<SVGProps> }` so both pages share logos
 
-**3. "Ask Vanta" Chat Over Captures**
-A compact input bar at the bottom of the result card: "Ask Vanta anything about this capture…" with suggested prompt pills (e.g., "Summarize key decisions", "Who should I follow up with?", "What are the next steps?"). Calls an edge function that passes the captured note + question to Gemini.
+---
 
-**4. Quick Share/Export Actions (like Granola's share menu)**
-A share row on the result card with icon buttons for: Copy to clipboard, Email to participants, Open in Notion (deep-link placeholder), Share public link (future). Uses the same vertical list style from Granola's share panel.
+### 2. Global De-Pill — Replace `rounded-full` with Sharp Geometry
 
-**5. Session Notes List (like Granola's sidebar note list)**
-Upgrade the "Recent Captures" section to show a more Granola-like card format: title bold, timestamp + attendee count, with template type pill badge.
+The Vanta design system uses hard edges. All interactive pill-shaped elements (tags, badges, filters, lenses) currently using `rounded-full` should switch to `rounded-sm` (2px) or no radius.
 
-### Technical Details
+**Files to update (~12 files, mechanical find-replace):**
 
-**Files to create:**
-- `src/components/CaptureTemplates.tsx` — template pill selector + skeleton content map
-- `src/components/CaptureResultSplit.tsx` — before/after two-panel result view with traffic-light header dots
-- `src/components/AskVantaBar.tsx` — chat-over-capture input + suggested prompts
-- `supabase/functions/ask-capture/index.ts` — edge function: takes note text + question, returns AI answer via Lovable AI
+| File | What changes |
+|---|---|
+| `src/components/ui/badge.tsx` | Base variant: `rounded-full` → `rounded-sm` |
+| `src/components/CaptureTemplates.tsx` | Template pill buttons |
+| `src/components/NoteCapture.tsx` | Quick tag buttons (`@person`, `#priority`) |
+| `src/components/ViewfinderPills.tsx` | Lens selector buttons |
+| `src/pages/ReleaseNotes.tsx` | Filter pills |
+| `src/pages/ConnectedAccounts.tsx` | Status badges |
+| `src/components/AskVantaBar.tsx` | Suggested prompt pills |
+| `src/components/ContactTagManager.tsx` | Tag chips |
+| `src/components/SignalEntryCard.tsx` | Any rounded-full on action chips |
+| `src/components/CalendarSyncSettings.tsx` | Status dot (keep rounded for dots) |
+| `src/components/CommsPrepCard.tsx` | Bullet dots (keep rounded) |
+| `src/pages/PersonalInfo.tsx` | Avatar circle (keep rounded) |
 
-**Files to modify:**
-- `src/pages/BrainDump.tsx` — integrate templates above tabs, replace inline result display with split view, add Ask Vanta bar
-- `src/components/NoteCapture.tsx` — accept optional template skeleton, pass raw text back to parent for split view
-- `src/data/releaseNotes.ts` — document v1.6.0
+**Rule:** Decorative circles (avatars, status dots, timeline dots) keep `rounded-full`. Interactive elements (buttons, badges, tags, filters) move to `rounded-sm`.
 
-**Template data structure:**
-```text
-templates = [
-  { key: "freeform", label: "Free Form", skeleton: "" },
-  { key: "meeting", label: "Meeting Notes", skeleton: "Attendees:\n\nKey Points:\n\nDecisions:\n\nNext Steps:" },
-  { key: "investment", label: "Investment Memo", skeleton: "Company:\n\nStage:\n\nAsk:\n\nThesis:\n\nRisks:" },
-  { key: "intro", label: "Intro Brief", skeleton: "Who:\n\nContext:\n\nAsk:\n\nRelevance:" },
-  { key: "decision", label: "Decision Log", skeleton: "Decision:\n\nContext:\n\nOptions Considered:\n\nOutcome:" },
-]
-```
+---
 
-**Split view layout:**
-```text
-┌─────────────────────┬─────────────────────┐
-│ ● ● ●               │ ● ● ●   ✦ Enhanced  │
-│                      │                     │
-│  Your raw input      │  AI-structured      │
-│  text as typed       │  title, sections,   │
-│                      │  tags, contacts     │
-│                      │                     │
-├─────────────────────┴─────────────────────┤
-│ Ask Vanta anything…    [Decisions] [Next]  │
-└───────────────────────────────────────────┘
-```
+### 3. LinkedIn Integration for Dossiers and Meeting Briefs
 
-**Ask Vanta edge function:** Receives `{ noteText, question }`, builds a system prompt scoped to the note content, returns a concise answer. Uses `google/gemini-2.5-flash` for speed.
+Add LinkedIn profile enrichment to the contact dossier and pre-meeting briefing views. This does not require LinkedIn API access — it uses URL construction and existing signal data.
 
-### Scope
+**A. Contact Profile Header — LinkedIn link**
+- `src/components/contacts/ContactProfileHeader.tsx`: Add a "View on LinkedIn" button that constructs a `linkedin.com/search/results/people/?keywords=` URL from the contact name (or stored LinkedIn URL from `raw_payload`)
+- If a LinkedIn URL is already captured in signals (the deep-link detector already finds them), surface it directly
 
-This adds 4 new components, 1 new edge function, and modifies 3 existing files. The split view and templates are the highest-impact items. The Ask Vanta bar can be a fast-follow if you want to ship templates + split view first.
+**B. Meeting Brief Dossier — LinkedIn per attendee**
+- `src/pages/Briefing.tsx`: In each attendee dossier section, add a LinkedIn search/profile link next to the attendee name
+- Scan that attendee's signals for any captured LinkedIn URLs; if found, link directly; otherwise, fall back to a search link
+
+**C. Edge function enrichment (optional fast-follow)**
+- A `linkedin-enrich` edge function that, given a contact name + company, uses Firecrawl or a public profile scraper to pull headline, current role, and mutual connections
+- Store results in `raw_payload._vanta_linkedin_profile` on a CONTEXT signal
+- This is additive — the UI links work without it
+
+**Files modified:**
+- `src/components/contacts/ContactProfileHeader.tsx` — add LinkedIn button
+- `src/pages/Briefing.tsx` — add LinkedIn link per attendee in dossier header
+- `src/components/SmartContactCard.tsx` — add LinkedIn icon link on contact cards
 
