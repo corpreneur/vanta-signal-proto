@@ -180,19 +180,19 @@ export default function BrainDump() {
 
       {/* Input mode tabs */}
       <Motion delay={60}>
-        <div className="flex gap-1.5">
+        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1">
           {([
             { key: "note" as const, label: "Note", icon: PenLine },
             { key: "image" as const, label: "Image", icon: Image },
             { key: "link" as const, label: "Link", icon: Link2 },
             { key: "email" as const, label: "Email", icon: Mail },
-            { key: "voice" as const, label: "Voice Memo", icon: Mic },
+            { key: "voice" as const, label: "Voice", icon: Mic },
             { key: "notion" as const, label: "Notion", icon: FileText },
           ]).map(({ key, label, icon: Icon }) => (
             <button
               key={key}
               onClick={() => setInputMode(key)}
-              className={`font-mono text-[10px] uppercase tracking-[0.15em] px-3 py-1.5 rounded-full border transition-all duration-200 flex items-center gap-1 ${
+              className={`font-mono text-[10px] uppercase tracking-[0.12em] px-3 py-1.5 rounded-full border transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                 inputMode === key
                   ? "bg-primary/10 border-primary text-primary"
                   : "bg-transparent border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
