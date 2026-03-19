@@ -4,6 +4,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import type { Signal, SignalStatus, MeetingArtifact } from "@/data/signals";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
+import { PARTNER_LOGOS } from "@/components/PartnerLogos";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import {
