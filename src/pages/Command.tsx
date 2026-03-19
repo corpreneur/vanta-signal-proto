@@ -209,14 +209,17 @@ export default function Command() {
   ];
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6">
+    <div className="max-w-2xl mx-auto px-4 py-8 md:py-12">
       {/* Header */}
       <Motion>
-        <header className="mb-5">
-          <h1 className="font-display text-2xl text-foreground tracking-tight">
+        <header className="mb-8">
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-3">
+            Fab Five · Easy Actions
+          </p>
+          <h1 className="font-display text-[clamp(28px,5vw,40px)] leading-[1.05] text-foreground mb-2">
             Action Queue
           </h1>
-          <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground mt-1">
+          <p className="font-sans text-[14px] text-muted-foreground leading-relaxed max-w-md">
             {inboxSignals.length} open · {highPriorityCount} high priority · {pinnedSignals.length} pinned
           </p>
         </header>

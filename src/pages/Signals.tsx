@@ -250,8 +250,8 @@ const Signals = () => {
             className="w-2 h-2 bg-vanta-accent"
             style={{ animation: "pulse-dot 2s ease-in-out infinite" }}
           />
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-vanta-accent">
-            Signal Log · Live
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
+            Fab Five · Signal Feed
           </p>
           {(isExecutive || isDnd) && (
             <span className="flex items-center gap-1 ml-2 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider border border-foreground text-foreground bg-vanta-bg-elevated">
@@ -260,10 +260,10 @@ const Signals = () => {
             </span>
           )}
         </div>
-        <h1 className="font-display text-[28px] md:text-[36px] leading-[1.15] text-vanta-text mb-3">
+        <h1 className="font-display text-[clamp(28px,5vw,40px)] leading-[1.05] text-foreground mb-2">
           Captured Signals
         </h1>
-        <p className="font-sans text-[13px] md:text-[14px] leading-[1.6] text-vanta-text-mid max-w-[640px]">
+        <p className="font-sans text-[14px] text-muted-foreground leading-relaxed max-w-[640px]">
           {isExecutive
             ? "Showing high-priority signals only. Switch to Creative mode for the full stream."
             : "A curated feed of intellectual capital captured from real conversations. Every message is evaluated through a two-stage AI pipeline… what matters is extracted before it disappears into the scroll."}
