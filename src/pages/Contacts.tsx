@@ -157,42 +157,33 @@ export default function Contacts() {
   const strongContacts = contacts.filter((c) => c.strength >= 75).length;
 
   return (
-    <div className="max-w-[960px] mx-auto px-4 pt-8 md:pt-12 pb-16">
+    <div className="max-w-[960px] mx-auto px-4 pt-6 pb-16">
       <Motion>
-        <header className="mb-6">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h1 className="font-display text-2xl md:text-3xl text-foreground tracking-tight">
-                Smart Contacts
-              </h1>
-              <p className="text-muted-foreground text-xs font-mono mt-2 max-w-xl">
-                Relationship intelligence — strength scores, interaction history, and proactive engagement.
-              </p>
-            </div>
-            <div className="flex items-center gap-2 shrink-0 flex-wrap">
+        <header className="mb-5">
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <h1 className="font-display text-2xl md:text-3xl text-foreground tracking-tight">
+              Smart Contacts
+            </h1>
+            <div className="flex items-center gap-1.5 shrink-0">
               <button
                 onClick={() => setImportOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.15em] border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+                className="flex items-center gap-1 px-2.5 py-2 font-mono text-[9px] uppercase tracking-[0.12em] border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors rounded-full"
               >
-                <Upload className="w-3.5 h-3.5" />
-                Import .vcf
+                <Upload className="w-3 h-3" />
+                <span className="hidden sm:inline">Import .vcf</span>
               </button>
               <Link
                 to="/contacts/sync"
-                className="flex items-center gap-1.5 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.15em] border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+                className="flex items-center gap-1 px-2.5 py-2 font-mono text-[9px] uppercase tracking-[0.12em] border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors rounded-full"
               >
-                <Smartphone className="w-3.5 h-3.5" />
-                iPhone Sync
+                <Smartphone className="w-3 h-3" />
+                <span className="hidden sm:inline">iPhone Sync</span>
               </Link>
-              <button
-                onClick={() => setAddingContact(!addingContact)}
-                className="flex items-center gap-1.5 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.15em] border border-primary text-primary hover:bg-primary/10 transition-colors"
-              >
-                <UserPlus className="w-3.5 h-3.5" />
-                Add Contact
-              </button>
             </div>
           </div>
+          <p className="text-muted-foreground text-xs font-mono max-w-md">
+            Relationship intelligence, strength scores, and proactive engagement.
+          </p>
 
           {addingContact && (
             <div className="mt-4 space-y-3">
@@ -200,7 +191,7 @@ export default function Contacts() {
                 value={newContactName}
                 onChange={(e) => setNewContactName(e.target.value)}
                 placeholder="Contact name…"
-                className="w-full bg-background border border-border px-3 py-2 font-mono text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
+                className="w-full bg-background border border-border px-3 py-2 font-mono text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 rounded-lg"
                 autoFocus
               />
               {newContactName.trim() && (
@@ -219,22 +210,22 @@ export default function Contacts() {
 
       {/* Stats */}
       <Motion delay={40}>
-        <div className="flex flex-wrap gap-6 mb-6 pb-4 border-b border-border">
+        <div className="grid grid-cols-4 gap-3 mb-5 pb-4 border-b border-border">
           <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">Contacts</p>
-            <p className="font-display text-[24px] text-foreground">{totalContacts}</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground mb-0.5">Contacts</p>
+            <p className="font-display text-xl text-foreground">{totalContacts}</p>
           </div>
           <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">Active (7d)</p>
-            <p className="font-display text-[24px] text-foreground">{activeContacts}</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground mb-0.5">Active (7d)</p>
+            <p className="font-display text-xl text-foreground">{activeContacts}</p>
           </div>
           <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">Strong</p>
-            <p className="font-display text-[24px] text-emerald-500">{strongContacts}</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground mb-0.5">Strong</p>
+            <p className="font-display text-xl text-emerald-500">{strongContacts}</p>
           </div>
           <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">Stalled (30d+)</p>
-            <p className="font-display text-[24px] text-destructive">{stalledContacts}</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground mb-0.5">Stalled</p>
+            <p className="font-display text-xl text-destructive">{stalledContacts}</p>
           </div>
         </div>
       </Motion>
@@ -251,15 +242,15 @@ export default function Contacts() {
               className="pl-9 font-mono text-xs bg-card border-border"
             />
           </div>
-          <div className="flex gap-1 flex-wrap">
+          <div className="flex gap-1.5 flex-wrap">
             {(["strength", "recency", "signals", "high", "alpha"] as SortMode[]).map((m) => (
               <button
                 key={m}
                 onClick={() => setSort(m)}
-                className={`px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider border transition-colors ${
+                className={`px-3 py-1.5 rounded-full font-mono text-[10px] uppercase tracking-wider transition-colors ${
                   sort === m
-                    ? "border-foreground text-foreground bg-card"
-                    : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/20"
+                    ? "bg-foreground text-background"
+                    : "border border-border text-muted-foreground hover:text-foreground hover:border-foreground/20"
                 }`}
               >
                 {m === "high" ? "Priority" : m === "alpha" ? "A–Z" : m === "signals" ? "Density" : m === "strength" ? "Strength" : "Recent"}

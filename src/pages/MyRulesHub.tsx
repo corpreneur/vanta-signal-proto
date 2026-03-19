@@ -35,46 +35,34 @@ export default function MyRulesHub() {
   const [active, setActive] = useState<Section>("overview");
 
   return (
-    <div className="max-w-[960px] mx-auto px-0 pt-0 pb-16">
+    <div className="max-w-[960px] mx-auto px-4 pt-6 pb-16">
       <Motion>
-        <header className="mb-8">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="w-1.5 h-1.5 bg-primary animate-pulse-dot" />
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
-              Personal Ontology · Intelligence Configuration
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Shield className="w-6 h-6 text-vanta-accent" />
-            <div>
-              <h1 className="font-display text-2xl md:text-3xl text-foreground tracking-tight">
-                My Rules
-              </h1>
-              <p className="text-muted-foreground text-xs font-mono mt-1 max-w-xl">
-                Your personal ontology — how Vanta classifies, prioritizes, and acts on your behalf.
-                All automation, custom types, and source weights in one place.
-              </p>
-            </div>
-          </div>
+        <header className="mb-6">
+          <h1 className="font-display text-2xl md:text-3xl text-foreground tracking-tight">
+            My Rules
+          </h1>
+          <p className="text-muted-foreground text-xs font-mono mt-1.5 max-w-md">
+            Your personal ontology. How Vanta classifies, prioritizes, and acts on your behalf.
+          </p>
         </header>
       </Motion>
 
       {active === "overview" ? (
         <Motion delay={40}>
-          {/* Stats banner */}
-          <div className="grid grid-cols-3 gap-px border border-vanta-border bg-vanta-border mb-8">
+          {/* Cards grid — stack on mobile */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
             {SECTIONS.map((s) => (
               <button
                 key={s.key}
                 onClick={() => setActive(s.key)}
-                className="group text-left p-6 bg-card hover:bg-vanta-bg-elevated transition-all duration-300"
+                className="group text-left p-5 bg-card border border-border hover:border-foreground/20 rounded-lg transition-all"
               >
-                <div className="w-10 h-10 rounded-lg bg-vanta-accent/10 flex items-center justify-center ring-1 ring-vanta-accent/20 mb-4 group-hover:scale-110 transition-transform">
-                  <s.icon className="w-5 h-5 text-vanta-accent" />
+                <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                  <s.icon className="w-5 h-5 text-muted-foreground" />
                 </div>
-                <p className="font-mono text-[13px] font-medium text-foreground mb-1">{s.label}</p>
-                <p className="font-mono text-[10px] text-vanta-text-muted leading-relaxed mb-3">{s.description}</p>
-                <p className="font-mono text-[9px] text-vanta-text-low leading-relaxed">{s.detail}</p>
+                <p className="font-sans text-[14px] font-medium text-foreground mb-1">{s.label}</p>
+                <p className="font-mono text-[10px] text-muted-foreground leading-relaxed mb-2">{s.description}</p>
+                <p className="font-mono text-[9px] text-muted-foreground/70 leading-relaxed">{s.detail}</p>
               </button>
             ))}
           </div>

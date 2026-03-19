@@ -90,39 +90,39 @@ const InsightEngine = () => {
   }, [filtered, groupByContact]);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto px-4 pt-6 pb-16 space-y-5">
       {/* Header */}
       <div>
-        <h1 className="font-sans text-2xl font-bold tracking-tight text-foreground">
+        <h1 className="font-display text-2xl text-foreground tracking-tight">
           Insight Engine
         </h1>
-        <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-muted-foreground mt-1">
+        <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground mt-1">
           Frameworks, observations & patterns from your network
         </p>
       </div>
 
       {/* Stats strip */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="border border-border bg-card p-4">
-          <div className="flex items-center gap-2 mb-1">
-            <Lightbulb className="w-4 h-4 text-muted-foreground" />
-            <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">Total</span>
+      <div className="grid grid-cols-3 gap-2">
+        <div className="border border-border bg-card p-3 rounded-lg">
+          <div className="flex items-center gap-1.5 mb-1">
+            <Lightbulb className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-muted-foreground">Total</span>
           </div>
-          <span className="font-sans text-2xl font-bold text-foreground">{filtered.length}</span>
+          <span className="font-display text-xl text-foreground">{filtered.length}</span>
         </div>
-        <div className="border border-border bg-card p-4">
-          <div className="flex items-center gap-2 mb-1">
-            <TrendingUp className="w-4 h-4 text-muted-foreground" />
-            <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">This Week</span>
+        <div className="border border-border bg-card p-3 rounded-lg">
+          <div className="flex items-center gap-1.5 mb-1">
+            <TrendingUp className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-muted-foreground">This Week</span>
           </div>
-          <span className="font-sans text-2xl font-bold text-foreground">{thisWeek}</span>
+          <span className="font-display text-xl text-foreground">{thisWeek}</span>
         </div>
-        <div className="border border-border bg-card p-4">
-          <div className="flex items-center gap-2 mb-1">
-            <Users className="w-4 h-4 text-muted-foreground" />
-            <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">Top Source</span>
+        <div className="border border-border bg-card p-3 rounded-lg">
+          <div className="flex items-center gap-1.5 mb-1">
+            <Users className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-muted-foreground">Top Source</span>
           </div>
-          <span className="font-sans text-sm font-semibold text-foreground truncate">
+          <span className="font-sans text-sm font-semibold text-foreground truncate block">
             {topContributors[0]?.[0] || "—"}
           </span>
         </div>
@@ -131,7 +131,7 @@ const InsightEngine = () => {
       {/* Controls */}
       <div className="flex items-center gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
           <Input
             placeholder="Search insights…"
             value={search}
@@ -139,7 +139,7 @@ const InsightEngine = () => {
             className="pl-9 font-mono text-xs"
           />
         </div>
-        <label className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground whitespace-nowrap">
+        <label className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.12em] text-muted-foreground whitespace-nowrap">
           <Switch checked={groupByContact} onCheckedChange={setGroupByContact} />
           Group by contact
         </label>
