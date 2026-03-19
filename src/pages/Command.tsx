@@ -558,8 +558,8 @@ function SignalActionRow({
 
         {/* Action cluster */}
         <div className="flex items-center gap-1 shrink-0">
-          <ActionButton icon={Check} label="Done" onClick={onDone} className="hover:text-green-500" />
-          <ActionButton icon={Clock} label="Snooze" onClick={onSnooze} className="hover:text-amber-500" />
+          <ActionButton icon={Check} label="Done" onClick={onDone} className="hover:text-primary" />
+          <ActionButton icon={Clock} label="Snooze" onClick={onSnooze} className="hover:text-warning" />
           <ActionButton
             icon={signal.pinned ? PinOff : Pin}
             label={signal.pinned ? "Unpin" : "Pin"}
