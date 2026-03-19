@@ -10,6 +10,16 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "1.5.0",
+    date: "2026-03-19",
+    title: "Fab Five Consistency & File Vault Content",
+    changes: [
+      { type: "improvement", text: "Pulsing status dot added to all Fab Five page headers — Focus, Easy Actions, Connectivity now match Signal Feed and Idea Capture" },
+      { type: "improvement", text: "Idea Capture restyled to mirror Signal Feed layout — unified container width, underline tabs, metrics strip, and editorial typography" },
+      { type: "feature", text: "File Vault populated with 14 test assets — hero images, mockups, floor plans, meeting notes, investor briefs, and CSV exports" },
+    ],
+  },
+  {
     version: "1.4.0",
     date: "2026-03-19",
     title: "MetaLab V3 — Full Design System Overhaul",
