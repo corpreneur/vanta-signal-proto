@@ -24,6 +24,7 @@ import Architecture from "./pages/Architecture";
 import BrainDump from "./pages/BrainDump";
 import OrbDemo from "./pages/OrbDemo";
 import ReleaseNotes from "./pages/ReleaseNotes";
+import Meetings from "./pages/Meetings";
 import Command from "./pages/Command";
 
 import Settings from "./pages/Settings";
