@@ -15,6 +15,9 @@ import NoteCapture from "@/components/NoteCapture";
 import ImageCapture from "@/components/ImageCapture";
 import EmailCapture from "@/components/EmailCapture";
 import VoiceMemoCapture from "@/components/VoiceMemoCapture";
+import CaptureTemplates, { CAPTURE_TEMPLATES, type CaptureTemplate } from "@/components/CaptureTemplates";
+import CaptureResultSplit from "@/components/CaptureResultSplit";
+import AskVantaBar from "@/components/AskVantaBar";
 import { Motion } from "@/components/ui/motion";
 
 const SIGNAL_TYPE_LABELS: Record<string, string> = {
@@ -70,6 +73,14 @@ export default function BrainDump() {
   const [sessionCaptures, setSessionCaptures] = useState<{ signalType: string; summary: string; timestamp: string }[]>([]);
   const [showTools, setShowTools] = useState(false);
 
+  // Granola-inspired state
+  const [selectedTemplate, setSelectedTemplate] = useState<CaptureTemplate>(CAPTURE_TEMPLATES[0]);
+  const [lastRawText, setLastRawText] = useState("");
+  const [lastClassification, setLastClassification] = useState<{
+    signalType: string; priority: string; summary: string;
+    suggestedTitle?: string; suggestedTags?: string[]; suggestedContacts?: string[]; accelerators?: string[];
+  } | null>(null);
+
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -98,9 +109,26 @@ export default function BrainDump() {
     } finally { setLoading(false); }
   };
 
-  const onCapture = (classification: { signalType: string; summary: string }) => {
-    setSessionCaptures((prev) => [{ ...classification, timestamp: new Date().toISOString() }, ...prev]);
+  const onCapture = (classification: { signalType: string; summary: string; suggestedTitle?: string; suggestedTags?: string[]; suggestedContacts?: string[]; accelerators?: string[] }) => {
+    setLastClassification(classification as typeof lastClassification);
+    setSessionCaptures((prev) => [{ signalType: classification.signalType, summary: classification.summary, timestamp: new Date().toISOString() }, ...prev]);
     queryClient.invalidateQueries({ queryKey: ["brain-dump-recent"] });
+  };
+
+  const onRawTextCapture = (raw: string) => {
+    setLastRawText(raw);
+  };
+
+  const handleTemplateSelect = (t: CaptureTemplate) => {
+    setSelectedTemplate(t);
+    // Clear previous result when switching templates
+    setLastClassification(null);
+    setLastRawText("");
+  };
+
+  const handleDismissResult = () => {
+    setLastClassification(null);
+    setLastRawText("");
   };
 
   const linkColors = linkResult ? SIGNAL_TYPE_COLORS[linkResult.signalType as SignalType] : null;
@@ -146,6 +174,9 @@ export default function BrainDump() {
         </div>
       </div>
 
+      {/* ══ Capture Templates (Granola-style) ══ */}
+      <CaptureTemplates selected={selectedTemplate.key} onSelect={handleTemplateSelect} />
+
       {/* ══ Input mode tabs (underline style matching Signal Feed) ══ */}
       <div className="flex items-center gap-0 mb-6 border-b border-vanta-border">
         {INPUT_MODES.map(({ key, label, icon: Icon }) => (
@@ -168,7 +199,13 @@ export default function BrainDump() {
       <div className="mb-8">
         {inputMode === "note" && (
           <div className="border border-vanta-border bg-card p-5">
-            <NoteCapture inline onCapture={onCapture} />
+            <NoteCapture
+              inline
+              onCapture={onCapture}
+              onRawText={onRawTextCapture}
+              templateSkeleton={selectedTemplate.skeleton}
+              templateKey={selectedTemplate.key}
+            />
           </div>
         )}
 
@@ -215,7 +252,22 @@ export default function BrainDump() {
         )}
       </div>
 
-      {/* Link result */}
+      {/* ══ Split View Result (Granola-style) ══ */}
+      {lastClassification && lastRawText && (
+        <div className="mb-8 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">Capture Result</span>
+            <button onClick={handleDismissResult} className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors">
+              + New capture
+            </button>
+          </div>
+          <CaptureResultSplit rawText={lastRawText} classification={lastClassification}>
+            <AskVantaBar noteText={lastRawText} />
+          </CaptureResultSplit>
+        </div>
+      )}
+
+      {/* Link result (non-note modes) */}
       {inputMode === "link" && linkResult && linkColors && (
         <div className={`border p-4 mb-8 space-y-3 ${linkColors.bg} ${linkColors.border}`}>
           <div className="flex items-center gap-2">
