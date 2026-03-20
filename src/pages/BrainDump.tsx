@@ -153,7 +153,7 @@ export default function BrainDump() {
   const manualCount = recentCaptures.filter(s => s.source === "manual").length;
 
   return (
-    <div className="max-w-[960px] mx-auto px-4 py-8 md:px-10 md:py-10">
+    <div className="max-w-[960px] mx-auto px-4 py-8 md:px-10 md:py-10 overflow-x-hidden">
 
       {/* ══ Hero header ══ */}
       <header className="mb-6">
