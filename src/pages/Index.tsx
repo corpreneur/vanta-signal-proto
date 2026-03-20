@@ -8,6 +8,7 @@ import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { useUserMode } from "@/hooks/use-user-mode";
 import { Motion } from "@/components/ui/motion";
 import SignalDetailDrawer from "@/components/SignalDetailDrawer";
+import SignalBriefCard from "@/components/signal/SignalBriefCard";
 import CoolingAlerts from "@/components/CoolingAlerts";
 import InlineBrainDump from "@/components/InlineBrainDump";
 import WhatsAhead from "@/components/WhatsAhead";
