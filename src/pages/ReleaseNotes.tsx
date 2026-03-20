@@ -171,25 +171,6 @@ export default function ReleaseNotes() {
         <ArrowRight className="w-4 h-4 text-primary shrink-0 group-hover:translate-x-0.5 transition-transform" />
       </Link>
 
-      {/* Executive Brief download */}
-      <a
-        href="/Vanta_Signal_Executive_Brief.pdf"
-        download="Vanta_Signal_Executive_Brief.pdf"
-        className="flex items-center justify-between gap-3 px-4 py-3 mb-6 border border-border bg-card/50 rounded-sm group hover:bg-card/80 transition-colors"
-      >
-        <div className="flex items-center gap-2.5">
-          <FileDown className="w-4 h-4 text-muted-foreground shrink-0" />
-          <div>
-            <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
-              Executive Brief · March 2026
-            </span>
-            <p className="font-sans text-[13px] text-muted-foreground leading-snug">
-              7-page sprint review — architecture, features, strategy & roadmap.
-            </p>
-          </div>
-        </div>
-        <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0 group-hover:translate-x-0.5 transition-transform" />
-      </a>
 
       {/* Featured: last 2 releases */}
       <div className="mb-8">
