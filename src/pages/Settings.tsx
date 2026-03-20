@@ -8,6 +8,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Save, RotateCcw, Settings2, MessageSquare, Users, Bell, Shield, Smartphone, Phone, Video, Mail, Calendar, ShieldCheck } from "lucide-react";
 import ClassificationAudit from "./ClassificationAudit";
 import CalendarSyncSettings from "@/components/CalendarSyncSettings";
+import DeliveryPreferences from "@/components/settings/DeliveryPreferences";
 
 interface SettingRow {
   key: string;
