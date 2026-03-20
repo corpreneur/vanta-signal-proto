@@ -56,7 +56,7 @@ export default function SignalBriefCard() {
 
   if (dismissed) return null;
 
-  const time = new Date(mockBrief.generatedAt).toLocaleTimeString("en-US", {
+  const time = new Date(generatedAt).toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",
   });
