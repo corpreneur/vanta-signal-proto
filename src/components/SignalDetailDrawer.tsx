@@ -404,6 +404,26 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
     </section>
   );
 
+  const [speakerProfiles, setSpeakerProfiles] = useState<Record<string, { meeting_count: number; last_seen_at: string; email: string | null }>>({});
+
+  useEffect(() => {
+    if (!signal || signal.signalType !== "MEETING") return;
+    (async () => {
+      const { data } = await supabase
+        .from("meeting_speakers")
+        .select("turn_count, speaker_profiles(name, email, meeting_count, last_seen_at)")
+        .eq("signal_id", signal.id) as any;
+      if (data) {
+        const map: Record<string, { meeting_count: number; last_seen_at: string; email: string | null }> = {};
+        for (const row of data) {
+          const p = row.speaker_profiles;
+          if (p) map[p.name] = { meeting_count: p.meeting_count, last_seen_at: p.last_seen_at, email: p.email };
+        }
+        setSpeakerProfiles(map);
+      }
+    })();
+  }, [signal?.id, signal?.signalType]);
+
   const renderSpeakersTab = () => {
     const turns = (artifact?.transcriptJson as Record<string, unknown>[] | null) ?? [];
     const speakerMap = new Map<string, number>();
@@ -417,19 +437,28 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
     const identified = [...speakerMap.entries()].filter(([name]) => attendeeNames.has(name));
     const other = [...speakerMap.entries()].filter(([name]) => !attendeeNames.has(name));
 
-    const renderSpeaker = ([name, count]: [string, number]) => (
-      <div key={name} className="flex items-center gap-3 py-2">
-        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-          <span className="font-display text-[12px] text-primary">{name.charAt(0).toUpperCase()}</span>
+    const renderSpeaker = ([name, count]: [string, number]) => {
+      const profile = speakerProfiles[name];
+      return (
+        <div key={name} className="flex items-center gap-3 py-2">
+          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+            <span className="font-display text-[12px] text-primary">{name.charAt(0).toUpperCase()}</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-sans text-[13px] font-semibold text-foreground truncate">{name}</p>
+            {profile && (
+              <p className="font-mono text-[9px] text-muted-foreground">
+                {profile.meeting_count} meeting{profile.meeting_count !== 1 ? "s" : ""}
+                {profile.email && <span className="ml-2">· {profile.email}</span>}
+              </p>
+            )}
+          </div>
+          <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground border border-border px-2 py-0.5 rounded">
+            {count} turn{count !== 1 ? "s" : ""}
+          </span>
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="font-sans text-[13px] font-semibold text-foreground truncate">{name}</p>
-        </div>
-        <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground border border-border px-2 py-0.5 rounded">
-          {count} turn{count !== 1 ? "s" : ""}
-        </span>
-      </div>
-    );
+      );
+    };
 
     return (
       <section className="space-y-4">
