@@ -10,6 +10,19 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "2.1.0",
+    date: "2026-03-20",
+    title: "Signal Brief, Context Layer & Delivery Preferences",
+    changes: [
+      { type: "feature", text: "Signal Brief Card — daily intelligence summary on the main dashboard with headline, stat tiles (trend arrows), and narrative overview" },
+      { type: "feature", text: "Context Layer Setup — 3-step onboarding flow at /setup/context to define up to 5 business contexts (client, project, income stream, personal) with primary focus selection" },
+      { type: "feature", text: "Context Switcher — compact dropdown on the Signal Brief card to toggle between active contexts" },
+      { type: "feature", text: "Delivery Preferences — new Settings tab for configuring Signal Brief delivery via Push, SMS, and Email with time-of-day picker and timezone detection" },
+      { type: "improvement", text: "Signal Brief Card restyled to MetaLab V3 design system — replaced gradient container with bg-card/border tokens and rounded-sm geometry" },
+      { type: "improvement", text: "Context Layer Setup de-pilled — all hardcoded purple HSL values replaced with semantic bg-primary/text-primary-foreground tokens" },
+    ],
+  },
+  {
     version: "2.0.0",
     date: "2026-03-20",
     title: "Jamie Feature Parity — Speaker Memory, Transcript Editing & Meeting Distribution",
