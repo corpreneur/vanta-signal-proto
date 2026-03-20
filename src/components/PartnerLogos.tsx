@@ -120,6 +120,72 @@ const GranolaLogo = (props: LogoProps) => (
   </svg>
 );
 
+/* ── App / Service Logos ── */
+
+const AppleCalendarLogo = (props: LogoProps) => (
+  <svg viewBox="0 0 24 24" fill="none" {...props}>
+    <rect width="24" height="24" rx="5" fill="#FF3B30" />
+    <rect x="3" y="7" width="18" height="14" rx="2" fill="#fff" />
+    <rect x="3" y="3" width="18" height="6" rx="2" fill="#FF3B30" />
+    <text x="12" y="18" textAnchor="middle" fill="#333" fontSize="8" fontWeight="bold" fontFamily="system-ui">17</text>
+  </svg>
+);
+
+const GoogleCalendarLogo = (props: LogoProps) => (
+  <svg viewBox="0 0 24 24" fill="none" {...props}>
+    <rect width="24" height="24" rx="4" fill="#fff" />
+    <rect x="2" y="2" width="20" height="20" rx="3" fill="#4285F4" />
+    <rect x="4" y="7" width="16" height="13" rx="1.5" fill="#fff" />
+    <rect x="4" y="4" width="16" height="5" rx="1.5" fill="#4285F4" />
+    <line x1="8" y1="10" x2="8" y2="18" stroke="#E8EAED" strokeWidth="0.5" />
+    <line x1="12" y1="10" x2="12" y2="18" stroke="#E8EAED" strokeWidth="0.5" />
+    <line x1="16" y1="10" x2="16" y2="18" stroke="#E8EAED" strokeWidth="0.5" />
+    <line x1="4" y1="12" x2="20" y2="12" stroke="#E8EAED" strokeWidth="0.5" />
+    <line x1="4" y1="15" x2="20" y2="15" stroke="#E8EAED" strokeWidth="0.5" />
+    <rect x="9" y="10.5" width="2.5" height="2" rx="0.3" fill="#4285F4" />
+    <rect x="13" y="13" width="2.5" height="2" rx="0.3" fill="#0B8043" />
+    <rect x="5.5" y="13" width="2.5" height="2" rx="0.3" fill="#F4B400" />
+  </svg>
+);
+
+const OutlookCalendarLogo = (props: LogoProps) => (
+  <svg viewBox="0 0 24 24" fill="none" {...props}>
+    <rect width="24" height="24" rx="4" fill="#0078D4" />
+    <rect x="4" y="7" width="16" height="13" rx="1.5" fill="#fff" />
+    <rect x="4" y="4" width="16" height="5" rx="1.5" fill="#0078D4" />
+    <text x="12" y="17.5" textAnchor="middle" fill="#0078D4" fontSize="7" fontWeight="bold" fontFamily="system-ui">20</text>
+  </svg>
+);
+
+const AppleMailLogo = (props: LogoProps) => (
+  <svg viewBox="0 0 24 24" fill="none" {...props}>
+    <rect width="24" height="24" rx="5" fill="#007AFF" />
+    <rect x="3" y="6" width="18" height="12" rx="2" fill="#fff" />
+    <path d="M3 8l9 5.5L21 8" stroke="#007AFF" strokeWidth="1.5" fill="none" />
+  </svg>
+);
+
+const GmailLogo = (props: LogoProps) => (
+  <svg viewBox="0 0 24 24" fill="none" {...props}>
+    <rect width="24" height="24" rx="4" fill="#fff" />
+    <rect x="2" y="5" width="20" height="14" rx="2" fill="#F6F6F6" />
+    <path d="M4 7l8 5.5L20 7" stroke="#EA4335" strokeWidth="1.8" fill="none" strokeLinecap="round" />
+    <rect x="2" y="5" width="3" height="14" fill="#4285F4" rx="1" />
+    <rect x="19" y="5" width="3" height="14" fill="#4285F4" rx="1" />
+    <rect x="2" y="5" width="20" height="2" rx="1" fill="#EA4335" />
+  </svg>
+);
+
+const OutlookMailLogo = (props: LogoProps) => (
+  <svg viewBox="0 0 24 24" fill="none" {...props}>
+    <rect width="24" height="24" rx="4" fill="#0078D4" />
+    <rect x="3" y="6" width="18" height="12" rx="2" fill="#fff" />
+    <path d="M3 8l9 5.5L21 8" stroke="#0078D4" strokeWidth="1.5" fill="none" />
+    <ellipse cx="9" cy="13" rx="4" ry="3.5" fill="#0078D4" />
+    <text x="9" y="15" textAnchor="middle" fill="#fff" fontSize="5" fontWeight="bold" fontFamily="system-ui">O</text>
+  </svg>
+);
+
 export const PARTNER_LOGOS: Record<string, React.FC<LogoProps>> = {
   google: GoogleLogo,
   zoom: ZoomLogo,
@@ -135,6 +201,12 @@ export const PARTNER_LOGOS: Record<string, React.FC<LogoProps>> = {
   phone_call: PhoneCallLogo,
   "idea-capture": IdeaCaptureLogo,
   granola: GranolaLogo,
+  apple_calendar: AppleCalendarLogo,
+  google_calendar: GoogleCalendarLogo,
+  outlook_calendar: OutlookCalendarLogo,
+  apple_mail: AppleMailLogo,
+  gmail: GmailLogo,
+  outlook_mail: OutlookMailLogo,
 };
 
 export default PARTNER_LOGOS;
