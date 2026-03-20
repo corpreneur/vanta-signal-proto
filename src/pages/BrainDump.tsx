@@ -32,11 +32,11 @@ type InputMode = "note" | "link" | "image" | "email" | "voice" | "granola";
 
 const INPUT_MODES: { key: InputMode; label: string; icon: React.ElementType }[] = [
   { key: "note", label: "Note", icon: PenLine },
+  { key: "granola", label: "Granola", icon: FileText },
   { key: "image", label: "Image", icon: Image },
   { key: "link", label: "Link", icon: Link2 },
   { key: "email", label: "Email", icon: Mail },
   { key: "voice", label: "Voice", icon: Mic },
-  { key: "granola", label: "Granola", icon: FileText },
 ];
 
 /* ── Fetch recent brain dump captures ── */
