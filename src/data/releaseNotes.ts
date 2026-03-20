@@ -10,6 +10,22 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "2.2.0",
+    date: "2026-03-20",
+    title: "Ultra-Crisp Dashboard & Meeting Data Population",
+    changes: [
+      { type: "feature", text: "Streamlined dashboard — replaced bulky stats block and channel grid with compact inline stat strip showing signal counts, high-priority count, and per-channel icon counts" },
+      { type: "feature", text: "Full meeting speaker profiles — 12 speaker identities with email, aliases, and meeting counts linked to all 13 meeting signals" },
+      { type: "feature", text: "Rich multi-turn transcripts — all meeting signals now have realistic speaker-attributed conversation transcripts" },
+      { type: "feature", text: "6 pre-meeting briefs — attendee context, talking points, and narrative dossiers for all upcoming meetings" },
+      { type: "improvement", text: "What's Ahead moved above Daily Timeline for immediate calendar visibility" },
+      { type: "improvement", text: "Priority signals capped at 2 for focused mobile scanning" },
+      { type: "improvement", text: "Cooling alerts limited to 3 most critical on dashboard" },
+      { type: "fix", text: "Mobile overflow — action bar horizontal scroll, card containment, container overflow-x-hidden" },
+      { type: "improvement", text: "Executive Brief PDF — real 7-page document with architecture, features, roadmap, and demo coverage" },
+    ],
+  },
+  {
     version: "2.1.0",
     date: "2026-03-20",
     title: "Signal Brief, Context Layer & Delivery Preferences",
