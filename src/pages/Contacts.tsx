@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import VCardImportDialog from "@/components/VCardImportDialog";
 import { useQuery } from "@tanstack/react-query";
@@ -8,10 +8,14 @@ import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { computeStrength, daysBetween, recencyLabel } from "@/lib/contactStrength";
 import { Motion } from "@/components/ui/motion";
 import { Input } from "@/components/ui/input";
-import { Search, Tag, Filter, UserPlus, LayoutGrid, LayoutList, Phone, Mail, MessageSquare, Smartphone, Upload } from "lucide-react";
+import { Search, Tag, Filter, UserPlus, LayoutGrid, LayoutList, Phone, Mail, MessageSquare, Smartphone, Upload, ChevronDown, ChevronUp, Network } from "lucide-react";
 import { useAllContactTags } from "@/components/ContactTagManager";
 import SmartContactCard from "@/components/SmartContactCard";
 import AddContactContext from "@/components/AddContactContext";
+import { buildGraph } from "@/components/graph/buildGraph";
+import ForceGraph from "@/components/graph/ForceGraph";
+import MiniContactCard from "@/components/graph/MiniContactCard";
+import type { FocusedNode } from "@/components/graph/types";
 
 async function fetchSignals(): Promise<Signal[]> {
   const { data, error } = await supabase
@@ -104,6 +108,24 @@ export default function Contacts() {
   const [newContactName, setNewContactName] = useState("");
   const [importOpen, setImportOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("list");
+  const [graphOpen, setGraphOpen] = useState(false);
+  const [focused, setFocused] = useState<FocusedNode | null>(null);
+  const graphContainerRef = useRef<HTMLDivElement>(null);
+  const [graphDims, setGraphDims] = useState({ w: 800, h: 420 });
+
+  const handleFocus = useCallback((f: FocusedNode | null) => setFocused(f), []);
+
+  useEffect(() => {
+    if (!graphOpen) return;
+    const el = graphContainerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const { width } = entries[0].contentRect;
+      setGraphDims({ w: width, h: Math.max(360, Math.min(500, width * 0.55)) });
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [graphOpen]);
 
   const { data: sequences = [] } = useQuery({
     queryKey: ["engagement-sequences"],
@@ -130,6 +152,7 @@ export default function Contacts() {
   });
 
   const contacts = useMemo(() => buildContacts(signals), [signals]);
+  const graphData = useMemo(() => buildGraph(signals), [signals]);
 
   const filtered = useMemo(() => {
     let list = contacts;
@@ -236,6 +259,74 @@ export default function Contacts() {
             <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground mb-0.5">Stalled</p>
             <p className="font-display text-xl text-destructive">{stalledContacts}</p>
           </div>
+        </div>
+      </Motion>
+
+      {/* Relationship Graph */}
+      <Motion delay={60}>
+        <div className="mb-5">
+          <button
+            onClick={() => { setGraphOpen(!graphOpen); setFocused(null); }}
+            className="flex items-center gap-2 w-full px-3 py-2.5 border border-border hover:border-foreground/20 bg-card transition-colors group"
+          >
+            <Network className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground group-hover:text-foreground transition-colors flex-1 text-left">
+              Relationship Graph
+            </span>
+            <span className="font-mono text-[9px] text-muted-foreground">
+              {graphData.nodes.length} nodes · {graphData.edges.length} edges
+            </span>
+            {graphOpen ? (
+              <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" />
+            ) : (
+              <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+            )}
+          </button>
+
+          {graphOpen && graphData.nodes.length > 0 && (
+            <div className="border border-t-0 border-border bg-card">
+              {/* Legend */}
+              <div className="flex flex-wrap gap-3 px-3 py-2 border-b border-border text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-primary inline-block rounded-full" /> &lt; 2d
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-vanta-accent-teal inline-block rounded-full" /> &lt; 7d
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-vanta-accent-amber inline-block rounded-full" /> &lt; 30d
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-muted-foreground inline-block rounded-full" /> 30d+
+                </span>
+                <span className="ml-auto text-muted-foreground/60">
+                  scroll zoom · drag pan · click node
+                </span>
+              </div>
+
+              {/* Canvas */}
+              <div ref={graphContainerRef} className="relative w-full">
+                <ForceGraph
+                  nodes={graphData.nodes}
+                  edges={graphData.edges}
+                  width={graphDims.w}
+                  height={graphDims.h}
+                  onFocus={handleFocus}
+                />
+                {focused && (
+                  <MiniContactCard focused={focused} onClose={() => setFocused(null)} />
+                )}
+              </div>
+            </div>
+          )}
+
+          {graphOpen && graphData.nodes.length === 0 && (
+            <div className="border border-t-0 border-border bg-card px-3 py-8 text-center">
+              <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                No relationship data to visualize
+              </p>
+            </div>
+          )}
         </div>
       </Motion>
 
