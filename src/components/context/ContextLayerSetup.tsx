@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { X, Plus, Briefcase, FolderOpen, Banknote, User, ArrowRight, ArrowLeft, Zap } from "lucide-react";
 import { Motion } from "@/components/ui/motion";
+import { useUserContexts } from "@/hooks/use-user-preferences";
 
 type ContextType = "client" | "project" | "income_stream" | "personal";
 
@@ -20,10 +21,12 @@ const TYPE_OPTIONS: { value: ContextType; label: string; icon: React.ComponentTy
 
 export default function ContextLayerSetup() {
   const navigate = useNavigate();
+  const { saveContexts } = useUserContexts();
   const [step, setStep] = useState(1);
   const [inputVal, setInputVal] = useState("");
   const [contexts, setContexts] = useState<DraftContext[]>([]);
   const [primaryId, setPrimaryId] = useState<string>("");
+  const [saving, setSaving] = useState(false);
 
   const addContext = () => {
     const name = inputVal.trim();
@@ -42,17 +45,14 @@ export default function ContextLayerSetup() {
     setContexts((c) => c.map((x) => (x.id === id ? { ...x, type } : x)));
   };
 
-  const finish = () => {
-    const final = contexts.map((c) => ({
-      id: c.id,
+  const finish = async () => {
+    setSaving(true);
+    const drafts = contexts.map((c) => ({
       name: c.name,
       type: c.type,
       isPrimary: c.id === primaryId,
-      createdAt: new Date().toISOString(),
     }));
-    localStorage.setItem("vanta_contexts", JSON.stringify(final));
-    localStorage.setItem("vanta_context_setup", "true");
-    localStorage.setItem("vanta_active_context", primaryId);
+    await saveContexts(drafts);
     navigate("/");
   };
 
@@ -207,10 +207,10 @@ export default function ContextLayerSetup() {
                 </button>
                 <button
                   onClick={finish}
-                  disabled={!primaryId}
+                  disabled={!primaryId || saving}
                   className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-mono text-[11px] uppercase tracking-wider rounded-sm hover:bg-primary/90 disabled:opacity-30 transition-colors"
                 >
-                  <Zap className="w-4 h-4" /> Activate Signal Brief
+                  <Zap className="w-4 h-4" /> {saving ? "Saving…" : "Activate Signal Brief"}
                 </button>
               </div>
             </div>

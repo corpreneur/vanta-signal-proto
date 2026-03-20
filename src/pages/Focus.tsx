@@ -89,7 +89,7 @@ export default function Focus() {
         {configOpen && (
           <Motion>
             <Tabs defaultValue={defaultTab} onValueChange={handleTabChange}>
-              <TabsList className="w-full justify-start bg-card border border-border mb-8 flex-wrap">
+              <TabsList className="w-full justify-start bg-card border border-border mb-8 flex-wrap h-auto gap-1 p-1">
                 <TabsTrigger
                   value="modes"
                   className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-muted"

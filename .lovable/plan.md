@@ -1,34 +1,67 @@
 
 
-# Merge Executive Briefs into a Single PDF
+# CMO Feedback Response — Implementation Plan
 
-## What we're building
+## Feedback Summary
 
-A unified 8–9 page Executive Brief PDF that uses **Doc 2's structured framework** (TOC, exec summary, architecture, strategy, roadmap) as the backbone, enriched with **Doc 1's editorial feature narratives** for v2.0 and v2.1. The result replaces `public/Vanta_Signal_Executive_Brief.pdf`.
+Six areas of CMO feedback, each with concrete prototype changes:
 
-## Document structure
+1. **Sources of Signal** — Align on launch sources, clarify SMS/iMessage feasibility
+2. **Signal Intelligence** — Rethink "risk" schema, make prioritization logic more transparent
+3. **Views** — Add more "quick win" view lenses beyond the current set
+4. **Focus View** — Move away from calendar-centric hub toward signal-humanity framing
+5. **Capture** — Reframe from "create a thought" to "magic food processor" capture metaphor
+6. **Actions** — Add capture-derived actions, lay groundwork for partner-based ephemeral offers
 
-```text
-Page 1  — Cover (merged stats: 21 releases, 60+ features, 12 edge fns, 16 tables)
-Page 2  — Executive Summary (Doc 2's Key Outcomes table + Doc 1's 5 Key Milestones)
-Page 3  — Sprint Velocity & Delivery (Doc 2's full release timeline table)
-Page 4  — v2.1 Feature Narrative (Doc 1's editorial: Signal Brief, Context Layer, Delivery Prefs)
-Page 5  — v2.0 Feature Narrative (Doc 1's editorial: Speaker Memory, Meeting Intelligence)
-Page 6  — Architecture & Infrastructure (Doc 2's 16-table + 12-function inventory)
-Page 7  — Strategic Positioning (Doc 2's competitive differentiation + platform moat)
-Page 8  — Next Horizons: PI-2 Roadmap (Doc 2's themes + success metrics)
-```
+---
 
-## Design
+## Changes by Area
 
-Vanta B/W style consistent with existing briefs: black text on white, clean tables with light gray borders, monospace headers, "CONFIDENTIAL" footer with page numbers.
+### 1. Sources of Signal — Launch Source Alignment
 
-## Technical approach
+**Current state**: Platform lists 6 channels (iMessage/Linq, Phone, Zoom, Email, Calendar, Notes). No explicit launch-tier differentiation.
 
-1. Write a Python/reportlab script to `/tmp/gen_merged_brief.py`
-2. Generate the PDF to `/mnt/documents/Vanta_Signal_Executive_Brief.pdf`
-3. QA via `pdftoppm` — inspect every page for layout issues
-4. Copy final PDF to `public/Vanta_Signal_Executive_Brief.pdf`
+**Changes**:
+- Update **Connectivity page** (`/connectivity`) to show a **Launch Tier** system:
+  - **Tier 1 (Launch)**: SMS/iMessage (via Linq), Calendar, Capture (manual)
+  - **Tier 2 (Fast-follow)**: Email, Phone
+  - **Tier 3 (Roadmap)**: Zoom, Fireflies, Otter
+- Add tier badges to each channel card (e.g., "Launch", "Fast-follow", "Roadmap")
+- Add a summary strip: "3 launch sources · 2 fast-follow · 3 roadmap"
 
-The existing in-app download link on the Release Notes page already points to this file, so no UI changes needed.
+### 2. Signal Intelligence — Evolve Beyond "Risk"
 
+**Current state**: Signals use `risk_level` (low/medium/high/critical) and `priority` (high/medium/low) as separate dimensions. The UI shows Shield icons for risk.
+
+**Changes**:
+- Rename "Risk Level" to **"Signal Weight"** across the UI — a more intuitive term that captures why something matters (urgency, stakes, time-sensitivity, relationship importance) rather than just "risk"
+- Update `EnhancedActionItems.tsx`, `SignalEntryCard.tsx`, `SignalDetailDrawer.tsx` to use new terminology
+- Add a **"Why this matters"** line in the signal detail drawer that surfaces the `classification_reasoning` field more prominently — making the AI's prioritization logic transparent and editable
+- Update the Focus page Priority Lenses to use clearer categories: **Time-Sensitive**, **High-Stakes**, **Relationship**, **Quick Win** (replacing the current risk-centric framing)
+
+### 3. Views — More Quick-Win Lenses
+
+**Current state**: ViewfinderPills has 4 lenses (Recommended, Quick, Contact, Overdue).
+
+**Changes**:
+- Add new lenses to `ViewfinderPills.tsx`:
+  - **"Under 5 min"** — signals with simple single-step actions (already partially "Quick")
+  - **"Waiting On"** — signals in "In Progress" status awaiting response
+  - **"This Week"** — signals with due dates in the current week
+  - **"Relationships"** — INTRO and relationship-tagged signals
+- Each lens gets a count badge showing how many signals match
+
+### 4. Focus View — Signal-Humanity Hub
+
+**Current state**: Dashboard hero says "Good morning" + "Clear until 11am" with meeting count — feels calendar-management focused per CMO feedback.
+
+**Changes to `Index.tsx`**:
+- Replace "Clear until {time}" with a **signal-centric context line** generated from actual data: e.g., "3 people waiting to hear from you · 1 decision by Friday" or "Quiet morning — good time to think"
+- Replace the meeting-count stat with a **"People in your orbit today"** count (unique senders from today's signals + meeting attendees)
+- Add a **"Signal Pulse"** indicator — a single-sentence AI-generated line from the `generate-brief` function that captures the emotional/relational tone of the day, not just logistics
+- Keep WhatsAhead but reframe its header from calendar-forward to **"Coming Up"** with signals interspersed alongside meetings
+
+### 5. Capture — Magic Food Processor
+
+**Changes**:
+- Update `InlineBrainDump.tsx` placeholder from "What's on your mind? Drop a note, link
