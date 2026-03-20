@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
 import type { FilterState } from "@/components/SignalFilters";
 import SignalFeed from "@/components/SignalFeed";
-import { Sparkles, Clock, User, AlertTriangle, ChevronDown, Hourglass, CalendarDays, Heart } from "lucide-react";
+import { Sparkles, Clock, User, AlertTriangle, Hourglass, CalendarDays, Heart } from "lucide-react";
 import { Motion } from "@/components/ui/motion";
 
 type Lens = "recommended" | "quick" | "contact" | "overdue" | "waiting" | "thisweek" | "relationships";
@@ -132,7 +132,6 @@ export default function ViewfinderPills() {
           {LENSES.map((lens) => {
             const isActive = activeLens === lens.key;
             const Icon = lens.icon;
-            // Count for badge
             const lensCount = (() => {
               const now = new Date();
               const weekEnd = new Date(now);
@@ -171,140 +170,6 @@ export default function ViewfinderPills() {
                     {lensCount}
                   </span>
                 )}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Contact selector for "By Contact" lens */}
-        {activeLens === "contact" && (
-          <div className="mb-4 flex items-center gap-2 flex-wrap">
-            {contacts.map((c) => (
-              <button
-                key={c}
-                onClick={() => setSelectedContact(c)}
-                className={`
-                  px-3 py-1.5 rounded-sm font-mono text-[10px] uppercase tracking-[0.1em] transition-all
-                  ${
-                    selectedContact === c
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-card text-muted-foreground border border-border hover:border-primary/40"
-                  }
-                `}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Lens count line */}
-        <div className="flex items-center gap-2 mb-5">
-          <span className="w-1 h-1 bg-foreground rounded-full" />
-          <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
-            {activeLensConfig.description} · {filtered.length} signal{filtered.length !== 1 ? "s" : ""}
-          </span>
-        </div>
-
-        {/* Signal feed */}
-        {isLoading ? (
-          <div className="border border-border bg-card p-10 text-center">
-            <div className="w-2 h-2 bg-primary rounded-full mx-auto mb-3 animate-pulse" />
-            <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
-              Loading viewfinder…
-            </p>
-          </div>
-        ) : activeLens === "contact" && !selectedContact ? (
-          <div className="border border-border bg-card p-10 text-center">
-            <User className="w-5 h-5 text-muted-foreground mx-auto mb-3" />
-            <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
-              Select a contact above to view their signals
-            </p>
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="border border-border bg-card p-10 text-center">
-            <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
-              No signals match this lens
-            </p>
-          </div>
-        ) : (
-          <SignalFeed signals={filtered} filters={DEFAULT_FILTERS} allSignals={signals} />
-        )}
-      </div>
-    </Motion>
-  );
-}
-
-
-    queryKey: ["viewfinder-signals"],
-    queryFn: fetchSignals,
-    refetchInterval: 30000,
-  });
-
-  const contacts = useMemo(() => {
-    const set = new Set(signals.map((s) => s.sender));
-    return Array.from(set).sort();
-  }, [signals]);
-
-  const filtered = useMemo(() => {
-    const now = new Date();
-    switch (activeLens) {
-      case "recommended":
-        return signals
-          .filter((s) => s.status !== "Complete")
-          .sort((a, b) => {
-            const prio = { high: 3, medium: 2, low: 1 };
-            return (prio[b.priority] || 0) - (prio[a.priority] || 0);
-          })
-          .slice(0, 10);
-      case "quick":
-        return signals.filter(
-          (s) =>
-            s.status !== "Complete" &&
-            s.signalType !== "MEETING" &&
-            s.priority !== "high" &&
-            !s.riskLevel
-        );
-      case "contact":
-        if (!selectedContact) return [];
-        return signals.filter((s) => s.sender === selectedContact);
-      case "overdue":
-        return signals.filter(
-          (s) => s.dueDate && new Date(s.dueDate) < now && s.status !== "Complete"
-        );
-      default:
-        return signals;
-    }
-  }, [signals, activeLens, selectedContact]);
-
-  const activeLensConfig = LENSES.find((l) => l.key === activeLens)!;
-
-  return (
-    <Motion>
-      <div className="mb-10">
-        {/* Lens pills */}
-        <div className="flex flex-wrap gap-2 mb-5">
-          {LENSES.map((lens) => {
-            const isActive = activeLens === lens.key;
-            const Icon = lens.icon;
-            return (
-              <button
-                key={lens.key}
-                onClick={() => {
-                  setActiveLens(lens.key);
-                  if (lens.key !== "contact") setSelectedContact(null);
-                }}
-                className={`
-                  inline-flex items-center gap-1.5 px-4 py-2.5 rounded-sm font-mono text-[10px] uppercase tracking-[0.12em] transition-all
-                  ${
-                    isActive
-                      ? "bg-foreground text-background shadow-sm"
-                      : "bg-card text-muted-foreground border border-border hover:border-foreground/30 hover:text-foreground"
-                  }
-                `}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                {lens.label}
               </button>
             );
           })}
