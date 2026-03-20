@@ -20,6 +20,7 @@ export const releaseNotes: ReleaseEntry[] = [
       { type: "feature", text: "Delivery Preferences — new Settings tab for configuring Signal Brief delivery via Push, SMS, and Email with time-of-day picker and timezone detection" },
       { type: "improvement", text: "Signal Brief Card restyled to MetaLab V3 design system — replaced gradient container with bg-card/border tokens and rounded-sm geometry" },
       { type: "improvement", text: "Context Layer Setup de-pilled — all hardcoded purple HSL values replaced with semantic bg-primary/text-primary-foreground tokens" },
+      { type: "feature", text: "Latest Drop product concept page — narrative showcase of v2.0–v2.1 features (Signal Brief, Context Layer, Speaker Memory, Meeting Distribution) at /product/latest" },
     ],
   },
   {
