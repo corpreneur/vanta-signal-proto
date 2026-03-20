@@ -10,6 +10,22 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "2.0.0",
+    date: "2026-03-20",
+    title: "Jamie Feature Parity — Speaker Memory, Transcript Editing & Meeting Distribution",
+    changes: [
+      { type: "feature", text: "Speaker Memory Registry — speaker_profiles table persists identities across meetings with aliases, email, and cumulative meeting counts" },
+      { type: "feature", text: "Meeting Speakers tracking — meeting_speakers join table links speakers to signals with per-meeting turn counts" },
+      { type: "feature", text: "Inline Transcript Editing — edit summary and source message directly in Signal Detail Drawer with save/cancel controls" },
+      { type: "feature", text: "Speakers tab in Signal Detail Drawer — displays meeting frequency, last-seen timestamps, and email for each participant" },
+      { type: "feature", text: "Meeting Summary Email — new edge function generates polished executive summaries via Gemini 2.5 Flash with takeaways, action items, and next steps" },
+      { type: "feature", text: "Share Summary button — copies formatted meeting notes to clipboard for quick distribution" },
+      { type: "feature", text: "Email Notes button — opens pre-filled mailto: link addressed to meeting attendees with AI-generated summary" },
+      { type: "improvement", text: "Transcript ingest now auto-upserts speaker profiles and matches attendees from calendar events" },
+      { type: "improvement", text: "Granola Meeting Import redesigned — split-view layout with macOS chrome, 5 meeting templates, structured AI output (Overview, People, Next Steps, Tags), and Ask Granola chat bar" },
+    ],
+  },
+  {
     version: "1.9.0",
     date: "2026-03-19",
     title: "Quick Actions Panel — Initiate from the Action Queue",
