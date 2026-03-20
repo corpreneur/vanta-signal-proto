@@ -108,6 +108,24 @@ export default function Contacts() {
   const [newContactName, setNewContactName] = useState("");
   const [importOpen, setImportOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("list");
+  const [graphOpen, setGraphOpen] = useState(false);
+  const [focused, setFocused] = useState<FocusedNode | null>(null);
+  const graphContainerRef = useRef<HTMLDivElement>(null);
+  const [graphDims, setGraphDims] = useState({ w: 800, h: 420 });
+
+  const handleFocus = useCallback((f: FocusedNode | null) => setFocused(f), []);
+
+  useEffect(() => {
+    if (!graphOpen) return;
+    const el = graphContainerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const { width } = entries[0].contentRect;
+      setGraphDims({ w: width, h: Math.max(360, Math.min(500, width * 0.55)) });
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [graphOpen]);
 
   const { data: sequences = [] } = useQuery({
     queryKey: ["engagement-sequences"],
