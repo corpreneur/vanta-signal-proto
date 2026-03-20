@@ -435,7 +435,7 @@ const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: Signa
         )}
 
         {/* ── Action bar ── */}
-        <div className="flex items-center gap-1.5 pt-2 border-t border-border/50">
+        <div className="flex items-center gap-1.5 pt-2 border-t border-border/50 overflow-x-auto scrollbar-hide">
           {cta && (
             <button
               onClick={(e) => { e.stopPropagation(); cta.action(); }}
