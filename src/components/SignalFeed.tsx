@@ -87,24 +87,8 @@ const SignalFeed = ({ signals, filters, showPromote, allSignals }: SignalFeedPro
 
   return (
     <>
-      {/* Pinned signals */}
       {pinned.length > 0 && (
-        <div className="mb-4">
-          <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent mb-2 flex items-center gap-1.5">
-            <span className="w-1 h-1 bg-vanta-accent rounded-full" />
-            Pinned
-          </h3>
-          <div className="flex flex-col gap-px border-l-2 border-vanta-accent-border pl-0">
-            {pinned.map((signal) => (
-              <SignalEntryCard
-                key={signal.id}
-                signal={signal}
-                onClick={() => setSelectedSignal(signal)}
-                contactContext={contactContextMap.get(signal.sender)}
-              />
-            ))}
-          </div>
-        </div>
+        <PinnedSection pinned={pinned} onSelect={setSelectedSignal} contactContextMap={contactContextMap} />
       )}
 
       {/* Temporal groups */}
