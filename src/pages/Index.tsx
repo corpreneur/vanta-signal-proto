@@ -341,6 +341,13 @@ const Index = () => {
 
       {/* Signal Detail Drawer */}
       <SignalDetailDrawer signal={drawerSignal} open={!!drawerSignal} onClose={() => setDrawerSignal(null)} />
+
+      {/* Last refreshed footer */}
+      <footer className="mt-16 mb-8 text-center">
+        <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground/50">
+          Data last refreshed · {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}, {new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+        </p>
+      </footer>
     </div>
   );
 };
