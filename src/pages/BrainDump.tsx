@@ -153,10 +153,10 @@ export default function BrainDump() {
   const manualCount = recentCaptures.filter(s => s.source === "manual").length;
 
   return (
-    <div className="max-w-[960px] mx-auto px-5 py-10 md:px-10">
+    <div className="max-w-[960px] mx-auto px-4 py-8 md:px-10 md:py-10">
 
       {/* ══ Hero header ══ */}
-      <header className="mb-8">
+      <header className="mb-6">
         <div className="flex items-center gap-3 mb-2">
           <div
             className="w-2 h-2 bg-vanta-accent"
@@ -166,48 +166,48 @@ export default function BrainDump() {
             Fab Five · Idea Capture
           </p>
         </div>
-        <h1 className="font-display text-[clamp(28px,5vw,40px)] leading-[1.05] text-foreground mb-2">
+        <h1 className="font-display text-[clamp(24px,5vw,40px)] leading-[1.05] text-foreground mb-2">
           What's on your mind?
         </h1>
-        <p className="font-sans text-[14px] text-muted-foreground leading-relaxed max-w-[640px]">
+        <p className="font-sans text-[13px] md:text-[14px] text-muted-foreground leading-relaxed max-w-[640px]">
           Share thoughts, links, or notes. Vanta organizes, collects context, and suggests actions.
         </p>
       </header>
 
       {/* ══ Stats strip ══ */}
-      <div className="flex flex-wrap gap-6 mb-6 pb-6 border-b border-vanta-border">
+      <div className="grid grid-cols-3 gap-3 mb-6 pb-6 border-b border-vanta-border">
         <div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Total Captures</p>
-          <p className="font-display text-[24px] text-vanta-text">{totalCaptures}</p>
+          <p className="font-mono text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Total Captures</p>
+          <p className="font-display text-[22px] md:text-[24px] text-vanta-text">{totalCaptures}</p>
         </div>
         <div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">This Session</p>
-          <p className="font-display text-[24px] text-vanta-accent">{sessionCaptures.length}</p>
+          <p className="font-mono text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">This Session</p>
+          <p className="font-display text-[22px] md:text-[24px] text-vanta-accent">{sessionCaptures.length}</p>
         </div>
         <div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Manual Notes</p>
-          <p className="font-display text-[24px] text-vanta-text">{manualCount}</p>
+          <p className="font-mono text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Manual Notes</p>
+          <p className="font-display text-[22px] md:text-[24px] text-vanta-text">{manualCount}</p>
         </div>
       </div>
 
-      {/* Templates removed — streamlined capture */}
-
-      {/* ══ Input mode tabs (underline style matching Signal Feed) ══ */}
-      <div className="flex items-center gap-0 mb-6 border-b border-vanta-border">
-        {INPUT_MODES.map(({ key, label, icon: Icon }) => (
-          <button
-            key={key}
-            onClick={() => setInputMode(key)}
-            className={`flex items-center gap-1.5 px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.15em] border-b-2 transition-colors ${
-              inputMode === key
-                ? "border-vanta-accent text-vanta-accent"
-                : "border-transparent text-vanta-text-low hover:text-foreground"
-            }`}
-          >
-            <Icon className="w-3.5 h-3.5" />
-            {label}
-          </button>
-        ))}
+      {/* ══ Input mode tabs (horizontally scrollable on mobile) ══ */}
+      <div className="overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 mb-6">
+        <div className="flex items-center gap-0 border-b border-vanta-border min-w-max">
+          {INPUT_MODES.map(({ key, label, icon: Icon }) => (
+            <button
+              key={key}
+              onClick={() => setInputMode(key)}
+              className={`flex items-center gap-1.5 px-3 md:px-4 py-2.5 font-mono text-[10px] md:text-[11px] uppercase tracking-[0.12em] md:tracking-[0.15em] border-b-2 transition-colors whitespace-nowrap ${
+                inputMode === key
+                  ? "border-vanta-accent text-vanta-accent"
+                  : "border-transparent text-vanta-text-low hover:text-foreground"
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* ══ Capture surface ══ */}
