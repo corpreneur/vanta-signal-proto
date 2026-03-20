@@ -51,10 +51,18 @@ export default function SignalBriefCard() {
 
   return (
     <Motion>
-      <div className="relative overflow-hidden bg-card border border-border rounded-sm mb-8">
+      {/* Force light-mode Vanta B/W: white card, black text, warm charcoal accent */}
+      <div
+        className="relative overflow-hidden rounded-sm mb-8 light"
+        style={{
+          background: "hsl(0 0% 100%)",
+          border: "1px solid hsl(0 0% 0% / 0.12)",
+          color: "hsl(0 0% 0%)",
+        }}
+      >
         <div className="p-5 md:p-6">
           {/* Header label */}
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary mb-1">
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] mb-1" style={{ color: "hsl(30 4% 18%)" }}>
             Today's Signal
           </p>
 
@@ -68,13 +76,14 @@ export default function SignalBriefCard() {
           {/* Empty state */}
           {!setupComplete ? (
             <div className="py-4 text-center">
-              <Zap className="w-7 h-7 text-muted-foreground mx-auto mb-3 opacity-40" />
-              <p className="font-sans text-[13px] text-muted-foreground leading-relaxed max-w-sm mx-auto mb-4">
+              <Zap className="w-7 h-7 mx-auto mb-3 opacity-40" style={{ color: "hsl(0 0% 35%)" }} />
+              <p className="font-sans text-[13px] leading-relaxed max-w-sm mx-auto mb-4" style={{ color: "hsl(0 0% 35%)" }}>
                 Connect your first context to activate your Signal Brief. Vanta Signal will brief you every morning once your data is live.
               </p>
               <a
                 href="/setup/context"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground font-mono text-[11px] uppercase tracking-wider rounded-sm hover:bg-primary/90 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 font-mono text-[11px] uppercase tracking-wider rounded-sm transition-colors"
+                style={{ background: "hsl(30 4% 18%)", color: "hsl(0 0% 100%)" }}
               >
                 Set Up Contexts
               </a>
@@ -82,40 +91,44 @@ export default function SignalBriefCard() {
           ) : (
             <>
               {/* Headline */}
-              <h2 className="font-display text-[18px] md:text-[20px] font-semibold text-foreground mb-5 leading-snug">
+              <h2 className="font-display text-[18px] md:text-[20px] font-semibold mb-5 leading-snug" style={{ color: "hsl(0 0% 0%)" }}>
                 {mockBrief.headline}
               </h2>
 
               {/* Stat tiles */}
-              <div className="flex flex-wrap divide-x divide-border/30 mb-5" key={refreshKey}>
-                {mockBrief.items.map((item) => (
-                  <SignalBriefItem key={item.id} {...item} />
+              <div className="flex flex-wrap mb-5" key={refreshKey} style={{ borderColor: "hsl(0 0% 0% / 0.08)" }}>
+                {mockBrief.items.map((item, i) => (
+                  <div key={item.id} className="flex-1 min-w-[100px]" style={{ borderLeft: i > 0 ? "1px solid hsl(0 0% 0% / 0.08)" : "none" }}>
+                    <SignalBriefItem {...item} forceLight />
+                  </div>
                 ))}
               </div>
 
               {/* Separator */}
-              <div className="border-t border-border/20 mb-4" />
+              <div className="mb-4" style={{ borderTop: "1px solid hsl(0 0% 0% / 0.08)" }} />
 
               {/* What this means */}
-              <p className="font-sans text-[13px] text-muted-foreground leading-relaxed mb-5">
+              <p className="font-sans text-[13px] leading-relaxed mb-5" style={{ color: "hsl(0 0% 35%)" }}>
                 {mockBrief.summary}
               </p>
 
               {/* Footer */}
               <div className="flex items-center justify-between">
-                <span className="font-mono text-[10px] text-muted-foreground">
+                <span className="font-mono text-[10px]" style={{ color: "hsl(0 0% 50%)" }}>
                   Generated at {time}
                 </span>
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setRefreshKey((k) => k + 1)}
-                    className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+                    className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider transition-colors"
+                    style={{ color: "hsl(0 0% 50%)" }}
                   >
                     <RefreshCcw className="w-3.5 h-3.5" /> Refresh
                   </button>
                   <button
                     onClick={() => setDismissed(true)}
-                    className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+                    className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider transition-colors"
+                    style={{ color: "hsl(0 0% 50%)" }}
                   >
                     <X className="w-3.5 h-3.5" /> Dismiss
                   </button>
