@@ -211,7 +211,7 @@ export default function Connectivity() {
             Channel Aggregation
           </p>
         </div>
-        <div className="flex items-center gap-6 mb-8 p-4 border border-vanta-border bg-card">
+        <div className="flex items-center gap-4 sm:gap-6 mb-8 p-4 border border-vanta-border bg-card flex-wrap">
           <div className="flex items-center gap-2">
             <Activity className="h-4 w-4 text-vanta-accent" />
             <div>
