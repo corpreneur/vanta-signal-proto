@@ -141,7 +141,6 @@ const Index = () => {
   const modeMeta = MODE_META[mode] || MODE_META.creative;
   const isDnd = mode === "dnd";
   const isExecutive = mode === "executive";
-  const clearUntil = getClearUntil(meetingCount);
 
   return (
     <div className="max-w-[960px] mx-auto px-4 py-8 md:px-10 relative overflow-x-hidden">
