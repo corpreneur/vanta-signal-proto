@@ -386,7 +386,7 @@ export default function GranolaMeetingImport({ onCapture }: GranolaMeetingImport
                   key={prompt}
                   onClick={() => handleAsk(prompt)}
                   disabled={askLoading}
-                  className="px-3 py-1.5 rounded-full bg-[hsl(50_50%_30%)]/10 border border-[hsl(50_50%_30%)]/30 text-[12px] font-sans text-foreground hover:bg-[hsl(50_50%_30%)]/20 transition-colors whitespace-nowrap disabled:opacity-40"
+                  className="px-3 py-1.5 rounded-sm bg-[hsl(50_50%_30%)]/10 border border-[hsl(50_50%_30%)]/30 text-[12px] font-sans text-foreground hover:bg-[hsl(50_50%_30%)]/20 transition-colors whitespace-nowrap disabled:opacity-40"
                 >
                   {prompt}
                 </button>
