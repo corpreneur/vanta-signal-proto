@@ -16,7 +16,7 @@ const SOURCE_FILTERS: { key: SourceFilter; label: string; logoKey?: string; comi
   { key: "zoom", label: "Zoom", logoKey: "zoom" },
   { key: "google_meet", label: "Google Meet", logoKey: "google_meet", comingSoon: true },
   { key: "teams", label: "Teams", logoKey: "teams", comingSoon: true },
-  { key: "webex", label: "Webex", logoKey: "webex", comingSoon: true },
+  
   { key: "fireflies", label: "Fireflies", logoKey: "fireflies" },
   { key: "otter", label: "Otter", logoKey: "otter" },
   { key: "granola", label: "Granola", logoKey: "granola" },
