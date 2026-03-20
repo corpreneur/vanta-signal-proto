@@ -194,6 +194,10 @@ export default function Settings() {
             <Calendar className="w-3.5 h-3.5" />
             Calendar
           </TabsTrigger>
+          <TabsTrigger value="delivery" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
+            <Bell className="w-3.5 h-3.5" />
+            Delivery
+          </TabsTrigger>
         </TabsList>
 
         {/* General Settings Tab */}
