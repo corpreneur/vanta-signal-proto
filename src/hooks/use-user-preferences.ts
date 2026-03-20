@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export interface UserContext {
   id: string;
+  user_id: string;
   name: string;
   context_type: string;
   is_primary: boolean;
@@ -31,6 +32,9 @@ const DEFAULT_PREFS: UserPreferences = {
   delivery_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
 };
 
+// Helper to query tables not yet in generated types
+const db = () => supabase as any;
+
 export function useUserPreferences() {
   const [prefs, setPrefs] = useState<UserPreferences>(DEFAULT_PREFS);
   const [loading, setLoading] = useState(true);
@@ -41,7 +45,7 @@ export function useUserPreferences() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user || cancelled) { setLoading(false); return; }
 
-      const { data } = await supabase
+      const { data } = await db()
         .from("user_preferences")
         .select("*")
         .eq("user_id", user.id)
@@ -73,7 +77,7 @@ export function useUserPreferences() {
     const newPrefs = { ...prefs, ...patch };
     setPrefs(newPrefs);
 
-    await supabase
+    await db()
       .from("user_preferences")
       .upsert({
         user_id: user.id,
@@ -93,7 +97,7 @@ export function useUserContexts() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setLoading(false); return; }
 
-    const { data } = await supabase
+    const { data } = await db()
       .from("user_contexts")
       .select("*")
       .eq("user_id", user.id)
@@ -112,7 +116,7 @@ export function useUserContexts() {
     if (!user) return null;
 
     // Delete old contexts
-    await supabase.from("user_contexts").delete().eq("user_id", user.id);
+    await db().from("user_contexts").delete().eq("user_id", user.id);
 
     // Insert new
     const rows = drafts.map(d => ({
@@ -122,17 +126,17 @@ export function useUserContexts() {
       is_primary: d.isPrimary,
     }));
 
-    const { data } = await supabase
+    const { data } = await db()
       .from("user_contexts")
       .insert(rows)
       .select();
 
     if (data) {
       setContexts(data);
-      const primaryCtx = data.find(c => c.is_primary);
+      const primaryCtx = data.find((c: any) => c.is_primary);
 
       // Upsert preferences
-      await supabase
+      await db()
         .from("user_preferences")
         .upsert({
           user_id: user.id,
