@@ -113,39 +113,74 @@ serve(async (req) => {
       });
     }
 
-    // Parse multipart form data
-    const formData = await req.formData();
-    const imageFile = formData.get("image") as File | null;
-    const contextText = formData.get("context") as string | null;
+    // Support both JSON (base64 data URL) and multipart form data
+    let base64Image: string;
+    let mimeType: string;
+    let contextText: string | null = null;
+    let imageName = "uploaded-image";
+    let imageBytes: ArrayBuffer | null = null;
 
-    if (!imageFile) {
-      return new Response(JSON.stringify({ error: "Image file is required" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    const contentType = req.headers.get("content-type") || "";
+
+    if (contentType.includes("application/json")) {
+      // JSON body with base64 data URL from the Processor tab
+      const body = await req.json();
+      const imageData: string | undefined = body.imageData || body.image;
+      contextText = body.context || body.text || null;
+
+      if (!imageData) {
+        return new Response(JSON.stringify({ error: "Image data is required" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Parse data URL: data:image/png;base64,iVBOR...
+      const match = imageData.match(/^data:(image\/\w+);base64,(.+)$/);
+      if (!match) {
+        return new Response(JSON.stringify({ error: "Invalid image data. Expected a base64 data URL." }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      mimeType = match[1];
+      base64Image = match[2];
+    } else {
+      // Multipart form data (legacy path)
+      const formData = await req.formData();
+      const imageFile = formData.get("image") as File | null;
+      contextText = formData.get("context") as string | null;
+
+      if (!imageFile) {
+        return new Response(JSON.stringify({ error: "Image file is required" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Validate file type
+      const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"];
+      if (!allowedTypes.includes(imageFile.type)) {
+        return new Response(JSON.stringify({ error: "Unsupported image format. Use JPEG, PNG, GIF, or WebP." }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Max 10MB
+      if (imageFile.size > 10 * 1024 * 1024) {
+        return new Response(JSON.stringify({ error: "Image must be under 10MB" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      imageName = imageFile.name;
+      imageBytes = await imageFile.arrayBuffer();
+      base64Image = btoa(String.fromCharCode(...new Uint8Array(imageBytes)));
+      mimeType = imageFile.type;
     }
-
-    // Validate file type
-    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"];
-    if (!allowedTypes.includes(imageFile.type)) {
-      return new Response(JSON.stringify({ error: "Unsupported image format. Use JPEG, PNG, GIF, or WebP." }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // Max 10MB
-    if (imageFile.size > 10 * 1024 * 1024) {
-      return new Response(JSON.stringify({ error: "Image must be under 10MB" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // Convert image to base64 for vision API
-    const imageBytes = await imageFile.arrayBuffer();
-    const base64Image = btoa(String.fromCharCode(...new Uint8Array(imageBytes)));
-    const mimeType = imageFile.type;
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
     if (!apiKey) throw new Error("LOVABLE_API_KEY not configured");
