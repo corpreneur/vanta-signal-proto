@@ -291,8 +291,6 @@ export default function BrainDump() {
       <div className="mb-8">
         <BrainDumpAskAI captureContext={captureContext} />
       </div>
-      )}
-
       {/* Link result (non-note modes) */}
       {inputMode === "link" && linkResult && linkColors && (
         <div className={`border p-4 mb-8 space-y-3 ${linkColors.bg} ${linkColors.border}`}>
