@@ -9,10 +9,33 @@ import type { FilterState } from "@/components/SignalFilters";
 import type { SignalType } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
-import { ShieldOff, BarChart3, ArrowUpDown, AlertTriangle, Users, Briefcase, BellOff, Clock, DollarSign, Flame, Zap } from "lucide-react";
+import { ShieldOff, BarChart3, ArrowUpDown, AlertTriangle, Users, Briefcase, BellOff, Clock, DollarSign, Flame, Zap, ChevronDown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { useUserMode } from "@/hooks/use-user-mode";
+
+function BriefsSection({ briefs }: { briefs: any[] }) {
+  const [expanded, setExpanded] = useState(false);
+  const visible = expanded ? briefs : briefs.slice(0, 2);
+  const hasMore = briefs.length > 2;
+
+  return (
+    <div className="mb-6">
+      {visible.map((brief: any) => (
+        <PreMeetingBriefCard key={brief.id} brief={brief} />
+      ))}
+      {hasMore && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="flex items-center gap-1.5 mx-auto mt-2 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground border border-border hover:border-foreground/20 transition-colors"
+        >
+          <ChevronDown className={`w-3 h-3 transition-transform ${expanded ? "rotate-180" : ""}`} />
+          {expanded ? "Show fewer" : `${briefs.length - 2} more brief${briefs.length - 2 !== 1 ? "s" : ""}`}
+        </button>
+      )}
+    </div>
+  );
+}
 
 const fetchSignals = async (): Promise<Signal[]> => {
   const { data, error } = await supabase
@@ -243,15 +266,15 @@ const Signals = () => {
   const actionCount = feedSignals.reduce((acc, s) => acc + s.actionsTaken.length, 0);
 
   return (
-    <div className="max-w-[960px] mx-auto px-5 py-10 md:px-10">
+    <div className="max-w-[960px] mx-auto px-5 py-10 md:px-10 overflow-x-hidden">
       <header className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <div
             className="w-2 h-2 bg-vanta-accent"
             style={{ animation: "pulse-dot 2s ease-in-out infinite" }}
           />
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-vanta-accent">
-            Signal Log · Live
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
+            Fab Five · Signal Feed
           </p>
           {(isExecutive || isDnd) && (
             <span className="flex items-center gap-1 ml-2 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider border border-foreground text-foreground bg-vanta-bg-elevated">
@@ -260,10 +283,10 @@ const Signals = () => {
             </span>
           )}
         </div>
-        <h1 className="font-display text-[28px] md:text-[36px] leading-[1.15] text-vanta-text mb-3">
+        <h1 className="font-display text-[clamp(28px,5vw,40px)] leading-[1.05] text-foreground mb-2">
           Captured Signals
         </h1>
-        <p className="font-sans text-[13px] md:text-[14px] leading-[1.6] text-vanta-text-mid max-w-[640px]">
+        <p className="font-sans text-[14px] text-muted-foreground leading-relaxed max-w-[640px]">
           {isExecutive
             ? "Showing high-priority signals only. Switch to Creative mode for the full stream."
             : "A curated feed of intellectual capital captured from real conversations. Every message is evaluated through a two-stage AI pipeline… what matters is extracted before it disappears into the scroll."}
@@ -417,11 +440,7 @@ const Signals = () => {
           </div>
 
           {briefs.length > 0 && (
-            <div className="mb-6">
-              {briefs.map((brief: any) => (
-                <PreMeetingBriefCard key={brief.id} brief={brief} />
-              ))}
-            </div>
+            <BriefsSection briefs={briefs} />
           )}
 
           <SignalFeed signals={feedSignals} filters={filters} allSignals={signals} />

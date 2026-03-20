@@ -87,7 +87,7 @@ const Login = () => {
         style={{ animation: "fadeUp 1.2s ease-out 0.1s forwards" }}
       >
         <img src={heroImage} alt="" className="w-full h-full object-cover object-top" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background from-35% via-background/95 via-50% to-background/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background from-25% via-background/60 via-50% to-transparent" />
       </div>
 
       {/* Content */}
@@ -150,7 +150,7 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full h-11 bg-stone-300 text-stone-900 font-mono text-[11px] uppercase tracking-[0.15em] hover:bg-stone-200 transition-colors disabled:opacity-50 mt-2"
+            className="w-full h-11 bg-foreground text-background font-mono text-[11px] uppercase tracking-[0.15em] hover:bg-foreground/90 transition-colors disabled:opacity-50 mt-2"
           >
             {loading
               ? "Processing..."

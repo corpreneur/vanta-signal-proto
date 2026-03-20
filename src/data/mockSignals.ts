@@ -1,18 +1,26 @@
 import type { Signal } from './signals';
 
+/**
+ * Static fallback data used when the database is empty.
+ * Dates use relative offsets from "now" so they never go stale.
+ */
+
+const h = (hoursAgo: number) =>
+  new Date(Date.now() - hoursAgo * 3_600_000).toISOString();
+
 export const mockSignals: Signal[] = [
   {
     id: 'sig_001',
     signalType: 'INTRO',
     sender: 'Steve Stoute',
     summary:
-      'Introduction to Kristina Windham, Head of Business Development at Maximum Effort. Steve framed William as CBO. High-value BD contact being evaluated for partnerships team.',
+      'Introduction to Kenji Nakamura, SVP Product at SoftBank Vision Fund. Steve positioned the intro as high priority for infrastructure partnership.',
     sourceMessage:
-      'William pls meet Kristina Windham.. Kristina as discussed William is our Chief Business Officer. You guys should connect',
+      'William meet Kenji. He runs product for SVF and is interested in what you guys are building on the intelligence layer.',
     priority: 'high',
-    capturedAt: '2026-03-11T07:16:00Z',
-    actionsTaken: ['BIO_RESEARCH', 'MEETING_PREP', 'EMAIL_DRAFT', 'AGENT_BUILD'],
-    status: 'Complete',
+    capturedAt: h(1),
+    actionsTaken: ['BIO_RESEARCH', 'MEETING_PREP'],
+    status: 'Captured',
     source: 'linq',
   },
   {
@@ -20,97 +28,105 @@ export const mockSignals: Signal[] = [
     signalType: 'INSIGHT',
     sender: 'John Greene',
     summary:
-      'Akio Morita product philosophy surfaced in late-night thread. Core insight: anticipation as product strategy, not customer feedback. Mapped to five abstraction layers.',
+      'Late-night thread on attention economics. Greene mapped Herbert Simon\'s scarcity framework to the current AI noise landscape — direct implications for Signal filtering UX.',
     sourceMessage:
-      "We don't ask consumers what they want. They don't know. Instead we apply our brain power to what they need.",
+      'The wealth of information creates a poverty of attention. Simon said it in 1971 and we still haven\'t solved it.',
     priority: 'high',
-    capturedAt: '2026-03-10T23:41:00Z',
+    capturedAt: h(3),
     actionsTaken: ['FRAMEWORK_EXTRACT', 'NOTION_LOG'],
-    status: 'Complete',
+    status: 'Captured',
     source: 'linq',
   },
   {
     id: 'sig_003',
     signalType: 'INVESTMENT',
-    sender: 'John Greene',
+    sender: 'Elena Ruiz',
     summary:
-      'a16z 13-question investment framework shared. Vanta ran full thesis stress test against all 13 questions. Investment deck language generated.',
+      'Series B term sheet comparison from Northstar vs. Foundry. Elena highlighted key differences in liquidation preferences and board composition that need legal review.',
     sourceMessage:
-      'As I dip out for my nightly deluge of dance/dinner drama, look at it this way.',
+      'The Northstar sheet has a 2x participating preferred that differs from Foundry standard. Flagging for review.',
     priority: 'high',
-    capturedAt: '2026-03-10T21:03:00Z',
+    capturedAt: h(6),
     actionsTaken: ['THESIS_ANALYSIS', 'NOTION_LOG'],
-    status: 'Complete',
+    status: 'Captured',
     source: 'linq',
+    riskLevel: 'critical',
+    dueDate: new Date(Date.now() + 3 * 86_400_000).toISOString().split('T')[0],
   },
   {
     id: 'sig_004',
     signalType: 'DECISION',
     sender: 'Julian',
     summary:
-      'Strategic input requested on partner communication approach. Julian flagged misalignment between what was shared and what was communicated externally.',
+      'Finalize GTM positioning for enterprise pilot. Julian flagged that the current pitch deck undersells the orchestration layer — needs reframe before Thursday partner call.',
     sourceMessage:
-      'What we told them was clear IMO. And not representative of what they shared.',
-    priority: 'medium',
-    capturedAt: '2026-03-10T20:47:00Z',
+      'We need to decide: are we selling intelligence or infrastructure? The deck tries to do both and lands neither.',
+    priority: 'high',
+    capturedAt: h(5),
     actionsTaken: ['NOTION_LOG'],
     status: 'Captured',
     source: 'linq',
+    riskLevel: 'high',
+    dueDate: new Date(Date.now() + 86_400_000).toISOString().split('T')[0],
   },
   {
     id: 'sig_005',
     signalType: 'INTRO',
-    sender: 'Steve Stoute',
+    sender: 'Marcus Webb',
     summary:
-      'Introduction to Marcus Thompson, Head of Strategy at Def Jam. Potential partnership discussion around artist intelligence infrastructure.',
+      'Warm intro to the CTO of Arcline Systems who is exploring AI infrastructure partnerships. Decision-maker mapping included.',
     sourceMessage:
-      'William meet Marcus Thompson. Marcus, William runs intelligence for us. You two should connect on the data side.',
+      'William meet Raj. He runs infra for Arcline and is looking for exactly what Vanta is building.',
     priority: 'high',
-    capturedAt: '2026-03-09T14:22:00Z',
-    actionsTaken: ['BIO_RESEARCH', 'MEETING_PREP', 'EMAIL_DRAFT', 'AGENT_BUILD'],
-    status: 'Complete',
+    capturedAt: h(10),
+    actionsTaken: ['BIO_RESEARCH', 'MEETING_PREP', 'EMAIL_DRAFT'],
+    status: 'Captured',
     source: 'linq',
   },
   {
     id: 'sig_006',
     signalType: 'CONTEXT',
-    sender: 'John Greene',
+    sender: 'Marcus Webb',
     summary:
-      'Follow-up context on the Morita thread. Additional reference to Clayton Christensen disruption framework as supporting evidence for anticipation model.',
+      'Background context on the Arcline Systems partnership discussion. Shared internal org chart and decision-maker mapping for the infrastructure team.',
     sourceMessage:
-      'The Christensen angle maps here too. Disruption is not about better products, it is about better questions.',
+      'Here is the Arcline org structure. The CTO reports to a new COO who joined from Palantir last quarter. That context matters.',
     priority: 'low',
-    capturedAt: '2026-03-09T08:15:00Z',
+    capturedAt: h(9),
     actionsTaken: ['NOTION_LOG'],
-    status: 'Complete',
+    status: 'Captured',
     source: 'linq',
   },
   {
     id: 'sig_007',
-    signalType: 'INVESTMENT',
-    sender: 'Steve Stoute',
+    signalType: 'DECISION',
+    sender: 'Stephen Chen',
     summary:
-      'Signal about potential Series A interest from a strategic investor. Mentioned conversation with NEA partner about Vanta positioning.',
+      'Telco flow diagram needed for discussion in the weekly status meeting. Team needs to review infrastructure dependencies before the partner demo.',
     sourceMessage:
-      'Had a good conversation with the NEA team yesterday. They are watching what we are building closely.',
+      'Stephen needs to create a telco flow diagram by end of week for discussion in the weekly status meeting.',
     priority: 'high',
-    capturedAt: '2026-03-08T16:30:00Z',
-    actionsTaken: ['THESIS_ANALYSIS', 'NOTION_LOG'],
-    status: 'In Progress',
+    capturedAt: h(24),
+    actionsTaken: [],
+    status: 'Captured',
     source: 'linq',
+    riskLevel: 'high',
+    dueDate: new Date(Date.now() + 86_400_000).toISOString().split('T')[0],
   },
   {
     id: 'sig_008',
-    signalType: 'INSIGHT',
-    sender: 'Julian',
+    signalType: 'DECISION',
+    sender: 'Mike Torres',
     summary:
-      'Product architecture insight. Julian identified a pattern in how the orchestration layer could be abstracted into a reusable primitive for third-party integrations.',
+      'Quarterly investor update draft needs final review before sending to 47 LPs on Friday. Financials and narrative need sign-off.',
     sourceMessage:
-      'If we abstract the orchestration router, every action pipeline becomes a plugin. That is the platform play.',
-    priority: 'medium',
-    capturedAt: '2026-03-08T11:05:00Z',
-    actionsTaken: ['FRAMEWORK_EXTRACT', 'NOTION_LOG'],
-    status: 'Complete',
+      'The Q1 update draft is ready for final eyes. Need sign-off on the ARR narrative and the market size framing before Friday send.',
+    priority: 'high',
+    capturedAt: h(30),
+    actionsTaken: ['NOTION_LOG'],
+    status: 'Captured',
     source: 'linq',
+    riskLevel: 'medium',
+    dueDate: new Date(Date.now() + 2 * 86_400_000).toISOString().split('T')[0],
   },
 ];

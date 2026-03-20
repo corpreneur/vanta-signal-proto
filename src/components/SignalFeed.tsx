@@ -1,15 +1,51 @@
 import { useState, useMemo } from "react";
+import { ChevronDown } from "lucide-react";
 import type { Signal } from "@/data/signals";
 import type { FilterState } from "@/components/SignalFilters";
 import SignalEntryCard from "@/components/SignalEntryCard";
 import SignalDetailDrawer from "@/components/SignalDetailDrawer";
+import CommsPrepCard from "@/components/CommsPrepCard";
 import { buildContactContextMap } from "@/lib/contactStrength";
 
 interface SignalFeedProps {
   signals: Signal[];
   filters: FilterState;
   showPromote?: boolean;
-  allSignals?: Signal[]; // full signal set for computing contact context
+  allSignals?: Signal[];
+}
+
+function PinnedSection({ pinned, onSelect, contactContextMap }: { pinned: Signal[]; onSelect: (s: Signal) => void; contactContextMap: Map<string, any> }) {
+  const [expanded, setExpanded] = useState(false);
+  const visible = expanded ? pinned : pinned.slice(0, 2);
+  const hasMore = pinned.length > 2;
+
+  return (
+    <div className="mb-4">
+      <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent mb-2 flex items-center gap-1.5">
+        <span className="w-1 h-1 bg-vanta-accent rounded-full" />
+        Pinned
+      </h3>
+      <div className="flex flex-col gap-px border-l-2 border-vanta-accent-border pl-0">
+        {visible.map((signal) => (
+          <SignalEntryCard
+            key={signal.id}
+            signal={signal}
+            onClick={() => onSelect(signal)}
+            contactContext={contactContextMap.get(signal.sender)}
+          />
+        ))}
+      </div>
+      {hasMore && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="flex items-center gap-1.5 mt-2 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground border border-border hover:border-foreground/20 transition-colors"
+        >
+          <ChevronDown className={`w-3 h-3 transition-transform ${expanded ? "rotate-180" : ""}`} />
+          {expanded ? "Show fewer" : `${pinned.length - 2} more pinned`}
+        </button>
+      )}
+    </div>
+  );
 }
 
 function getTemporalGroup(iso: string): string {
@@ -85,24 +121,8 @@ const SignalFeed = ({ signals, filters, showPromote, allSignals }: SignalFeedPro
 
   return (
     <>
-      {/* Pinned signals */}
       {pinned.length > 0 && (
-        <div className="mb-4">
-          <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent mb-2 flex items-center gap-1.5">
-            <span className="w-1 h-1 bg-vanta-accent rounded-full" />
-            Pinned
-          </h3>
-          <div className="flex flex-col gap-px border-l-2 border-vanta-accent-border pl-0">
-            {pinned.map((signal) => (
-              <SignalEntryCard
-                key={signal.id}
-                signal={signal}
-                onClick={() => setSelectedSignal(signal)}
-                contactContext={contactContextMap.get(signal.sender)}
-              />
-            ))}
-          </div>
-        </div>
+        <PinnedSection pinned={pinned} onSelect={setSelectedSignal} contactContextMap={contactContextMap} />
       )}
 
       {/* Temporal groups */}
@@ -112,15 +132,22 @@ const SignalFeed = ({ signals, filters, showPromote, allSignals }: SignalFeedPro
             {label}
           </h3>
           <div className="flex flex-col gap-px">
-            {groupSignals.map((signal) => (
-              <SignalEntryCard
-                key={signal.id}
-                signal={signal}
-                onClick={() => setSelectedSignal(signal)}
-                showPromote={showPromote}
-                contactContext={contactContextMap.get(signal.sender)}
-              />
-            ))}
+            {groupSignals.map((signal) => {
+              const isCommsSignal = signal.signalType === "PHONE_CALL" || signal.source === "phone" || signal.source === "linq";
+              return (
+                <div key={signal.id}>
+                  {isCommsSignal && (
+                    <CommsPrepCard signal={signal} allSignals={allSignals || signals} />
+                  )}
+                  <SignalEntryCard
+                    signal={signal}
+                    onClick={() => setSelectedSignal(signal)}
+                    showPromote={showPromote}
+                    contactContext={contactContextMap.get(signal.sender)}
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
       ))}

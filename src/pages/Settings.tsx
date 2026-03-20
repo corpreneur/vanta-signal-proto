@@ -5,12 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Save, RotateCcw, Settings2, MessageSquare, Users, Bell, Shield, Smartphone, Phone, Video, Mail, Calendar, Filter, SlidersHorizontal, ShieldCheck, Zap, Palette } from "lucide-react";
-import UserModes from "./UserModes";
-import NoiseQueue from "./NoiseQueue";
+import { Save, RotateCcw, Settings2, MessageSquare, Users, Bell, Shield, Smartphone, Phone, Video, Mail, Calendar, ShieldCheck } from "lucide-react";
 import ClassificationAudit from "./ClassificationAudit";
-import WorkflowBuilder from "@/components/WorkflowBuilder";
-import CustomSignalTypes from "@/components/CustomSignalTypes";
+import CalendarSyncSettings from "@/components/CalendarSyncSettings";
+import DeliveryPreferences from "@/components/settings/DeliveryPreferences";
 
 interface SettingRow {
   key: string;
@@ -72,7 +70,7 @@ const SOURCE_CHANNELS: Array<{
 
 const SOURCE_KEYS = new Set(SOURCE_CHANNELS.map((c) => c.key));
 
-const TAB_MAP: Record<string, string> = { noise: "noise", modes: "modes", audit: "audit", workflows: "workflows", types: "types" };
+const TAB_MAP: Record<string, string> = { audit: "audit", calendar: "calendar", delivery: "delivery" };
 
 export default function Settings() {
   const queryClient = useQueryClient();
@@ -188,25 +186,17 @@ export default function Settings() {
             <Settings2 className="w-3.5 h-3.5" />
             General
           </TabsTrigger>
-          <TabsTrigger value="noise" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
-            <Filter className="w-3.5 h-3.5" />
-            Noise Queue
-          </TabsTrigger>
-          <TabsTrigger value="modes" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
-            <SlidersHorizontal className="w-3.5 h-3.5" />
-            User Modes
-          </TabsTrigger>
           <TabsTrigger value="audit" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
             <ShieldCheck className="w-3.5 h-3.5" />
             Audit
           </TabsTrigger>
-          <TabsTrigger value="workflows" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
-            <Zap className="w-3.5 h-3.5" />
-            Workflows
+          <TabsTrigger value="calendar" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
+            <Calendar className="w-3.5 h-3.5" />
+            Calendar
           </TabsTrigger>
-          <TabsTrigger value="types" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
-            <Palette className="w-3.5 h-3.5" />
-            Signal Types
+          <TabsTrigger value="delivery" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
+            <Bell className="w-3.5 h-3.5" />
+            Delivery
           </TabsTrigger>
         </TabsList>
 
@@ -411,29 +401,20 @@ export default function Settings() {
           </div>
         </TabsContent>
 
-        {/* Noise Queue Tab */}
-        <TabsContent value="noise">
-          <NoiseQueue />
-        </TabsContent>
-
-        {/* User Modes Tab */}
-        <TabsContent value="modes">
-          <UserModes />
-        </TabsContent>
 
         {/* Classification Audit Tab */}
         <TabsContent value="audit">
           <ClassificationAudit />
         </TabsContent>
 
-        {/* Workflows Tab */}
-        <TabsContent value="workflows">
-          <WorkflowBuilder />
+        {/* Calendar Sync Tab */}
+        <TabsContent value="calendar">
+          <CalendarSyncSettings />
         </TabsContent>
 
-        {/* Custom Signal Types Tab */}
-        <TabsContent value="types">
-          <CustomSignalTypes />
+        {/* Signal Delivery Tab */}
+        <TabsContent value="delivery">
+          <DeliveryPreferences />
         </TabsContent>
       </Tabs>
     </div>

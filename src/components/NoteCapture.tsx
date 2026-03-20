@@ -33,6 +33,10 @@ type AcceleratorIntent = "email" | "sms" | "reminder" | "task" | "document";
 
 interface NoteCaptureProps {
   inline?: boolean;
+  onCapture?: (classification: ClassificationResult) => void;
+  onRawText?: (rawText: string) => void;
+  templateSkeleton?: string;
+  templateKey?: string;
 }
 
 /**
@@ -79,14 +83,22 @@ function intentIcon(intent: AcceleratorIntent) {
   }
 }
 
-export default function NoteCapture({ inline = false }: NoteCaptureProps) {
+export default function NoteCapture({ inline = false, onCapture, onRawText, templateSkeleton, templateKey }: NoteCaptureProps) {
   const { isDnd } = useUserMode();
   const [open, setOpen] = useState(inline);
-  const [text, setText] = useState("");
+  const [text, setText] = useState(templateSkeleton || "");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ClassificationResult | null>(null);
   const [firedAccelerators, setFiredAccelerators] = useState<Set<string>>(new Set());
+  const [lastTemplateKey, setLastTemplateKey] = useState(templateKey);
+
+  // Reset text when template changes
+  if (templateKey !== lastTemplateKey) {
+    setLastTemplateKey(templateKey);
+    setText(templateSkeleton || "");
+    setResult(null);
+  }
 
   // Editable result state
   const [editableTitle, setEditableTitle] = useState("");
@@ -149,6 +161,10 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
       setEditableTitle(classification.suggestedTitle || "");
       setEditableTags(classification.suggestedTags || []);
       setEditableContacts(classification.suggestedContacts || []);
+
+      // Notify parent of capture
+      onRawText?.(text.trim());
+      onCapture?.(classification);
 
       toast({
         title: `Captured as ${SIGNAL_TYPE_LABELS[classification.signalType] || classification.signalType}`,
@@ -362,7 +378,7 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
           <button
             key={tag}
             onClick={() => toggleTag(tag)}
-            className={`font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1 rounded-full border transition-all duration-150 ${
+            className={`font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1 rounded-sm border transition-all duration-150 ${
               selectedTags.includes(tag)
                 ? "bg-primary/15 border-primary/40 text-primary"
                 : "bg-transparent border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground"
@@ -457,7 +473,7 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
                 <button
                   key={tag}
                   onClick={() => removeTag(tag)}
-                  className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive transition-all min-h-[36px]"
+                  className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1.5 rounded-sm border border-primary/30 bg-primary/10 text-primary hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive transition-all min-h-[36px]"
                 >
                   <X className="h-3 w-3" />
                   {tag}
@@ -480,7 +496,7 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
               ) : (
                 <button
                   onClick={() => setShowTagInput(true)}
-                  className="font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1.5 rounded-full border border-dashed border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all min-h-[36px]"
+                  className="font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1.5 rounded-sm border border-dashed border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all min-h-[36px]"
                 >
                   + add
                 </button>
@@ -499,7 +515,7 @@ export default function NoteCapture({ inline = false }: NoteCaptureProps) {
                   <button
                     key={contact}
                     onClick={() => removeContact(contact)}
-                    className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1.5 rounded-full border border-accent/40 bg-accent/10 text-accent-foreground hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive transition-all min-h-[36px]"
+                    className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1.5 rounded-sm border border-accent/40 bg-accent/10 text-accent-foreground hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive transition-all min-h-[36px]"
                   >
                     + {contact}
                   </button>

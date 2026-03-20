@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 3.1%;
@@ -236,4 +246,115 @@
 @keyframes vanta-orb-expand {
   from { transform: scale(1); border-radius: 9999px; }
   to { transform: scale(1); border-radius: var(--radius, 0.75rem); }
+}
+
+/* Print styles for briefing export */
+@media print {
+  /* Hide everything except the briefing content */
+  body.print-brief [data-sidebar],
+  body.print-brief nav,
+  body.print-brief header,
+  body.print-brief .smart-note-fab,
+  body.print-brief .print\\:hidden {
+    display: none !important;
+  }
+
+  body.print-brief {
+    background: white !important;
+    color: #111 !important;
+    font-size: 11pt !important;
+    line-height: 1.5 !important;
+  }
+
+  body.print-brief * {
+    color: #111 !important;
+    border-color: #ccc !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Page setup */
+  @page {
+    size: letter;
+    margin: 0.75in 0.85in;
+  }
+
+  /* Clean typography */
+  body.print-brief h1 {
+    font-size: 22pt !important;
+    line-height: 1.2 !important;
+    margin-bottom: 4pt !important;
+    page-break-after: avoid !important;
+  }
+
+  body.print-brief h3 {
+    font-size: 9pt !important;
+    letter-spacing: 0.12em !important;
+    page-break-after: avoid !important;
+  }
+
+  body.print-brief p {
+    font-size: 10.5pt !important;
+    line-height: 1.55 !important;
+    orphans: 3 !important;
+    widows: 3 !important;
+  }
+
+  /* Attendee sections stay together */
+  body.print-brief section {
+    page-break-inside: avoid !important;
+    border: 1px solid #ccc !important;
+    margin-bottom: 12pt !important;
+  }
+
+  /* Badges print cleanly */
+  body.print-brief span[class*="uppercase"] {
+    font-size: 7pt !important;
+    border: 0.5pt solid #999 !important;
+    background: transparent !important;
+    color: #333 !important;
+    padding: 1pt 4pt !important;
+  }
+
+  /* Signal history entries */
+  body.print-brief .max-h-\\[300px\\] {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* Strength bar prints as text label */
+  body.print-brief .bg-vanta-signal-green,
+  body.print-brief .bg-vanta-signal-blue,
+  body.print-brief .bg-vanta-signal-yellow {
+    background: #333 !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  /* Links show URL */
+  body.print-brief a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 7pt;
+    color: #666 !important;
+    word-break: break-all;
+  }
+
+  /* Tighten spacing */
+  body.print-brief .px-5 { padding-left: 0 !important; padding-right: 0 !important; }
+  body.print-brief .py-8,
+  body.print-brief .py-12 { padding-top: 0 !important; padding-bottom: 0 !important; }
+  body.print-brief .mb-8 { margin-bottom: 12pt !important; }
+  body.print-brief .mb-6 { margin-bottom: 8pt !important; }
+  body.print-brief .space-y-8 > * + * { margin-top: 12pt !important; }
+  body.print-brief .p-5 { padding: 8pt 10pt !important; }
+
+  /* Footer with generation info */
+  body.print-brief .print-footer {
+    display: block !important;
+    font-size: 7pt;
+    color: #999 !important;
+    border-top: 0.5pt solid #ccc;
+    padding-top: 6pt;
+    margin-top: 16pt;
+  }
 }

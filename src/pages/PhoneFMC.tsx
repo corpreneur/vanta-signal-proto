@@ -50,7 +50,7 @@ const PhoneFMC = () => {
             { n: "02", icon: Radio, label: "Call Placed or Received", desc: "User calls from their native iPhone or Android dialer… no Vanta app involved. The call transits Vanta's network." },
             { n: "03", icon: Layers, label: "CDR Generated", desc: "ConnectX records the call event: parties, duration, timestamp. This is the trigger for signal processing." },
             { n: "04", icon: Zap, label: "Audio Capture + Transcription", desc: "Call audio routed through Vanta's recording layer at SIP level. Transcript generated via Whisper." },
-            { n: "05", icon: GitBranch, label: "Signal Detection", desc: "Transcript passed through two-stage pipeline: Haiku triage → Sonnet detection. Signal extracted, tagged, scored." },
+            { n: "05", icon: GitBranch, label: "Signal Detection", desc: "Transcript passed through Gemini Flash pipeline. Signal extracted, tagged, scored with confidence and risk level." },
             { n: "06", icon: ArrowRight, label: "Capture + Delivery", desc: "Signals written to persistent store with speaker attribution. iMessage summary ping within 10 minutes of call end." },
           ].map((step, i) => (
             <div key={step.n} className={`flex items-start gap-4 p-4 ${i > 0 ? "border-t border-vanta-border-mid" : ""} ${i === 0 || i === 5 ? "bg-vanta-accent-phone-faint" : "bg-card"}`}>

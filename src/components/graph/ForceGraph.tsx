@@ -15,21 +15,21 @@ import type { SignalType } from "@/data/signals";
 
 // Color mapping using CSS variable HSL values for canvas rendering
 const TYPE_COLORS: Record<string, string> = {
-  INTRO: "hsl(30, 4%, 75%)",
-  INSIGHT: "hsl(210, 100%, 63%)",
-  INVESTMENT: "hsl(55, 100%, 62%)",
-  DECISION: "hsl(55, 100%, 62%)",
-  CONTEXT: "hsl(0, 0%, 50%)",
-  NOISE: "hsl(0, 0%, 40%)",
-  MEETING: "hsl(210, 100%, 63%)",
-  PHONE_CALL: "hsl(340, 82%, 60%)",
+  INTRO: "hsl(30, 4%, 55%)",
+  INSIGHT: "hsl(210, 100%, 50%)",
+  INVESTMENT: "hsl(45, 100%, 45%)",
+  DECISION: "hsl(280, 60%, 55%)",
+  CONTEXT: "hsl(0, 0%, 45%)",
+  NOISE: "hsl(0, 0%, 55%)",
+  MEETING: "hsl(170, 70%, 40%)",
+  PHONE_CALL: "hsl(340, 82%, 50%)",
 };
 
 const RECENCY_COLORS: [number, string][] = [
-  [1, "hsl(30, 4%, 75%)"],      // accent
-  [7, "hsl(162, 89%, 63%)"],     // teal
-  [30, "hsl(43, 89%, 63%)"],     // amber
-  [Infinity, "hsl(0, 0%, 35%)"], // muted
+  [2, "hsl(30, 10%, 25%)"],       // < 2d  — dark/strong
+  [7, "hsl(170, 70%, 35%)"],      // < 7d  — teal
+  [30, "hsl(43, 90%, 45%)"],      // < 30d — amber
+  [Infinity, "hsl(0, 0%, 60%)"],  // 30d+  — muted
 ];
 
 function getRecencyColor(days: number): string {
@@ -96,9 +96,9 @@ export default function ForceGraph({ nodes, edges, width, height, onFocus }: Pro
       ctx.beginPath();
       ctx.moveTo(src.x, src.y);
       ctx.lineTo(tgt.x, tgt.y);
-      const alpha = Math.min(0.4, 0.08 + e.weight * 0.06);
-      ctx.strokeStyle = `hsla(0, 0%, 100%, ${alpha})`;
-      ctx.lineWidth = Math.min(2.5, 0.5 + e.weight * 0.3);
+      const alpha = Math.min(0.6, 0.15 + e.weight * 0.1);
+      ctx.strokeStyle = `hsla(0, 0%, 30%, ${alpha})`;
+      ctx.lineWidth = Math.min(3, 0.8 + e.weight * 0.4);
       ctx.stroke();
     }
 
@@ -106,52 +106,64 @@ export default function ForceGraph({ nodes, edges, width, height, onFocus }: Pro
     for (const n of nodesRef.current) {
       if (n.x == null || n.y == null) continue;
       const r = nodeRadius(n);
+      const typeColor = TYPE_COLORS[n.dominantType] || TYPE_COLORS.CONTEXT;
+
+      // Drop shadow
+      ctx.save();
+      ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
+      ctx.shadowBlur = 8;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 2;
+
+      // Fill — solid with moderate opacity
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = typeColor.replace("hsl(", "hsla(").replace(")", ", 0.35)");
+      ctx.fill();
+      ctx.restore();
+
+      // Border
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+      ctx.strokeStyle = typeColor.replace("hsl(", "hsla(").replace(")", ", 0.8)");
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
 
       // Recency ring
       ctx.beginPath();
-      ctx.arc(n.x, n.y, r + 2, 0, Math.PI * 2);
+      ctx.arc(n.x, n.y, r + 3, 0, Math.PI * 2);
       ctx.strokeStyle = getRecencyColor(n.daysSinceLast);
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 2.5;
       ctx.stroke();
 
-      // Fill
-      const typeColor = TYPE_COLORS[n.dominantType] || TYPE_COLORS.CONTEXT;
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
-      ctx.fillStyle = typeColor.replace(")", ", 0.15)").replace("hsl(", "hsla(");
-      ctx.fill();
-      ctx.strokeStyle = typeColor.replace(")", ", 0.5)").replace("hsl(", "hsla(");
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
-      // Count label
-      ctx.fillStyle = typeColor;
-      ctx.font = `bold ${Math.max(9, r * 0.7)}px 'DM Mono', monospace`;
+      // Count label — dark for readability
+      ctx.fillStyle = "hsl(0, 0%, 15%)";
+      ctx.font = `bold ${Math.max(10, r * 0.75)}px 'DM Mono', monospace`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(String(n.signalCount), n.x, n.y);
 
-      // Name label (only when zoomed in enough or node is large)
+      // Name label
       if (t.k > 0.8 || r > 16) {
-        ctx.fillStyle = "hsla(43, 33%, 95%, 0.6)";
-        ctx.font = `${Math.max(8, 10 / Math.max(t.k, 0.6))}px 'DM Mono', monospace`;
+        ctx.fillStyle = "hsl(0, 0%, 25%)";
+        ctx.font = `600 ${Math.max(9, 11 / Math.max(t.k, 0.6))}px 'DM Mono', monospace`;
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
         const label = n.name.length > 14 ? n.name.slice(0, 12) + "…" : n.name;
-        ctx.fillText(label, n.x, n.y + r + 4);
+        ctx.fillText(label, n.x, n.y + r + 6);
       }
     }
 
     // Center hub
     ctx.beginPath();
-    ctx.arc(0, 0, 16, 0, Math.PI * 2);
-    ctx.fillStyle = "hsla(30, 4%, 75%, 0.08)";
+    ctx.arc(0, 0, 18, 0, Math.PI * 2);
+    ctx.fillStyle = "hsla(0, 0%, 92%, 1)";
     ctx.fill();
-    ctx.strokeStyle = "hsla(30, 4%, 75%, 0.3)";
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = "hsl(0, 0%, 60%)";
+    ctx.lineWidth = 1.5;
     ctx.stroke();
-    ctx.fillStyle = "hsl(30, 4%, 75%)";
-    ctx.font = "bold 8px 'DM Mono', monospace";
+    ctx.fillStyle = "hsl(0, 0%, 20%)";
+    ctx.font = "bold 9px 'DM Mono', monospace";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText("YOU", 0, 0);

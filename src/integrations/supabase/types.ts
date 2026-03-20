@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      contact_tags: {
+        Row: {
+          color: string
+          contact_name: string
+          created_at: string
+          id: string
+          tag: string
+        }
+        Insert: {
+          color?: string
+          contact_name: string
+          created_at?: string
+          id?: string
+          tag: string
+        }
+        Update: {
+          color?: string
+          contact_name?: string
+          created_at?: string
+          id?: string
+          tag?: string
+        }
+        Relationships: []
+      }
       custom_signal_types: {
         Row: {
           color_bg: string
@@ -44,6 +68,42 @@ export type Database = {
           id?: string
           training_examples?: Json
           type_name?: string
+        }
+        Relationships: []
+      }
+      engagement_sequences: {
+        Row: {
+          contact_name: string
+          created_at: string
+          enabled: boolean
+          id: string
+          interval_days: number
+          last_fired_at: string | null
+          next_due_at: string
+          note: string | null
+          sequence_type: string
+        }
+        Insert: {
+          contact_name: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          interval_days?: number
+          last_fired_at?: string | null
+          next_due_at?: string
+          note?: string | null
+          sequence_type?: string
+        }
+        Update: {
+          contact_name?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          interval_days?: number
+          last_fired_at?: string | null
+          next_due_at?: string
+          note?: string | null
+          sequence_type?: string
         }
         Relationships: []
       }
@@ -105,6 +165,45 @@ export type Database = {
             columns: ["signal_id"]
             isOneToOne: false
             referencedRelation: "signals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meeting_speakers: {
+        Row: {
+          created_at: string
+          id: string
+          signal_id: string
+          speaker_profile_id: string
+          turn_count: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          signal_id: string
+          speaker_profile_id: string
+          turn_count?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          signal_id?: string
+          speaker_profile_id?: string
+          turn_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_speakers_signal_id_fkey"
+            columns: ["signal_id"]
+            isOneToOne: false
+            referencedRelation: "signals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meeting_speakers_speaker_profile_id_fkey"
+            columns: ["speaker_profile_id"]
+            isOneToOne: false
+            referencedRelation: "speaker_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -314,6 +413,42 @@ export type Database = {
         }
         Relationships: []
       }
+      speaker_profiles: {
+        Row: {
+          aliases: string[]
+          created_at: string
+          email: string | null
+          first_seen_at: string
+          id: string
+          last_seen_at: string
+          meeting_count: number
+          metadata: Json | null
+          name: string
+        }
+        Insert: {
+          aliases?: string[]
+          created_at?: string
+          email?: string | null
+          first_seen_at?: string
+          id?: string
+          last_seen_at?: string
+          meeting_count?: number
+          metadata?: Json | null
+          name: string
+        }
+        Update: {
+          aliases?: string[]
+          created_at?: string
+          email?: string | null
+          first_seen_at?: string
+          id?: string
+          last_seen_at?: string
+          meeting_count?: number
+          metadata?: Json | null
+          name?: string
+        }
+        Relationships: []
+      }
       system_settings: {
         Row: {
           key: string
@@ -400,12 +535,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      refresh_demo_timestamps: { Args: never; Returns: undefined }
     }
     Enums: {
       signal_priority: "high" | "medium" | "low"
       signal_risk_level: "low" | "medium" | "high" | "critical"
-      signal_source: "linq" | "gmail" | "manual" | "recall" | "phone"
+      signal_source:
+        | "linq"
+        | "gmail"
+        | "manual"
+        | "recall"
+        | "phone"
+        | "fireflies"
+        | "otter"
       signal_status: "Captured" | "In Progress" | "Complete"
       signal_type:
         | "INTRO"
@@ -545,7 +687,15 @@ export const Constants = {
     Enums: {
       signal_priority: ["high", "medium", "low"],
       signal_risk_level: ["low", "medium", "high", "critical"],
-      signal_source: ["linq", "gmail", "manual", "recall", "phone"],
+      signal_source: [
+        "linq",
+        "gmail",
+        "manual",
+        "recall",
+        "phone",
+        "fireflies",
+        "otter",
+      ],
       signal_status: ["Captured", "In Progress", "Complete"],
       signal_type: [
         "INTRO",

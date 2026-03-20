@@ -14,20 +14,41 @@ import Signals from "./pages/Signals";
 import CasePage from "./pages/CasePage";
 import Graph from "./pages/Graph";
 import PhoneFMC from "./pages/PhoneFMC";
+import Connectivity from "./pages/Connectivity";
 import Ontology from "./pages/Ontology";
 import ProductSignalPage from "./pages/ProductSignalPage";
+import InsightEngine from "./pages/InsightEngine";
+import InvestmentIntel from "./pages/InvestmentIntel";
+import DecisionCapture from "./pages/DecisionCapture";
 import Architecture from "./pages/Architecture";
 import BrainDump from "./pages/BrainDump";
+import OrbDemo from "./pages/OrbDemo";
 import ReleaseNotes from "./pages/ReleaseNotes";
+import Meetings from "./pages/Meetings";
+import Command from "./pages/Command";
+import LatestFeatures from "./pages/LatestFeatures";
+import ReleaseV19 from "./pages/ReleaseV19";
 
 import Settings from "./pages/Settings";
+import PersonalInfo from "./pages/PersonalInfo";
+import MyPlan from "./pages/MyPlan";
+import BillingHistory from "./pages/BillingHistory";
+import ConnectedAccounts from "./pages/ConnectedAccounts";
+import NotificationPreferences from "./pages/NotificationPreferences";
+import PrivacyData from "./pages/PrivacyData";
 import ContactTimeline from "./pages/ContactTimeline";
 import Briefing from "./pages/Briefing";
-import Command from "./pages/Command";
 import Contacts from "./pages/Contacts";
 import NoiseQueue from "./pages/NoiseQueue";
 import UserModes from "./pages/UserModes";
+import Focus from "./pages/Focus";
+import FileVault from "./pages/FileVault";
+import MyRulesHub from "./pages/MyRulesHub";
+// QuickCaptureExtension merged into BrainDump
 import Admin from "./pages/Admin";
+import NativeContactSync from "./pages/NativeContactSync";
+import QuickCapture from "./components/QuickCapture";
+import ContextLayerSetup from "./components/context/ContextLayerSetup";
 import type { Session } from "@supabase/supabase-js";
 
 const ProtectedRoute = ({ children, session }: { children: React.ReactNode; session: Session | null }) => {
@@ -67,28 +88,48 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/login" element={session ? <Navigate to="/" replace /> : <Login />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/setup/context" element={<ProtectedRoute session={session}><ContextLayerSetup /></ProtectedRoute>} />
       <Route path="/" element={<ProtectedRoute session={session}><ProductLayout><Index /></ProductLayout></ProtectedRoute>} />
       <Route path="/signals" element={<ProtectedRoute session={session}><ProductLayout><Signals /></ProductLayout></ProtectedRoute>} />
       <Route path="/case/:id" element={<ProtectedRoute session={session}><ProductLayout><CasePage /></ProductLayout></ProtectedRoute>} />
       <Route path="/graph" element={<ProtectedRoute session={session}><ProductLayout><Graph /></ProductLayout></ProtectedRoute>} />
+      <Route path="/connectivity" element={<ProtectedRoute session={session}><ProductLayout><Connectivity /></ProductLayout></ProtectedRoute>} />
       <Route path="/phone-fmc" element={<ProtectedRoute session={session}><ProductLayout><PhoneFMC /></ProductLayout></ProtectedRoute>} />
       <Route path="/ontology" element={<ProtectedRoute session={session}><ProductLayout><Ontology /></ProductLayout></ProtectedRoute>} />
+      <Route path="/insights" element={<ProtectedRoute session={session}><ProductLayout><InsightEngine /></ProductLayout></ProtectedRoute>} />
+      <Route path="/investments" element={<ProtectedRoute session={session}><ProductLayout><InvestmentIntel /></ProductLayout></ProtectedRoute>} />
+      <Route path="/decisions" element={<ProtectedRoute session={session}><ProductLayout><DecisionCapture /></ProductLayout></ProtectedRoute>} />
+      <Route path="/product/latest" element={<ProtectedRoute session={session}><ProductLayout><LatestFeatures /></ProductLayout></ProtectedRoute>} />
+      <Route path="/product/releases/v1.9" element={<ProtectedRoute session={session}><ProductLayout><ReleaseV19 /></ProductLayout></ProtectedRoute>} />
       <Route path="/product/:signalType" element={<ProtectedRoute session={session}><ProductLayout><ProductSignalPage /></ProductLayout></ProtectedRoute>} />
       <Route path="/architecture" element={<ProtectedRoute session={session}><ProductLayout><Architecture /></ProductLayout></ProtectedRoute>} />
       <Route path="/brain-dump" element={<ProtectedRoute session={session}><ProductLayout><BrainDump /></ProductLayout></ProtectedRoute>} />
       <Route path="/releases" element={<ProtectedRoute session={session}><ProductLayout><ReleaseNotes /></ProductLayout></ProtectedRoute>} />
+      <Route path="/meetings" element={<ProtectedRoute session={session}><ProductLayout><Meetings /></ProductLayout></ProtectedRoute>} />
       <Route path="/audit" element={<Navigate to="/settings?tab=audit" replace />} />
       <Route path="/settings" element={<ProtectedRoute session={session}><ProductLayout><Settings /></ProductLayout></ProtectedRoute>} />
+      <Route path="/settings/profile" element={<ProtectedRoute session={session}><ProductLayout><PersonalInfo /></ProductLayout></ProtectedRoute>} />
+      <Route path="/settings/plan" element={<ProtectedRoute session={session}><ProductLayout><MyPlan /></ProductLayout></ProtectedRoute>} />
+      <Route path="/settings/billing" element={<ProtectedRoute session={session}><ProductLayout><BillingHistory /></ProductLayout></ProtectedRoute>} />
+      <Route path="/settings/connected" element={<ProtectedRoute session={session}><ProductLayout><ConnectedAccounts /></ProductLayout></ProtectedRoute>} />
+      <Route path="/settings/notifications" element={<ProtectedRoute session={session}><ProductLayout><NotificationPreferences /></ProductLayout></ProtectedRoute>} />
+      <Route path="/settings/privacy" element={<ProtectedRoute session={session}><ProductLayout><PrivacyData /></ProductLayout></ProtectedRoute>} />
       <Route path="/contact/:name" element={<ProtectedRoute session={session}><ProductLayout><ContactTimeline /></ProductLayout></ProtectedRoute>} />
       <Route path="/briefing/:id" element={<ProtectedRoute session={session}><ProductLayout><Briefing /></ProductLayout></ProtectedRoute>} />
       <Route path="/command" element={<ProtectedRoute session={session}><ProductLayout><Command /></ProductLayout></ProtectedRoute>} />
       <Route path="/contacts" element={<ProtectedRoute session={session}><ProductLayout><Contacts /></ProductLayout></ProtectedRoute>} />
       <Route path="/admin" element={<ProtectedRoute session={session}><ProductLayout><Admin /></ProductLayout></ProtectedRoute>} />
-      <Route path="/noise-queue" element={<Navigate to="/settings?tab=noise" replace />} />
-      <Route path="/user-modes" element={<Navigate to="/settings?tab=modes" replace />} />
+      <Route path="/contacts/sync" element={<ProtectedRoute session={session}><ProductLayout><NativeContactSync /></ProductLayout></ProtectedRoute>} />
+      <Route path="/noise-queue" element={<Navigate to="/focus?tab=noise" replace />} />
+      <Route path="/focus" element={<ProtectedRoute session={session}><ProductLayout><Focus /></ProductLayout></ProtectedRoute>} />
+      <Route path="/files" element={<ProtectedRoute session={session}><ProductLayout><FileVault /></ProductLayout></ProtectedRoute>} />
+      <Route path="/my-rules" element={<ProtectedRoute session={session}><ProductLayout><MyRulesHub /></ProductLayout></ProtectedRoute>} />
+      <Route path="/quick-capture" element={<Navigate to="/brain-dump" replace />} />
+      <Route path="/user-modes" element={<Navigate to="/focus" replace />} />
       <Route path="/case-01" element={<Navigate to="/case/01" replace />} />
       <Route path="/case-02" element={<Navigate to="/case/02" replace />} />
       <Route path="/case-03" element={<Navigate to="/case/03" replace />} />
+      <Route path="/orb-demo" element={<OrbDemo />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
@@ -101,6 +142,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AppRoutes />
+        <QuickCapture />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

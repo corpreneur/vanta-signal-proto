@@ -4,22 +4,18 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
-import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { useUserMode } from "@/hooks/use-user-mode";
 import { Motion } from "@/components/ui/motion";
 import SignalDetailDrawer from "@/components/SignalDetailDrawer";
 import CoolingAlerts from "@/components/CoolingAlerts";
+import InlineBrainDump from "@/components/InlineBrainDump";
+import WhatsAhead from "@/components/WhatsAhead";
+import EnhancedActionItems from "@/components/EnhancedActionItems";
+import DailyTimeline from "@/components/DailyTimeline";
+import SignalEntryCard from "@/components/SignalEntryCard";
 import {
-  MessageSquare,
-  Phone,
-  Video,
-  Mail,
-  Calendar,
-  ArrowRight,
-  ChevronRight,
-  Shield,
-  Sparkles,
-  Moon,
+  MessageSquare, Phone, Video, Mail, Calendar,
+  Shield, Sparkles, Moon, ArrowRight,
 } from "lucide-react";
 
 /* ── data fetchers ─────────────────────────────────────── */
@@ -30,67 +26,41 @@ const fetchSignals = async (): Promise<Signal[]> => {
     .select("*")
     .order("captured_at", { ascending: false })
     .limit(200);
-
   if (error) return [];
   return (data || []).map((row) => ({
-    id: row.id,
-    signalType: row.signal_type,
-    sender: row.sender,
-    summary: row.summary,
-    sourceMessage: row.source_message,
-    priority: row.priority,
-    capturedAt: row.captured_at,
-    actionsTaken: row.actions_taken || [],
-    status: row.status,
+    id: row.id, signalType: row.signal_type, sender: row.sender, summary: row.summary,
+    sourceMessage: row.source_message, priority: row.priority, capturedAt: row.captured_at,
+    actionsTaken: row.actions_taken || [], status: row.status,
     source: (row as Record<string, unknown>).source as Signal["source"] || "linq",
     rawPayload: row.raw_payload as Record<string, unknown> | null,
     linqMessageId: row.linq_message_id,
     emailMetadata: (row as Record<string, unknown>).email_metadata as Signal["emailMetadata"] || null,
     meetingId: (row as Record<string, unknown>).meeting_id as string | null,
+    confidenceScore: row.confidence_score ?? null,
+    classificationReasoning: row.classification_reasoning ?? null,
+    dueDate: row.due_date ?? null, pinned: row.pinned ?? false, riskLevel: row.risk_level ?? null,
   }));
 };
 
 async function fetchTodayMeetingCount(): Promise<number> {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const { count } = await supabase
-    .from("upcoming_meetings")
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
+  const { count } = await supabase.from("upcoming_meetings")
     .select("*", { count: "exact", head: true })
-    .gte("starts_at", today.toISOString())
-    .lt("starts_at", tomorrow.toISOString());
+    .gte("starts_at", today.toISOString()).lt("starts_at", tomorrow.toISOString());
   return count || 0;
 }
 
 /* ── constants ─────────────────────────────────────────── */
 
 const CHANNELS = [
-  { key: "linq", label: "iMessage", icon: MessageSquare, color: "text-vanta-accent", bg: "bg-vanta-accent/10", ring: "ring-vanta-accent/20", barColor: "bg-vanta-accent", href: "/product/intro" },
-  { key: "phone", label: "Phone", icon: Phone, color: "text-vanta-accent-phone", bg: "bg-vanta-accent-phone/10", ring: "ring-vanta-accent-phone/20", barColor: "bg-vanta-accent-phone", href: "/product/phone-call" },
-  { key: "recall", label: "Zoom", icon: Video, color: "text-vanta-accent-zoom", bg: "bg-vanta-accent-zoom/10", ring: "ring-vanta-accent-zoom/20", barColor: "bg-vanta-accent-zoom", href: "/product/meeting" },
-  { key: "gmail", label: "Email", icon: Mail, color: "text-vanta-accent-teal", bg: "bg-vanta-accent-teal/10", ring: "ring-vanta-accent-teal/20", barColor: "bg-vanta-accent-teal", href: "/product/email" },
-  { key: "calendar", label: "Calendar", icon: Calendar, color: "text-vanta-accent-amber", bg: "bg-vanta-accent-amber/10", ring: "ring-vanta-accent-amber/20", barColor: "bg-vanta-accent-amber", href: "/product/calendar" },
-  { key: "manual", label: "Brain Dump", icon: StickyNote, color: "text-vanta-accent-violet", bg: "bg-vanta-accent-violet/10", ring: "ring-vanta-accent-violet/20", barColor: "bg-vanta-accent-violet", href: "/brain-dump" },
+  { key: "linq", label: "iMessage", icon: MessageSquare, color: "text-vanta-accent" },
+  { key: "phone", label: "Phone", icon: Phone, color: "text-vanta-accent-phone" },
+  { key: "recall", label: "Zoom", icon: Video, color: "text-vanta-accent-zoom" },
+  { key: "gmail", label: "Email", icon: Mail, color: "text-vanta-accent-teal" },
+  { key: "calendar", label: "Calendar", icon: Calendar, color: "text-vanta-accent-amber" },
+  { key: "manual", label: "Notes", icon: StickyNote, color: "text-vanta-accent-violet" },
 ];
-
-const SOURCE_ICONS: Record<string, typeof MessageSquare> = {
-  linq: MessageSquare,
-  phone: Phone,
-  recall: Video,
-  gmail: Mail,
-  manual: StickyNote,
-};
-
-const SIGNAL_LEFT_BORDER: Record<string, string> = {
-  INTRO: "border-l-[hsl(var(--vanta-accent))]",
-  INSIGHT: "border-l-[hsl(var(--vanta-signal-blue))]",
-  INVESTMENT: "border-l-[hsl(var(--vanta-signal-yellow))]",
-  DECISION: "border-l-[hsl(var(--vanta-signal-yellow))]",
-  CONTEXT: "border-l-[hsl(var(--vanta-text-low))]",
-  MEETING: "border-l-[hsl(var(--vanta-signal-blue))]",
-  PHONE_CALL: "border-l-[hsl(var(--vanta-accent-phone))]",
-};
 
 const MODE_META: Record<string, { label: string; icon: typeof Shield; color: string }> = {
   executive: { label: "Executive", icon: Shield, color: "text-vanta-accent-amber" },
@@ -107,18 +77,17 @@ function greeting() {
   return "Good evening";
 }
 
-function formatRelative(iso: string) {
-  const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
-  if (diff < 1) return "just now";
-  if (diff < 60) return `${diff}m ago`;
-  if (diff < 1440) return `${Math.floor(diff / 60)}h ago`;
-  return `${Math.floor(diff / 1440)}d ago`;
+function todayCount(signals: Signal[]) {
+  const start = new Date(); start.setHours(0, 0, 0, 0);
+  return signals.filter((s) => new Date(s.capturedAt) >= start).length;
 }
 
-function todayCount(signals: Signal[]) {
-  const start = new Date();
-  start.setHours(0, 0, 0, 0);
-  return signals.filter((s) => new Date(s.capturedAt) >= start).length;
+function getClearUntil(meetingCount: number): string {
+  if (meetingCount === 0) return "end of day";
+  const now = new Date();
+  const nextHour = new Date(now);
+  nextHour.setHours(nextHour.getHours() + 1, 0, 0, 0);
+  return nextHour.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
 }
 
 /* ── component ─────────────────────────────────────────── */
@@ -127,235 +96,184 @@ const Index = () => {
   const [drawerSignal, setDrawerSignal] = useState<Signal | null>(null);
   const { mode } = useUserMode();
 
-  const { data: signals = [] } = useQuery({
-    queryKey: ["signals-dashboard"],
-    queryFn: fetchSignals,
-    refetchInterval: 60_000,
-  });
-
-  const { data: meetingCount = 0 } = useQuery({
-    queryKey: ["dashboard-meeting-count"],
-    queryFn: fetchTodayMeetingCount,
-    refetchInterval: 120_000,
-  });
+  const { data: signals = [] } = useQuery({ queryKey: ["signals-dashboard"], queryFn: fetchSignals, refetchInterval: 60_000 });
+  const { data: meetingCount = 0 } = useQuery({ queryKey: ["dashboard-meeting-count"], queryFn: fetchTodayMeetingCount, refetchInterval: 120_000 });
 
   const activeSignals = useMemo(() => signals.filter((s) => s.signalType !== "NOISE"), [signals]);
   const noiseCount = useMemo(() => signals.length - activeSignals.length, [signals, activeSignals]);
   const highCount = useMemo(() => activeSignals.filter((s) => s.priority === "high").length, [activeSignals]);
-  const actionCount = useMemo(() => activeSignals.reduce((acc, s) => acc + s.actionsTaken.length, 0), [activeSignals]);
   const todayNew = useMemo(() => todayCount(activeSignals), [activeSignals]);
 
-  const channelData = useMemo(() => {
-    const counts: Record<string, number> = {};
-    const latest: Record<string, string> = {};
-    activeSignals.forEach((s) => {
-      counts[s.source] = (counts[s.source] || 0) + 1;
-      if (!latest[s.source] || s.capturedAt > latest[s.source]) latest[s.source] = s.capturedAt;
-    });
-    return { counts, latest };
+  const top2 = useMemo(() => {
+    return activeSignals
+      .filter((s) => s.status !== "Complete")
+      .sort((a, b) => {
+        const prio = { high: 0, medium: 1, low: 2 };
+        if (prio[a.priority] !== prio[b.priority]) return prio[a.priority] - prio[b.priority];
+        return new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime();
+      })
+      .slice(0, 2);
   }, [activeSignals]);
 
-  const recentSignals = useMemo(
-    () => [...activeSignals].sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()).slice(0, 8),
-    [activeSignals]
-  );
+  const channelCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    activeSignals.forEach((s) => { counts[s.source] = (counts[s.source] || 0) + 1; });
+    return counts;
+  }, [activeSignals]);
 
   const modeMeta = MODE_META[mode] || MODE_META.creative;
+  const isDnd = mode === "dnd";
+  const isExecutive = mode === "executive";
+  const clearUntil = getClearUntil(meetingCount);
 
   return (
-    <div className="max-w-[960px] mx-auto px-5 py-10 md:px-10 relative overflow-hidden">
-      {/* Geometric background motif */}
-      <div className="absolute top-[-80px] right-[-120px] w-[400px] h-[400px] rounded-full border border-foreground/[0.04] pointer-events-none" />
+    <div className="max-w-[960px] mx-auto px-4 py-8 md:px-10 relative overflow-x-hidden">
 
-      {/* 7. Greeting Hero */}
+      {/* ══ Hero ══ */}
       <Motion>
-        <header className="mb-6 relative">
+        <header className="mb-6">
           <div className="flex items-center gap-2 mb-3">
-            <span className="w-1.5 h-1.5 bg-primary animate-pulse-dot" />
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-low">
-              Connectivity OS · Dashboard
+            <span className="w-1.5 h-1.5 bg-primary animate-pulse-dot rounded-full" />
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
+              Vanta Signal
+            </span>
+            <span className="w-px h-3 bg-border mx-1" />
+            <span className={`font-mono text-[9px] uppercase tracking-wider flex items-center gap-1 ${modeMeta.color}`}>
+              <modeMeta.icon className="w-3 h-3" /> {modeMeta.label}
             </span>
           </div>
-          <h1 className="font-display text-[clamp(32px,5vw,48px)] leading-[1.05] text-foreground mb-2">
+
+          <h1 className="font-display text-[clamp(32px,5.5vw,48px)] leading-[1.02] text-foreground mb-2">
             {greeting()}
           </h1>
-          <p className="font-sans text-[15px] text-vanta-text-mid max-w-[520px] leading-relaxed">
-            So you can focus, decide, and move.
-          </p>
+
+          {!isDnd && (
+            <div className="flex items-center gap-3 flex-wrap">
+              <p className="font-sans text-[14px] text-muted-foreground">
+                Clear until <span className="text-foreground font-medium">{clearUntil}</span>
+              </p>
+              {meetingCount > 0 && (
+                <>
+                  <span className="w-px h-3.5 bg-border" />
+                  <span className="font-mono text-[10px] text-muted-foreground flex items-center gap-1">
+                    <Calendar className="w-3 h-3 text-vanta-accent-amber" />
+                    {meetingCount} meeting{meetingCount !== 1 ? "s" : ""}
+                  </span>
+                </>
+              )}
+              {todayNew > 0 && (
+                <>
+                  <span className="w-px h-3.5 bg-border" />
+                  <span className="font-mono text-[10px] text-primary">+{todayNew} signals today</span>
+                </>
+              )}
+            </div>
+          )}
         </header>
       </Motion>
 
-      {/* 1. Today Context Row */}
-      <Motion delay={40}>
-        <div className="flex flex-wrap items-center gap-4 mb-8 pb-5 border-b border-vanta-border">
-          <span className="font-mono text-[11px] text-vanta-text-low">
-            {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
-          </span>
-          <span className="w-px h-4 bg-vanta-border" />
-          <span className="font-mono text-[11px] text-vanta-text-low flex items-center gap-1.5">
-            <Calendar className="w-3.5 h-3.5 text-vanta-accent-amber" />
-            {meetingCount} meeting{meetingCount !== 1 ? "s" : ""} today
-          </span>
-          <span className="w-px h-4 bg-vanta-border" />
-          <span className={`font-mono text-[10px] uppercase tracking-wider flex items-center gap-1.5 ${modeMeta.color}`}>
-            <modeMeta.icon className="w-3.5 h-3.5" />
-            {modeMeta.label} Mode
-          </span>
-        </div>
-      </Motion>
-
-      {/* Cooling Alerts */}
-      <CoolingAlerts />
-
-      {/* 3. Stats Strip (clickable + today delta) */}
-      <Motion delay={80}>
-        <div className="flex flex-wrap gap-6 mb-8 pb-6 border-b border-vanta-border">
-          <Link to="/signals" className="group">
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Signals Captured</p>
-            <div className="flex items-baseline gap-2">
-              <p className="font-display text-[28px] text-foreground group-hover:text-primary transition-colors">{activeSignals.length}</p>
-              {todayNew > 0 && (
-                <span className="font-mono text-[10px] text-vanta-accent">+{todayNew} today</span>
-              )}
-            </div>
-          </Link>
-          <Link to="/signals" className="group">
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">High Strength</p>
-            <p className="font-display text-[28px] text-vanta-accent group-hover:text-primary transition-colors">{highCount}</p>
-          </Link>
-          <Link to="/signals" className="group">
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Actions Fired</p>
-            <p className="font-display text-[28px] text-foreground group-hover:text-primary transition-colors">{actionCount}</p>
-          </Link>
-          <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Pipeline</p>
-            <div className="flex items-center gap-2 mt-2 px-2.5 py-1 bg-vanta-accent-faint border border-vanta-accent-border">
-              <div className="w-1.5 h-1.5 bg-vanta-accent animate-pulse-dot" />
-              <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-vanta-accent">Active</p>
-            </div>
-          </div>
-        </div>
-      </Motion>
-
-      {/* 4. Channel Grid (polish) */}
-      <Motion delay={120}>
-        <section className="mb-10">
-          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-4">Channels</p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      {/* ══ Inline stat strip ══ */}
+      {!isDnd && (
+        <Motion delay={20}>
+          <div className="flex items-center gap-5 mb-6 pb-5 border-b border-border overflow-x-auto scrollbar-hide">
+            <Link to="/signals" className="flex items-center gap-2 shrink-0 group">
+              <span className="font-display text-[22px] text-foreground group-hover:text-primary transition-colors">{activeSignals.length}</span>
+              <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground">Signals</span>
+            </Link>
+            <span className="w-px h-5 bg-border shrink-0" />
+            <Link to="/signals" className="flex items-center gap-2 shrink-0 group">
+              <span className="font-display text-[22px] text-primary group-hover:text-foreground transition-colors">{highCount}</span>
+              <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground">High</span>
+            </Link>
+            <span className="w-px h-5 bg-border shrink-0" />
             {CHANNELS.map((ch) => {
-              const count = channelData.counts[ch.key] || 0;
-              const maxCount = Math.max(...Object.values(channelData.counts), 1);
-              const barWidth = count > 0 ? Math.max(12, (count / maxCount) * 100) : 0;
-              const freshness = channelData.latest[ch.key] ? formatRelative(channelData.latest[ch.key]) : null;
-
+              const count = channelCounts[ch.key] || 0;
+              if (count === 0) return null;
               return (
-                <Link
-                  key={ch.key}
-                  to={ch.href}
-                  className="group relative flex flex-col justify-between p-5 bg-card border border-vanta-border rounded-sm hover:border-foreground/10 transition-all duration-300 hover:shadow-md overflow-hidden"
-                >
-                  {/* Top: icon badge + freshness */}
-                  <div className="flex items-start justify-between mb-5">
-                    <div className={`w-9 h-9 rounded-lg ${ch.bg} flex items-center justify-center ring-1 ${ch.ring} transition-transform duration-300 group-hover:scale-110`}>
-                      <ch.icon className={`w-4 h-4 ${ch.color}`} />
-                    </div>
-                    {freshness ? (
-                      <span className="font-mono text-[8px] text-vanta-text-muted mt-1">{freshness}</span>
-                    ) : (
-                      <span className="font-mono text-[8px] text-vanta-text-muted mt-1 italic">idle</span>
-                    )}
-                  </div>
-
-                  {/* Count + label */}
-                  <div>
-                    <p className="font-display text-[32px] leading-none text-foreground mb-1 tracking-tight">{count}</p>
-                    <p className="font-mono text-[10px] uppercase tracking-wider text-vanta-text-low">{ch.label}</p>
-                  </div>
-
-                  {/* Signal strength bar */}
-                  <div className="mt-4 h-1 w-full bg-vanta-border/50 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full ${ch.barColor} rounded-full transition-all duration-700 ease-out opacity-50 group-hover:opacity-100`}
-                      style={{ width: `${barWidth}%` }}
-                    />
-                  </div>
-
-                  {/* Hover arrow */}
-                  <ChevronRight className="w-3.5 h-3.5 text-vanta-text-muted absolute right-3 top-5 opacity-0 group-hover:opacity-60 transition-all duration-200 translate-x-1 group-hover:translate-x-0" />
-                </Link>
+                <div key={ch.key} className="flex items-center gap-1.5 shrink-0">
+                  <ch.icon className={`w-3 h-3 ${ch.color}`} />
+                  <span className="font-mono text-[11px] text-foreground">{count}</span>
+                </div>
               );
             })}
-          </div>
-        </section>
-      </Motion>
-
-      {/* 5. Recent Signals (enhanced) */}
-      <Motion delay={160}>
-        <section className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted">Recent Signals</p>
-            <Link
-              to="/signals"
-              className="font-mono text-[9px] uppercase tracking-wider text-primary hover:text-vanta-accent transition-colors flex items-center gap-1"
-            >
-              View All <ArrowRight className="w-3 h-3" />
-            </Link>
-          </div>
-          <div className="border border-vanta-border divide-y divide-vanta-border">
-            {recentSignals.length === 0 ? (
-              <div className="p-6 text-center">
-                <p className="font-mono text-[10px] uppercase tracking-wider text-vanta-text-muted">No signals captured yet</p>
-              </div>
-            ) : (
-              recentSignals.map((s) => {
-                const SourceIcon = SOURCE_ICONS[s.source] || MessageSquare;
-                const leftBorder = SIGNAL_LEFT_BORDER[s.signalType] || "border-l-transparent";
-                return (
-                  <button
-                    key={s.id}
-                    onClick={() => setDrawerSignal(s)}
-                    className={`flex items-start gap-3 p-4 bg-card hover:bg-vanta-bg-elevated transition-colors w-full text-left border-l-2 ${leftBorder}`}
-                  >
-                    <SourceIcon className="w-3.5 h-3.5 text-vanta-text-muted shrink-0 mt-1" />
-                    <div className="min-w-0 flex-1">
-                      <p className="font-sans text-[13px] text-foreground truncate">{s.summary}</p>
-                      <p className="font-mono text-[9px] text-vanta-text-low mt-0.5">
-                        {s.sender} · {formatRelative(s.capturedAt)}
-                      </p>
-                    </div>
-                    {s.priority === "high" && (
-                      <span className="font-mono text-[8px] uppercase tracking-wider text-vanta-accent px-1.5 py-0.5 border border-vanta-accent-border bg-vanta-accent-faint shrink-0">
-                        High
-                      </span>
-                    )}
-                  </button>
-                );
-              })
+            {noiseCount > 0 && (
+              <>
+                <span className="w-px h-5 bg-border shrink-0" />
+                <Link to="/focus?tab=noise" className="font-mono text-[9px] text-muted-foreground hover:text-foreground transition-colors shrink-0">
+                  {noiseCount} noise
+                </Link>
+              </>
             )}
-          </div>
-        </section>
-      </Motion>
-
-      {/* 6. Noise Footer */}
-      {noiseCount > 0 && (
-        <Motion delay={200}>
-          <div className="mb-12 text-center">
-            <Link
-              to="/settings?tab=noise"
-              className="font-mono text-[10px] text-vanta-text-muted hover:text-vanta-text-low transition-colors"
-            >
-              {noiseCount} item{noiseCount !== 1 ? "s" : ""} filtered as noise · Review queue →
-            </Link>
           </div>
         </Motion>
       )}
 
+      {/* ══ Priority Signals ══ */}
+      {!isDnd && top2.length > 0 && (
+        <Motion delay={30}>
+          <section className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
+                Priority Signals
+              </p>
+              <Link to="/signals" className="flex items-center gap-1 font-mono text-[10px] uppercase tracking-wider text-primary hover:text-primary/80 transition-colors">
+                All <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+            <div className="space-y-2.5">
+              {top2.map((s) => (
+                <SignalEntryCard key={s.id} signal={s} onClick={() => setDrawerSignal(s)} />
+              ))}
+            </div>
+          </section>
+        </Motion>
+      )}
+
+      {/* ══ Brain dump ══ */}
+      {!isDnd && <InlineBrainDump />}
+
+      {/* ══ Mode-specific content ══ */}
+      {isDnd ? (
+        <Motion delay={40}>
+          <div className="flex items-center gap-2 py-3 mb-5">
+            <Moon className="w-4 h-4 text-destructive" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+              Do Not Disturb · essentials only
+            </span>
+          </div>
+          <WhatsAhead />
+          <EnhancedActionItems onSignalClick={(s) => setDrawerSignal(s)} />
+          <CoolingAlerts />
+        </Motion>
+      ) : isExecutive ? (
+        <>
+          <WhatsAhead />
+          <Motion delay={40}>
+            <DailyTimeline signals={activeSignals} onSignalClick={(s) => setDrawerSignal(s)} highOnly />
+          </Motion>
+          <EnhancedActionItems onSignalClick={(s) => setDrawerSignal(s)} />
+          <CoolingAlerts />
+        </>
+      ) : (
+        <>
+          <WhatsAhead />
+          <Motion delay={40}>
+            <DailyTimeline signals={activeSignals} onSignalClick={(s) => setDrawerSignal(s)} highOnly={false} />
+          </Motion>
+          <EnhancedActionItems onSignalClick={(s) => setDrawerSignal(s)} />
+          <CoolingAlerts />
+        </>
+      )}
+
       {/* Signal Detail Drawer */}
-      <SignalDetailDrawer
-        signal={drawerSignal}
-        open={!!drawerSignal}
-        onClose={() => setDrawerSignal(null)}
-      />
+      <SignalDetailDrawer signal={drawerSignal} open={!!drawerSignal} onClose={() => setDrawerSignal(null)} />
+
+      {/* Footer */}
+      <footer className="mt-12 mb-6 text-center">
+        <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground/40">
+          {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })} · {new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+        </p>
+      </footer>
     </div>
   );
 };

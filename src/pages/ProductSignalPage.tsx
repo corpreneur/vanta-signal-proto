@@ -18,27 +18,27 @@ interface ProductDef {
 const PRODUCTS: Record<string, ProductDef> = {
   intro: {
     type: "INTRO",
-    label: "Introductions",
+    label: "iMessage",
     icon: MessageSquare,
-    tagline: "Every introduction is a future relationship… or a missed one.",
-    channels: ["iMessage via Linq", "Email via Gmail", "Manual"],
+    tagline: "Your highest-signal channel… captured in real-time via Linq bridge.",
+    channels: ["iMessage via Linq webhook", "SMS fallback"],
     narrative: [
-      "The most valuable thing a creative entrepreneur receives is an introduction. Not a lead… an introduction. Someone with trust and access putting their name behind a connection.",
-      "Vanta captures every introduction across iMessage and email, classifies the strategic relevance, researches the person being introduced, and prepares a contextual brief… all before you read the message.",
-      "The result: you never walk into an intro cold. You know who they are, what they've done, and why this connection matters.",
+      "iMessage is where trust lives. Introductions, deal updates, quick decisions, investor pings… the conversations that matter most happen in the thread, not the inbox.",
+      "Vanta captures every inbound and outbound iMessage in real-time via the Linq webhook bridge. Messages are classified through a two-stage AI pipeline: Gemini Flash triage for instant noise filtering, then deep analysis for signal extraction.",
+      "The result: introductions are detected and briefed before you respond. Commitments are logged. Investment language is flagged. And you never lose a signal to the scroll.",
     ],
     howItWorks: [
-      { step: "Detection", desc: "AI identifies introduction patterns in message text… warm intros, CC intros, forwarded intros." },
-      { step: "Bio Research", desc: "Automated research on the introduced party… LinkedIn, company, recent press, shared connections." },
-      { step: "Brief Compile", desc: "A structured brief is generated with talking points, strategic relevance, and suggested first response." },
-      { step: "Auto-Response", desc: "High-priority introductions trigger an immediate acknowledgment via Linq… within 90 seconds." },
+      { step: "Linq Bridge", desc: "Linq webhook delivers every iMessage event in real-time… sender, content, timestamp, and thread context." },
+      { step: "Gemini Triage", desc: "First-pass classification separates signal from noise within milliseconds. Greetings and pleasantries are suppressed." },
+      { step: "Deep Analysis", desc: "Signal-bearing messages are classified into types: INTRO, INSIGHT, INVESTMENT, DECISION, CONTEXT." },
+      { step: "Action Delivery", desc: "High-priority signals trigger iMessage acknowledgments via Linq… within 90 seconds of capture." },
     ],
     signalExamples: [
-      "Steve introduces you to a VP of Partnerships at a media company via iMessage",
-      "An investor forwards a warm intro email to a potential advisor",
-      "A contact CCs you into a thread with someone they think you should meet",
+      "Steve introduces you to a VP of Partnerships via iMessage… INTRO detected, bio research triggered",
+      "An investor texts a follow-up on term sheet timing… INVESTMENT signal flagged",
+      "A collaborator shares a framework idea in a group thread… INSIGHT captured with attribution",
     ],
-    whyItMatters: "Introductions compound. Every one you respond to quickly and thoughtfully increases your surface area. Every one you miss or delay degrades trust in the person who made it.",
+    whyItMatters: "iMessage is the channel with the highest trust density. Capturing it invisibly, without asking users to change behavior, is what separates Vanta from every note-taking app.",
   },
   insight: {
     type: "INSIGHT",
@@ -122,7 +122,7 @@ const PRODUCTS: Record<string, ProductDef> = {
       "Vanta captures context signals silently. They don't trigger alerts or actions. But they're indexed, searchable, and automatically surfaced when the person or topic comes up again in a higher-priority signal.",
     ],
     howItWorks: [
-      { step: "Triage", desc: "Haiku classifies the message as context… valuable but not actionable." },
+      { step: "Triage", desc: "Gemini Flash classifies the message as context… valuable but not actionable." },
       { step: "Silent Log", desc: "Stored with full attribution and source metadata." },
       { step: "Cross-Reference", desc: "Linked to the sender's profile in the relationship graph." },
       { step: "Resurface", desc: "Appears in pre-meeting briefs and contact profiles when relevant." },
@@ -172,7 +172,7 @@ const PRODUCTS: Record<string, ProductDef> = {
       { step: "eSIM Provisioning", desc: "User is provisioned a Vanta eSIM via ConnectX… native endpoint on Vanta's network." },
       { step: "CDR Trigger", desc: "Call ends → ConnectX generates a CDR event with parties, duration, and timestamp." },
       { step: "Transcription", desc: "Call audio routed through SIP recording layer → Whisper transcription with speaker diarisation." },
-      { step: "Signal Detection", desc: "Transcript processed through two-stage pipeline with phone-specific tag extraction." },
+      { step: "Signal Detection", desc: "Transcript processed through Gemini Flash pipeline with phone-specific tag extraction." },
       { step: "Delivery", desc: "Signal logged, iMessage summary ping sent within 10 minutes of call end." },
     ],
     signalExamples: [
@@ -190,10 +190,10 @@ const PRODUCTS: Record<string, ProductDef> = {
     channels: ["All channels"],
     narrative: [
       "The hardest problem in intelligence isn't capture… it's discrimination. The difference between a system that helps and one that overwhelms is the ability to identify noise and suppress it without losing anything that matters.",
-      "Vanta's Haiku triage stage classifies low-signal content as NOISE within milliseconds. These messages are silently logged but never surfaced in the feed, never trigger alerts, and never create action items. They exist in the archive for completeness, but they don't compete for your attention.",
+      "Vanta's Gemini Flash triage classifies low-signal content as NOISE within milliseconds. These messages are silently logged but never surfaced in the feed, never trigger alerts, and never create action items. They exist in the archive for completeness, but they don't compete for your attention.",
     ],
     howItWorks: [
-      { step: "Haiku Triage", desc: "First-pass classification identifies low-signal content… greetings, status confirmations, social pleasantries." },
+      { step: "Gemini Triage", desc: "First-pass classification identifies low-signal content… greetings, status confirmations, social pleasantries." },
       { step: "Silent Log", desc: "Noise is stored with full metadata but flagged as suppressed." },
       { step: "No Surface", desc: "Does not appear in the signal feed, briefs, or alerts." },
       { step: "Recoverable", desc: "If a future signal from the same sender references this conversation, the context can be recovered." },
