@@ -1,8 +1,11 @@
-import { MessageSquare, Phone, Video, Mail, Calendar, Activity, CheckCircle2, XCircle, ArrowRight, Radio, Smartphone, Signal, Layers, Wifi } from "lucide-react";
+import { MessageSquare, Phone, Video, Mail, Calendar, Activity, CheckCircle2, XCircle, ArrowRight, Radio, Smartphone, Signal, Layers, Wifi, StickyNote } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { Motion } from "@/components/ui/motion";
+import { Badge } from "@/components/ui/badge";
+
+type LaunchTier = "launch" | "fast-follow" | "roadmap";
 
 interface ChannelConfig {
   key: string;
@@ -16,12 +19,19 @@ interface ChannelConfig {
   signalSource?: string;
   signalType?: string;
   href: string;
+  tier: LaunchTier;
 }
+
+const TIER_META: Record<LaunchTier, { label: string; className: string }> = {
+  launch: { label: "Launch", className: "bg-vanta-signal-green/15 text-vanta-signal-green border-vanta-signal-green/30" },
+  "fast-follow": { label: "Fast-follow", className: "bg-vanta-signal-yellow/15 text-vanta-signal-yellow border-vanta-signal-yellow/30" },
+  roadmap: { label: "Roadmap", className: "bg-muted text-muted-foreground border-border" },
+};
 
 const CHANNELS: ChannelConfig[] = [
   {
     key: "imessage",
-    label: "iMessage",
+    label: "SMS / iMessage",
     icon: MessageSquare,
     colorClass: "text-lime-400",
     bgClass: "bg-lime-400/10",
@@ -30,42 +40,7 @@ const CHANNELS: ChannelConfig[] = [
     settingKey: "source_linq_enabled",
     signalSource: "linq",
     href: "/product/intro",
-  },
-  {
-    key: "phone",
-    label: "Phone",
-    icon: Phone,
-    colorClass: "text-[hsl(var(--vanta-accent-phone))]",
-    bgClass: "bg-[hsl(var(--vanta-accent-phone-faint))]",
-    borderClass: "border-[hsl(var(--vanta-accent-phone-border))]",
-    ringClass: "ring-[hsl(var(--vanta-accent-phone)/0.3)]",
-    settingKey: "source_phone_enabled",
-    signalSource: "phone",
-    href: "/product/phone-call",
-  },
-  {
-    key: "zoom",
-    label: "Zoom",
-    icon: Video,
-    colorClass: "text-[hsl(var(--vanta-accent-zoom))]",
-    bgClass: "bg-[hsl(var(--vanta-accent-zoom-faint))]",
-    borderClass: "border-[hsl(var(--vanta-accent-zoom-border))]",
-    ringClass: "ring-[hsl(var(--vanta-accent-zoom)/0.3)]",
-    settingKey: "source_zoom_enabled",
-    signalSource: "recall",
-    href: "/product/meeting",
-  },
-  {
-    key: "email",
-    label: "Email",
-    icon: Mail,
-    colorClass: "text-[hsl(var(--vanta-accent-teal))]",
-    bgClass: "bg-[hsl(var(--vanta-accent-teal-faint))]",
-    borderClass: "border-[hsl(var(--vanta-accent-teal-border))]",
-    ringClass: "ring-[hsl(var(--vanta-accent-teal)/0.3)]",
-    settingKey: "source_email_enabled",
-    signalSource: "gmail",
-    href: "/product/email",
+    tier: "launch",
   },
   {
     key: "calendar",
@@ -78,9 +53,61 @@ const CHANNELS: ChannelConfig[] = [
     settingKey: "source_calendar_enabled",
     signalType: "MEETING",
     href: "/product/calendar",
+    tier: "launch",
+  },
+  {
+    key: "capture",
+    label: "Capture",
+    icon: StickyNote,
+    colorClass: "text-[hsl(var(--vanta-accent-violet,270,60%,60%))]",
+    bgClass: "bg-[hsl(var(--vanta-accent-violet,270,60%,60%)/0.1)]",
+    borderClass: "border-[hsl(var(--vanta-accent-violet,270,60%,60%)/0.2)]",
+    ringClass: "ring-[hsl(var(--vanta-accent-violet,270,60%,60%)/0.3)]",
+    settingKey: "source_manual_enabled",
+    signalSource: "manual",
+    href: "/brain-dump",
+    tier: "launch",
+  },
+  {
+    key: "email",
+    label: "Email",
+    icon: Mail,
+    colorClass: "text-[hsl(var(--vanta-accent-teal))]",
+    bgClass: "bg-[hsl(var(--vanta-accent-teal-faint))]",
+    borderClass: "border-[hsl(var(--vanta-accent-teal-border))]",
+    ringClass: "ring-[hsl(var(--vanta-accent-teal)/0.3)]",
+    settingKey: "source_email_enabled",
+    signalSource: "gmail",
+    href: "/product/email",
+    tier: "fast-follow",
+  },
+  {
+    key: "phone",
+    label: "Phone",
+    icon: Phone,
+    colorClass: "text-[hsl(var(--vanta-accent-phone))]",
+    bgClass: "bg-[hsl(var(--vanta-accent-phone-faint))]",
+    borderClass: "border-[hsl(var(--vanta-accent-phone-border))]",
+    ringClass: "ring-[hsl(var(--vanta-accent-phone)/0.3)]",
+    settingKey: "source_phone_enabled",
+    signalSource: "phone",
+    href: "/product/phone-call",
+    tier: "fast-follow",
+  },
+  {
+    key: "zoom",
+    label: "Zoom",
+    icon: Video,
+    colorClass: "text-[hsl(var(--vanta-accent-zoom))]",
+    bgClass: "bg-[hsl(var(--vanta-accent-zoom-faint))]",
+    borderClass: "border-[hsl(var(--vanta-accent-zoom-border))]",
+    ringClass: "ring-[hsl(var(--vanta-accent-zoom)/0.3)]",
+    settingKey: "source_zoom_enabled",
+    signalSource: "recall",
+    href: "/product/meeting",
+    tier: "roadmap",
   },
 ];
-
 const MVNO_LAYERS = [
   {
     icon: Smartphone,
