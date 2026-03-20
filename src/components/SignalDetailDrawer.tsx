@@ -10,7 +10,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   Video, FileText, MessageSquare, Sparkles, Image, Film, Mic, Paperclip,
   Download, Mail, CalendarPlus, Flag, ListChecks, User, Brain, Edit3,
-  Pin, CheckCircle2, Clock, Send, Pencil, ChevronDown, X, Phone,
+  Pin, CheckCircle2, Clock, Send, Pencil, ChevronDown, X, Phone, Search,
   AlertTriangle, Lightbulb, BookOpen, Copy, Loader2, Users, Share2, Save,
 } from "lucide-react";
 import { format } from "date-fns";
@@ -146,6 +146,8 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   const [editingSource, setEditingSource] = useState(false);
   const [editSourceText, setEditSourceText] = useState("");
   const [savingEdit, setSavingEdit] = useState(false);
+  const [transcriptSearch, setTranscriptSearch] = useState("");
+  const [transcriptExpanded, setTranscriptExpanded] = useState(false);
   const queryClient = useQueryClient();
 
   // Sync edit texts when signal changes
@@ -289,22 +291,7 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
     if (loadingArtifact) return <div className="py-8 text-center"><p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">Loading meeting data…</p></div>;
     switch (meetingTab) {
       case "intelligence": return renderIntelligenceTab();
-      case "summary": return (
-        <section>
-          <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Meeting Summary</h3>
-          {artifact?.summaryText ? <p className="font-sans text-[13px] leading-[1.7] text-foreground/70 whitespace-pre-wrap">{artifact.summaryText}</p> : <p className="font-mono text-[10px] text-muted-foreground">No summary available.</p>}
-          {artifact?.attendees && (artifact.attendees as Record<string, unknown>[]).length > 0 && (
-            <div className="mt-4">
-              <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Attendees</h4>
-              <div className="flex flex-wrap gap-1.5">
-                {(artifact.attendees as Record<string, unknown>[]).map((a, i) => (
-                  <span key={i} className="font-mono text-[9px] uppercase tracking-[0.15em] text-primary border border-primary/30 px-2 py-1 rounded">{(a as Record<string, unknown>).name as string || (a as Record<string, unknown>).email as string || `Participant ${i + 1}`}</span>
-                ))}
-              </div>
-            </div>
-          )}
-        </section>
-      );
+      case "summary": return renderSummaryTab();
       case "ask-ai": return renderAskAITab();
       case "speakers": return renderSpeakersTab();
       case "transcript": return renderTranscriptTab();
@@ -488,6 +475,111 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
     );
   };
 
+  const renderSummaryTab = () => {
+    const attendees = (artifact?.attendees as Record<string, unknown>[] | null) ?? [];
+    const summaryText = artifact?.summaryText || "";
+    const actionItems = signal.actionsTaken?.length ? signal.actionsTaken : [];
+    const lines = summaryText.split("\n").filter((l: string) => l.trim());
+    const bulletLines = lines.filter((l: string) => /^[-•*]/.test(l.trim()));
+    const narrativeLines = lines.filter((l: string) => !/^[-•*]/.test(l.trim()));
+
+    return (
+      <section className="space-y-5">
+        <div>
+          <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-2 flex items-center gap-1.5">
+            <FileText className="w-3 h-3" /> Meeting Summary
+          </h3>
+          {narrativeLines.length > 0 ? (
+            <p className="font-sans text-[13px] leading-[1.7] text-foreground/80 whitespace-pre-wrap">{narrativeLines.join("\n")}</p>
+          ) : summaryText ? (
+            <p className="font-sans text-[13px] leading-[1.7] text-foreground/80 whitespace-pre-wrap">{summaryText}</p>
+          ) : (
+            <p className="font-mono text-[10px] text-muted-foreground">No summary available.</p>
+          )}
+        </div>
+
+        {bulletLines.length > 0 && (
+          <div>
+            <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-2 flex items-center gap-1.5">
+              <Sparkles className="w-3 h-3" /> Key Takeaways
+            </h4>
+            <div className="border border-border bg-muted/20 rounded-lg p-3 space-y-2">
+              {bulletLines.map((line: string, i: number) => (
+                <div key={i} className="flex items-start gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-[6px]" />
+                  <p className="font-sans text-[12px] leading-[1.6] text-foreground/70">{line.replace(/^[-•*]\s*/, "")}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {actionItems.length > 0 && (
+          <div>
+            <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-2 flex items-center gap-1.5">
+              <CheckCircle2 className="w-3 h-3" /> Action Items
+            </h4>
+            <div className="border border-primary/20 bg-primary/5 rounded-lg p-3 space-y-2">
+              {actionItems.map((item: string, i: number) => (
+                <div key={i} className="flex items-start gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0 mt-[2px]" />
+                  <p className="font-sans text-[12px] leading-[1.5] text-foreground/80">{item}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          {signal.confidenceScore != null && (
+            <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-muted-foreground border border-border px-2 py-0.5 rounded-sm">
+              Confidence {Math.round(signal.confidenceScore * 100)}%
+            </span>
+          )}
+          {signal.riskLevel && (
+            <span className={`font-mono text-[9px] uppercase tracking-[0.12em] px-2 py-0.5 rounded-sm border ${
+              signal.riskLevel === "critical" ? "border-red-500/40 text-red-500 bg-red-500/5" :
+              signal.riskLevel === "high" ? "border-orange-500/40 text-orange-500 bg-orange-500/5" :
+              "border-border text-muted-foreground"
+            }`}>
+              Risk: {signal.riskLevel}
+            </span>
+          )}
+          <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-muted-foreground border border-border px-2 py-0.5 rounded-sm">
+            Source: {signal.source}
+          </span>
+        </div>
+
+        {attendees.length > 0 && (
+          <div>
+            <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-2 flex items-center gap-1.5">
+              <Users className="w-3 h-3" /> Attendees ({attendees.length})
+            </h4>
+            <div className="grid grid-cols-2 gap-2">
+              {attendees.map((a, i) => {
+                const name = (a as Record<string, unknown>).name as string || `Participant ${i + 1}`;
+                const email = (a as Record<string, unknown>).email as string || null;
+                return (
+                  <div key={i} className="flex items-center gap-2 border border-border rounded-lg px-3 py-2 bg-muted/10">
+                    <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                      <span className="font-display text-[10px] text-primary">{name.charAt(0).toUpperCase()}</span>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-sans text-[11px] font-semibold text-foreground truncate">{name}</p>
+                      {email && <p className="font-mono text-[8px] text-muted-foreground truncate">{email}</p>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </section>
+    );
+  };
+
+
+
   const renderTranscriptTab = () => {
     const copyTranscript = () => {
       if (!artifact?.transcriptJson) return;
@@ -498,10 +590,39 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
       toast.success("Transcript copied");
     };
 
+    const allTurns = (artifact?.transcriptJson as Record<string, unknown>[] | null) ?? [];
+    const filtered = transcriptSearch.trim()
+      ? allTurns.filter((t) => {
+          const text = ((t as Record<string, unknown>).text as string || (t as Record<string, unknown>).content as string || "").toLowerCase();
+          const speaker = ((t as Record<string, unknown>).speaker as string || "").toLowerCase();
+          return text.includes(transcriptSearch.toLowerCase()) || speaker.includes(transcriptSearch.toLowerCase());
+        })
+      : allTurns;
+
+    const MAX_COLLAPSED = 20;
+    const displayTurns = transcriptExpanded ? filtered : filtered.slice(0, MAX_COLLAPSED);
+    const hasMore = filtered.length > MAX_COLLAPSED && !transcriptExpanded;
+
+    const grouped: { speaker: string; timestamp?: string; lines: string[] }[] = [];
+    displayTurns.forEach((turn) => {
+      const speaker = (turn as Record<string, unknown>).speaker as string || "Unknown";
+      const text = (turn as Record<string, unknown>).text as string || (turn as Record<string, unknown>).content as string || "";
+      const timestamp = (turn as Record<string, unknown>).timestamp as string | undefined;
+      const last = grouped[grouped.length - 1];
+      if (last && last.speaker === speaker) {
+        last.lines.push(text);
+      } else {
+        grouped.push({ speaker, timestamp, lines: [text] });
+      }
+    });
+
     return (
-      <section>
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">Full Transcript</h3>
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-1.5">
+            <FileText className="w-3 h-3" /> Full Transcript
+            <span className="text-muted-foreground/50">({allTurns.length} turns)</span>
+          </h3>
           {artifact?.transcriptJson && (
             <button onClick={copyTranscript}
               className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded border border-border hover:border-foreground/30">
@@ -509,21 +630,55 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
             </button>
           )}
         </div>
-        {artifact?.transcriptJson && Array.isArray(artifact.transcriptJson) ? (
-          <div className="space-y-3 max-h-[400px] overflow-y-auto border border-border bg-muted/30 p-4 rounded-lg">
-            {(artifact.transcriptJson as Record<string, unknown>[]).map((turn, i) => (
-              <div key={i}>
-                <div className="flex items-baseline gap-2">
-                  <span className="font-sans text-[12px] font-bold text-foreground">{(turn as Record<string, unknown>).speaker as string || "Unknown"}</span>
-                  {(turn as Record<string, unknown>).timestamp && (
-                    <span className="font-mono text-[9px] text-muted-foreground">{(turn as Record<string, unknown>).timestamp as string}</span>
-                  )}
+
+        {allTurns.length > 5 && (
+          <div className="flex items-center gap-2 border border-border rounded-lg px-3 py-1.5 bg-muted/20">
+            <Search className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+            <input type="text" value={transcriptSearch} onChange={(e) => setTranscriptSearch(e.target.value)}
+              placeholder="Search transcript…"
+              className="flex-1 bg-transparent font-mono text-[11px] text-foreground placeholder:text-muted-foreground focus:outline-none" />
+            {transcriptSearch && (
+              <button onClick={() => setTranscriptSearch("")} className="text-muted-foreground hover:text-foreground">
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+        )}
+
+        {transcriptSearch && (
+          <p className="font-mono text-[9px] text-muted-foreground">{filtered.length} result{filtered.length !== 1 ? "s" : ""}</p>
+        )}
+
+        {grouped.length > 0 ? (
+          <div className="space-y-4 border border-border bg-muted/20 p-4 rounded-lg">
+            {grouped.map((group, gi) => (
+              <div key={gi} className="flex gap-3">
+                <div className="shrink-0 pt-0.5">
+                  <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
+                    <span className="font-display text-[10px] text-primary">{group.speaker.charAt(0).toUpperCase()}</span>
+                  </div>
                 </div>
-                <p className="font-sans text-[12px] leading-[1.6] text-foreground/60 mt-0.5">{(turn as Record<string, unknown>).text as string || (turn as Record<string, unknown>).content as string || ""}</p>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-baseline gap-2 mb-1">
+                    <span className="font-sans text-[12px] font-bold text-foreground">{group.speaker}</span>
+                    {group.timestamp && <span className="font-mono text-[9px] text-muted-foreground/60">{group.timestamp}</span>}
+                  </div>
+                  {group.lines.map((line, li) => (
+                    <p key={li} className="font-sans text-[12px] leading-[1.65] text-foreground/65 mt-0.5">{line}</p>
+                  ))}
+                </div>
               </div>
             ))}
+            {hasMore && (
+              <button onClick={() => setTranscriptExpanded(true)}
+                className="w-full py-2 font-mono text-[9px] uppercase tracking-[0.15em] text-primary hover:text-foreground border border-border rounded-lg hover:border-foreground/30 transition-colors flex items-center justify-center gap-1.5">
+                <ChevronDown className="w-3 h-3" /> Show all {filtered.length} turns
+              </button>
+            )}
           </div>
-        ) : <p className="font-mono text-[10px] text-muted-foreground">No transcript available.</p>}
+        ) : (
+          <p className="font-mono text-[10px] text-muted-foreground">{transcriptSearch ? "No matching turns." : "No transcript available."}</p>
+        )}
       </section>
     );
   };
