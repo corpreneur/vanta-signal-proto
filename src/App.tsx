@@ -86,6 +86,7 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/login" element={session ? <Navigate to="/" replace /> : <Login />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/setup/context" element={<ProtectedRoute session={session}><ContextLayerSetup /></ProtectedRoute>} />
       <Route path="/" element={<ProtectedRoute session={session}><ProductLayout><Index /></ProductLayout></ProtectedRoute>} />
       <Route path="/signals" element={<ProtectedRoute session={session}><ProductLayout><Signals /></ProductLayout></ProtectedRoute>} />
       <Route path="/case/:id" element={<ProtectedRoute session={session}><ProductLayout><CasePage /></ProductLayout></ProtectedRoute>} />
