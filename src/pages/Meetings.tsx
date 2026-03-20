@@ -107,7 +107,7 @@ export default function Meetings() {
   );
 
   const counts = useMemo(() => {
-    const c: Record<SourceFilter, number> = { all: meetings.length, zoom: 0, fireflies: 0, otter: 0, google_meet: 0, teams: 0, webex: 0 };
+    const c: Record<SourceFilter, number> = { all: meetings.length, zoom: 0, fireflies: 0, otter: 0, granola: 0, google_meet: 0, teams: 0, webex: 0 };
     meetings.forEach((m) => { if (c[m.sourceKey] !== undefined) c[m.sourceKey]++; });
     return c;
   }, [meetings]);
