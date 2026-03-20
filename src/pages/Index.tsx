@@ -82,12 +82,27 @@ function todayCount(signals: Signal[]) {
   return signals.filter((s) => new Date(s.capturedAt) >= start).length;
 }
 
-function getClearUntil(meetingCount: number): string {
-  if (meetingCount === 0) return "end of day";
-  const now = new Date();
-  const nextHour = new Date(now);
-  nextHour.setHours(nextHour.getHours() + 1, 0, 0, 0);
-  return nextHour.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+function getSignalPulse(signals: Signal[]): string {
+  const start = new Date(); start.setHours(0, 0, 0, 0);
+  const todaySignals = signals.filter((s) => new Date(s.capturedAt) >= start);
+  const uniqueSenders = new Set(todaySignals.map((s) => s.sender));
+  const waitingOn = signals.filter((s) => s.status === "In Progress").length;
+  const decisions = signals.filter((s) => s.signalType === "DECISION" && s.status !== "Complete").length;
+  const overdue = signals.filter((s) => s.dueDate && new Date(s.dueDate) < new Date() && s.status !== "Complete").length;
+
+  const parts: string[] = [];
+  if (uniqueSenders.size > 0) parts.push(`${uniqueSenders.size} ${uniqueSenders.size === 1 ? "person" : "people"} in your orbit today`);
+  if (waitingOn > 0) parts.push(`${waitingOn} awaiting response`);
+  if (decisions > 0) parts.push(`${decisions} ${decisions === 1 ? "decision" : "decisions"} pending`);
+  if (overdue > 0) parts.push(`${overdue} overdue`);
+  if (parts.length === 0) return "Quiet morning — good time to think";
+  return parts.slice(0, 2).join(" · ");
+}
+
+function getPeopleCount(signals: Signal[]): number {
+  const start = new Date(); start.setHours(0, 0, 0, 0);
+  const todaySignals = signals.filter((s) => new Date(s.capturedAt) >= start);
+  return new Set(todaySignals.map((s) => s.sender)).size;
 }
 
 /* ── component ─────────────────────────────────────────── */
@@ -103,6 +118,8 @@ const Index = () => {
   const noiseCount = useMemo(() => signals.length - activeSignals.length, [signals, activeSignals]);
   const highCount = useMemo(() => activeSignals.filter((s) => s.priority === "high").length, [activeSignals]);
   const todayNew = useMemo(() => todayCount(activeSignals), [activeSignals]);
+  const signalPulse = useMemo(() => getSignalPulse(activeSignals), [activeSignals]);
+  const peopleCount = useMemo(() => getPeopleCount(activeSignals), [activeSignals]);
 
   const top2 = useMemo(() => {
     return activeSignals
@@ -124,7 +141,6 @@ const Index = () => {
   const modeMeta = MODE_META[mode] || MODE_META.creative;
   const isDnd = mode === "dnd";
   const isExecutive = mode === "executive";
-  const clearUntil = getClearUntil(meetingCount);
 
   return (
     <div className="max-w-[960px] mx-auto px-4 py-8 md:px-10 relative overflow-x-hidden">
@@ -148,26 +164,9 @@ const Index = () => {
           </h1>
 
           {!isDnd && (
-            <div className="flex items-center gap-3 flex-wrap">
-              <p className="font-sans text-[14px] text-muted-foreground">
-                Clear until <span className="text-foreground font-medium">{clearUntil}</span>
-              </p>
-              {meetingCount > 0 && (
-                <>
-                  <span className="w-px h-3.5 bg-border" />
-                  <span className="font-mono text-[10px] text-muted-foreground flex items-center gap-1">
-                    <Calendar className="w-3 h-3 text-vanta-accent-amber" />
-                    {meetingCount} meeting{meetingCount !== 1 ? "s" : ""}
-                  </span>
-                </>
-              )}
-              {todayNew > 0 && (
-                <>
-                  <span className="w-px h-3.5 bg-border" />
-                  <span className="font-mono text-[10px] text-primary">+{todayNew} signals today</span>
-                </>
-              )}
-            </div>
+            <p className="font-sans text-[14px] text-muted-foreground">
+              {signalPulse}
+            </p>
           )}
         </header>
       </Motion>
@@ -176,10 +175,10 @@ const Index = () => {
       {!isDnd && (
         <Motion delay={20}>
           <div className="flex items-center gap-5 mb-6 pb-5 border-b border-border overflow-x-auto scrollbar-hide">
-            <Link to="/signals" className="flex items-center gap-2 shrink-0 group">
-              <span className="font-display text-[22px] text-foreground group-hover:text-primary transition-colors">{activeSignals.length}</span>
-              <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground">Signals</span>
-            </Link>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="font-display text-[22px] text-foreground">{peopleCount}</span>
+              <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground">People today</span>
+            </div>
             <span className="w-px h-5 bg-border shrink-0" />
             <Link to="/signals" className="flex items-center gap-2 shrink-0 group">
               <span className="font-display text-[22px] text-primary group-hover:text-foreground transition-colors">{highCount}</span>

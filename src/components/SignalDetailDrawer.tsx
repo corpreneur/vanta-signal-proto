@@ -313,8 +313,8 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
       </section>
       {signal.classificationReasoning && (
         <section>
-          <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-2 flex items-center gap-1.5"><Brain className="w-3 h-3" /> Why This Classification?</h3>
-          <div className="border border-border bg-muted/30 p-3 rounded-lg"><p className="font-mono text-[11px] leading-[1.6] text-foreground/60">{signal.classificationReasoning}</p></div>
+          <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-2 flex items-center gap-1.5"><Brain className="w-3 h-3" /> Why This Matters</h3>
+          <div className="border border-primary/20 bg-primary/5 p-3 rounded-lg"><p className="font-mono text-[11px] leading-[1.6] text-foreground/80">{signal.classificationReasoning}</p></div>
         </section>
       )}
       <section>
@@ -696,7 +696,7 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
 
             {signal.riskLevel && (
               <span className={`inline-block px-2.5 py-1 rounded-md font-mono text-[9px] font-bold uppercase tracking-wider ${RISK_BADGE[signal.riskLevel]}`}>
-                {signal.riskLevel}
+                {signal.riskLevel} weight
               </span>
             )}
             {signal.priority === "high" && !signal.riskLevel && (

@@ -4,10 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
 import type { FilterState } from "@/components/SignalFilters";
 import SignalFeed from "@/components/SignalFeed";
-import { Sparkles, Clock, User, AlertTriangle, ChevronDown } from "lucide-react";
+import { Sparkles, Clock, User, AlertTriangle, Hourglass, CalendarDays, Heart } from "lucide-react";
 import { Motion } from "@/components/ui/motion";
 
-type Lens = "recommended" | "quick" | "contact" | "overdue";
+type Lens = "recommended" | "quick" | "contact" | "overdue" | "waiting" | "thisweek" | "relationships";
 
 const fetchSignals = async (): Promise<Signal[]> => {
   const { data, error } = await supabase
@@ -49,6 +49,9 @@ const fetchSignals = async (): Promise<Signal[]> => {
 const LENSES: { key: Lens; label: string; icon: typeof Sparkles; description: string }[] = [
   { key: "recommended", label: "Recommended", icon: Sparkles, description: "AI-prioritized signals" },
   { key: "quick", label: "Under 5 min", icon: Clock, description: "Quick actions you can knock out now" },
+  { key: "waiting", label: "Waiting On", icon: Hourglass, description: "In progress — awaiting response" },
+  { key: "thisweek", label: "This Week", icon: CalendarDays, description: "Due this week" },
+  { key: "relationships", label: "Relationships", icon: Heart, description: "Introductions & relationship signals" },
   { key: "contact", label: "By Contact", icon: User, description: "Signals grouped by sender" },
   { key: "overdue", label: "Overdue", icon: AlertTriangle, description: "Past due date" },
 ];
@@ -78,6 +81,10 @@ export default function ViewfinderPills() {
 
   const filtered = useMemo(() => {
     const now = new Date();
+    const weekEnd = new Date(now);
+    weekEnd.setDate(weekEnd.getDate() + (7 - weekEnd.getDay()));
+    weekEnd.setHours(23, 59, 59, 999);
+
     switch (activeLens) {
       case "recommended":
         return signals
@@ -95,6 +102,14 @@ export default function ViewfinderPills() {
             s.priority !== "high" &&
             !s.riskLevel
         );
+      case "waiting":
+        return signals.filter((s) => s.status === "In Progress");
+      case "thisweek":
+        return signals.filter(
+          (s) => s.dueDate && new Date(s.dueDate) >= now && new Date(s.dueDate) <= weekEnd && s.status !== "Complete"
+        );
+      case "relationships":
+        return signals.filter((s) => s.signalType === "INTRO" || s.signalType === "CONTEXT");
       case "contact":
         if (!selectedContact) return [];
         return signals.filter((s) => s.sender === selectedContact);
@@ -117,6 +132,19 @@ export default function ViewfinderPills() {
           {LENSES.map((lens) => {
             const isActive = activeLens === lens.key;
             const Icon = lens.icon;
+            const lensCount = (() => {
+              const now = new Date();
+              const weekEnd = new Date(now);
+              weekEnd.setDate(weekEnd.getDate() + (7 - weekEnd.getDay()));
+              weekEnd.setHours(23, 59, 59, 999);
+              switch (lens.key) {
+                case "waiting": return signals.filter((s) => s.status === "In Progress").length;
+                case "thisweek": return signals.filter((s) => s.dueDate && new Date(s.dueDate) >= now && new Date(s.dueDate) <= weekEnd && s.status !== "Complete").length;
+                case "relationships": return signals.filter((s) => s.signalType === "INTRO" || s.signalType === "CONTEXT").length;
+                case "overdue": return signals.filter((s) => s.dueDate && new Date(s.dueDate) < now && s.status !== "Complete").length;
+                default: return null;
+              }
+            })();
             return (
               <button
                 key={lens.key}
@@ -135,6 +163,13 @@ export default function ViewfinderPills() {
               >
                 <Icon className="w-3.5 h-3.5" />
                 {lens.label}
+                {lensCount !== null && lensCount > 0 && (
+                  <span className={`ml-0.5 px-1.5 py-0.5 rounded-sm text-[8px] font-bold ${
+                    isActive ? "bg-background/20 text-background" : "bg-muted text-muted-foreground"
+                  }`}>
+                    {lensCount}
+                  </span>
+                )}
               </button>
             );
           })}

@@ -50,7 +50,7 @@ const InlineBrainDump = () => {
               handleSubmit();
             }
           }}
-          placeholder="What's on your mind? Drop a note, link, or thought…"
+          placeholder="Capture anything — a thought, a screenshot, a name you don't want to forget…"
           disabled={loading}
           className="flex-1 bg-transparent font-sans text-[13px] text-foreground placeholder:text-vanta-text-muted focus:outline-none disabled:opacity-50"
         />
