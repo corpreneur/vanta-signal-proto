@@ -9,7 +9,7 @@ import { format, parseISO } from "date-fns";
 import SignalDetailDrawer from "@/components/SignalDetailDrawer";
 import type { Signal, MeetingArtifact } from "@/data/signals";
 
-type SourceFilter = "all" | "zoom" | "fireflies" | "otter" | "granola" | "google_meet" | "teams" | "webex";
+type SourceFilter = "all" | "zoom" | "fireflies" | "otter" | "granola" | "google_meet" | "teams";
 
 const SOURCE_FILTERS: { key: SourceFilter; label: string; logoKey?: string; comingSoon?: boolean }[] = [
   { key: "all", label: "All" },
