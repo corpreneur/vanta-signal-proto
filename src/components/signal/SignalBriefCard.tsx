@@ -39,12 +39,24 @@ const mockBrief: SignalBrief = {
 export default function SignalBriefCard() {
   const [dismissed, setDismissed] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
+  const [generatedAt, setGeneratedAt] = useState(mockBrief.generatedAt);
+
+  const handleRefresh = () => {
+    if (refreshing) return;
+    setRefreshing(true);
+    setRefreshKey((k) => k + 1);
+    setTimeout(() => {
+      setGeneratedAt(new Date().toISOString());
+      setRefreshing(false);
+    }, 800);
+  };
 
   const setupComplete = localStorage.getItem("vanta_context_setup") === "true";
 
   if (dismissed) return null;
 
-  const time = new Date(mockBrief.generatedAt).toLocaleTimeString("en-US", {
+  const time = new Date(generatedAt).toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",
   });
@@ -119,11 +131,11 @@ export default function SignalBriefCard() {
                 </span>
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={() => setRefreshKey((k) => k + 1)}
+                    onClick={handleRefresh}
                     className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider transition-colors"
                     style={{ color: "hsl(0 0% 50%)" }}
                   >
-                    <RefreshCcw className="w-3.5 h-3.5" /> Refresh
+                    <RefreshCcw className={`w-3.5 h-3.5 transition-transform duration-700 ${refreshing ? "animate-spin" : ""}`} /> Refresh
                   </button>
                   <button
                     onClick={() => setDismissed(true)}
