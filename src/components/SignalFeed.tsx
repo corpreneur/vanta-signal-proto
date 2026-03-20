@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { ChevronDown } from "lucide-react";
 import type { Signal } from "@/data/signals";
 import type { FilterState } from "@/components/SignalFilters";
 import SignalEntryCard from "@/components/SignalEntryCard";
