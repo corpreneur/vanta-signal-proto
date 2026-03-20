@@ -10,7 +10,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   Video, FileText, MessageSquare, Sparkles, Image, Film, Mic, Paperclip,
   Download, Mail, CalendarPlus, Flag, ListChecks, User, Brain, Edit3,
-  Pin, CheckCircle2, Clock, Send, Pencil, ChevronDown, X, Phone,
+  Pin, CheckCircle2, Clock, Send, Pencil, ChevronDown, X, Phone, Search,
   AlertTriangle, Lightbulb, BookOpen, Copy, Loader2, Users, Share2, Save,
 } from "lucide-react";
 import { format } from "date-fns";
