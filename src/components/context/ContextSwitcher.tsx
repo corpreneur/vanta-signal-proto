@@ -1,12 +1,5 @@
-import { useState, useEffect } from "react";
 import { Briefcase, FolderOpen, Banknote, User } from "lucide-react";
-
-interface BusinessContext {
-  id: string;
-  name: string;
-  type: "client" | "project" | "income_stream" | "personal";
-  isPrimary: boolean;
-}
+import { useUserContexts, useUserPreferences } from "@/hooks/use-user-preferences";
 
 const TYPE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   client: Briefcase,
@@ -16,33 +9,20 @@ const TYPE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = 
 };
 
 export default function ContextSwitcher() {
-  const [contexts, setContexts] = useState<BusinessContext[]>([]);
-  const [activeId, setActiveId] = useState<string>("");
-
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem("vanta_contexts");
-      const active = localStorage.getItem("vanta_active_context");
-      if (stored) {
-        const parsed = JSON.parse(stored) as BusinessContext[];
-        setContexts(parsed);
-        setActiveId(active || parsed.find((c) => c.isPrimary)?.id || parsed[0]?.id || "");
-      }
-    } catch { /* ignore */ }
-  }, []);
+  const { contexts } = useUserContexts();
+  const { prefs, updatePrefs } = useUserPreferences();
 
   if (contexts.length <= 1) return null;
 
   const handleSwitch = (id: string) => {
-    setActiveId(id);
-    localStorage.setItem("vanta_active_context", id);
+    updatePrefs({ active_context_id: id });
   };
 
   return (
     <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide py-1">
       {contexts.map((ctx) => {
-        const Icon = TYPE_ICONS[ctx.type] || User;
-        const isActive = ctx.id === activeId;
+        const Icon = TYPE_ICONS[ctx.context_type] || User;
+        const isActive = ctx.id === prefs.active_context_id;
         return (
           <button
             key={ctx.id}

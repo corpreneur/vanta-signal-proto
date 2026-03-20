@@ -1,69 +1,68 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RefreshCcw, X, Zap } from "lucide-react";
 import { Motion } from "@/components/ui/motion";
 import SignalBriefItem from "./SignalBriefItem";
 import ContextSwitcher from "@/components/context/ContextSwitcher";
+import { useUserPreferences } from "@/hooks/use-user-preferences";
+import { supabase } from "@/integrations/supabase/client";
 
-interface BriefItem {
-  id: string;
-  icon: string;
-  label: string;
-  value: string;
-  trend: "up" | "down" | "neutral";
-  trendLabel?: string;
-}
-
-interface SignalBrief {
-  id: string;
-  generatedAt: string;
+interface BriefData {
   headline: string;
-  items: BriefItem[];
   summary: string;
-  date: string;
+  items: { id: string; icon: string; label: string; value: string; trend: "up" | "down" | "neutral"; trendLabel?: string }[];
+  generated_at: string;
 }
 
-const mockBrief: SignalBrief = {
-  id: "brief-001",
-  generatedAt: "2026-03-19T06:02:00Z",
-  headline: "Two clients are quiet — worth a quick check-in.",
-  date: "March 19, 2026",
-  items: [
-    { id: "s1", icon: "Users", label: "Active Clients", value: "4", trend: "neutral", trendLabel: "No change" },
-    { id: "s2", icon: "DollarSign", label: "Revenue This Month", value: "$6,240", trend: "up", trendLabel: "+18% vs last month" },
-    { id: "s3", icon: "AlertCircle", label: "Overdue Tasks", value: "3", trend: "down", trendLabel: "Down from 5" },
-  ],
-  summary:
-    "Revenue is trending well but two client accounts have had no activity in 8+ days. Consider a quick pulse-check before end of week. Overdue tasks are declining — good momentum.",
+const FALLBACK_BRIEF: BriefData = {
+  headline: "Your morning brief is loading…",
+  summary: "Generating your personalized signal intelligence.",
+  items: [],
+  generated_at: new Date().toISOString(),
 };
 
 export default function SignalBriefCard() {
   const [dismissed, setDismissed] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
-  const [generatedAt, setGeneratedAt] = useState(mockBrief.generatedAt);
+  const [brief, setBrief] = useState<BriefData | null>(null);
+  const [loaded, setLoaded] = useState(false);
+  const { prefs, loading: prefsLoading } = useUserPreferences();
 
-  const handleRefresh = () => {
-    if (refreshing) return;
+  const fetchBrief = async () => {
     setRefreshing(true);
-    setRefreshKey((k) => k + 1);
-    setTimeout(() => {
-      setGeneratedAt(new Date().toISOString());
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-brief");
+      if (!error && data) {
+        setBrief(data as BriefData);
+      }
+    } catch (e) {
+      console.error("Brief fetch failed:", e);
+    } finally {
       setRefreshing(false);
-    }, 800);
+      setLoaded(true);
+    }
   };
 
-  const setupComplete = localStorage.getItem("vanta_context_setup") === "true";
+  // Auto-fetch on mount if setup is complete
+  useEffect(() => {
+    if (!prefsLoading && prefs.context_setup_complete && !loaded) {
+      fetchBrief();
+    } else if (!prefsLoading) {
+      setLoaded(true);
+    }
+  }, [prefsLoading, prefs.context_setup_complete]);
 
-  if (dismissed) return null;
+  if (prefsLoading || dismissed) return null;
 
-  const time = new Date(generatedAt).toLocaleTimeString("en-US", {
+  const setupComplete = prefs.context_setup_complete;
+  const displayBrief = brief || FALLBACK_BRIEF;
+
+  const time = new Date(displayBrief.generated_at).toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",
   });
 
   return (
     <Motion>
-      {/* Force light-mode Vanta B/W: white card, black text, warm charcoal accent */}
       <div
         className="relative overflow-hidden rounded-sm mb-8 light"
         style={{
@@ -73,19 +72,16 @@ export default function SignalBriefCard() {
         }}
       >
         <div className="p-5 md:p-6">
-          {/* Header label */}
           <p className="font-mono text-[10px] uppercase tracking-[0.2em] mb-1" style={{ color: "hsl(30 4% 18%)" }}>
             Today's Signal
           </p>
 
-          {/* Context switcher — only if setup done */}
           {setupComplete && (
             <div className="mb-3">
               <ContextSwitcher />
             </div>
           )}
 
-          {/* Empty state */}
           {!setupComplete ? (
             <div className="py-4 text-center">
               <Zap className="w-7 h-7 mx-auto mb-3 opacity-40" style={{ color: "hsl(0 0% 35%)" }} />
@@ -102,36 +98,34 @@ export default function SignalBriefCard() {
             </div>
           ) : (
             <>
-              {/* Headline */}
               <h2 className="font-display text-[18px] md:text-[20px] font-semibold mb-5 leading-snug" style={{ color: "hsl(0 0% 0%)" }}>
-                {mockBrief.headline}
+                {displayBrief.headline}
               </h2>
 
-              {/* Stat tiles */}
-              <div className="flex flex-wrap mb-5" key={refreshKey} style={{ borderColor: "hsl(0 0% 0% / 0.08)" }}>
-                {mockBrief.items.map((item, i) => (
-                  <div key={item.id} className="flex-1 min-w-[100px]" style={{ borderLeft: i > 0 ? "1px solid hsl(0 0% 0% / 0.08)" : "none" }}>
-                    <SignalBriefItem {...item} forceLight />
-                  </div>
-                ))}
-              </div>
+              {displayBrief.items.length > 0 && (
+                <div className="flex flex-wrap mb-5" style={{ borderColor: "hsl(0 0% 0% / 0.08)" }}>
+                  {displayBrief.items.map((item, i) => (
+                    <div key={item.id} className="flex-1 min-w-[100px]" style={{ borderLeft: i > 0 ? "1px solid hsl(0 0% 0% / 0.08)" : "none" }}>
+                      <SignalBriefItem {...item} forceLight />
+                    </div>
+                  ))}
+                </div>
+              )}
 
-              {/* Separator */}
               <div className="mb-4" style={{ borderTop: "1px solid hsl(0 0% 0% / 0.08)" }} />
 
-              {/* What this means */}
               <p className="font-sans text-[13px] leading-relaxed mb-5" style={{ color: "hsl(0 0% 35%)" }}>
-                {mockBrief.summary}
+                {displayBrief.summary}
               </p>
 
-              {/* Footer */}
               <div className="flex items-center justify-between">
                 <span className="font-mono text-[10px]" style={{ color: "hsl(0 0% 50%)" }}>
                   Generated at {time}
                 </span>
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={handleRefresh}
+                    onClick={fetchBrief}
+                    disabled={refreshing}
                     className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider transition-colors"
                     style={{ color: "hsl(0 0% 50%)" }}
                   >
