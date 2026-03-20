@@ -11,7 +11,7 @@ import {
   Video, FileText, MessageSquare, Sparkles, Image, Film, Mic, Paperclip,
   Download, Mail, CalendarPlus, Flag, ListChecks, User, Brain, Edit3,
   Pin, CheckCircle2, Clock, Send, Pencil, ChevronDown, X, Phone,
-  AlertTriangle, Lightbulb, BookOpen,
+  AlertTriangle, Lightbulb, BookOpen, Copy, Loader2, Users,
 } from "lucide-react";
 import { format } from "date-fns";
 import FileAttachments from "@/components/FileAttachments";
