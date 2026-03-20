@@ -136,6 +136,19 @@ export default function BrainDump() {
 
   const linkColors = linkResult ? SIGNAL_TYPE_COLORS[linkResult.signalType as SignalType] : null;
 
+  // Build context string from recent captures for Ask AI
+  const captureContext = useMemo(() => {
+    const parts = recentCaptures.slice(0, 5).map((s) =>
+      `[${s.signalType}] ${s.summary}`
+    );
+    if (sessionCaptures.length > 0) {
+      sessionCaptures.slice(0, 5).forEach((s) => {
+        parts.unshift(`[${s.signalType}] ${s.summary}`);
+      });
+    }
+    return parts.join("\n\n");
+  }, [recentCaptures, sessionCaptures]);
+
   const totalCaptures = recentCaptures.length + sessionCaptures.length;
   const manualCount = recentCaptures.filter(s => s.source === "manual").length;
 
