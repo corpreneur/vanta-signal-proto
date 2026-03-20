@@ -1,19 +1,21 @@
 import { useState, useRef, useCallback } from "react";
-import { PenLine, Link2, Image, Mail, Mic, X } from "lucide-react";
+import { PenLine, Link2, Image, Mail, Mic, FileText, X } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import NoteCapture from "@/components/NoteCapture";
 import ImageCapture from "@/components/ImageCapture";
 import EmailCapture from "@/components/EmailCapture";
 import VoiceMemoCapture from "@/components/VoiceMemoCapture";
+import GranolaMeetingImport from "@/components/GranolaMeetingImport";
 import { useLocation } from "react-router-dom";
 
-type InputMode = "note" | "image" | "link" | "email" | "voice";
+type InputMode = "note" | "image" | "email" | "voice" | "granola";
 
 const TABS: { key: InputMode; label: string; icon: React.ElementType }[] = [
   { key: "note", label: "Note", icon: PenLine },
   { key: "image", label: "Image", icon: Image },
   { key: "email", label: "Email", icon: Mail },
   { key: "voice", label: "Voice", icon: Mic },
+  { key: "granola", label: "Granola", icon: FileText },
 ];
 
 export default function SmartNoteFAB() {
@@ -112,13 +114,13 @@ export default function SmartNoteFAB() {
             </div>
           </SheetHeader>
 
-          {/* Mode tabs */}
-          <div className="flex gap-1.5 mb-4 px-1">
+          {/* Mode tabs — de-pilled per MetaLab V3 */}
+          <div className="flex gap-1.5 mb-4 px-1 overflow-x-auto scrollbar-hide">
             {TABS.map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
                 onClick={() => setMode(key)}
-                className={`font-mono text-[10px] uppercase tracking-[0.15em] px-3 py-1.5 rounded-full border transition-all duration-200 flex items-center gap-1 ${
+                className={`font-mono text-[10px] uppercase tracking-[0.15em] px-3 py-1.5 rounded-sm border transition-all duration-200 flex items-center gap-1 whitespace-nowrap ${
                   mode === key
                     ? "bg-primary/10 border-primary text-primary"
                     : "bg-transparent border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
@@ -156,6 +158,13 @@ export default function SmartNoteFAB() {
             )}
             {mode === "voice" && (
               <VoiceMemoCapture
+                onCapture={() => {
+                  setTimeout(() => setOpen(false), 1500);
+                }}
+              />
+            )}
+            {mode === "granola" && (
+              <GranolaMeetingImport
                 onCapture={() => {
                   setTimeout(() => setOpen(false), 1500);
                 }}
