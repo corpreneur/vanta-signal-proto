@@ -82,11 +82,12 @@ export default function ProfileMenuDrawer({ open, onClose }: ProfileMenuDrawerPr
         <SheetHeader className="px-6 pt-8 pb-6 border-b border-border">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center ring-2 ring-primary/20">
-              <span className="font-display text-[22px] text-primary">{userName.charAt(0).toUpperCase()}</span>
+              <span className="font-sans text-[20px] font-extrabold tracking-[0.15em] text-primary">V</span>
             </div>
             <div className="flex-1 min-w-0">
-              <SheetTitle className="font-display text-[17px] text-foreground text-left truncate">{userName}</SheetTitle>
-              {userEmail && <p className="font-mono text-[11px] text-muted-foreground truncate">{userEmail}</p>}
+              <SheetTitle className="font-sans text-[17px] font-extrabold tracking-[0.15em] uppercase text-foreground text-left">VANTA</SheetTitle>
+              <p className="font-mono text-[11px] text-muted-foreground truncate">{userName}</p>
+              {userEmail && <p className="font-mono text-[10px] text-muted-foreground/70 truncate">{userEmail}</p>}
             </div>
           </div>
         </SheetHeader>
