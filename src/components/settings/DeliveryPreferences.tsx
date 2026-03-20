@@ -1,53 +1,40 @@
-import { useState, useEffect } from "react";
 import { Bell, MessageSquare, Mail, Clock, Save } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-
-interface DeliveryPrefs {
-  pushEnabled: boolean;
-  smsEnabled: boolean;
-  emailEnabled: boolean;
-  emailAddress: string;
-  deliveryTime: string;
-  timezone: string;
-}
-
-const DEFAULT_PREFS: DeliveryPrefs = {
-  pushEnabled: false,
-  smsEnabled: false,
-  emailEnabled: false,
-  emailAddress: "",
-  deliveryTime: "06:30",
-  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-};
+import { useUserPreferences } from "@/hooks/use-user-preferences";
 
 export default function DeliveryPreferences() {
-  const [prefs, setPrefs] = useState<DeliveryPrefs>(DEFAULT_PREFS);
+  const { prefs, loading, updatePrefs } = useUserPreferences();
 
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem("vanta_delivery_prefs");
-      if (stored) setPrefs({ ...DEFAULT_PREFS, ...JSON.parse(stored) });
-    } catch { /* ignore */ }
-  }, []);
+  if (loading) return <div className="animate-pulse h-40 bg-muted rounded-sm" />;
 
-  const update = (patch: Partial<DeliveryPrefs>) => setPrefs((p) => ({ ...p, ...patch }));
-
-  const anyEnabled = prefs.pushEnabled || prefs.smsEnabled || prefs.emailEnabled;
+  const anyEnabled = prefs.delivery_push || prefs.delivery_sms || prefs.delivery_email;
 
   const channels = [
-    prefs.pushEnabled && "In-App Push",
-    prefs.smsEnabled && "SMS",
-    prefs.emailEnabled && "Email",
+    prefs.delivery_push && "In-App Push",
+    prefs.delivery_sms && "SMS",
+    prefs.delivery_email && "Email",
   ].filter(Boolean);
 
-  const save = () => {
-    localStorage.setItem("vanta_delivery_prefs", JSON.stringify(prefs));
+  const save = async () => {
+    await updatePrefs({
+      delivery_push: prefs.delivery_push,
+      delivery_sms: prefs.delivery_sms,
+      delivery_email: prefs.delivery_email,
+      delivery_email_address: prefs.delivery_email_address,
+      delivery_time: prefs.delivery_time,
+      delivery_timezone: prefs.delivery_timezone,
+    });
     toast.success(
       anyEnabled
-        ? `Preferences saved. Signal Brief will arrive at ${prefs.deliveryTime} via ${channels.join(", ")}.`
+        ? `Preferences saved. Signal Brief will arrive at ${prefs.delivery_time} via ${channels.join(", ")}.`
         : "Preferences saved. All delivery channels disabled."
     );
+  };
+
+  const update = (patch: Partial<typeof prefs>) => {
+    // Optimistic local update via the hook
+    updatePrefs(patch);
   };
 
   return (
@@ -69,7 +56,7 @@ export default function DeliveryPreferences() {
               <p className="font-mono text-[10px] text-vanta-text-muted">Alerts delivered to this device</p>
             </div>
           </div>
-          <Switch checked={prefs.pushEnabled} onCheckedChange={(v) => update({ pushEnabled: v })} />
+          <Switch checked={prefs.delivery_push} onCheckedChange={(v) => update({ delivery_push: v })} />
         </div>
 
         {/* SMS */}
@@ -82,9 +69,9 @@ export default function DeliveryPreferences() {
                 <p className="font-mono text-[10px] text-vanta-text-muted">Delivered to your Vanta Wireless number. No setup required.</p>
               </div>
             </div>
-            <Switch checked={prefs.smsEnabled} onCheckedChange={(v) => update({ smsEnabled: v })} />
+            <Switch checked={prefs.delivery_sms} onCheckedChange={(v) => update({ delivery_sms: v })} />
           </div>
-          {prefs.smsEnabled && (
+          {prefs.delivery_sms && (
             <div className="px-4 pb-4 pt-0">
               <span className="font-mono text-[11px] text-muted-foreground">Number: ••••3821</span>
             </div>
@@ -101,14 +88,14 @@ export default function DeliveryPreferences() {
                 <p className="font-mono text-[10px] text-vanta-text-muted">Send to your email address</p>
               </div>
             </div>
-            <Switch checked={prefs.emailEnabled} onCheckedChange={(v) => update({ emailEnabled: v })} />
+            <Switch checked={prefs.delivery_email} onCheckedChange={(v) => update({ delivery_email: v })} />
           </div>
-          {prefs.emailEnabled && (
+          {prefs.delivery_email && (
             <div className="px-4 pb-4 pt-0">
               <input
                 type="email"
-                value={prefs.emailAddress}
-                onChange={(e) => update({ emailAddress: e.target.value })}
+                value={prefs.delivery_email_address}
+                onChange={(e) => update({ delivery_email_address: e.target.value })}
                 placeholder="your@email.com"
                 className="w-full bg-background border border-vanta-border px-3 py-2 font-mono text-[12px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-vanta-accent/50 transition-colors rounded-sm"
               />
@@ -126,12 +113,12 @@ export default function DeliveryPreferences() {
           </div>
           <input
             type="time"
-            value={prefs.deliveryTime}
-            onChange={(e) => update({ deliveryTime: e.target.value })}
+            value={prefs.delivery_time}
+            onChange={(e) => update({ delivery_time: e.target.value })}
             className="bg-background border border-vanta-border px-3 py-2 font-mono text-[12px] text-foreground focus:outline-none focus:border-vanta-accent/50 transition-colors rounded-sm mb-2"
           />
           <p className="font-mono text-[10px] text-vanta-text-muted">
-            Based on your location: {prefs.timezone.replace("_", " ")}
+            Based on your location: {prefs.delivery_timezone.replace("_", " ")}
           </p>
         </div>
       )}
