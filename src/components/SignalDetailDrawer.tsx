@@ -163,6 +163,9 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
       setReplyMessage(getProposedReply(signal));
       setEditingReply(false);
       setReplyOpen(false);
+      setAiQuestion("");
+      setAiAnswer("");
+      setAiLoading(false);
     }
   }, [signal?.id]);
 
