@@ -71,7 +71,7 @@ function timeAgo(iso: string) {
 }
 
 export default function BrainDump() {
-  const [inputMode, setInputMode] = useState<InputMode>("note");
+  const [inputMode, setInputMode] = useState<InputMode>("processor");
   const [linkUrl, setLinkUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
