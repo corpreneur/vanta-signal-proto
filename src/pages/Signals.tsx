@@ -9,10 +9,33 @@ import type { FilterState } from "@/components/SignalFilters";
 import type { SignalType } from "@/data/signals";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
-import { ShieldOff, BarChart3, ArrowUpDown, AlertTriangle, Users, Briefcase, BellOff, Clock, DollarSign, Flame, Zap } from "lucide-react";
+import { ShieldOff, BarChart3, ArrowUpDown, AlertTriangle, Users, Briefcase, BellOff, Clock, DollarSign, Flame, Zap, ChevronDown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { useUserMode } from "@/hooks/use-user-mode";
+
+function BriefsSection({ briefs }: { briefs: any[] }) {
+  const [expanded, setExpanded] = useState(false);
+  const visible = expanded ? briefs : briefs.slice(0, 2);
+  const hasMore = briefs.length > 2;
+
+  return (
+    <div className="mb-6">
+      {visible.map((brief: any) => (
+        <PreMeetingBriefCard key={brief.id} brief={brief} />
+      ))}
+      {hasMore && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="flex items-center gap-1.5 mx-auto mt-2 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground border border-border hover:border-foreground/20 transition-colors"
+        >
+          <ChevronDown className={`w-3 h-3 transition-transform ${expanded ? "rotate-180" : ""}`} />
+          {expanded ? "Show fewer" : `${briefs.length - 2} more brief${briefs.length - 2 !== 1 ? "s" : ""}`}
+        </button>
+      )}
+    </div>
+  );
+}
 
 const fetchSignals = async (): Promise<Signal[]> => {
   const { data, error } = await supabase
@@ -417,11 +440,7 @@ const Signals = () => {
           </div>
 
           {briefs.length > 0 && (
-            <div className="mb-6">
-              {briefs.map((brief: any) => (
-                <PreMeetingBriefCard key={brief.id} brief={brief} />
-              ))}
-            </div>
+            <BriefsSection briefs={briefs} />
           )}
 
           <SignalFeed signals={feedSignals} filters={filters} allSignals={signals} />
