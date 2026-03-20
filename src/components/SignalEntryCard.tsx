@@ -151,9 +151,9 @@ function extractDeepLinks(signal: Signal): DetectedLink[] {
   return links;
 }
 
-/* ── Risk badge styles (filled, high-contrast per Chunk DS) ── */
+/* ── Signal Weight badge styles (filled, high-contrast per Chunk DS) ── */
 
-const RISK_BADGE: Record<string, string> = {
+const WEIGHT_BADGE: Record<string, string> = {
   critical: "bg-vanta-signal-red text-white",
   high: "bg-vanta-signal-red text-white",
   medium: "bg-vanta-signal-yellow text-vanta-grey-900",
