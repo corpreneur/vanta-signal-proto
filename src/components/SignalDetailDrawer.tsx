@@ -242,22 +242,9 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
           )}
         </section>
       );
-      case "transcript": return (
-        <section>
-          <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Full Transcript</h3>
-          {artifact?.transcriptJson && Array.isArray(artifact.transcriptJson) ? (
-            <div className="space-y-3 max-h-[400px] overflow-y-auto border border-border bg-muted/30 p-4 rounded-lg">
-              {(artifact.transcriptJson as Record<string, unknown>[]).map((turn, i) => (
-                <div key={i}>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-primary">{(turn as Record<string, unknown>).speaker as string || "Unknown"}</span>
-                  {(turn as Record<string, unknown>).timestamp && <span className="font-mono text-[9px] text-muted-foreground ml-2">{(turn as Record<string, unknown>).timestamp as string}</span>}
-                  <p className="font-mono text-[11px] leading-[1.6] text-foreground/60 mt-0.5">{(turn as Record<string, unknown>).text as string || (turn as Record<string, unknown>).content as string || ""}</p>
-                </div>
-              ))}
-            </div>
-          ) : <p className="font-mono text-[10px] text-muted-foreground">No transcript available.</p>}
-        </section>
-      );
+      case "ask-ai": return renderAskAITab();
+      case "speakers": return renderSpeakersTab();
+      case "transcript": return renderTranscriptTab();
       case "recording": return (
         <section>
           <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Meeting Recording</h3>
