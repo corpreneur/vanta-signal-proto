@@ -1,28 +1,32 @@
 import { useState, useRef, useCallback } from "react";
-import { PenLine, Link2, Image, Mail, Mic, FileText, X } from "lucide-react";
+import { PenLine, Image, Mic, X } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import NoteCapture from "@/components/NoteCapture";
-import ImageCapture from "@/components/ImageCapture";
-import EmailCapture from "@/components/EmailCapture";
-import VoiceMemoCapture from "@/components/VoiceMemoCapture";
-import GranolaMeetingImport from "@/components/GranolaMeetingImport";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { useLocation } from "react-router-dom";
+import UnifiedCaptureInput, { type CapturePayload } from "@/components/UnifiedCaptureInput";
+import CaptureProcessingReveal from "@/components/CaptureProcessingReveal";
 
-type InputMode = "note" | "image" | "email" | "voice" | "granola";
-
-const TABS: { key: InputMode; label: string; icon: React.ElementType }[] = [
-  { key: "note", label: "Note", icon: PenLine },
-  { key: "image", label: "Image", icon: Image },
-  { key: "email", label: "Email", icon: Mail },
-  { key: "voice", label: "Voice", icon: Mic },
-  { key: "granola", label: "Granola", icon: FileText },
-];
+const SIGNAL_LABELS: Record<string, string> = {
+  INTRO: "Introduction", INSIGHT: "Insight", INVESTMENT: "Investment Intel",
+  DECISION: "Decision", CONTEXT: "Context", NOISE: "Noise",
+  MEETING: "Meeting", PHONE_CALL: "Phone Call",
+};
 
 export default function SmartNoteFAB() {
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState<InputMode>("note");
   const [hovered, setHovered] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [rawText, setRawText] = useState("");
+  const [result, setResult] = useState<{
+    signalType: string; priority: string; summary: string;
+    suggestedTitle?: string; suggestedTags?: string[];
+    suggestedContacts?: string[]; accelerators?: string[];
+  } | null>(null);
+
   const location = useLocation();
+  const queryClient = useQueryClient();
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didLongPress = useRef(false);
 
@@ -30,7 +34,6 @@ export default function SmartNoteFAB() {
     didLongPress.current = false;
     longPressTimer.current = setTimeout(() => {
       didLongPress.current = true;
-      setMode("voice");
       setOpen(true);
     }, 500);
   }, []);
@@ -43,30 +46,92 @@ export default function SmartNoteFAB() {
   }, []);
 
   const handleClick = useCallback(() => {
-    if (didLongPress.current) return; // already opened via long-press
+    if (didLongPress.current) return;
     setOpen(true);
   }, []);
 
-  // Suppress on Idea Capture page (it already has full capture UI)
+  const handleSubmit = async (payload: CapturePayload) => {
+    if (loading) return;
+    setLoading(true);
+    setRawText(payload.text || "(image capture)");
+    setResult(null);
+
+    try {
+      let data: any = null;
+      let error: any = null;
+
+      if (payload.type === "image" && payload.imageFile) {
+        const reader = new FileReader();
+        const base64 = await new Promise<string>((resolve) => {
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(payload.imageFile!);
+        });
+        const resp = await supabase.functions.invoke("brain-dump-image", {
+          body: { image: base64, context: payload.text || "" },
+        });
+        data = resp.data;
+        error = resp.error;
+      } else {
+        const resp = await supabase.functions.invoke("brain-dump", {
+          body: payload.type === "url" ? { url: payload.text } : { text: payload.text },
+        });
+        data = resp.data;
+        error = resp.error;
+      }
+
+      if (error) throw error;
+
+      const classification = data?.classification;
+      if (classification) {
+        await new Promise((r) => setTimeout(r, 300));
+        setResult(classification);
+        queryClient.invalidateQueries({ queryKey: ["signals-dashboard"] });
+        toast.success(
+          `Signal detected · ${SIGNAL_LABELS[classification.signalType] || classification.signalType}`
+        );
+      }
+    } catch (err) {
+      console.error("Capture error:", err);
+      toast.error("Failed to process — try again");
+      setResult(null);
+      setRawText("");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDismiss = () => {
+    setResult(null);
+    setRawText("");
+  };
+
+  const handleClose = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen) {
+      // Reset state when sheet closes
+      setTimeout(() => {
+        setResult(null);
+        setRawText("");
+        setLoading(false);
+      }, 300);
+    }
+  };
+
+  // Suppress on Idea Capture page
   if (location.pathname === "/brain-dump") return null;
 
   return (
     <>
       {/* VANTA Orb FAB */}
       <div className="fixed bottom-6 right-6 z-40 flex items-center justify-center" style={{ width: 80, height: 80 }}>
-        {/* Layer 1: Glow halo */}
         <div
           className="absolute inset-0 m-auto w-14 h-14 rounded-full pointer-events-none"
           style={{ animation: "vanta-glow-pulse 3s ease-in-out infinite" }}
         />
-
-        {/* Layer 2: Breathing aura ring */}
         <div
           className="absolute inset-0 m-auto w-[72px] h-[72px] rounded-full border-2 border-primary/30 pointer-events-none"
           style={{ animation: "vanta-breathe 3s ease-in-out infinite" }}
         />
-
-        {/* Layer 3: Orbital dot */}
         <div
           className="absolute inset-0 m-auto w-20 h-20 pointer-events-none"
           style={{ animation: "vanta-orbit 6s linear infinite" }}
@@ -77,7 +142,6 @@ export default function SmartNoteFAB() {
           />
         </div>
 
-        {/* Layer 4: Core button */}
         <button
           onClick={handleClick}
           onPointerDown={handlePointerDown}
@@ -91,7 +155,6 @@ export default function SmartNoteFAB() {
           <PenLine className="w-5 h-5 transition-transform duration-300" style={{ transform: hovered ? "rotate(-8deg)" : "none" }} />
         </button>
 
-        {/* Layer 5: Hover whisper label */}
         <span
           className="absolute -bottom-1 left-1/2 font-mono text-[9px] uppercase tracking-[0.2em] text-primary/70 transition-all duration-300 pointer-events-none whitespace-nowrap"
           style={{
@@ -103,71 +166,28 @@ export default function SmartNoteFAB() {
         </span>
       </div>
 
-      {/* Capture Sheet */}
-      <Sheet open={open} onOpenChange={setOpen}>
+      {/* Capture Sheet — unified surface */}
+      <Sheet open={open} onOpenChange={handleClose}>
         <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto bg-background border-t border-border">
           <SheetHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <SheetTitle className="font-mono text-xs uppercase tracking-[0.2em] text-foreground">
-                Quick Capture
-              </SheetTitle>
-            </div>
+            <SheetTitle className="font-mono text-xs uppercase tracking-[0.2em] text-foreground">
+              Quick Capture
+            </SheetTitle>
           </SheetHeader>
 
-          {/* Mode tabs — de-pilled per MetaLab V3 */}
-          <div className="flex gap-1.5 mb-4 px-1 overflow-x-auto scrollbar-hide">
-            {TABS.map(({ key, label, icon: Icon }) => (
-              <button
-                key={key}
-                onClick={() => setMode(key)}
-                className={`font-mono text-[10px] uppercase tracking-[0.15em] px-3 py-1.5 rounded-sm border transition-all duration-200 flex items-center gap-1 whitespace-nowrap ${
-                  mode === key
-                    ? "bg-primary/10 border-primary text-primary"
-                    : "bg-transparent border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
-                }`}
-              >
-                <Icon className="h-3 w-3" />
-                {label}
-              </button>
-            ))}
-          </div>
-
-          {/* Content */}
           <div className="px-1 pb-4">
-            {mode === "note" && (
-              <NoteCapture
-                inline
-                onCapture={() => {
-                  setTimeout(() => setOpen(false), 1500);
-                }}
+            {result || loading ? (
+              <CaptureProcessingReveal
+                rawText={rawText}
+                result={result}
+                processing={loading}
+                onDismiss={handleDismiss}
               />
-            )}
-            {mode === "image" && (
-              <ImageCapture
-                onCapture={() => {
-                  setTimeout(() => setOpen(false), 1500);
-                }}
-              />
-            )}
-            {mode === "email" && (
-              <EmailCapture
-                onCapture={() => {
-                  setTimeout(() => setOpen(false), 1500);
-                }}
-              />
-            )}
-            {mode === "voice" && (
-              <VoiceMemoCapture
-                onCapture={() => {
-                  setTimeout(() => setOpen(false), 1500);
-                }}
-              />
-            )}
-            {mode === "granola" && (
-              <GranolaMeetingImport
-                onCapture={() => {
-                  setTimeout(() => setOpen(false), 1500);
-                }}
+            ) : (
+              <UnifiedCaptureInput
+                onSubmit={handleSubmit}
+                loading={loading}
+                placeholder="Drop anything here — a name, a screenshot, a fragment of an idea…"
               />
             )}
           </div>

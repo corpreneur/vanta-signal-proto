@@ -248,6 +248,23 @@
   to { transform: scale(1); border-radius: var(--radius, 0.75rem); }
 }
 
+/* Capture processor shimmer */
+@keyframes capture-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.capture-shimmer {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 25%,
+    hsl(var(--muted-foreground) / 0.08) 50%,
+    hsl(var(--muted)) 75%
+  );
+  background-size: 200% 100%;
+  animation: capture-shimmer 1.5s ease-in-out infinite;
+}
+
 /* Print styles for briefing export */
 @media print {
   /* Hide everything except the briefing content */
