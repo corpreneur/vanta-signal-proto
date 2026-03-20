@@ -125,7 +125,7 @@ const Index = () => {
         if (prio[a.priority] !== prio[b.priority]) return prio[a.priority] - prio[b.priority];
         return new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime();
       })
-      .slice(0, 3);
+      .slice(0, 2);
   }, [activeSignals]);
 
   const channelData = useMemo(() => {
