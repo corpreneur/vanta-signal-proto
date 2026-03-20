@@ -70,7 +70,7 @@ const SOURCE_CHANNELS: Array<{
 
 const SOURCE_KEYS = new Set(SOURCE_CHANNELS.map((c) => c.key));
 
-const TAB_MAP: Record<string, string> = { audit: "audit", calendar: "calendar" };
+const TAB_MAP: Record<string, string> = { audit: "audit", calendar: "calendar", delivery: "delivery" };
 
 export default function Settings() {
   const queryClient = useQueryClient();
