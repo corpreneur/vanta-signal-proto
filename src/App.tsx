@@ -46,6 +46,7 @@ import MyRulesHub from "./pages/MyRulesHub";
 import Admin from "./pages/Admin";
 import NativeContactSync from "./pages/NativeContactSync";
 import QuickCapture from "./components/QuickCapture";
+import ContextLayerSetup from "./components/context/ContextLayerSetup";
 import type { Session } from "@supabase/supabase-js";
 
 const ProtectedRoute = ({ children, session }: { children: React.ReactNode; session: Session | null }) => {
