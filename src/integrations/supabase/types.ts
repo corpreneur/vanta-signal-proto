@@ -535,7 +535,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      refresh_demo_timestamps: { Args: never; Returns: undefined }
     }
     Enums: {
       signal_priority: "high" | "medium" | "low"
