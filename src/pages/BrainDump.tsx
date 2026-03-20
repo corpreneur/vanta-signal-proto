@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   PenLine, Link2, FileText, Loader2, ArrowRight, Plus, Clock, Zap,
   Image, Mail, Mic, BookmarkPlus, Copy, Check, Smartphone, Globe,
-  Monitor, ExternalLink, ChevronDown, ChevronRight, Send,
+  Monitor, ExternalLink, ChevronDown, ChevronRight, Send, Sparkles,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
