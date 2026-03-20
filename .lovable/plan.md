@@ -1,67 +1,109 @@
 
 
-# CMO Feedback Response — Implementation Plan
+# Making Capture Magical
 
-## Feedback Summary
+The CMO's insight is clear: capture isn't about "creating a thought." It's a **magic food processor** — you throw in whatever fragment is on your mind (a name, a screenshot, a half-baked idea, something you overheard) and it processes it into structured signal. The current implementation has the right plumbing but the experience doesn't feel magical yet. Here's how to close that gap.
 
-Six areas of CMO feedback, each with concrete prototype changes:
+## What's Missing Today
 
-1. **Sources of Signal** — Align on launch sources, clarify SMS/iMessage feasibility
-2. **Signal Intelligence** — Rethink "risk" schema, make prioritization logic more transparent
-3. **Views** — Add more "quick win" view lenses beyond the current set
-4. **Focus View** — Move away from calendar-centric hub toward signal-humanity framing
-5. **Capture** — Reframe from "create a thought" to "magic food processor" capture metaphor
-6. **Actions** — Add capture-derived actions, lay groundwork for partner-based ephemeral offers
+The current capture flow is functional but mechanical:
+- Text box → hit enter → toast notification → done
+- The "processing" moment is invisible (just a spinner)
+- Results appear as flat classification cards
+- No sense of transformation happening
+- The FAB orb is beautiful but the sheet it opens is utilitarian
+- Multiple input modes exist but feel like separate tools, not one processor
 
----
+## The Concept: One Slot, Any Input
 
-## Changes by Area
+Think of it like dropping something into a funnel. You don't pick "note mode" or "image mode" first — you just throw something in. The processor figures out what it is and what to do with it.
 
-### 1. Sources of Signal — Launch Source Alignment
+### 1. Unified Capture Bar (Replace InlineBrainDump)
 
-**Current state**: Platform lists 6 channels (iMessage/Linq, Phone, Zoom, Email, Calendar, Notes). No explicit launch-tier differentiation.
+Instead of a plain text input, build a **multi-modal capture strip** that accepts text, paste (images from clipboard), and drag-drop — all in one component. No mode tabs needed for the inline version.
 
-**Changes**:
-- Update **Connectivity page** (`/connectivity`) to show a **Launch Tier** system:
-  - **Tier 1 (Launch)**: SMS/iMessage (via Linq), Calendar, Capture (manual)
-  - **Tier 2 (Fast-follow)**: Email, Phone
-  - **Tier 3 (Roadmap)**: Zoom, Fireflies, Otter
-- Add tier badges to each channel card (e.g., "Launch", "Fast-follow", "Roadmap")
-- Add a summary strip: "3 launch sources · 2 fast-follow · 3 roadmap"
+- Text input as default, but if you paste an image it instantly shows a thumbnail
+- If you paste a URL it auto-detects and shows a link preview chip
+- Mic button on the right for voice-to-text (already have speech recognition hook)
+- Single "Process" action regardless of input type
 
-### 2. Signal Intelligence — Evolve Beyond "Risk"
+### 2. The Processing Moment (The Magic)
 
-**Current state**: Signals use `risk_level` (low/medium/high/critical) and `priority` (high/medium/low) as separate dimensions. The UI shows Shield icons for risk.
+This is where the magic lives. When you hit capture:
 
-**Changes**:
-- Rename "Risk Level" to **"Signal Weight"** across the UI — a more intuitive term that captures why something matters (urgency, stakes, time-sensitivity, relationship importance) rather than just "risk"
-- Update `EnhancedActionItems.tsx`, `SignalEntryCard.tsx`, `SignalDetailDrawer.tsx` to use new terminology
-- Add a **"Why this matters"** line in the signal detail drawer that surfaces the `classification_reasoning` field more prominently — making the AI's prioritization logic transparent and editable
-- Update the Focus page Priority Lenses to use clearer categories: **Time-Sensitive**, **High-Stakes**, **Relationship**, **Quick Win** (replacing the current risk-centric framing)
+- The input bar **collapses smoothly** into a compact "processing" state
+- A **shimmer animation** ripples across a card that morphs from raw → structured
+- Text appears to be "typed out" by the AI (letter-by-letter reveal of the summary)
+- Signal type badge **fades in** with a subtle color wash
+- Suggested actions **cascade in** one by one (staggered 150ms)
+- The whole thing takes ~2 seconds of choreographed animation even if the AI responds faster (buffer the reveal)
 
-### 3. Views — More Quick-Win Lenses
+### 3. Result Card: "Before → After" Split
 
-**Current state**: ViewfinderPills has 4 lenses (Recommended, Quick, Contact, Overdue).
+When processing completes, show a compact **transformation card**:
 
-**Changes**:
-- Add new lenses to `ViewfinderPills.tsx`:
-  - **"Under 5 min"** — signals with simple single-step actions (already partially "Quick")
-  - **"Waiting On"** — signals in "In Progress" status awaiting response
-  - **"This Week"** — signals with due dates in the current week
-  - **"Relationships"** — INTRO and relationship-tagged signals
-- Each lens gets a count badge showing how many signals match
+```text
+┌─────────────────────────────────────┐
+│ ◇ What you captured                 │
+│ "ran into james at the thing last   │
+│  night, he's raising a series B,    │
+│  should connect him w/ sarah"       │
+│                                     │
+│ ─ ─ ─ processed into ─ ─ ─         │
+│                                     │
+│ ● Introduction Signal     high      │
+│   James — Series B raise,           │
+│   connect with Sarah                │
+│                                     │
+│ → Send intro email to Sarah         │
+│ → Set reminder: follow up w/ James  │
+│ → Link to existing: Sarah Chen      │
+└─────────────────────────────────────┘
+```
 
-### 4. Focus View — Signal-Humanity Hub
+### 4. SmartNoteFAB Sheet Simplification
 
-**Current state**: Dashboard hero says "Good morning" + "Clear until 11am" with meeting count — feels calendar-management focused per CMO feedback.
+Replace the 5-tab sheet with a **single unified capture surface**:
+- Large text area that also accepts paste/drop
+- Small icon row below for explicit mode switches (camera, mic, link) — but positioned as "input helpers" not "modes"
+- Remove "Granola" and "Email" as primary tabs — fold them into the capture page only
 
-**Changes to `Index.tsx`**:
-- Replace "Clear until {time}" with a **signal-centric context line** generated from actual data: e.g., "3 people waiting to hear from you · 1 decision by Friday" or "Quiet morning — good time to think"
-- Replace the meeting-count stat with a **"People in your orbit today"** count (unique senders from today's signals + meeting attendees)
-- Add a **"Signal Pulse"** indicator — a single-sentence AI-generated line from the `generate-brief` function that captures the emotional/relational tone of the day, not just logistics
-- Keep WhatsAhead but reframe its header from calendar-forward to **"Coming Up"** with signals interspersed alongside meetings
+### 5. Micro-copy That Sells the Magic
 
-### 5. Capture — Magic Food Processor
+Update all capture-related copy to reinforce the processor metaphor:
+- Placeholder: "Drop anything here… a name, a screenshot, a fragment of an idea"
+- Processing state: "Processing…"  
+- Result header: "Processed into signal"
+- Toast: "Signal detected · Introduction" (not "Captured as INTRO")
+- Empty state: "Nothing in the processor yet"
 
-**Changes**:
-- Update `InlineBrainDump.tsx` placeholder from "What's on your mind? Drop a note, link
+## Implementation Plan
+
+### Step 1: Build unified capture input component
+Create `UnifiedCaptureInput.tsx` — a single input that handles text, pasted images, pasted URLs, and voice toggle. No mode tabs. Detects input type automatically.
+
+### Step 2: Build animated processing reveal
+Create `CaptureProcessingReveal.tsx` — the choreographed animation sequence that transforms raw input into structured signal card with typewriter summary, cascading actions, and color wash.
+
+### Step 3: Redesign InlineBrainDump
+Replace current plain input with `UnifiedCaptureInput` + `CaptureProcessingReveal`. The inline bar on Focus/Signals pages becomes the magic food processor.
+
+### Step 4: Simplify SmartNoteFAB sheet  
+Remove mode tabs. Use `UnifiedCaptureInput` as the single capture surface. Keep small icon helpers (camera, mic) as secondary affordances below the input.
+
+### Step 5: Update all capture micro-copy
+Placeholder text, toast messages, result labels, empty states — all updated to "processor" language per section 5 above.
+
+## Files to Create/Modify
+
+| File | Action |
+|------|--------|
+| `src/components/UnifiedCaptureInput.tsx` | **Create** — multi-modal input (text + paste image + paste URL + voice) |
+| `src/components/CaptureProcessingReveal.tsx` | **Create** — animated before/after transformation card |
+| `src/components/InlineBrainDump.tsx` | **Rewrite** — use UnifiedCaptureInput + ProcessingReveal |
+| `src/components/SmartNoteFAB.tsx` | **Simplify** — remove mode tabs, unified surface |
+| `src/pages/BrainDump.tsx` | **Update** — integrate new components, update copy |
+| `src/index.css` | **Add** — shimmer/typewriter animation keyframes |
+
+No database changes required. All existing edge functions (brain-dump, brain-dump-image) continue to work as-is.
+
