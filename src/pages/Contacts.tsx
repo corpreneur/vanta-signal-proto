@@ -262,6 +262,74 @@ export default function Contacts() {
         </div>
       </Motion>
 
+      {/* Relationship Graph */}
+      <Motion delay={60}>
+        <div className="mb-5">
+          <button
+            onClick={() => { setGraphOpen(!graphOpen); setFocused(null); }}
+            className="flex items-center gap-2 w-full px-3 py-2.5 border border-border hover:border-foreground/20 bg-card transition-colors group"
+          >
+            <Network className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground group-hover:text-foreground transition-colors flex-1 text-left">
+              Relationship Graph
+            </span>
+            <span className="font-mono text-[9px] text-muted-foreground">
+              {graphData.nodes.length} nodes · {graphData.edges.length} edges
+            </span>
+            {graphOpen ? (
+              <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" />
+            ) : (
+              <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+            )}
+          </button>
+
+          {graphOpen && graphData.nodes.length > 0 && (
+            <div className="border border-t-0 border-border bg-card">
+              {/* Legend */}
+              <div className="flex flex-wrap gap-3 px-3 py-2 border-b border-border text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-primary inline-block rounded-full" /> &lt; 2d
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-vanta-accent-teal inline-block rounded-full" /> &lt; 7d
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-vanta-accent-amber inline-block rounded-full" /> &lt; 30d
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-muted-foreground inline-block rounded-full" /> 30d+
+                </span>
+                <span className="ml-auto text-muted-foreground/60">
+                  scroll zoom · drag pan · click node
+                </span>
+              </div>
+
+              {/* Canvas */}
+              <div ref={graphContainerRef} className="relative w-full">
+                <ForceGraph
+                  nodes={graphData.nodes}
+                  edges={graphData.edges}
+                  width={graphDims.w}
+                  height={graphDims.h}
+                  onFocus={handleFocus}
+                />
+                {focused && (
+                  <MiniContactCard focused={focused} onClose={() => setFocused(null)} />
+                )}
+              </div>
+            </div>
+          )}
+
+          {graphOpen && graphData.nodes.length === 0 && (
+            <div className="border border-t-0 border-border bg-card px-3 py-8 text-center">
+              <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                No relationship data to visualize
+              </p>
+            </div>
+          )}
+        </div>
+      </Motion>
+
       {/* Toolbar */}
       <Motion delay={80}>
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
