@@ -11,7 +11,7 @@ import {
   Video, FileText, MessageSquare, Sparkles, Image, Film, Mic, Paperclip,
   Download, Mail, CalendarPlus, Flag, ListChecks, User, Brain, Edit3,
   Pin, CheckCircle2, Clock, Send, Pencil, ChevronDown, X, Phone,
-  AlertTriangle, Lightbulb, BookOpen, Copy, Loader2, Users,
+  AlertTriangle, Lightbulb, BookOpen, Copy, Loader2, Users, Share2, Save,
 } from "lucide-react";
 import { format } from "date-fns";
 import FileAttachments from "@/components/FileAttachments";
@@ -140,7 +140,50 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   const [aiQuestion, setAiQuestion] = useState("");
   const [aiAnswer, setAiAnswer] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
+  // Inline editing states
+  const [editingSummary, setEditingSummary] = useState(false);
+  const [editSummaryText, setEditSummaryText] = useState("");
+  const [editingSource, setEditingSource] = useState(false);
+  const [editSourceText, setEditSourceText] = useState("");
+  const [savingEdit, setSavingEdit] = useState(false);
   const queryClient = useQueryClient();
+
+  // Sync edit texts when signal changes
+  useEffect(() => {
+    if (signal) {
+      setEditSummaryText(signal.summary);
+      setEditSourceText(signal.sourceMessage);
+      setEditingSummary(false);
+      setEditingSource(false);
+    }
+  }, [signal?.id]);
+
+  const handleSaveEdit = async (field: "summary" | "source_message", value: string) => {
+    if (!signal) return;
+    setSavingEdit(true);
+    const update = field === "summary" ? { summary: value } : { source_message: value };
+    const { error } = await supabase.from("signals").update(update).eq("id", signal.id);
+    setSavingEdit(false);
+    if (error) { toast.error("Failed to save edit"); return; }
+    queryClient.invalidateQueries({ queryKey: ["signals"] });
+    queryClient.invalidateQueries({ queryKey: ["meetings-hub"] });
+    if (field === "summary") setEditingSummary(false);
+    else setEditingSource(false);
+    toast.success("Saved");
+  };
+
+  const handleShareMeeting = async () => {
+    if (!signal) return;
+    const summaryBlock = artifact?.summaryText ? `\n\nSummary:\n${artifact.summaryText}` : "";
+    const actionsBlock = signal.actionsTaken.length > 0 ? `\n\nActions:\n${signal.actionsTaken.map(a => `• ${a.replace(/_/g, " ")}`).join("\n")}` : "";
+    const text = `${signal.summary}${summaryBlock}${actionsBlock}\n\n— Vanta Signal`;
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("Meeting summary copied to clipboard");
+    } catch {
+      toast.error("Failed to copy");
+    }
+  };
 
   useEffect(() => { if (signal?.status) setCurrentStatus(signal.status); }, [signal?.id, signal?.status]);
   useEffect(() => { if (open && scrollRef.current) scrollRef.current.scrollTop = 0; }, [signal?.id, open]);
@@ -168,6 +211,26 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
       setAiLoading(false);
     }
   }, [signal?.id]);
+
+  const [speakerProfiles, setSpeakerProfiles] = useState<Record<string, { meeting_count: number; last_seen_at: string; email: string | null }>>({});
+
+  useEffect(() => {
+    if (!signal || signal.signalType !== "MEETING") return;
+    (async () => {
+      const { data } = await supabase
+        .from("meeting_speakers")
+        .select("turn_count, speaker_profiles(name, email, meeting_count, last_seen_at)")
+        .eq("signal_id", signal.id) as any;
+      if (data) {
+        const map: Record<string, { meeting_count: number; last_seen_at: string; email: string | null }> = {};
+        for (const row of data) {
+          const p = row.speaker_profiles;
+          if (p) map[p.name] = { meeting_count: p.meeting_count, last_seen_at: p.last_seen_at, email: p.email };
+        }
+        setSpeakerProfiles(map);
+      }
+    })();
+  }, [signal?.id, signal?.signalType]);
 
   if (!signal) return null;
 
@@ -361,6 +424,7 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
     </section>
   );
 
+
   const renderSpeakersTab = () => {
     const turns = (artifact?.transcriptJson as Record<string, unknown>[] | null) ?? [];
     const speakerMap = new Map<string, number>();
@@ -374,19 +438,28 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
     const identified = [...speakerMap.entries()].filter(([name]) => attendeeNames.has(name));
     const other = [...speakerMap.entries()].filter(([name]) => !attendeeNames.has(name));
 
-    const renderSpeaker = ([name, count]: [string, number]) => (
-      <div key={name} className="flex items-center gap-3 py-2">
-        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-          <span className="font-display text-[12px] text-primary">{name.charAt(0).toUpperCase()}</span>
+    const renderSpeaker = ([name, count]: [string, number]) => {
+      const profile = speakerProfiles[name];
+      return (
+        <div key={name} className="flex items-center gap-3 py-2">
+          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+            <span className="font-display text-[12px] text-primary">{name.charAt(0).toUpperCase()}</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-sans text-[13px] font-semibold text-foreground truncate">{name}</p>
+            {profile && (
+              <p className="font-mono text-[9px] text-muted-foreground">
+                {profile.meeting_count} meeting{profile.meeting_count !== 1 ? "s" : ""}
+                {profile.email && <span className="ml-2">· {profile.email}</span>}
+              </p>
+            )}
+          </div>
+          <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground border border-border px-2 py-0.5 rounded">
+            {count} turn{count !== 1 ? "s" : ""}
+          </span>
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="font-sans text-[13px] font-semibold text-foreground truncate">{name}</p>
-        </div>
-        <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground border border-border px-2 py-0.5 rounded">
-          {count} turn{count !== 1 ? "s" : ""}
-        </span>
-      </div>
-    );
+      );
+    };
 
     return (
       <section className="space-y-4">
@@ -531,11 +604,79 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
 
         <div className="px-6 py-5 space-y-6">
 
-          {/* ── Summary ── */}
+          {/* ── Summary (editable) ── */}
           <section>
-            <h3 className="font-display text-[17px] font-bold text-foreground leading-snug mb-2">{signal.summary}</h3>
-            <p className="font-sans text-[13px] leading-relaxed text-muted-foreground">{signal.sourceMessage}</p>
+            <div className="flex items-start justify-between gap-2 mb-2">
+              {editingSummary ? (
+                <div className="flex-1 space-y-2">
+                  <textarea value={editSummaryText} onChange={(e) => setEditSummaryText(e.target.value)} rows={3}
+                    className="w-full bg-background border border-border font-display text-[17px] font-bold text-foreground leading-snug px-3 py-2 focus:outline-none focus:border-primary/40 resize-none rounded" />
+                  <div className="flex gap-1.5">
+                    <button onClick={() => handleSaveEdit("summary", editSummaryText)} disabled={savingEdit}
+                      className="flex items-center gap-1 px-2 py-1 rounded font-mono text-[9px] uppercase tracking-wider bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
+                      <Save className="w-3 h-3" /> Save
+                    </button>
+                    <button onClick={() => { setEditingSummary(false); setEditSummaryText(signal.summary); }}
+                      className="px-2 py-1 rounded font-mono text-[9px] uppercase tracking-wider text-muted-foreground border border-border hover:text-foreground">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <h3 className="font-display text-[17px] font-bold text-foreground leading-snug flex-1">{signal.summary}</h3>
+              )}
+              {!editingSummary && (
+                <button onClick={() => setEditingSummary(true)} className="p-1 rounded text-muted-foreground hover:text-foreground transition-colors shrink-0 mt-0.5">
+                  <Pencil className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            {/* Source message (editable) */}
+            <div className="group relative">
+              {editingSource ? (
+                <div className="space-y-2">
+                  <textarea value={editSourceText} onChange={(e) => setEditSourceText(e.target.value)} rows={5}
+                    className="w-full bg-background border border-border font-sans text-[13px] leading-relaxed text-muted-foreground px-3 py-2 focus:outline-none focus:border-primary/40 resize-none rounded" />
+                  <div className="flex gap-1.5">
+                    <button onClick={() => handleSaveEdit("source_message", editSourceText)} disabled={savingEdit}
+                      className="flex items-center gap-1 px-2 py-1 rounded font-mono text-[9px] uppercase tracking-wider bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
+                      <Save className="w-3 h-3" /> Save
+                    </button>
+                    <button onClick={() => { setEditingSource(false); setEditSourceText(signal.sourceMessage); }}
+                      className="px-2 py-1 rounded font-mono text-[9px] uppercase tracking-wider text-muted-foreground border border-border hover:text-foreground">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <p className="font-sans text-[13px] leading-relaxed text-muted-foreground">{signal.sourceMessage}</p>
+                  <button onClick={() => setEditingSource(true)}
+                    className="absolute top-0 right-0 p-1 rounded text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Pencil className="w-3 h-3" />
+                  </button>
+                </>
+              )}
+            </div>
           </section>
+
+          {/* Share button for meetings */}
+          {isMeeting && (
+            <div className="flex gap-2">
+              <button onClick={handleShareMeeting}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-md font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors">
+                <Share2 className="w-3.5 h-3.5" /> Share Summary
+              </button>
+              <button onClick={() => {
+                const subject = encodeURIComponent(`Meeting Notes: ${signal.summary}`);
+                const body = encodeURIComponent(`${signal.summary}\n\n${artifact?.summaryText || signal.sourceMessage}\n\n— Vanta Signal`);
+                window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
+              }} className="flex items-center gap-1.5 px-3 py-2 rounded-md font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors">
+                <Mail className="w-3.5 h-3.5" /> Email Notes
+              </button>
+            </div>
+          )}
 
           {isMeeting ? renderMeetingContent() : (
             <>
