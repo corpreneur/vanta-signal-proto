@@ -230,7 +230,7 @@ export default function Contacts() {
           </div>
           <div>
             <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground mb-0.5">Strong</p>
-            <p className="font-display text-xl text-emerald-500">{strongContacts}</p>
+            <p className="font-display text-xl text-vanta-signal-green">{strongContacts}</p>
           </div>
           <div>
             <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground mb-0.5">Stalled</p>
