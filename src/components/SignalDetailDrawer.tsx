@@ -289,22 +289,7 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
     if (loadingArtifact) return <div className="py-8 text-center"><p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">Loading meeting data…</p></div>;
     switch (meetingTab) {
       case "intelligence": return renderIntelligenceTab();
-      case "summary": return (
-        <section>
-          <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Meeting Summary</h3>
-          {artifact?.summaryText ? <p className="font-sans text-[13px] leading-[1.7] text-foreground/70 whitespace-pre-wrap">{artifact.summaryText}</p> : <p className="font-mono text-[10px] text-muted-foreground">No summary available.</p>}
-          {artifact?.attendees && (artifact.attendees as Record<string, unknown>[]).length > 0 && (
-            <div className="mt-4">
-              <h4 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Attendees</h4>
-              <div className="flex flex-wrap gap-1.5">
-                {(artifact.attendees as Record<string, unknown>[]).map((a, i) => (
-                  <span key={i} className="font-mono text-[9px] uppercase tracking-[0.15em] text-primary border border-primary/30 px-2 py-1 rounded">{(a as Record<string, unknown>).name as string || (a as Record<string, unknown>).email as string || `Participant ${i + 1}`}</span>
-                ))}
-              </div>
-            </div>
-          )}
-        </section>
-      );
+      case "summary": return renderSummaryTab();
       case "ask-ai": return renderAskAITab();
       case "speakers": return renderSpeakersTab();
       case "transcript": return renderTranscriptTab();
