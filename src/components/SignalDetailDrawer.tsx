@@ -574,11 +574,79 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
 
         <div className="px-6 py-5 space-y-6">
 
-          {/* ── Summary ── */}
+          {/* ── Summary (editable) ── */}
           <section>
-            <h3 className="font-display text-[17px] font-bold text-foreground leading-snug mb-2">{signal.summary}</h3>
-            <p className="font-sans text-[13px] leading-relaxed text-muted-foreground">{signal.sourceMessage}</p>
+            <div className="flex items-start justify-between gap-2 mb-2">
+              {editingSummary ? (
+                <div className="flex-1 space-y-2">
+                  <textarea value={editSummaryText} onChange={(e) => setEditSummaryText(e.target.value)} rows={3}
+                    className="w-full bg-background border border-border font-display text-[17px] font-bold text-foreground leading-snug px-3 py-2 focus:outline-none focus:border-primary/40 resize-none rounded" />
+                  <div className="flex gap-1.5">
+                    <button onClick={() => handleSaveEdit("summary", editSummaryText)} disabled={savingEdit}
+                      className="flex items-center gap-1 px-2 py-1 rounded font-mono text-[9px] uppercase tracking-wider bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
+                      <Save className="w-3 h-3" /> Save
+                    </button>
+                    <button onClick={() => { setEditingSummary(false); setEditSummaryText(signal.summary); }}
+                      className="px-2 py-1 rounded font-mono text-[9px] uppercase tracking-wider text-muted-foreground border border-border hover:text-foreground">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <h3 className="font-display text-[17px] font-bold text-foreground leading-snug flex-1">{signal.summary}</h3>
+              )}
+              {!editingSummary && (
+                <button onClick={() => setEditingSummary(true)} className="p-1 rounded text-muted-foreground hover:text-foreground transition-colors shrink-0 mt-0.5">
+                  <Pencil className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            {/* Source message (editable) */}
+            <div className="group relative">
+              {editingSource ? (
+                <div className="space-y-2">
+                  <textarea value={editSourceText} onChange={(e) => setEditSourceText(e.target.value)} rows={5}
+                    className="w-full bg-background border border-border font-sans text-[13px] leading-relaxed text-muted-foreground px-3 py-2 focus:outline-none focus:border-primary/40 resize-none rounded" />
+                  <div className="flex gap-1.5">
+                    <button onClick={() => handleSaveEdit("source_message", editSourceText)} disabled={savingEdit}
+                      className="flex items-center gap-1 px-2 py-1 rounded font-mono text-[9px] uppercase tracking-wider bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
+                      <Save className="w-3 h-3" /> Save
+                    </button>
+                    <button onClick={() => { setEditingSource(false); setEditSourceText(signal.sourceMessage); }}
+                      className="px-2 py-1 rounded font-mono text-[9px] uppercase tracking-wider text-muted-foreground border border-border hover:text-foreground">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <p className="font-sans text-[13px] leading-relaxed text-muted-foreground">{signal.sourceMessage}</p>
+                  <button onClick={() => setEditingSource(true)}
+                    className="absolute top-0 right-0 p-1 rounded text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Pencil className="w-3 h-3" />
+                  </button>
+                </>
+              )}
+            </div>
           </section>
+
+          {/* Share button for meetings */}
+          {isMeeting && (
+            <div className="flex gap-2">
+              <button onClick={handleShareMeeting}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-md font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors">
+                <Share2 className="w-3.5 h-3.5" /> Share Summary
+              </button>
+              <button onClick={() => {
+                const subject = encodeURIComponent(`Meeting Notes: ${signal.summary}`);
+                const body = encodeURIComponent(`${signal.summary}\n\n${artifact?.summaryText || signal.sourceMessage}\n\n— Vanta Signal`);
+                window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
+              }} className="flex items-center gap-1.5 px-3 py-2 rounded-md font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors">
+                <Mail className="w-3.5 h-3.5" /> Email Notes
+              </button>
+            </div>
+          )}
 
           {isMeeting ? renderMeetingContent() : (
             <>

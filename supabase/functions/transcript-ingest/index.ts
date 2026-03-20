@@ -393,6 +393,78 @@ Deno.serve(async (req) => {
       console.error("Artifact insert error (non-fatal):", artifactError);
     }
 
+    // ── Upsert speaker profiles & link to meeting ──
+    try {
+      const speakerTurnCounts = new Map<string, number>();
+      for (const turn of normalised.transcript) {
+        speakerTurnCounts.set(turn.speaker, (speakerTurnCounts.get(turn.speaker) || 0) + 1);
+      }
+
+      // Match attendees to speakers for email enrichment
+      const attendeeEmailMap = new Map<string, string>();
+      for (const a of normalised.attendees) {
+        if (a.email) attendeeEmailMap.set(a.name.toLowerCase(), a.email);
+      }
+
+      for (const [speakerName, turnCount] of speakerTurnCounts) {
+        const email = attendeeEmailMap.get(speakerName.toLowerCase()) || null;
+
+        // Try to find existing profile by email first, then by exact name
+        let profileId: string | null = null;
+
+        if (email) {
+          const { data: byEmail } = await supabase
+            .from("speaker_profiles")
+            .select("id, meeting_count")
+            .eq("email", email)
+            .maybeSingle();
+          if (byEmail) {
+            profileId = byEmail.id;
+            await supabase.from("speaker_profiles").update({
+              last_seen_at: new Date().toISOString(),
+              meeting_count: byEmail.meeting_count + 1,
+            }).eq("id", profileId);
+          }
+        }
+
+        if (!profileId) {
+          const { data: byName } = await supabase
+            .from("speaker_profiles")
+            .select("id, meeting_count")
+            .eq("name", speakerName)
+            .maybeSingle();
+          if (byName) {
+            profileId = byName.id;
+            await supabase.from("speaker_profiles").update({
+              last_seen_at: new Date().toISOString(),
+              meeting_count: byName.meeting_count + 1,
+              ...(email ? { email } : {}),
+            }).eq("id", profileId);
+          }
+        }
+
+        if (!profileId) {
+          const { data: newProfile } = await supabase
+            .from("speaker_profiles")
+            .insert({ name: speakerName, email })
+            .select("id")
+            .single();
+          if (newProfile) profileId = newProfile.id;
+        }
+
+        if (profileId) {
+          await supabase.from("meeting_speakers").insert({
+            signal_id: signalData.id,
+            speaker_profile_id: profileId,
+            turn_count: turnCount,
+          }).onConflict("signal_id,speaker_profile_id" as any);
+        }
+      }
+      console.log(`Speaker profiles upserted for ${speakerTurnCounts.size} speakers`);
+    } catch (speakerErr) {
+      console.error("Speaker profiling error (non-fatal):", speakerErr);
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
