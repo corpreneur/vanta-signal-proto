@@ -227,6 +227,7 @@ const Index = () => {
         </Motion>
       ) : isExecutive ? (
         <>
+          <WhatsAhead />
           <Motion delay={40}>
             <DailyTimeline signals={activeSignals} onSignalClick={(s) => setDrawerSignal(s)} highOnly />
           </Motion>
@@ -250,7 +251,6 @@ const Index = () => {
               </div>
             </div>
           </Motion>
-          <WhatsAhead />
         </>
       ) : (
         /* Creative mode — full experience */
