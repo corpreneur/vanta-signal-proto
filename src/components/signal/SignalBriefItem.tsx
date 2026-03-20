@@ -1,5 +1,5 @@
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
-import * as LucideIcons from "lucide-react";
+import { Users, DollarSign, AlertCircle } from "lucide-react";
 
 interface SignalBriefItemProps {
   icon: string;
