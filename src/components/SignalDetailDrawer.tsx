@@ -140,7 +140,50 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   const [aiQuestion, setAiQuestion] = useState("");
   const [aiAnswer, setAiAnswer] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
+  // Inline editing states
+  const [editingSummary, setEditingSummary] = useState(false);
+  const [editSummaryText, setEditSummaryText] = useState("");
+  const [editingSource, setEditingSource] = useState(false);
+  const [editSourceText, setEditSourceText] = useState("");
+  const [savingEdit, setSavingEdit] = useState(false);
   const queryClient = useQueryClient();
+
+  // Sync edit texts when signal changes
+  useEffect(() => {
+    if (signal) {
+      setEditSummaryText(signal.summary);
+      setEditSourceText(signal.sourceMessage);
+      setEditingSummary(false);
+      setEditingSource(false);
+    }
+  }, [signal?.id]);
+
+  const handleSaveEdit = async (field: "summary" | "source_message", value: string) => {
+    if (!signal) return;
+    setSavingEdit(true);
+    const update = field === "summary" ? { summary: value } : { source_message: value };
+    const { error } = await supabase.from("signals").update(update).eq("id", signal.id);
+    setSavingEdit(false);
+    if (error) { toast.error("Failed to save edit"); return; }
+    queryClient.invalidateQueries({ queryKey: ["signals"] });
+    queryClient.invalidateQueries({ queryKey: ["meetings-hub"] });
+    if (field === "summary") setEditingSummary(false);
+    else setEditingSource(false);
+    toast.success("Saved");
+  };
+
+  const handleShareMeeting = async () => {
+    if (!signal) return;
+    const summaryBlock = artifact?.summaryText ? `\n\nSummary:\n${artifact.summaryText}` : "";
+    const actionsBlock = signal.actionsTaken.length > 0 ? `\n\nActions:\n${signal.actionsTaken.map(a => `• ${a.replace(/_/g, " ")}`).join("\n")}` : "";
+    const text = `${signal.summary}${summaryBlock}${actionsBlock}\n\n— Vanta Signal`;
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("Meeting summary copied to clipboard");
+    } catch {
+      toast.error("Failed to copy");
+    }
+  };
 
   useEffect(() => { if (signal?.status) setCurrentStatus(signal.status); }, [signal?.id, signal?.status]);
   useEffect(() => { if (open && scrollRef.current) scrollRef.current.scrollTop = 0; }, [signal?.id, open]);
