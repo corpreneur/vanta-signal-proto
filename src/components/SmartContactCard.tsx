@@ -92,6 +92,37 @@ export default function SmartContactCard({ contact }: { contact: SmartContactCar
           </div>
         </div>
 
+        {/* Mini activity sparkline — 8 weeks */}
+        {(() => {
+          const now = Date.now();
+          const weekMs = 7 * 24 * 60 * 60 * 1000;
+          const weeks = Array.from({ length: 8 }, (_, i) => {
+            const weekStart = now - (7 - i) * weekMs;
+            const weekEnd = weekStart + weekMs;
+            return contact.recentSignals.filter((s) => {
+              const t = new Date(s.capturedAt).getTime();
+              return t >= weekStart && t < weekEnd;
+            }).length;
+          });
+          const max = Math.max(...weeks, 1);
+          return (
+            <div className="flex items-end gap-[3px] h-4 mb-3">
+              {weeks.map((count, i) => (
+                <div
+                  key={i}
+                  className={`flex-1 rounded-[1px] transition-all ${
+                    count > 0 ? "bg-primary" : "bg-muted"
+                  }`}
+                  style={{
+                    height: count > 0 ? `${Math.max(20, (count / max) * 100)}%` : "15%",
+                    opacity: count > 0 ? 0.4 + (count / max) * 0.6 : 0.3,
+                  }}
+                />
+              ))}
+            </div>
+          );
+        })()}
+
         {/* Stats row */}
         <div className="flex items-center gap-4 mb-3 pb-3 border-b border-border/50">
           <div className="flex items-center gap-1">
