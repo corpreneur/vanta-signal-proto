@@ -208,7 +208,7 @@ export default function ContextLayerSetup() {
                 <button
                   onClick={finish}
                   disabled={!primaryId}
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[hsl(270_60%_60%)] text-white font-mono text-[11px] uppercase tracking-wider rounded-sm hover:bg-[hsl(270_60%_50%)] disabled:opacity-30 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-mono text-[11px] uppercase tracking-wider rounded-sm hover:bg-primary/90 disabled:opacity-30 transition-colors"
                 >
                   <Zap className="w-4 h-4" /> Activate Signal Brief
                 </button>
