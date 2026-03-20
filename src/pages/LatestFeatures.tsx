@@ -10,7 +10,17 @@ import {
   Mic,
   ArrowRight,
 } from "lucide-react";
-import { Card } from "@/components/ui/card";
+
+/* ── Forced light-mode Vanta B/W palette ── */
+const L = {
+  bg: "hsl(0 0% 100%)",
+  card: "hsl(0 0% 96%)",
+  fg: "hsl(0 0% 5%)",
+  muted: "hsl(30 4% 46%)",
+  accent: "hsl(30 4% 18%)",
+  border: "hsl(0 0% 90%)",
+  primary: "hsl(30 4% 18%)",
+};
 
 /* ── Feature definitions ── */
 
@@ -66,7 +76,7 @@ const SECTIONS: DropSection[] = [
   },
 ];
 
-/* ── How-it-works steps (combined narrative) ── */
+/* ── How-it-works steps ── */
 const STEPS = [
   { n: "01", title: "Context is set", desc: "You define your business contexts once during onboarding — or adjust them anytime from the brief card." },
   { n: "02", title: "Signals are captured", desc: "Meetings, calls, emails, and messages flow in from connected sources. Speaker identities are matched and persisted." },
@@ -79,16 +89,19 @@ const STEPS = [
 
 export default function LatestFeatures() {
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10 space-y-16">
+    <div
+      className="max-w-3xl mx-auto px-4 py-10 space-y-16"
+      style={{ background: L.bg, color: L.fg }}
+    >
       {/* Page header */}
       <header className="space-y-3">
-        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em]" style={{ color: L.accent }}>
           Latest Drop · v2.0 – v2.1
         </p>
-        <h1 className="font-display text-[28px] sm:text-[36px] font-extrabold leading-[1.1] text-foreground tracking-tight">
+        <h1 className="font-display text-[28px] sm:text-[36px] font-extrabold leading-[1.1] tracking-tight" style={{ color: L.fg }}>
           Signal Brief & Meeting Intelligence
         </h1>
-        <p className="font-sans text-[15px] text-muted-foreground leading-relaxed max-w-xl">
+        <p className="font-sans text-[15px] leading-relaxed max-w-xl" style={{ color: L.muted }}>
           Two releases, one thesis: intelligence should arrive — scoped, summarised, and ready to act on — not wait to be found.
         </p>
       </header>
@@ -96,44 +109,46 @@ export default function LatestFeatures() {
       {/* Sections */}
       {SECTIONS.map((section) => (
         <section key={section.version} className="space-y-8">
-          {/* Section header */}
           <div className="space-y-2">
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em]" style={{ color: L.muted }}>
               {section.version} · {section.date}
             </p>
-            <h2 className="font-display text-[22px] font-bold text-foreground">
+            <h2 className="font-display text-[22px] font-bold" style={{ color: L.fg }}>
               {section.headline}
             </h2>
-            <p className="font-sans text-[14px] italic text-muted-foreground">
+            <p className="font-sans text-[14px] italic" style={{ color: L.muted }}>
               {section.tagline}
             </p>
           </div>
 
-          {/* Narrative */}
-          <p className="font-sans text-[14px] text-muted-foreground leading-relaxed">
+          <p className="font-sans text-[14px] leading-relaxed" style={{ color: L.muted }}>
             {section.narrative}
           </p>
 
           {/* Feature cards */}
           <div className="grid gap-3 sm:grid-cols-2">
             {section.features.map((f) => (
-              <Card key={f.title} className="p-4 space-y-2 border-border bg-card">
+              <div
+                key={f.title}
+                className="p-4 space-y-2"
+                style={{ background: L.card, border: `1px solid ${L.border}` }}
+              >
                 <div className="flex items-center gap-2">
-                  <f.icon className="h-4 w-4 text-primary shrink-0" />
-                  <span className="font-mono text-[11px] uppercase tracking-wider text-foreground font-bold">
+                  <f.icon className="h-4 w-4 shrink-0" style={{ color: L.accent }} />
+                  <span className="font-mono text-[11px] uppercase tracking-wider font-bold" style={{ color: L.fg }}>
                     {f.title}
                   </span>
                 </div>
-                <p className="font-sans text-[13px] text-muted-foreground leading-relaxed">
+                <p className="font-sans text-[13px] leading-relaxed" style={{ color: L.muted }}>
                   {f.desc}
                 </p>
-              </Card>
+              </div>
             ))}
           </div>
 
           {/* Pull quote */}
-          <blockquote className="border-l-2 border-primary pl-4 py-2">
-            <p className="font-sans text-[13px] italic text-foreground leading-relaxed">
+          <blockquote className="pl-4 py-2" style={{ borderLeft: `2px solid ${L.accent}` }}>
+            <p className="font-sans text-[13px] italic leading-relaxed" style={{ color: L.fg }}>
               {section.whyItMatters}
             </p>
           </blockquote>
@@ -142,20 +157,20 @@ export default function LatestFeatures() {
 
       {/* How it works */}
       <section className="space-y-6">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em]" style={{ color: L.muted }}>
           How it works
         </p>
         <div className="space-y-4">
           {STEPS.map((step) => (
             <div key={step.n} className="flex gap-4">
-              <span className="font-mono text-[11px] text-primary shrink-0 mt-0.5 w-5">
+              <span className="font-mono text-[11px] shrink-0 mt-0.5 w-5" style={{ color: L.accent }}>
                 {step.n}
               </span>
               <div>
-                <p className="font-sans text-[13px] font-bold text-foreground mb-1">
+                <p className="font-sans text-[13px] font-bold mb-1" style={{ color: L.fg }}>
                   {step.title}
                 </p>
-                <p className="font-sans text-[13px] text-muted-foreground leading-relaxed">
+                <p className="font-sans text-[13px] leading-relaxed" style={{ color: L.muted }}>
                   {step.desc}
                 </p>
               </div>
@@ -165,7 +180,7 @@ export default function LatestFeatures() {
       </section>
 
       {/* CTA */}
-      <div className="flex items-center gap-2 text-primary font-mono text-[11px] uppercase tracking-wider">
+      <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider" style={{ color: L.accent }}>
         <span>Explore the Signal Feed</span>
         <ArrowRight className="h-3.5 w-3.5" />
       </div>
