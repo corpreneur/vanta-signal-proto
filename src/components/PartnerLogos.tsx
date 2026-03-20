@@ -88,13 +88,6 @@ const TeamsLogo = (props: LogoProps) => (
   </svg>
 );
 
-const WebexLogo = (props: LogoProps) => (
-  <svg viewBox="0 0 24 24" fill="none" {...props}>
-    <rect width="24" height="24" rx="4" fill="#07C160" />
-    <circle cx="9" cy="12" r="4.5" fill="#fff" opacity="0.9" />
-    <circle cx="15" cy="12" r="4.5" fill="#fff" opacity="0.7" />
-  </svg>
-);
 
 const PhoneCallLogo = (props: LogoProps) => (
   <svg viewBox="0 0 24 24" fill="none" {...props}>
