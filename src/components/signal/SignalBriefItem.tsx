@@ -17,7 +17,8 @@ const trendConfig = {
 
 export default function SignalBriefItem({ icon, label, value, trend, trendLabel }: SignalBriefItemProps) {
   const { Icon: TrendIcon, color } = trendConfig[trend];
-  const LucideIcon = (LucideIcons as Record<string, React.ComponentType<{ className?: string }>>)[icon] || Minus;
+  const iconMap: Record<string, React.ComponentType<{ className?: string }>> = { Users, DollarSign, AlertCircle };
+  const LucideIcon = iconMap[icon] || Minus;
 
   return (
     <div className="flex-1 min-w-[100px] flex flex-col gap-1.5 px-3 py-2">
