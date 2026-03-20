@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { releaseNotes, type ReleaseEntry } from "@/data/releaseNotes";
+import { Zap, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -95,6 +97,21 @@ export default function ReleaseNotes() {
           Every version shipped. Every signal strengthened.
         </p>
       </div>
+
+      {/* Latest Drop banner */}
+      <Link
+        to="/product/latest"
+        className="flex items-center justify-between gap-3 px-4 py-3 mb-8 border border-primary/20 bg-primary/5 rounded-sm group hover:border-primary/40 transition-colors"
+      >
+        <div className="flex items-center gap-2.5">
+          <Zap className="w-4 h-4 text-primary shrink-0" />
+          <div>
+            <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-primary">Latest Drop · v2.0–v2.1</span>
+            <p className="font-sans text-[13px] text-muted-foreground leading-snug">Signal Brief, Context Layer & Meeting Intelligence — the full narrative.</p>
+          </div>
+        </div>
+        <ArrowRight className="w-4 h-4 text-primary shrink-0 group-hover:translate-x-0.5 transition-transform" />
+      </Link>
 
       {/* Time filter pills */}
       <div className="flex gap-1.5 mb-8">
