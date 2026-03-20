@@ -169,6 +169,45 @@ export type Database = {
           },
         ]
       }
+      meeting_speakers: {
+        Row: {
+          created_at: string
+          id: string
+          signal_id: string
+          speaker_profile_id: string
+          turn_count: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          signal_id: string
+          speaker_profile_id: string
+          turn_count?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          signal_id?: string
+          speaker_profile_id?: string
+          turn_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_speakers_signal_id_fkey"
+            columns: ["signal_id"]
+            isOneToOne: false
+            referencedRelation: "signals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meeting_speakers_speaker_profile_id_fkey"
+            columns: ["speaker_profile_id"]
+            isOneToOne: false
+            referencedRelation: "speaker_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pre_meeting_briefs: {
         Row: {
           attendee_context: Json
@@ -371,6 +410,42 @@ export type Database = {
           source_message?: string
           status?: Database["public"]["Enums"]["signal_status"]
           summary?: string
+        }
+        Relationships: []
+      }
+      speaker_profiles: {
+        Row: {
+          aliases: string[]
+          created_at: string
+          email: string | null
+          first_seen_at: string
+          id: string
+          last_seen_at: string
+          meeting_count: number
+          metadata: Json | null
+          name: string
+        }
+        Insert: {
+          aliases?: string[]
+          created_at?: string
+          email?: string | null
+          first_seen_at?: string
+          id?: string
+          last_seen_at?: string
+          meeting_count?: number
+          metadata?: Json | null
+          name: string
+        }
+        Update: {
+          aliases?: string[]
+          created_at?: string
+          email?: string | null
+          first_seen_at?: string
+          id?: string
+          last_seen_at?: string
+          meeting_count?: number
+          metadata?: Json | null
+          name?: string
         }
         Relationships: []
       }
