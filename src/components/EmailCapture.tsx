@@ -102,7 +102,7 @@ export default function EmailCapture({ onCapture }: EmailCaptureProps) {
           {result.suggestedContacts && result.suggestedContacts.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {result.suggestedContacts.map((c) => (
-                <span key={c} className="font-mono text-[9px] px-2 py-0.5 rounded-full border border-primary/30 bg-primary/10 text-primary">
+                <span key={c} className="font-mono text-[9px] px-2 py-0.5 rounded-sm border border-primary/30 bg-primary/10 text-primary">
                   {c}
                 </span>
               ))}

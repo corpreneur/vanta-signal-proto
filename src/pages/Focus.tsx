@@ -45,7 +45,7 @@ export default function Focus() {
   };
 
   return (
-    <div className="max-w-[960px] mx-auto px-5 py-8 md:py-12 pb-16">
+    <div className="max-w-[960px] mx-auto px-5 py-8 md:py-12 pb-16 overflow-x-hidden">
       <Motion>
         <header className="mb-8">
           <div className="flex items-center gap-3 mb-2">

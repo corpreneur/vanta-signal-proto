@@ -236,7 +236,7 @@ export default function Command() {
   ];
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 md:py-12">
+    <div className="max-w-2xl mx-auto px-4 py-8 md:py-12 overflow-x-hidden">
       {/* Header */}
       <Motion>
         <header className="mb-6">

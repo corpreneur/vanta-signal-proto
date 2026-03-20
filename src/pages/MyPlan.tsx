@@ -112,7 +112,7 @@ export default function MyPlan() {
                 className={`border ${isCurrent ? plan.border : "border-border"} rounded-lg p-5 ${isCurrent ? plan.bg : ""} relative`}
               >
                 {isCurrent && (
-                  <span className="absolute top-3 right-3 font-mono text-[8px] uppercase tracking-widest px-2 py-0.5 bg-primary text-primary-foreground rounded-full">
+                  <span className="absolute top-3 right-3 font-mono text-[8px] uppercase tracking-widest px-2 py-0.5 bg-primary text-primary-foreground rounded-sm">
                     Current
                   </span>
                 )}

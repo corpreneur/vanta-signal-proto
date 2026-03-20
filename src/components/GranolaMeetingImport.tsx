@@ -407,7 +407,7 @@ export default function GranolaMeetingImport({ onCapture }: GranolaMeetingImport
               <button
                 onClick={() => handleAsk()}
                 disabled={!askQuestion.trim() || askLoading}
-                className="w-8 h-8 rounded-full bg-[hsl(50_50%_30%)] text-white flex items-center justify-center hover:bg-[hsl(50_50%_25%)] transition-colors disabled:opacity-30"
+                className="w-8 h-8 rounded-sm bg-[hsl(50_50%_30%)] text-white flex items-center justify-center hover:bg-[hsl(50_50%_25%)] transition-colors disabled:opacity-30"
               >
                 {askLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowUp className="w-4 h-4" />}
               </button>

@@ -113,19 +113,25 @@ export default function Meetings() {
   }, [meetings]);
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-12">
+    <div className="max-w-[960px] mx-auto px-5 py-8 md:px-10 md:py-12 overflow-x-hidden">
       {/* Header */}
-      <div className="mb-8">
-        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">
-          Platform · Meetings
-        </p>
-        <h1 className="font-sans text-[28px] font-extrabold tracking-tight text-foreground mb-1">
+      <header className="mb-8">
+        <div className="flex items-center gap-3 mb-2">
+          <div
+            className="w-2 h-2 bg-vanta-accent"
+            style={{ animation: "pulse-dot 2s ease-in-out infinite" }}
+          />
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
+            Platform · Meetings
+          </p>
+        </div>
+        <h1 className="font-display text-[clamp(28px,5vw,40px)] leading-[1.05] text-foreground mb-2">
           Meeting Intelligence
         </h1>
-        <p className="font-sans text-[14px] text-muted-foreground">
+        <p className="font-sans text-[14px] text-muted-foreground leading-relaxed max-w-[640px]">
           Every transcript. Every insight. Across all sources.
         </p>
-      </div>
+      </header>
 
       {/* Source filters */}
       <div className="flex flex-wrap gap-1.5 mb-8">
