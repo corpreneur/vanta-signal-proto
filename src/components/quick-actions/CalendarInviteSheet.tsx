@@ -1,11 +1,11 @@
 import { Calendar } from "lucide-react";
+import { PARTNER_LOGOS } from "@/components/PartnerLogos";
 
 const CALENDAR_OPTIONS = [
   {
     label: "Apple Calendar",
     desc: "Default iOS calendar",
     handler: () => {
-      // Generate a minimal .ics blob and trigger download — iOS intercepts and opens Calendar.app
       const ics = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
@@ -24,7 +24,7 @@ const CALENDAR_OPTIONS = [
       a.click();
       URL.revokeObjectURL(url);
     },
-    icon: "📅",
+    logoKey: "apple_calendar",
   },
   {
     label: "Google Calendar",
@@ -32,7 +32,7 @@ const CALENDAR_OPTIONS = [
     handler: () => {
       window.open("https://calendar.google.com/calendar/r/eventedit", "_blank");
     },
-    icon: "📆",
+    logoKey: "google_calendar",
   },
   {
     label: "Outlook",
@@ -40,7 +40,7 @@ const CALENDAR_OPTIONS = [
     handler: () => {
       window.open("https://outlook.live.com/calendar/0/deeplink/compose", "_blank");
     },
-    icon: "🗓️",
+    logoKey: "outlook_calendar",
   },
 ];
 
@@ -60,23 +60,26 @@ export default function CalendarInviteSheet({ onClose }: { onClose: () => void }
       </div>
 
       <div className="space-y-1.5">
-        {CALENDAR_OPTIONS.map((opt) => (
-          <button
-            key={opt.label}
-            onClick={() => handlePick(opt)}
-            className="w-full flex items-center gap-3 p-3.5 border border-border bg-card hover:border-foreground/20 hover:bg-muted transition-all duration-200 text-left"
-          >
-            <span className="text-xl leading-none">{opt.icon}</span>
-            <div className="flex flex-col">
-              <span className="font-mono text-[11px] uppercase tracking-wider text-foreground font-medium">
-                {opt.label}
-              </span>
-              <span className="font-mono text-[9px] text-muted-foreground">
-                {opt.desc}
-              </span>
-            </div>
-          </button>
-        ))}
+        {CALENDAR_OPTIONS.map((opt) => {
+          const Logo = PARTNER_LOGOS[opt.logoKey];
+          return (
+            <button
+              key={opt.label}
+              onClick={() => handlePick(opt)}
+              className="w-full flex items-center gap-3 p-3.5 border border-border bg-card hover:border-foreground/20 hover:bg-muted transition-all duration-200 text-left"
+            >
+              {Logo && <Logo className="w-8 h-8 shrink-0" />}
+              <div className="flex flex-col">
+                <span className="font-mono text-[11px] uppercase tracking-wider text-foreground font-medium">
+                  {opt.label}
+                </span>
+                <span className="font-mono text-[9px] text-muted-foreground">
+                  {opt.desc}
+                </span>
+              </div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
