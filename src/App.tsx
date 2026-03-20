@@ -27,6 +27,7 @@ import ReleaseNotes from "./pages/ReleaseNotes";
 import Meetings from "./pages/Meetings";
 import Command from "./pages/Command";
 import LatestFeatures from "./pages/LatestFeatures";
+import ReleaseV19 from "./pages/ReleaseV19";
 
 import Settings from "./pages/Settings";
 import PersonalInfo from "./pages/PersonalInfo";
