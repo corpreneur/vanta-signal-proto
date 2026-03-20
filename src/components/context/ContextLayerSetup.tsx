@@ -85,7 +85,7 @@ export default function ContextLayerSetup() {
                   onChange={(e) => setInputVal(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && addContext()}
                   placeholder="Client name, project, or income stream…"
-                  className="flex-1 bg-card border border-border px-4 py-3 font-sans text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[hsl(270_60%_60%/0.5)] transition-colors rounded-sm"
+                  className="flex-1 bg-card border border-border px-4 py-3 font-sans text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors rounded-sm"
                   maxLength={40}
                 />
                 <button
