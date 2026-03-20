@@ -20,6 +20,8 @@ import CaptureResultSplit from "@/components/CaptureResultSplit";
 import AskVantaBar from "@/components/AskVantaBar";
 import BrainDumpAskAI from "@/components/BrainDumpAskAI";
 import GranolaMeetingImport from "@/components/GranolaMeetingImport";
+import UnifiedCaptureInput, { type CapturePayload } from "@/components/UnifiedCaptureInput";
+import CaptureProcessingReveal from "@/components/CaptureProcessingReveal";
 import { Motion } from "@/components/ui/motion";
 
 const SIGNAL_TYPE_LABELS: Record<string, string> = {
