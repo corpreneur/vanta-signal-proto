@@ -234,8 +234,6 @@ export default function ViewfinderPills() {
     </Motion>
   );
 }
-  const [activeLens, setActiveLens] = useState<Lens>("recommended");
-  const [selectedContact, setSelectedContact] = useState<string | null>(null);
 
   const { data: signals = [], isLoading } = useQuery({
     queryKey: ["viewfinder-signals"],
