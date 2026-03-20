@@ -157,31 +157,40 @@ export default function Contacts() {
   const strongContacts = contacts.filter((c) => c.strength >= 75).length;
 
   return (
-    <div className="max-w-[960px] mx-auto px-4 pt-6 pb-16">
+    <div className="max-w-[960px] mx-auto px-4 pt-6 pb-16 overflow-x-hidden">
       <Motion>
         <header className="mb-5">
+          <div className="flex items-center gap-3 mb-2">
+            <div
+              className="w-2 h-2 bg-vanta-accent"
+              style={{ animation: "pulse-dot 2s ease-in-out infinite" }}
+            />
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
+              Platform · Contacts
+            </p>
+          </div>
           <div className="flex items-start justify-between gap-3 mb-3">
-            <h1 className="font-display text-2xl md:text-3xl text-foreground tracking-tight">
+            <h1 className="font-display text-[clamp(28px,5vw,40px)] leading-[1.05] text-foreground">
               Smart Contacts
             </h1>
             <div className="flex items-center gap-1.5 shrink-0">
               <button
                 onClick={() => setImportOpen(true)}
-                className="flex items-center gap-1 px-2.5 py-2 font-mono text-[9px] uppercase tracking-[0.12em] border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors rounded-full"
+                className="flex items-center gap-1 px-2.5 py-2 font-mono text-[9px] uppercase tracking-[0.12em] border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors rounded-sm"
               >
                 <Upload className="w-3 h-3" />
                 <span className="hidden sm:inline">Import .vcf</span>
               </button>
               <Link
                 to="/contacts/sync"
-                className="flex items-center gap-1 px-2.5 py-2 font-mono text-[9px] uppercase tracking-[0.12em] border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors rounded-full"
+                className="flex items-center gap-1 px-2.5 py-2 font-mono text-[9px] uppercase tracking-[0.12em] border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors rounded-sm"
               >
                 <Smartphone className="w-3 h-3" />
                 <span className="hidden sm:inline">iPhone Sync</span>
               </Link>
             </div>
           </div>
-          <p className="text-muted-foreground text-xs font-mono max-w-md">
+          <p className="font-sans text-[14px] text-muted-foreground leading-relaxed max-w-[640px]">
             Relationship intelligence, strength scores, and proactive engagement.
           </p>
 
@@ -221,7 +230,7 @@ export default function Contacts() {
           </div>
           <div>
             <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground mb-0.5">Strong</p>
-            <p className="font-display text-xl text-emerald-500">{strongContacts}</p>
+            <p className="font-display text-xl text-vanta-signal-green">{strongContacts}</p>
           </div>
           <div>
             <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground mb-0.5">Stalled</p>

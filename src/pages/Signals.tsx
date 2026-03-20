@@ -243,7 +243,7 @@ const Signals = () => {
   const actionCount = feedSignals.reduce((acc, s) => acc + s.actionsTaken.length, 0);
 
   return (
-    <div className="max-w-[960px] mx-auto px-5 py-10 md:px-10">
+    <div className="max-w-[960px] mx-auto px-5 py-10 md:px-10 overflow-x-hidden">
       <header className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <div

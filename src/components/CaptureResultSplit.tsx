@@ -116,7 +116,7 @@ export default function CaptureResultSplit({ rawText, classification, children }
             {classification.suggestedTags && classification.suggestedTags.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {classification.suggestedTags.map((tag) => (
-                  <span key={tag} className="font-mono text-[9px] uppercase tracking-[0.12em] px-2 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary">
+                  <span key={tag} className="font-mono text-[9px] uppercase tracking-[0.12em] px-2 py-1 rounded-sm border border-primary/30 bg-primary/10 text-primary">
                     {tag}
                   </span>
                 ))}
@@ -127,7 +127,7 @@ export default function CaptureResultSplit({ rawText, classification, children }
             {classification.suggestedContacts && classification.suggestedContacts.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {classification.suggestedContacts.map((c) => (
-                  <span key={c} className="font-mono text-[9px] uppercase tracking-[0.12em] px-2 py-1 rounded-full border border-accent/30 bg-accent/10 text-accent-foreground">
+                  <span key={c} className="font-mono text-[9px] uppercase tracking-[0.12em] px-2 py-1 rounded-sm border border-accent/30 bg-accent/10 text-accent-foreground">
                     + {c}
                   </span>
                 ))}

@@ -263,7 +263,7 @@ export default function GranolaMeetingImport({ onCapture }: GranolaMeetingImport
             <button
               onClick={handleSubmit}
               disabled={!meetingNotes.trim() || loading}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[hsl(50_50%_30%)] text-white font-sans text-[13px] hover:bg-[hsl(50_50%_25%)] transition-colors disabled:opacity-40"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-sm bg-[hsl(50_50%_30%)] text-white font-sans text-[13px] hover:bg-[hsl(50_50%_25%)] transition-colors disabled:opacity-40"
             >
               {loading ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Classifying…</>
@@ -367,7 +367,7 @@ export default function GranolaMeetingImport({ onCapture }: GranolaMeetingImport
                 {result.suggestedTags && result.suggestedTags.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 pt-2">
                     {result.suggestedTags.map((tag) => (
-                      <span key={tag} className="font-mono text-[9px] px-2 py-0.5 rounded-full bg-muted/40 text-muted-foreground border border-border">
+                      <span key={tag} className="font-mono text-[9px] px-2 py-0.5 rounded-sm bg-muted/40 text-muted-foreground border border-border">
                         #{tag}
                       </span>
                     ))}
@@ -386,7 +386,7 @@ export default function GranolaMeetingImport({ onCapture }: GranolaMeetingImport
                   key={prompt}
                   onClick={() => handleAsk(prompt)}
                   disabled={askLoading}
-                  className="px-3 py-1.5 rounded-full bg-[hsl(50_50%_30%)]/10 border border-[hsl(50_50%_30%)]/30 text-[12px] font-sans text-foreground hover:bg-[hsl(50_50%_30%)]/20 transition-colors whitespace-nowrap disabled:opacity-40"
+                  className="px-3 py-1.5 rounded-sm bg-[hsl(50_50%_30%)]/10 border border-[hsl(50_50%_30%)]/30 text-[12px] font-sans text-foreground hover:bg-[hsl(50_50%_30%)]/20 transition-colors whitespace-nowrap disabled:opacity-40"
                 >
                   {prompt}
                 </button>
@@ -407,7 +407,7 @@ export default function GranolaMeetingImport({ onCapture }: GranolaMeetingImport
               <button
                 onClick={() => handleAsk()}
                 disabled={!askQuestion.trim() || askLoading}
-                className="w-8 h-8 rounded-full bg-[hsl(50_50%_30%)] text-white flex items-center justify-center hover:bg-[hsl(50_50%_25%)] transition-colors disabled:opacity-30"
+                className="w-8 h-8 rounded-sm bg-[hsl(50_50%_30%)] text-white flex items-center justify-center hover:bg-[hsl(50_50%_25%)] transition-colors disabled:opacity-30"
               >
                 {askLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowUp className="w-4 h-4" />}
               </button>

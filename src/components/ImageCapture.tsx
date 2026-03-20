@@ -212,7 +212,7 @@ export default function ImageCapture({ onCapture }: ImageCaptureProps) {
           {result.suggestedTags && result.suggestedTags.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {result.suggestedTags.map((tag) => (
-                <span key={tag} className="font-mono text-[9px] px-2 py-0.5 rounded-full border border-border bg-muted/30 text-muted-foreground">
+                <span key={tag} className="font-mono text-[9px] px-2 py-0.5 rounded-sm border border-border bg-muted/30 text-muted-foreground">
                   {tag}
                 </span>
               ))}

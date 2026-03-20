@@ -136,7 +136,7 @@ export default function Connectivity() {
   const activeChannels = CHANNELS.filter((ch) => settings[ch.settingKey] !== false).length;
 
   return (
-    <div className="max-w-[960px] mx-auto px-5 py-12 md:px-10 md:py-20">
+    <div className="max-w-[960px] mx-auto px-5 py-12 md:px-10 md:py-20 overflow-x-hidden">
       {/* Header */}
       <Motion>
         <header className="mb-8">
