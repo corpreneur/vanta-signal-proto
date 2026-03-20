@@ -82,12 +82,27 @@ function todayCount(signals: Signal[]) {
   return signals.filter((s) => new Date(s.capturedAt) >= start).length;
 }
 
-function getClearUntil(meetingCount: number): string {
-  if (meetingCount === 0) return "end of day";
-  const now = new Date();
-  const nextHour = new Date(now);
-  nextHour.setHours(nextHour.getHours() + 1, 0, 0, 0);
-  return nextHour.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+function getSignalPulse(signals: Signal[]): string {
+  const start = new Date(); start.setHours(0, 0, 0, 0);
+  const todaySignals = signals.filter((s) => new Date(s.capturedAt) >= start);
+  const uniqueSenders = new Set(todaySignals.map((s) => s.sender));
+  const waitingOn = signals.filter((s) => s.status === "In Progress").length;
+  const decisions = signals.filter((s) => s.signalType === "DECISION" && s.status !== "Complete").length;
+  const overdue = signals.filter((s) => s.dueDate && new Date(s.dueDate) < new Date() && s.status !== "Complete").length;
+
+  const parts: string[] = [];
+  if (uniqueSenders.size > 0) parts.push(`${uniqueSenders.size} ${uniqueSenders.size === 1 ? "person" : "people"} in your orbit today`);
+  if (waitingOn > 0) parts.push(`${waitingOn} awaiting response`);
+  if (decisions > 0) parts.push(`${decisions} ${decisions === 1 ? "decision" : "decisions"} pending`);
+  if (overdue > 0) parts.push(`${overdue} overdue`);
+  if (parts.length === 0) return "Quiet morning — good time to think";
+  return parts.slice(0, 2).join(" · ");
+}
+
+function getPeopleCount(signals: Signal[]): number {
+  const start = new Date(); start.setHours(0, 0, 0, 0);
+  const todaySignals = signals.filter((s) => new Date(s.capturedAt) >= start);
+  return new Set(todaySignals.map((s) => s.sender)).size;
 }
 
 /* ── component ─────────────────────────────────────────── */
