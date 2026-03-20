@@ -26,6 +26,7 @@ import OrbDemo from "./pages/OrbDemo";
 import ReleaseNotes from "./pages/ReleaseNotes";
 import Meetings from "./pages/Meetings";
 import Command from "./pages/Command";
+import LatestFeatures from "./pages/LatestFeatures";
 
 import Settings from "./pages/Settings";
 import PersonalInfo from "./pages/PersonalInfo";
