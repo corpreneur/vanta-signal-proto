@@ -263,7 +263,7 @@ export default function GranolaMeetingImport({ onCapture }: GranolaMeetingImport
             <button
               onClick={handleSubmit}
               disabled={!meetingNotes.trim() || loading}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[hsl(50_50%_30%)] text-white font-sans text-[13px] hover:bg-[hsl(50_50%_25%)] transition-colors disabled:opacity-40"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-sm bg-[hsl(50_50%_30%)] text-white font-sans text-[13px] hover:bg-[hsl(50_50%_25%)] transition-colors disabled:opacity-40"
             >
               {loading ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Classifying…</>
