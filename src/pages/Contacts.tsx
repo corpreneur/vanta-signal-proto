@@ -152,6 +152,7 @@ export default function Contacts() {
   });
 
   const contacts = useMemo(() => buildContacts(signals), [signals]);
+  const graphData = useMemo(() => buildGraph(signals), [signals]);
 
   const filtered = useMemo(() => {
     let list = contacts;
