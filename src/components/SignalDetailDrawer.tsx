@@ -424,25 +424,6 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
     </section>
   );
 
-  const [speakerProfiles, setSpeakerProfiles] = useState<Record<string, { meeting_count: number; last_seen_at: string; email: string | null }>>({});
-
-  useEffect(() => {
-    if (!signal || signal.signalType !== "MEETING") return;
-    (async () => {
-      const { data } = await supabase
-        .from("meeting_speakers")
-        .select("turn_count, speaker_profiles(name, email, meeting_count, last_seen_at)")
-        .eq("signal_id", signal.id) as any;
-      if (data) {
-        const map: Record<string, { meeting_count: number; last_seen_at: string; email: string | null }> = {};
-        for (const row of data) {
-          const p = row.speaker_profiles;
-          if (p) map[p.name] = { meeting_count: p.meeting_count, last_seen_at: p.last_seen_at, email: p.email };
-        }
-        setSpeakerProfiles(map);
-      }
-    })();
-  }, [signal?.id, signal?.signalType]);
 
   const renderSpeakersTab = () => {
     const turns = (artifact?.transcriptJson as Record<string, unknown>[] | null) ?? [];
