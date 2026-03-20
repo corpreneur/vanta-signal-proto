@@ -118,6 +118,8 @@ const Index = () => {
   const noiseCount = useMemo(() => signals.length - activeSignals.length, [signals, activeSignals]);
   const highCount = useMemo(() => activeSignals.filter((s) => s.priority === "high").length, [activeSignals]);
   const todayNew = useMemo(() => todayCount(activeSignals), [activeSignals]);
+  const signalPulse = useMemo(() => getSignalPulse(activeSignals), [activeSignals]);
+  const peopleCount = useMemo(() => getPeopleCount(activeSignals), [activeSignals]);
 
   const top2 = useMemo(() => {
     return activeSignals
