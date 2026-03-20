@@ -1,19 +1,21 @@
 import { useState, useRef, useCallback } from "react";
-import { PenLine, Link2, Image, Mail, Mic, X } from "lucide-react";
+import { PenLine, Link2, Image, Mail, Mic, FileText, X } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import NoteCapture from "@/components/NoteCapture";
 import ImageCapture from "@/components/ImageCapture";
 import EmailCapture from "@/components/EmailCapture";
 import VoiceMemoCapture from "@/components/VoiceMemoCapture";
+import GranolaMeetingImport from "@/components/GranolaMeetingImport";
 import { useLocation } from "react-router-dom";
 
-type InputMode = "note" | "image" | "link" | "email" | "voice";
+type InputMode = "note" | "image" | "email" | "voice" | "granola";
 
 const TABS: { key: InputMode; label: string; icon: React.ElementType }[] = [
   { key: "note", label: "Note", icon: PenLine },
   { key: "image", label: "Image", icon: Image },
   { key: "email", label: "Email", icon: Mail },
   { key: "voice", label: "Voice", icon: Mic },
+  { key: "granola", label: "Granola", icon: FileText },
 ];
 
 export default function SmartNoteFAB() {
