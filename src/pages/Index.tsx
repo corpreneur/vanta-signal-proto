@@ -148,6 +148,9 @@ const Index = () => {
       {/* Geometric background motif */}
       <div className="absolute top-[-80px] right-[-120px] w-[400px] h-[400px] rounded-full border border-foreground/[0.04] pointer-events-none" />
 
+      {/* ══ Signal Brief Card ══ */}
+      <SignalBriefCard />
+
       {/* ══ Focus View Hero (MetaLab) ══ */}
       <Motion>
         <header className="mb-8 relative">
