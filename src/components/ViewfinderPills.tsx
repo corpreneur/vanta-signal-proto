@@ -235,7 +235,7 @@ export default function ViewfinderPills() {
   );
 }
 
-  const { data: signals = [], isLoading } = useQuery({
+
     queryKey: ["viewfinder-signals"],
     queryFn: fetchSignals,
     refetchInterval: 30000,
