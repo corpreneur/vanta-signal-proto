@@ -190,7 +190,7 @@ export const PARTNER_LOGOS: Record<string, React.FC<LogoProps>> = {
   otter: OtterLogo,
   google_meet: GoogleMeetLogo,
   teams: TeamsLogo,
-  webex: WebexLogo,
+  
   phone_call: PhoneCallLogo,
   "idea-capture": IdeaCaptureLogo,
   granola: GranolaLogo,
