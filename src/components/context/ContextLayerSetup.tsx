@@ -65,8 +65,8 @@ export default function ContextLayerSetup() {
             {[1, 2, 3].map((s) => (
               <div
                 key={s}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  s === step ? "w-8 bg-[hsl(270_60%_60%)]" : s < step ? "w-4 bg-[hsl(270_60%_60%/0.4)]" : "w-4 bg-border"
+                className={`h-1.5 rounded-sm transition-all duration-300 ${
+                  s === step ? "w-8 bg-primary" : s < step ? "w-4 bg-primary/40" : "w-4 bg-border"
                 }`}
               />
             ))}
