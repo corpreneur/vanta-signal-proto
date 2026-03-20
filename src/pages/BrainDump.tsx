@@ -262,6 +262,32 @@ export default function BrainDump() {
 
       {/* ══ Capture surface ══ */}
       <div className="mb-8">
+        {inputMode === "processor" && (
+          <div className="space-y-4">
+            {!processorResult ? (
+              <UnifiedCaptureInput
+                onSubmit={handleProcessorSubmit}
+                loading={processorLoading}
+                placeholder="Drop anything here… a name, a screenshot, a fragment of an idea"
+              />
+            ) : (
+              <div className="space-y-3">
+                <CaptureProcessingReveal
+                  rawText={processorRawText}
+                  result={processorResult}
+                  loading={processorLoading}
+                />
+                <button
+                  onClick={handleProcessorReset}
+                  className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                >
+                  <Sparkles className="w-3 h-3" /> Process another
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         {inputMode === "note" && (
           <div className="border border-vanta-border bg-card p-5">
             <NoteCapture
