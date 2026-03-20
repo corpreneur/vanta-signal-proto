@@ -496,7 +496,7 @@ export default function NoteCapture({ inline = false, onCapture, onRawText, temp
               ) : (
                 <button
                   onClick={() => setShowTagInput(true)}
-                  className="font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1.5 rounded-full border border-dashed border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all min-h-[36px]"
+                  className="font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1.5 rounded-sm border border-dashed border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all min-h-[36px]"
                 >
                   + add
                 </button>
