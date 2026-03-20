@@ -137,7 +137,7 @@ export default function ContextLayerSetup() {
                             onClick={() => setType(c.id, opt.value)}
                             className={`flex items-center gap-1.5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider rounded-sm border transition-all ${
                               isSelected
-                                ? "bg-[hsl(270_60%_60%)] text-white border-[hsl(270_60%_60%)]"
+                                ? "bg-primary text-primary-foreground border-primary"
                                 : "bg-transparent text-muted-foreground border-border hover:border-foreground/20"
                             }`}
                           >
