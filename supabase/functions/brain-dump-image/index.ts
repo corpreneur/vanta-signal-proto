@@ -244,8 +244,8 @@ serve(async (req) => {
 
     // Insert signal
     const sourceMessage = contextText?.trim()
-      ? `[Image: ${imageFile.name}] ${contextText.trim()}`
-      : `[Image: ${imageFile.name}]`;
+      ? `[Image: ${imageName}] ${contextText.trim()}`
+      : `[Image: ${imageName}]`;
 
     const { data: signal, error: insertError } = await supabase
       .from("signals")
@@ -272,15 +272,17 @@ serve(async (req) => {
       throw new Error("Failed to save signal");
     }
 
-    // Upload image to signal-attachments bucket
-    const storagePath = `signal-${signal.id}/${Date.now()}-${imageFile.name}`;
-    const { error: uploadError } = await supabase.storage
-      .from("signal-attachments")
-      .upload(storagePath, imageBytes, { contentType: mimeType });
+    // Upload image to signal-attachments bucket (only if we have raw bytes)
+    if (imageBytes) {
+      const storagePath = `signal-${signal.id}/${Date.now()}-${imageName}`;
+      const { error: uploadError } = await supabase.storage
+        .from("signal-attachments")
+        .upload(storagePath, imageBytes, { contentType: mimeType });
 
-    if (uploadError) {
-      console.error("Storage upload error:", uploadError);
-      // Non-fatal — signal was saved
+      if (uploadError) {
+        console.error("Storage upload error:", uploadError);
+        // Non-fatal — signal was saved
+      }
     }
 
     return new Response(JSON.stringify({ signal, classification }), {
