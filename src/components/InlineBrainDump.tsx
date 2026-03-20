@@ -39,7 +39,7 @@ const InlineBrainDump = () => {
       let error: Error | null = null;
 
       if (payload.type === "image" && payload.imageFile) {
-        // Convert image to base64
+        // Send image as base64 data URL in JSON body
         const reader = new FileReader();
         const base64 = await new Promise<string>((resolve) => {
           reader.onloadend = () => resolve(reader.result as string);
@@ -47,7 +47,7 @@ const InlineBrainDump = () => {
         });
 
         const resp = await supabase.functions.invoke("brain-dump-image", {
-          body: { image: base64, context: payload.text || "" },
+          body: { imageData: base64, context: payload.text || "" },
         });
         data = resp.data;
         error = resp.error;
