@@ -143,6 +143,47 @@ export default function BrainDump() {
     setLastRawText("");
   };
 
+  const handleProcessorSubmit = async (payload: CapturePayload) => {
+    setProcessorLoading(true);
+    setProcessorResult(null);
+    setProcessorRawText(payload.text || "(image capture)");
+    try {
+      const isImage = payload.imageDataUrl && !payload.text?.trim();
+      const endpoint = isImage ? "brain-dump-image" : "brain-dump";
+      const body = isImage
+        ? { imageData: payload.imageDataUrl }
+        : { text: payload.text };
+      const { data, error } = await supabase.functions.invoke(endpoint, { body });
+      if (error) throw error;
+      const c = data?.classification;
+      if (c) {
+        await new Promise(r => setTimeout(r, 300));
+        setProcessorResult({
+          signalType: c.signalType || c.signal_type || "CONTEXT",
+          priority: c.priority || "medium",
+          summary: c.summary || "",
+          suggestedActions: c.accelerators || c.suggestedActions,
+        });
+        setSessionCaptures(prev => [{
+          signalType: c.signalType || c.signal_type || "CONTEXT",
+          summary: c.summary || "",
+          timestamp: new Date().toISOString(),
+        }, ...prev]);
+        queryClient.invalidateQueries({ queryKey: ["brain-dump-recent"] });
+        toast({ title: `Signal detected · ${SIGNAL_TYPE_LABELS[c.signalType || c.signal_type] || c.signalType}`, description: c.summary });
+      }
+    } catch (e: unknown) {
+      toast({ title: "Processing failed", description: e instanceof Error ? e.message : "Something went wrong.", variant: "destructive" });
+    } finally {
+      setProcessorLoading(false);
+    }
+  };
+
+  const handleProcessorReset = () => {
+    setProcessorResult(null);
+    setProcessorRawText("");
+  };
+
   const linkColors = linkResult ? SIGNAL_TYPE_COLORS[linkResult.signalType as SignalType] : null;
 
   // Build context string from recent captures for Ask AI
