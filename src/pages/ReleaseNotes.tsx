@@ -174,8 +174,7 @@ export default function ReleaseNotes() {
       {/* Executive Brief download */}
       <a
         href="/Vanta_Signal_Executive_Brief.pdf"
-        target="_blank"
-        rel="noopener noreferrer"
+        download="Vanta_Signal_Executive_Brief.pdf"
         className="flex items-center justify-between gap-3 px-4 py-3 mb-6 border border-border bg-card/50 rounded-sm group hover:bg-card/80 transition-colors"
       >
         <div className="flex items-center gap-2.5">
