@@ -26,6 +26,7 @@ import OrbDemo from "./pages/OrbDemo";
 import ReleaseNotes from "./pages/ReleaseNotes";
 import Meetings from "./pages/Meetings";
 import Command from "./pages/Command";
+import LatestFeatures from "./pages/LatestFeatures";
 
 import Settings from "./pages/Settings";
 import PersonalInfo from "./pages/PersonalInfo";
@@ -97,6 +98,7 @@ const AppRoutes = () => {
       <Route path="/insights" element={<ProtectedRoute session={session}><ProductLayout><InsightEngine /></ProductLayout></ProtectedRoute>} />
       <Route path="/investments" element={<ProtectedRoute session={session}><ProductLayout><InvestmentIntel /></ProductLayout></ProtectedRoute>} />
       <Route path="/decisions" element={<ProtectedRoute session={session}><ProductLayout><DecisionCapture /></ProductLayout></ProtectedRoute>} />
+      <Route path="/product/latest" element={<ProtectedRoute session={session}><ProductLayout><LatestFeatures /></ProductLayout></ProtectedRoute>} />
       <Route path="/product/:signalType" element={<ProtectedRoute session={session}><ProductLayout><ProductSignalPage /></ProductLayout></ProtectedRoute>} />
       <Route path="/architecture" element={<ProtectedRoute session={session}><ProductLayout><Architecture /></ProductLayout></ProtectedRoute>} />
       <Route path="/brain-dump" element={<ProtectedRoute session={session}><ProductLayout><BrainDump /></ProductLayout></ProtectedRoute>} />
