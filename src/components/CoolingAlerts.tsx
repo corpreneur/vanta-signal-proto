@@ -26,7 +26,7 @@ export default function CoolingAlerts() {
         .select("*")
         .eq("dismissed", false)
         .order("created_at", { ascending: false })
-        .limit(10);
+        .limit(3);
       if (error) throw error;
       return (data || []) as CoolingAlert[];
     },
