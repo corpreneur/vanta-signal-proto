@@ -183,7 +183,7 @@ export default function ContextLayerSetup() {
                       onClick={() => setPrimaryId(c.id)}
                       className={`w-full flex items-center gap-3 px-4 py-4 border rounded-sm transition-all text-left ${
                         primaryId === c.id
-                          ? "border-[hsl(270_60%_60%)] bg-[hsl(270_60%_60%/0.08)]"
+                          ? "border-primary bg-primary/10"
                           : "border-border hover:border-foreground/20"
                       }`}
                     >
