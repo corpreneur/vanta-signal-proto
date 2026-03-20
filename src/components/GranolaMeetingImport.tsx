@@ -132,7 +132,7 @@ export default function GranolaMeetingImport({ onCapture }: GranolaMeetingImport
       ) : colors ? (
         <div className={`border p-4 space-y-3 ${colors.bg} ${colors.border}`}>
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+            <CheckCircle2 className="w-4 h-4 text-primary" />
             <span className={`font-mono text-[10px] uppercase tracking-widest ${colors.text}`}>
               {SIGNAL_TYPE_LABELS[result.signalType] || result.signalType}
             </span>
