@@ -68,7 +68,6 @@ const channelItems = [
 ];
 
 const productItems = [
-  { title: "Latest Drop", url: "/product/latest", icon: Zap },
   { title: "Meetings", url: "/meetings", icon: Video },
   { title: "Smart Contacts", url: "/contacts", icon: Users },
   { title: "Relationship Graph", url: "/graph", icon: Network },
