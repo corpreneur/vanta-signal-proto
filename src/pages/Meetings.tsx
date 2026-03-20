@@ -133,9 +133,9 @@ export default function Meetings() {
         </p>
       </header>
 
-      {/* Source filters */}
-      <div className="flex flex-wrap gap-1.5 mb-8">
-        {SOURCE_FILTERS.map((f) => {
+      {/* Source filters — single scrollable row */}
+      <div className="flex items-center gap-0 mb-8 border border-border rounded-sm overflow-x-auto scrollbar-hide">
+        {SOURCE_FILTERS.map((f, i) => {
           const Logo = f.logoKey ? PARTNER_LOGOS[f.logoKey] : null;
           const isActive = filter === f.key;
           const count = counts[f.key];
@@ -145,17 +145,19 @@ export default function Meetings() {
               key={f.key}
               onClick={() => !disabled && setFilter(f.key)}
               disabled={disabled}
-              className={`inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] px-2.5 py-1.5 rounded-sm border transition-all duration-200 ${
+              className={`relative inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] px-3.5 py-2.5 shrink-0 transition-all duration-150 ${
+                i > 0 ? "border-l border-border" : ""
+              } ${
                 disabled
-                  ? "opacity-30 cursor-not-allowed bg-transparent border-border text-muted-foreground"
+                  ? "opacity-25 cursor-not-allowed text-muted-foreground"
                   : isActive
-                    ? "bg-primary/10 border-primary text-primary"
-                    : "bg-transparent border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
               }`}
             >
               {Logo && <Logo className="w-3.5 h-3.5" />}
               {f.key === "all" ? "All" : f.label}
-              <span className={`tabular-nums ${isActive ? "text-primary" : "opacity-50"}`}>{count}</span>
+              <span className={`tabular-nums font-semibold ${isActive ? "text-background/70" : "opacity-40"}`}>{count}</span>
               {f.comingSoon && <span className="text-[7px] tracking-wider opacity-40">SOON</span>}
             </button>
           );
