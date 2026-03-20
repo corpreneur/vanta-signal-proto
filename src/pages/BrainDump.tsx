@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   PenLine, Link2, FileText, Loader2, ArrowRight, Plus, Clock, Zap,
   Image, Mail, Mic, BookmarkPlus, Copy, Check, Smartphone, Globe,
-  Monitor, ExternalLink, ChevronDown, ChevronRight, Send,
+  Monitor, ExternalLink, ChevronDown, ChevronRight, Send, Sparkles,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,8 @@ import CaptureResultSplit from "@/components/CaptureResultSplit";
 import AskVantaBar from "@/components/AskVantaBar";
 import BrainDumpAskAI from "@/components/BrainDumpAskAI";
 import GranolaMeetingImport from "@/components/GranolaMeetingImport";
+import UnifiedCaptureInput, { type CapturePayload } from "@/components/UnifiedCaptureInput";
+import CaptureProcessingReveal from "@/components/CaptureProcessingReveal";
 import { Motion } from "@/components/ui/motion";
 
 const SIGNAL_TYPE_LABELS: Record<string, string> = {
@@ -28,9 +30,10 @@ const SIGNAL_TYPE_LABELS: Record<string, string> = {
   MEETING: "Meeting", PHONE_CALL: "Phone Call",
 };
 
-type InputMode = "note" | "link" | "image" | "email" | "voice" | "granola";
+type InputMode = "processor" | "note" | "link" | "image" | "email" | "voice" | "granola";
 
 const INPUT_MODES: { key: InputMode; label: string; icon: React.ElementType }[] = [
+  { key: "processor", label: "Processor", icon: Sparkles },
   { key: "note", label: "Note", icon: PenLine },
   { key: "granola", label: "Granola", icon: FileText },
   { key: "image", label: "Image", icon: Image },
@@ -68,13 +71,19 @@ function timeAgo(iso: string) {
 }
 
 export default function BrainDump() {
-  const [inputMode, setInputMode] = useState<InputMode>("note");
+  const [inputMode, setInputMode] = useState<InputMode>("processor");
   const [linkUrl, setLinkUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
   const [linkResult, setLinkResult] = useState<{ signalType: string; priority: string; summary: string } | null>(null);
   const [sessionCaptures, setSessionCaptures] = useState<{ signalType: string; summary: string; timestamp: string }[]>([]);
   const [showTools, setShowTools] = useState(false);
+  const [processorLoading, setProcessorLoading] = useState(false);
+  const [processorRawText, setProcessorRawText] = useState("");
+  const [processorResult, setProcessorResult] = useState<{
+    signalType: string; priority: string; summary: string;
+    suggestedActions?: string[];
+  } | null>(null);
 
   // Granola-inspired state
   const [selectedTemplate, setSelectedTemplate] = useState<CaptureTemplate>(CAPTURE_TEMPLATES[0]);
@@ -132,6 +141,47 @@ export default function BrainDump() {
   const handleDismissResult = () => {
     setLastClassification(null);
     setLastRawText("");
+  };
+
+  const handleProcessorSubmit = async (payload: CapturePayload) => {
+    setProcessorLoading(true);
+    setProcessorResult(null);
+    setProcessorRawText(payload.text || "(image capture)");
+    try {
+      const isImage = payload.type === "image" && payload.imagePreview && !payload.text?.trim();
+      const endpoint = isImage ? "brain-dump-image" : "brain-dump";
+      const body = isImage
+        ? { imageData: payload.imagePreview }
+        : { text: payload.text };
+      const { data, error } = await supabase.functions.invoke(endpoint, { body });
+      if (error) throw error;
+      const c = data?.classification;
+      if (c) {
+        await new Promise(r => setTimeout(r, 300));
+        setProcessorResult({
+          signalType: c.signalType || c.signal_type || "CONTEXT",
+          priority: c.priority || "medium",
+          summary: c.summary || "",
+          suggestedActions: c.accelerators || c.suggestedActions,
+        });
+        setSessionCaptures(prev => [{
+          signalType: c.signalType || c.signal_type || "CONTEXT",
+          summary: c.summary || "",
+          timestamp: new Date().toISOString(),
+        }, ...prev]);
+        queryClient.invalidateQueries({ queryKey: ["brain-dump-recent"] });
+        toast({ title: `Signal detected · ${SIGNAL_TYPE_LABELS[c.signalType || c.signal_type] || c.signalType}`, description: c.summary });
+      }
+    } catch (e: unknown) {
+      toast({ title: "Processing failed", description: e instanceof Error ? e.message : "Something went wrong.", variant: "destructive" });
+    } finally {
+      setProcessorLoading(false);
+    }
+  };
+
+  const handleProcessorReset = () => {
+    setProcessorResult(null);
+    setProcessorRawText("");
   };
 
   const linkColors = linkResult ? SIGNAL_TYPE_COLORS[linkResult.signalType as SignalType] : null;
@@ -212,6 +262,33 @@ export default function BrainDump() {
 
       {/* ══ Capture surface ══ */}
       <div className="mb-8">
+        {inputMode === "processor" && (
+          <div className="space-y-4">
+            {!processorResult ? (
+              <UnifiedCaptureInput
+                onSubmit={handleProcessorSubmit}
+                loading={processorLoading}
+                placeholder="Drop anything here… a name, a screenshot, a fragment of an idea"
+              />
+            ) : (
+              <div className="space-y-3">
+                <CaptureProcessingReveal
+                  rawText={processorRawText}
+                  result={processorResult}
+                  processing={processorLoading}
+                  onDismiss={handleProcessorReset}
+                />
+                <button
+                  onClick={handleProcessorReset}
+                  className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                >
+                  <Sparkles className="w-3 h-3" /> Process another
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         {inputMode === "note" && (
           <div className="border border-vanta-border bg-card p-5">
             <NoteCapture
