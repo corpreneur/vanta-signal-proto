@@ -148,10 +148,10 @@ export default function BrainDump() {
     setProcessorResult(null);
     setProcessorRawText(payload.text || "(image capture)");
     try {
-      const isImage = payload.imageDataUrl && !payload.text?.trim();
+      const isImage = payload.type === "image" && payload.imagePreview && !payload.text?.trim();
       const endpoint = isImage ? "brain-dump-image" : "brain-dump";
       const body = isImage
-        ? { imageData: payload.imageDataUrl }
+        ? { imageData: payload.imagePreview }
         : { text: payload.text };
       const { data, error } = await supabase.functions.invoke(endpoint, { body });
       if (error) throw error;
