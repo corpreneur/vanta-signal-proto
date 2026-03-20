@@ -275,6 +275,8 @@ export default function BrainDump() {
                 <CaptureProcessingReveal
                   rawText={processorRawText}
                   result={processorResult}
+                  processing={processorLoading}
+                  onDismiss={handleProcessorReset}
                 />
                 <button
                   onClick={handleProcessorReset}
