@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   PenLine, Link2, FileText, Loader2, ArrowRight, Plus, Clock, Zap,
@@ -18,6 +18,8 @@ import VoiceMemoCapture from "@/components/VoiceMemoCapture";
 import CaptureTemplates, { CAPTURE_TEMPLATES, type CaptureTemplate } from "@/components/CaptureTemplates";
 import CaptureResultSplit from "@/components/CaptureResultSplit";
 import AskVantaBar from "@/components/AskVantaBar";
+import BrainDumpAskAI from "@/components/BrainDumpAskAI";
+import GranolaMeetingImport from "@/components/GranolaMeetingImport";
 import { Motion } from "@/components/ui/motion";
 
 const SIGNAL_TYPE_LABELS: Record<string, string> = {
@@ -26,7 +28,7 @@ const SIGNAL_TYPE_LABELS: Record<string, string> = {
   MEETING: "Meeting", PHONE_CALL: "Phone Call",
 };
 
-type InputMode = "note" | "link" | "image" | "email" | "voice" | "notion";
+type InputMode = "note" | "link" | "image" | "email" | "voice" | "granola";
 
 const INPUT_MODES: { key: InputMode; label: string; icon: React.ElementType }[] = [
   { key: "note", label: "Note", icon: PenLine },
@@ -34,6 +36,7 @@ const INPUT_MODES: { key: InputMode; label: string; icon: React.ElementType }[] 
   { key: "link", label: "Link", icon: Link2 },
   { key: "email", label: "Email", icon: Mail },
   { key: "voice", label: "Voice", icon: Mic },
+  { key: "granola", label: "Granola", icon: FileText },
 ];
 
 /* ── Fetch recent brain dump captures ── */
@@ -132,6 +135,19 @@ export default function BrainDump() {
   };
 
   const linkColors = linkResult ? SIGNAL_TYPE_COLORS[linkResult.signalType as SignalType] : null;
+
+  // Build context string from recent captures for Ask AI
+  const captureContext = useMemo(() => {
+    const parts = recentCaptures.slice(0, 5).map((s) =>
+      `[${s.signalType}] ${s.summary}`
+    );
+    if (sessionCaptures.length > 0) {
+      sessionCaptures.slice(0, 5).forEach((s) => {
+        parts.unshift(`[${s.signalType}] ${s.summary}`);
+      });
+    }
+    return parts.join("\n\n");
+  }, [recentCaptures, sessionCaptures]);
 
   const totalCaptures = recentCaptures.length + sessionCaptures.length;
   const manualCount = recentCaptures.filter(s => s.source === "manual").length;
@@ -249,6 +265,11 @@ export default function BrainDump() {
             <VoiceMemoCapture onCapture={onCapture} />
           </div>
         )}
+        {inputMode === "granola" && (
+          <div className="border border-vanta-border bg-card p-5">
+            <GranolaMeetingImport onCapture={onCapture} />
+          </div>
+        )}
       </div>
 
       {/* ══ Split View Result (Granola-style) ══ */}
@@ -266,6 +287,10 @@ export default function BrainDump() {
         </div>
       )}
 
+      {/* ══ Ask AI — Jamie-style persistent chat ══ */}
+      <div className="mb-8">
+        <BrainDumpAskAI captureContext={captureContext} />
+      </div>
       {/* Link result (non-note modes) */}
       {inputMode === "link" && linkResult && linkColors && (
         <div className={`border p-4 mb-8 space-y-3 ${linkColors.bg} ${linkColors.border}`}>
