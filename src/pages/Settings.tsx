@@ -411,6 +411,11 @@ export default function Settings() {
         <TabsContent value="calendar">
           <CalendarSyncSettings />
         </TabsContent>
+
+        {/* Signal Delivery Tab */}
+        <TabsContent value="delivery">
+          <DeliveryPreferences />
+        </TabsContent>
       </Tabs>
     </div>
   );
