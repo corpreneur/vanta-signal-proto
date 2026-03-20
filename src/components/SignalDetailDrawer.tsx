@@ -11,7 +11,7 @@ import {
   Video, FileText, MessageSquare, Sparkles, Image, Film, Mic, Paperclip,
   Download, Mail, CalendarPlus, Flag, ListChecks, User, Brain, Edit3,
   Pin, CheckCircle2, Clock, Send, Pencil, ChevronDown, X, Phone,
-  AlertTriangle, Lightbulb, BookOpen,
+  AlertTriangle, Lightbulb, BookOpen, Copy, Loader2, Users,
 } from "lucide-react";
 import { format } from "date-fns";
 import FileAttachments from "@/components/FileAttachments";
@@ -34,11 +34,13 @@ function formatAction(action: string): string {
   return action.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-type MeetingTab = "intelligence" | "summary" | "transcript" | "recording";
+type MeetingTab = "intelligence" | "summary" | "ask-ai" | "speakers" | "transcript" | "recording";
 
 const MEETING_TABS: { key: MeetingTab; label: string; icon: React.ReactNode }[] = [
   { key: "intelligence", label: "Intelligence", icon: <Sparkles className="w-3 h-3" /> },
   { key: "summary", label: "Summary", icon: <FileText className="w-3 h-3" /> },
+  { key: "ask-ai", label: "Ask AI", icon: <Brain className="w-3 h-3" /> },
+  { key: "speakers", label: "Speakers", icon: <Users className="w-3 h-3" /> },
   { key: "transcript", label: "Transcript", icon: <MessageSquare className="w-3 h-3" /> },
   { key: "recording", label: "Recording", icon: <Video className="w-3 h-3" /> },
 ];
@@ -135,6 +137,9 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   const [loadingArtifact, setLoadingArtifact] = useState(false);
   const [editingReply, setEditingReply] = useState(false);
   const [showRawPayload, setShowRawPayload] = useState(false);
+  const [aiQuestion, setAiQuestion] = useState("");
+  const [aiAnswer, setAiAnswer] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
   const queryClient = useQueryClient();
 
   useEffect(() => { if (signal?.status) setCurrentStatus(signal.status); }, [signal?.id, signal?.status]);
@@ -158,6 +163,9 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
       setReplyMessage(getProposedReply(signal));
       setEditingReply(false);
       setReplyOpen(false);
+      setAiQuestion("");
+      setAiAnswer("");
+      setAiLoading(false);
     }
   }, [signal?.id]);
 
@@ -234,22 +242,9 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
           )}
         </section>
       );
-      case "transcript": return (
-        <section>
-          <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Full Transcript</h3>
-          {artifact?.transcriptJson && Array.isArray(artifact.transcriptJson) ? (
-            <div className="space-y-3 max-h-[400px] overflow-y-auto border border-border bg-muted/30 p-4 rounded-lg">
-              {(artifact.transcriptJson as Record<string, unknown>[]).map((turn, i) => (
-                <div key={i}>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-primary">{(turn as Record<string, unknown>).speaker as string || "Unknown"}</span>
-                  {(turn as Record<string, unknown>).timestamp && <span className="font-mono text-[9px] text-muted-foreground ml-2">{(turn as Record<string, unknown>).timestamp as string}</span>}
-                  <p className="font-mono text-[11px] leading-[1.6] text-foreground/60 mt-0.5">{(turn as Record<string, unknown>).text as string || (turn as Record<string, unknown>).content as string || ""}</p>
-                </div>
-              ))}
-            </div>
-          ) : <p className="font-mono text-[10px] text-muted-foreground">No transcript available.</p>}
-        </section>
-      );
+      case "ask-ai": return renderAskAITab();
+      case "speakers": return renderSpeakersTab();
+      case "transcript": return renderTranscriptTab();
       case "recording": return (
         <section>
           <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Meeting Recording</h3>
@@ -297,6 +292,168 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
       </section>
     </>
   );
+
+  const MEETING_AI_PROMPTS = [
+    "Key decisions",
+    "Action items",
+    artifact?.attendees?.[0] ? `What did ${((artifact.attendees as Record<string, unknown>[])[0] as Record<string, unknown>).name || "the first speaker"} say?` : "Summarize each speaker",
+    "Summarize takeaways",
+  ];
+
+  const askMeetingAI = async (q: string) => {
+    if (!q.trim() || aiLoading) return;
+    setAiLoading(true);
+    setAiAnswer("");
+    try {
+      const transcriptText = artifact?.transcriptJson
+        ? (artifact.transcriptJson as Record<string, unknown>[])
+            .map((t) => `[${(t as Record<string, unknown>).speaker || "Unknown"}]: ${(t as Record<string, unknown>).text || (t as Record<string, unknown>).content || ""}`)
+            .join("\n")
+        : "";
+      const { data, error } = await supabase.functions.invoke("ask-meeting", {
+        body: { summary: artifact?.summaryText || signal.summary, transcript: transcriptText, question: q.trim() },
+      });
+      if (error) throw error;
+      setAiAnswer(data.answer || "No response.");
+    } catch (e) {
+      console.error("Ask meeting AI error:", e);
+      toast.error("Couldn't get an answer");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const renderAskAITab = () => (
+    <section className="space-y-3">
+      <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-1.5">
+        <Brain className="w-3 h-3" /> Ask AI About This Meeting
+      </h3>
+
+      {aiAnswer && (
+        <div className="p-3 border border-primary/20 bg-primary/5 rounded-lg">
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <Sparkles className="h-3 w-3 text-primary" />
+            <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-primary">Vanta</span>
+          </div>
+          <p className="font-sans text-[13px] text-foreground leading-relaxed">{aiAnswer}</p>
+        </div>
+      )}
+
+      <div className="flex flex-wrap gap-1.5">
+        {MEETING_AI_PROMPTS.map((p) => (
+          <button key={p} onClick={() => { setAiQuestion(p); askMeetingAI(p); }} disabled={aiLoading}
+            className="font-mono text-[9px] uppercase tracking-[0.1em] px-2.5 py-1 rounded-sm border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all disabled:opacity-40">
+            {p}
+          </button>
+        ))}
+      </div>
+
+      <form onSubmit={(e) => { e.preventDefault(); askMeetingAI(aiQuestion); }} className="flex items-center gap-2 border border-border rounded-lg px-3 py-2 bg-muted/20">
+        <Sparkles className="h-3.5 w-3.5 text-primary shrink-0" />
+        <input type="text" value={aiQuestion} onChange={(e) => setAiQuestion(e.target.value)}
+          placeholder="Ask anything about this meeting…"
+          className="flex-1 bg-transparent font-mono text-[11px] text-foreground placeholder:text-muted-foreground focus:outline-none" disabled={aiLoading} />
+        <button type="submit" disabled={!aiQuestion.trim() || aiLoading}
+          className="p-1.5 rounded-md text-primary hover:bg-primary/10 transition-colors disabled:opacity-30">
+          {aiLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+        </button>
+      </form>
+    </section>
+  );
+
+  const renderSpeakersTab = () => {
+    const turns = (artifact?.transcriptJson as Record<string, unknown>[] | null) ?? [];
+    const speakerMap = new Map<string, number>();
+    turns.forEach((t) => {
+      const name = ((t as Record<string, unknown>).speaker as string) || "Unknown";
+      speakerMap.set(name, (speakerMap.get(name) || 0) + 1);
+    });
+    const attendeeNames = new Set(
+      ((artifact?.attendees as Record<string, unknown>[] | null) ?? []).map((a) => ((a as Record<string, unknown>).name as string) || ((a as Record<string, unknown>).email as string) || "")
+    );
+    const identified = [...speakerMap.entries()].filter(([name]) => attendeeNames.has(name));
+    const other = [...speakerMap.entries()].filter(([name]) => !attendeeNames.has(name));
+
+    const renderSpeaker = ([name, count]: [string, number]) => (
+      <div key={name} className="flex items-center gap-3 py-2">
+        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+          <span className="font-display text-[12px] text-primary">{name.charAt(0).toUpperCase()}</span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-sans text-[13px] font-semibold text-foreground truncate">{name}</p>
+        </div>
+        <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground border border-border px-2 py-0.5 rounded">
+          {count} turn{count !== 1 ? "s" : ""}
+        </span>
+      </div>
+    );
+
+    return (
+      <section className="space-y-4">
+        <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-1.5">
+          <Users className="w-3 h-3" /> Speakers ({speakerMap.size})
+        </h3>
+        {speakerMap.size === 0 ? (
+          <p className="font-mono text-[10px] text-muted-foreground">No speaker data available.</p>
+        ) : (
+          <>
+            {identified.length > 0 && (
+              <div>
+                <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-muted-foreground/60 mb-1">Identified</p>
+                <div className="divide-y divide-border">{identified.map(renderSpeaker)}</div>
+              </div>
+            )}
+            {other.length > 0 && (
+              <div>
+                <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-muted-foreground/60 mb-1">{identified.length > 0 ? "Other" : "All Speakers"}</p>
+                <div className="divide-y divide-border">{other.map(renderSpeaker)}</div>
+              </div>
+            )}
+          </>
+        )}
+      </section>
+    );
+  };
+
+  const renderTranscriptTab = () => {
+    const copyTranscript = () => {
+      if (!artifact?.transcriptJson) return;
+      const text = (artifact.transcriptJson as Record<string, unknown>[])
+        .map((t) => `[${(t as Record<string, unknown>).speaker || "Unknown"}] ${(t as Record<string, unknown>).text || (t as Record<string, unknown>).content || ""}`)
+        .join("\n");
+      navigator.clipboard.writeText(text);
+      toast.success("Transcript copied");
+    };
+
+    return (
+      <section>
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">Full Transcript</h3>
+          {artifact?.transcriptJson && (
+            <button onClick={copyTranscript}
+              className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded border border-border hover:border-foreground/30">
+              <Copy className="w-3 h-3" /> Copy
+            </button>
+          )}
+        </div>
+        {artifact?.transcriptJson && Array.isArray(artifact.transcriptJson) ? (
+          <div className="space-y-3 max-h-[400px] overflow-y-auto border border-border bg-muted/30 p-4 rounded-lg">
+            {(artifact.transcriptJson as Record<string, unknown>[]).map((turn, i) => (
+              <div key={i}>
+                <div className="flex items-baseline gap-2">
+                  <span className="font-sans text-[12px] font-bold text-foreground">{(turn as Record<string, unknown>).speaker as string || "Unknown"}</span>
+                  {(turn as Record<string, unknown>).timestamp && (
+                    <span className="font-mono text-[9px] text-muted-foreground">{(turn as Record<string, unknown>).timestamp as string}</span>
+                  )}
+                </div>
+                <p className="font-sans text-[12px] leading-[1.6] text-foreground/60 mt-0.5">{(turn as Record<string, unknown>).text as string || (turn as Record<string, unknown>).content as string || ""}</p>
+              </div>
+            ))}
+          </div>
+        ) : <p className="font-mono text-[10px] text-muted-foreground">No transcript available.</p>}
+      </section>
+    );
+  };
 
   return (
     <Sheet open={open} onOpenChange={(v) => { if (!v) { setReplyOpen(false); onClose(); } }}>

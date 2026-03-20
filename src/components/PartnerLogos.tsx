@@ -110,6 +110,16 @@ const IdeaCaptureLogo = (props: LogoProps) => (
   </svg>
 );
 
+const GranolaLogo = (props: LogoProps) => (
+  <svg viewBox="0 0 24 24" fill="none" {...props}>
+    <rect width="24" height="24" rx="4" fill="hsl(30 60% 50%)" />
+    <path d="M12 5c-1.5 0-2.8.6-3.8 1.5C7.2 7.5 6.5 9 6.5 10.5c0 2.5 1.8 4.5 4 5.2v2.3c0 .6.7 1 1.2.6l.3-.2.3.2c.5.4 1.2 0 1.2-.6v-2.3c2.2-.7 4-2.7 4-5.2 0-1.5-.7-3-1.7-4C14.8 5.6 13.5 5 12 5Z" fill="#fff" />
+    <circle cx="10.5" cy="10" r="1" fill="hsl(30 60% 50%)" />
+    <circle cx="13.5" cy="10" r="1" fill="hsl(30 60% 50%)" />
+    <circle cx="12" cy="12.5" r="0.8" fill="hsl(30 60% 50%)" />
+  </svg>
+);
+
 export const PARTNER_LOGOS: Record<string, React.FC<LogoProps>> = {
   google: GoogleLogo,
   zoom: ZoomLogo,
@@ -124,6 +134,7 @@ export const PARTNER_LOGOS: Record<string, React.FC<LogoProps>> = {
   webex: WebexLogo,
   phone_call: PhoneCallLogo,
   "idea-capture": IdeaCaptureLogo,
+  granola: GranolaLogo,
 };
 
 export default PARTNER_LOGOS;
