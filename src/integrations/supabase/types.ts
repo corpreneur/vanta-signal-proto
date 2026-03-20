@@ -303,6 +303,44 @@ export type Database = {
         }
         Relationships: []
       }
+      signal_briefs: {
+        Row: {
+          context_id: string | null
+          generated_at: string
+          headline: string
+          id: string
+          items: Json
+          summary: string
+          user_id: string
+        }
+        Insert: {
+          context_id?: string | null
+          generated_at?: string
+          headline: string
+          id?: string
+          items?: Json
+          summary: string
+          user_id: string
+        }
+        Update: {
+          context_id?: string | null
+          generated_at?: string
+          headline?: string
+          id?: string
+          items?: Json
+          summary?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signal_briefs_context_id_fkey"
+            columns: ["context_id"]
+            isOneToOne: false
+            referencedRelation: "user_contexts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       signal_corrections: {
         Row: {
           corrected_at: string
@@ -502,6 +540,86 @@ export type Database = {
           zoom_meeting_id?: string | null
         }
         Relationships: []
+      }
+      user_contexts: {
+        Row: {
+          context_type: string
+          created_at: string
+          id: string
+          is_primary: boolean
+          name: string
+          user_id: string
+        }
+        Insert: {
+          context_type?: string
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          name: string
+          user_id: string
+        }
+        Update: {
+          context_type?: string
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_preferences: {
+        Row: {
+          active_context_id: string | null
+          context_setup_complete: boolean
+          created_at: string
+          delivery_email: boolean
+          delivery_email_address: string | null
+          delivery_push: boolean
+          delivery_sms: boolean
+          delivery_time: string
+          delivery_timezone: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active_context_id?: string | null
+          context_setup_complete?: boolean
+          created_at?: string
+          delivery_email?: boolean
+          delivery_email_address?: string | null
+          delivery_push?: boolean
+          delivery_sms?: boolean
+          delivery_time?: string
+          delivery_timezone?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active_context_id?: string | null
+          context_setup_complete?: boolean
+          created_at?: string
+          delivery_email?: boolean
+          delivery_email_address?: string | null
+          delivery_push?: boolean
+          delivery_sms?: boolean
+          delivery_time?: string
+          delivery_timezone?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_preferences_active_context_id_fkey"
+            columns: ["active_context_id"]
+            isOneToOne: false
+            referencedRelation: "user_contexts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       workflows: {
         Row: {
