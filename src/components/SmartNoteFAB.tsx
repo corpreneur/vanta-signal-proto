@@ -114,13 +114,13 @@ export default function SmartNoteFAB() {
             </div>
           </SheetHeader>
 
-          {/* Mode tabs */}
-          <div className="flex gap-1.5 mb-4 px-1">
+          {/* Mode tabs — de-pilled per MetaLab V3 */}
+          <div className="flex gap-1.5 mb-4 px-1 overflow-x-auto scrollbar-hide">
             {TABS.map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
                 onClick={() => setMode(key)}
-                className={`font-mono text-[10px] uppercase tracking-[0.15em] px-3 py-1.5 rounded-full border transition-all duration-200 flex items-center gap-1 ${
+                className={`font-mono text-[10px] uppercase tracking-[0.15em] px-3 py-1.5 rounded-sm border transition-all duration-200 flex items-center gap-1 whitespace-nowrap ${
                   mode === key
                     ? "bg-primary/10 border-primary text-primary"
                     : "bg-transparent border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
