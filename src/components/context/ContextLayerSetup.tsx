@@ -65,8 +65,8 @@ export default function ContextLayerSetup() {
             {[1, 2, 3].map((s) => (
               <div
                 key={s}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  s === step ? "w-8 bg-[hsl(270_60%_60%)]" : s < step ? "w-4 bg-[hsl(270_60%_60%/0.4)]" : "w-4 bg-border"
+                className={`h-1.5 rounded-sm transition-all duration-300 ${
+                  s === step ? "w-8 bg-primary" : s < step ? "w-4 bg-primary/40" : "w-4 bg-border"
                 }`}
               />
             ))}
@@ -85,13 +85,13 @@ export default function ContextLayerSetup() {
                   onChange={(e) => setInputVal(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && addContext()}
                   placeholder="Client name, project, or income stream…"
-                  className="flex-1 bg-card border border-border px-4 py-3 font-sans text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[hsl(270_60%_60%/0.5)] transition-colors rounded-sm"
+                  className="flex-1 bg-card border border-border px-4 py-3 font-sans text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors rounded-sm"
                   maxLength={40}
                 />
                 <button
                   onClick={addContext}
                   disabled={!inputVal.trim() || contexts.length >= 5}
-                  className="px-4 py-3 bg-[hsl(270_60%_60%)] text-white rounded-sm hover:bg-[hsl(270_60%_50%)] disabled:opacity-30 transition-colors"
+                  className="px-4 py-3 bg-primary text-primary-foreground rounded-sm hover:bg-primary/90 disabled:opacity-30 transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                 </button>
@@ -109,7 +109,7 @@ export default function ContextLayerSetup() {
               {contexts.length > 0 && (
                 <button
                   onClick={() => setStep(2)}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-[hsl(270_60%_60%)] text-white font-mono text-[11px] uppercase tracking-wider rounded-sm hover:bg-[hsl(270_60%_50%)] transition-colors"
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-mono text-[11px] uppercase tracking-wider rounded-sm hover:bg-primary/90 transition-colors"
                 >
                   Next <ArrowRight className="w-4 h-4" />
                 </button>
@@ -137,7 +137,7 @@ export default function ContextLayerSetup() {
                             onClick={() => setType(c.id, opt.value)}
                             className={`flex items-center gap-1.5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider rounded-sm border transition-all ${
                               isSelected
-                                ? "bg-[hsl(270_60%_60%)] text-white border-[hsl(270_60%_60%)]"
+                                ? "bg-primary text-primary-foreground border-primary"
                                 : "bg-transparent text-muted-foreground border-border hover:border-foreground/20"
                             }`}
                           >
@@ -159,7 +159,7 @@ export default function ContextLayerSetup() {
                 </button>
                 <button
                   onClick={() => setStep(3)}
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[hsl(270_60%_60%)] text-white font-mono text-[11px] uppercase tracking-wider rounded-sm hover:bg-[hsl(270_60%_50%)] transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-mono text-[11px] uppercase tracking-wider rounded-sm hover:bg-primary/90 transition-colors"
                 >
                   Next <ArrowRight className="w-4 h-4" />
                 </button>
@@ -183,14 +183,14 @@ export default function ContextLayerSetup() {
                       onClick={() => setPrimaryId(c.id)}
                       className={`w-full flex items-center gap-3 px-4 py-4 border rounded-sm transition-all text-left ${
                         primaryId === c.id
-                          ? "border-[hsl(270_60%_60%)] bg-[hsl(270_60%_60%/0.08)]"
+                          ? "border-primary bg-primary/10"
                           : "border-border hover:border-foreground/20"
                       }`}
                     >
                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                        primaryId === c.id ? "border-[hsl(270_60%_60%)]" : "border-muted-foreground/30"
+                        primaryId === c.id ? "border-primary" : "border-muted-foreground/30"
                       }`}>
-                        {primaryId === c.id && <div className="w-2.5 h-2.5 rounded-full bg-[hsl(270_60%_60%)]" />}
+                        {primaryId === c.id && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
                       </div>
                       <TypeIcon className="w-4 h-4 text-muted-foreground" />
                       <span className="font-mono text-[12px] uppercase tracking-wider text-foreground">{c.name}</span>
@@ -208,7 +208,7 @@ export default function ContextLayerSetup() {
                 <button
                   onClick={finish}
                   disabled={!primaryId}
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[hsl(270_60%_60%)] text-white font-mono text-[11px] uppercase tracking-wider rounded-sm hover:bg-[hsl(270_60%_50%)] disabled:opacity-30 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-mono text-[11px] uppercase tracking-wider rounded-sm hover:bg-primary/90 disabled:opacity-30 transition-colors"
                 >
                   <Zap className="w-4 h-4" /> Activate Signal Brief
                 </button>

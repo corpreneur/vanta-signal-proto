@@ -51,25 +51,10 @@ export default function SignalBriefCard() {
 
   return (
     <Motion>
-      <div
-        className="relative rounded-xl overflow-hidden mb-8"
-        style={{
-          background: "linear-gradient(135deg, hsl(0 0% 10%), hsl(0 0% 7%))",
-        }}
-      >
-        {/* Gradient border accent */}
-        <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
-          background: "linear-gradient(to right, hsl(240 60% 60% / 0.3), hsl(270 60% 60% / 0.2), transparent)",
-          mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-          maskComposite: "xor",
-          WebkitMaskComposite: "xor",
-          padding: "1px",
-          borderRadius: "inherit",
-        }} />
-
-        <div className="relative p-5 md:p-6">
+      <div className="relative overflow-hidden bg-card border border-border rounded-sm mb-8">
+        <div className="p-5 md:p-6">
           {/* Header label */}
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[hsl(270_60%_70%)] mb-1">
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary mb-1">
             Today's Signal
           </p>
 
@@ -82,14 +67,14 @@ export default function SignalBriefCard() {
 
           {/* Empty state */}
           {!setupComplete ? (
-            <div className="py-6 text-center">
-              <Zap className="w-8 h-8 text-muted-foreground mx-auto mb-3 opacity-40" />
-              <p className="font-sans text-[14px] text-muted-foreground leading-relaxed max-w-sm mx-auto mb-4">
+            <div className="py-4 text-center">
+              <Zap className="w-7 h-7 text-muted-foreground mx-auto mb-3 opacity-40" />
+              <p className="font-sans text-[13px] text-muted-foreground leading-relaxed max-w-sm mx-auto mb-4">
                 Connect your first context to activate your Signal Brief. Vanta Signal will brief you every morning once your data is live.
               </p>
               <a
                 href="/setup/context"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-[hsl(270_60%_60%)] text-white font-mono text-[11px] uppercase tracking-wider rounded-sm hover:bg-[hsl(270_60%_50%)] transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground font-mono text-[11px] uppercase tracking-wider rounded-sm hover:bg-primary/90 transition-colors"
               >
                 Set Up Contexts
               </a>
