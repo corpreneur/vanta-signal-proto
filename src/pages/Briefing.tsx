@@ -169,7 +169,7 @@ export default function Briefing() {
     : null;
 
   return (
-    <div className="max-w-[720px] mx-auto px-5 py-8 md:py-12">
+    <div data-brief-content className="max-w-[720px] mx-auto px-5 py-8 md:py-12">
       {/* Back */}
       <Link
         to="/signals"
