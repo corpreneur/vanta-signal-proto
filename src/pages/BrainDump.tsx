@@ -30,9 +30,10 @@ const SIGNAL_TYPE_LABELS: Record<string, string> = {
   MEETING: "Meeting", PHONE_CALL: "Phone Call",
 };
 
-type InputMode = "note" | "link" | "image" | "email" | "voice" | "granola";
+type InputMode = "processor" | "note" | "link" | "image" | "email" | "voice" | "granola";
 
 const INPUT_MODES: { key: InputMode; label: string; icon: React.ElementType }[] = [
+  { key: "processor", label: "Processor", icon: Sparkles },
   { key: "note", label: "Note", icon: PenLine },
   { key: "granola", label: "Granola", icon: FileText },
   { key: "image", label: "Image", icon: Image },
