@@ -163,6 +163,13 @@ export default function SmartNoteFAB() {
                 }}
               />
             )}
+            {mode === "granola" && (
+              <GranolaMeetingImport
+                onCapture={() => {
+                  setTimeout(() => setOpen(false), 1500);
+                }}
+              />
+            )}
           </div>
         </SheetContent>
       </Sheet>
