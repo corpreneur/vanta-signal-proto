@@ -78,6 +78,12 @@ export default function BrainDump() {
   const [linkResult, setLinkResult] = useState<{ signalType: string; priority: string; summary: string } | null>(null);
   const [sessionCaptures, setSessionCaptures] = useState<{ signalType: string; summary: string; timestamp: string }[]>([]);
   const [showTools, setShowTools] = useState(false);
+  const [processorLoading, setProcessorLoading] = useState(false);
+  const [processorRawText, setProcessorRawText] = useState("");
+  const [processorResult, setProcessorResult] = useState<{
+    signalType: string; priority: string; summary: string;
+    suggestedActions?: string[];
+  } | null>(null);
 
   // Granola-inspired state
   const [selectedTemplate, setSelectedTemplate] = useState<CaptureTemplate>(CAPTURE_TEMPLATES[0]);
