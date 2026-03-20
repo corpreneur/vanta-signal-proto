@@ -578,8 +578,7 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
     );
   };
 
-  const [transcriptSearch, setTranscriptSearch] = useState("");
-  const [transcriptExpanded, setTranscriptExpanded] = useState(false);
+
 
   const renderTranscriptTab = () => {
     const copyTranscript = () => {
