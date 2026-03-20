@@ -1,78 +1,72 @@
-import { useState } from "react";
-import { Mail, Send, Loader2 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { Mail } from "lucide-react";
+
+const EMAIL_OPTIONS = [
+  {
+    label: "Apple Mail",
+    desc: "Default iOS email",
+    url: "mailto:",
+    icon: "✉️",
+  },
+  {
+    label: "Gmail",
+    desc: "Google email",
+    url: "googlegmail:///co",
+    fallback: "https://mail.google.com/mail/?view=cm",
+    icon: "📧",
+  },
+  {
+    label: "Outlook",
+    desc: "Microsoft email",
+    url: "ms-outlook://compose",
+    fallback: "https://outlook.live.com/mail/0/deeplink/compose",
+    icon: "📨",
+  },
+];
 
 export default function EmailComposeSheet({ onClose }: { onClose: () => void }) {
-  const [to, setTo] = useState("");
-  const [subject, setSubject] = useState("");
-  const [body, setBody] = useState("");
-  const [sending, setSending] = useState(false);
-
-  const canSend = to.trim().length > 0 && body.trim().length > 0;
-
-  async function handleSend() {
-    if (!canSend) return;
-    setSending(true);
-    try {
-      const { error } = await supabase.functions.invoke("linq-send", {
-        body: { to: to.trim(), message: subject ? `${subject}\n\n${body}` : body },
-      });
-      if (error) throw error;
-      toast.success("Email drafted & sent");
-      onClose();
-    } catch (err) {
-      toast.error("Failed to send: " + (err instanceof Error ? err.message : "Unknown error"));
-    } finally {
-      setSending(false);
+  function handlePick(option: (typeof EMAIL_OPTIONS)[number]) {
+    // Try native deep link first, fall back to web URL
+    if (option.fallback) {
+      const w = window.open(option.url, "_blank");
+      // If the deep link didn't work (returns null or about:blank), use fallback
+      setTimeout(() => {
+        if (!w || w.closed) {
+          window.open(option.fallback, "_blank");
+        }
+      }, 500);
+    } else {
+      window.open(option.url, "_blank");
     }
+    onClose();
   }
 
   return (
-    <div className="space-y-4 pt-2">
-      <div className="flex items-center gap-2 mb-2">
+    <div className="space-y-3 pt-2">
+      <div className="flex items-center gap-2 mb-3">
         <Mail className="w-4 h-4 text-muted-foreground" />
         <h3 className="font-mono text-[11px] uppercase tracking-[0.15em] text-foreground font-medium">
-          Draft Email
+          Open Email In…
         </h3>
       </div>
 
-      <Input
-        placeholder="To (email or name)"
-        value={to}
-        onChange={(e) => setTo(e.target.value)}
-        className="font-mono text-sm"
-      />
-      <Input
-        placeholder="Subject (optional)"
-        value={subject}
-        onChange={(e) => setSubject(e.target.value)}
-        className="font-mono text-sm"
-      />
-      <Textarea
-        placeholder="Write your message…"
-        value={body}
-        onChange={(e) => setBody(e.target.value)}
-        rows={5}
-        className="font-sans text-sm resize-none"
-      />
-
-      <div className="flex justify-end gap-2 pt-2">
-        <Button variant="ghost" size="sm" onClick={onClose} className="font-mono text-[10px] uppercase tracking-wider">
-          Cancel
-        </Button>
-        <Button
-          size="sm"
-          disabled={!canSend || sending}
-          onClick={handleSend}
-          className="font-mono text-[10px] uppercase tracking-wider gap-1.5"
-        >
-          {sending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-          Send
-        </Button>
+      <div className="space-y-1.5">
+        {EMAIL_OPTIONS.map((opt) => (
+          <button
+            key={opt.label}
+            onClick={() => handlePick(opt)}
+            className="w-full flex items-center gap-3 p-3.5 border border-border bg-card hover:border-foreground/20 hover:bg-muted transition-all duration-200 text-left"
+          >
+            <span className="text-xl leading-none">{opt.icon}</span>
+            <div className="flex flex-col">
+              <span className="font-mono text-[11px] uppercase tracking-wider text-foreground font-medium">
+                {opt.label}
+              </span>
+              <span className="font-mono text-[9px] text-muted-foreground">
+                {opt.desc}
+              </span>
+            </div>
+          </button>
+        ))}
       </div>
     </div>
   );
