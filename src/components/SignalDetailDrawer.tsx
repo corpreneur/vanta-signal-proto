@@ -34,11 +34,13 @@ function formatAction(action: string): string {
   return action.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-type MeetingTab = "intelligence" | "summary" | "transcript" | "recording";
+type MeetingTab = "intelligence" | "summary" | "ask-ai" | "speakers" | "transcript" | "recording";
 
 const MEETING_TABS: { key: MeetingTab; label: string; icon: React.ReactNode }[] = [
   { key: "intelligence", label: "Intelligence", icon: <Sparkles className="w-3 h-3" /> },
   { key: "summary", label: "Summary", icon: <FileText className="w-3 h-3" /> },
+  { key: "ask-ai", label: "Ask AI", icon: <Brain className="w-3 h-3" /> },
+  { key: "speakers", label: "Speakers", icon: <Users className="w-3 h-3" /> },
   { key: "transcript", label: "Transcript", icon: <MessageSquare className="w-3 h-3" /> },
   { key: "recording", label: "Recording", icon: <Video className="w-3 h-3" /> },
 ];
