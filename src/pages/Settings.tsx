@@ -8,6 +8,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Save, RotateCcw, Settings2, MessageSquare, Users, Bell, Shield, Smartphone, Phone, Video, Mail, Calendar, ShieldCheck } from "lucide-react";
 import ClassificationAudit from "./ClassificationAudit";
 import CalendarSyncSettings from "@/components/CalendarSyncSettings";
+import DeliveryPreferences from "@/components/settings/DeliveryPreferences";
 
 interface SettingRow {
   key: string;
@@ -69,7 +70,7 @@ const SOURCE_CHANNELS: Array<{
 
 const SOURCE_KEYS = new Set(SOURCE_CHANNELS.map((c) => c.key));
 
-const TAB_MAP: Record<string, string> = { audit: "audit", calendar: "calendar" };
+const TAB_MAP: Record<string, string> = { audit: "audit", calendar: "calendar", delivery: "delivery" };
 
 export default function Settings() {
   const queryClient = useQueryClient();
@@ -192,6 +193,10 @@ export default function Settings() {
           <TabsTrigger value="calendar" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
             <Calendar className="w-3.5 h-3.5" />
             Calendar
+          </TabsTrigger>
+          <TabsTrigger value="delivery" className="font-mono text-[11px] uppercase tracking-widest gap-1.5 data-[state=active]:bg-vanta-bg-elevated">
+            <Bell className="w-3.5 h-3.5" />
+            Delivery
           </TabsTrigger>
         </TabsList>
 
@@ -405,6 +410,11 @@ export default function Settings() {
         {/* Calendar Sync Tab */}
         <TabsContent value="calendar">
           <CalendarSyncSettings />
+        </TabsContent>
+
+        {/* Signal Delivery Tab */}
+        <TabsContent value="delivery">
+          <DeliveryPreferences />
         </TabsContent>
       </Tabs>
     </div>

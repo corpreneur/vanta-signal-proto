@@ -8,6 +8,7 @@ import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { useUserMode } from "@/hooks/use-user-mode";
 import { Motion } from "@/components/ui/motion";
 import SignalDetailDrawer from "@/components/SignalDetailDrawer";
+import SignalBriefCard from "@/components/signal/SignalBriefCard";
 import CoolingAlerts from "@/components/CoolingAlerts";
 import InlineBrainDump from "@/components/InlineBrainDump";
 import WhatsAhead from "@/components/WhatsAhead";
@@ -146,6 +147,9 @@ const Index = () => {
     <div className="max-w-[960px] mx-auto px-5 py-10 md:px-10 relative overflow-hidden">
       {/* Geometric background motif */}
       <div className="absolute top-[-80px] right-[-120px] w-[400px] h-[400px] rounded-full border border-foreground/[0.04] pointer-events-none" />
+
+      {/* ══ Signal Brief Card ══ */}
+      <SignalBriefCard />
 
       {/* ══ Focus View Hero (MetaLab) ══ */}
       <Motion>
