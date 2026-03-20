@@ -9,14 +9,14 @@ import { format, parseISO } from "date-fns";
 import SignalDetailDrawer from "@/components/SignalDetailDrawer";
 import type { Signal, MeetingArtifact } from "@/data/signals";
 
-type SourceFilter = "all" | "zoom" | "fireflies" | "otter" | "granola" | "google_meet" | "teams" | "webex";
+type SourceFilter = "all" | "zoom" | "fireflies" | "otter" | "granola" | "google_meet" | "teams";
 
 const SOURCE_FILTERS: { key: SourceFilter; label: string; logoKey?: string; comingSoon?: boolean }[] = [
   { key: "all", label: "All" },
   { key: "zoom", label: "Zoom", logoKey: "zoom" },
   { key: "google_meet", label: "Google Meet", logoKey: "google_meet", comingSoon: true },
   { key: "teams", label: "Teams", logoKey: "teams", comingSoon: true },
-  { key: "webex", label: "Webex", logoKey: "webex", comingSoon: true },
+  
   { key: "fireflies", label: "Fireflies", logoKey: "fireflies" },
   { key: "otter", label: "Otter", logoKey: "otter" },
   { key: "granola", label: "Granola", logoKey: "granola" },
@@ -107,7 +107,7 @@ export default function Meetings() {
   );
 
   const counts = useMemo(() => {
-    const c: Record<SourceFilter, number> = { all: meetings.length, zoom: 0, fireflies: 0, otter: 0, granola: 0, google_meet: 0, teams: 0, webex: 0 };
+    const c: Record<SourceFilter, number> = { all: meetings.length, zoom: 0, fireflies: 0, otter: 0, granola: 0, google_meet: 0, teams: 0 };
     meetings.forEach((m) => { if (c[m.sourceKey] !== undefined) c[m.sourceKey]++; });
     return c;
   }, [meetings]);
