@@ -144,7 +144,7 @@ const Index = () => {
   const clearUntil = getClearUntil(meetingCount);
 
   return (
-    <div className="max-w-[960px] mx-auto px-5 py-10 md:px-10 relative overflow-hidden">
+    <div className="max-w-[960px] mx-auto px-4 py-10 md:px-10 relative overflow-x-hidden">
       {/* Geometric background motif */}
       <div className="absolute top-[-80px] right-[-120px] w-[400px] h-[400px] rounded-full border border-foreground/[0.04] pointer-events-none" />
 

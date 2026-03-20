@@ -324,7 +324,7 @@ const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: Signa
   const isGroupChat = signal.rawPayload && typeof signal.rawPayload === "object" && (signal.rawPayload as Record<string, unknown>)._vanta_group_chat === true;
 
   return (
-    <div className={`rounded-lg border transition-all hover:shadow-md ${
+    <div className={`rounded-lg border transition-all hover:shadow-md min-w-0 overflow-hidden ${
       signal.pinned ? "border-primary/40 bg-primary/[0.03]" : "border-border bg-card"
     } ${signal.status === "Complete" ? "opacity-50" : ""}`}>
 
@@ -435,7 +435,7 @@ const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: Signa
         )}
 
         {/* ── Action bar ── */}
-        <div className="flex items-center gap-1.5 pt-2 border-t border-border/50">
+        <div className="flex items-center gap-1.5 pt-2 border-t border-border/50 overflow-x-auto scrollbar-hide">
           {cta && (
             <button
               onClick={(e) => { e.stopPropagation(); cta.action(); }}
