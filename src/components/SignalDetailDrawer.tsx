@@ -146,6 +146,8 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   const [editingSource, setEditingSource] = useState(false);
   const [editSourceText, setEditSourceText] = useState("");
   const [savingEdit, setSavingEdit] = useState(false);
+  const [transcriptSearch, setTranscriptSearch] = useState("");
+  const [transcriptExpanded, setTranscriptExpanded] = useState(false);
   const queryClient = useQueryClient();
 
   // Sync edit texts when signal changes
