@@ -164,26 +164,9 @@ const Index = () => {
           </h1>
 
           {!isDnd && (
-            <div className="flex items-center gap-3 flex-wrap">
-              <p className="font-sans text-[14px] text-muted-foreground">
-                Clear until <span className="text-foreground font-medium">{clearUntil}</span>
-              </p>
-              {meetingCount > 0 && (
-                <>
-                  <span className="w-px h-3.5 bg-border" />
-                  <span className="font-mono text-[10px] text-muted-foreground flex items-center gap-1">
-                    <Calendar className="w-3 h-3 text-vanta-accent-amber" />
-                    {meetingCount} meeting{meetingCount !== 1 ? "s" : ""}
-                  </span>
-                </>
-              )}
-              {todayNew > 0 && (
-                <>
-                  <span className="w-px h-3.5 bg-border" />
-                  <span className="font-mono text-[10px] text-primary">+{todayNew} signals today</span>
-                </>
-              )}
-            </div>
+            <p className="font-sans text-[14px] text-muted-foreground">
+              {signalPulse}
+            </p>
           )}
         </header>
       </Motion>
