@@ -188,9 +188,9 @@ export default function ContextLayerSetup() {
                       }`}
                     >
                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                        primaryId === c.id ? "border-[hsl(270_60%_60%)]" : "border-muted-foreground/30"
+                        primaryId === c.id ? "border-primary" : "border-muted-foreground/30"
                       }`}>
-                        {primaryId === c.id && <div className="w-2.5 h-2.5 rounded-full bg-[hsl(270_60%_60%)]" />}
+                        {primaryId === c.id && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
                       </div>
                       <TypeIcon className="w-4 h-4 text-muted-foreground" />
                       <span className="font-mono text-[12px] uppercase tracking-wider text-foreground">{c.name}</span>
