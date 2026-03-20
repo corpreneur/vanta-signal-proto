@@ -417,11 +417,7 @@ const Signals = () => {
           </div>
 
           {briefs.length > 0 && (
-            <div className="mb-6">
-              {briefs.map((brief: any) => (
-                <PreMeetingBriefCard key={brief.id} brief={brief} />
-              ))}
-            </div>
+            <BriefsSection briefs={briefs} />
           )}
 
           <SignalFeed signals={feedSignals} filters={filters} allSignals={signals} />
