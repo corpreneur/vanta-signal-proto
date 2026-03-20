@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   PenLine, Link2, FileText, Loader2, ArrowRight, Plus, Clock, Zap,
@@ -18,6 +18,8 @@ import VoiceMemoCapture from "@/components/VoiceMemoCapture";
 import CaptureTemplates, { CAPTURE_TEMPLATES, type CaptureTemplate } from "@/components/CaptureTemplates";
 import CaptureResultSplit from "@/components/CaptureResultSplit";
 import AskVantaBar from "@/components/AskVantaBar";
+import BrainDumpAskAI from "@/components/BrainDumpAskAI";
+import GranolaMeetingImport from "@/components/GranolaMeetingImport";
 import { Motion } from "@/components/ui/motion";
 
 const SIGNAL_TYPE_LABELS: Record<string, string> = {
@@ -26,7 +28,7 @@ const SIGNAL_TYPE_LABELS: Record<string, string> = {
   MEETING: "Meeting", PHONE_CALL: "Phone Call",
 };
 
-type InputMode = "note" | "link" | "image" | "email" | "voice" | "notion";
+type InputMode = "note" | "link" | "image" | "email" | "voice" | "granola";
 
 const INPUT_MODES: { key: InputMode; label: string; icon: React.ElementType }[] = [
   { key: "note", label: "Note", icon: PenLine },
@@ -34,6 +36,7 @@ const INPUT_MODES: { key: InputMode; label: string; icon: React.ElementType }[] 
   { key: "link", label: "Link", icon: Link2 },
   { key: "email", label: "Email", icon: Mail },
   { key: "voice", label: "Voice", icon: Mic },
+  { key: "granola", label: "Granola", icon: FileText },
 ];
 
 /* ── Fetch recent brain dump captures ── */
