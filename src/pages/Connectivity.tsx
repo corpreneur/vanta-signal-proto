@@ -251,6 +251,18 @@ export default function Connectivity() {
             <p className="font-mono text-[9px] uppercase tracking-wider text-vanta-text-low">Total Signals</p>
             <p className="font-display text-[28px] text-foreground leading-none">{totalSignals}</p>
           </div>
+          <div className="w-px h-10 bg-vanta-border" />
+          <div className="flex items-center gap-3">
+            {(["launch", "fast-follow", "roadmap"] as LaunchTier[]).map((tier) => {
+              const count = CHANNELS.filter((c) => c.tier === tier).length;
+              const meta = TIER_META[tier];
+              return (
+                <span key={tier} className={`inline-flex items-center gap-1 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider border rounded-sm ${meta.className}`}>
+                  {count} {meta.label}
+                </span>
+              );
+            })}
+          </div>
         </div>
       </Motion>
 
