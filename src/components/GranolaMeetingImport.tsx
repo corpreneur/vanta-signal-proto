@@ -367,7 +367,7 @@ export default function GranolaMeetingImport({ onCapture }: GranolaMeetingImport
                 {result.suggestedTags && result.suggestedTags.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 pt-2">
                     {result.suggestedTags.map((tag) => (
-                      <span key={tag} className="font-mono text-[9px] px-2 py-0.5 rounded-full bg-muted/40 text-muted-foreground border border-border">
+                      <span key={tag} className="font-mono text-[9px] px-2 py-0.5 rounded-sm bg-muted/40 text-muted-foreground border border-border">
                         #{tag}
                       </span>
                     ))}
