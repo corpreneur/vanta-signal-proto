@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { releaseNotes, type ReleaseEntry } from "@/data/releaseNotes";
-import { Zap, ArrowRight, Sparkles } from "lucide-react";
+import { Zap, ArrowRight, Sparkles, FileDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
