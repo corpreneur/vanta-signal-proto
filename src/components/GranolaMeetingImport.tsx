@@ -77,8 +77,8 @@ export default function GranolaMeetingImport({ onCapture }: GranolaMeetingImport
     <div className="space-y-4">
       {/* Granola branding bar */}
       <div className="flex items-center gap-2">
-        <div className="w-5 h-5 rounded bg-amber-600/20 flex items-center justify-center">
-          <span className="text-[10px] font-bold text-amber-600">G</span>
+        <div className="w-5 h-5 rounded bg-primary/20 flex items-center justify-center">
+          <span className="text-[10px] font-bold text-primary">G</span>
         </div>
         <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground">
           Granola Meeting Notes Import
