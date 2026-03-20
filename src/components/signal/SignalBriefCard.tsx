@@ -39,6 +39,18 @@ const mockBrief: SignalBrief = {
 export default function SignalBriefCard() {
   const [dismissed, setDismissed] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
+  const [generatedAt, setGeneratedAt] = useState(mockBrief.generatedAt);
+
+  const handleRefresh = () => {
+    if (refreshing) return;
+    setRefreshing(true);
+    setRefreshKey((k) => k + 1);
+    setTimeout(() => {
+      setGeneratedAt(new Date().toISOString());
+      setRefreshing(false);
+    }, 800);
+  };
 
   const setupComplete = localStorage.getItem("vanta_context_setup") === "true";
 
