@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import VCardImportDialog from "@/components/VCardImportDialog";
 import { useQuery } from "@tanstack/react-query";
@@ -8,10 +8,14 @@ import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import { computeStrength, daysBetween, recencyLabel } from "@/lib/contactStrength";
 import { Motion } from "@/components/ui/motion";
 import { Input } from "@/components/ui/input";
-import { Search, Tag, Filter, UserPlus, LayoutGrid, LayoutList, Phone, Mail, MessageSquare, Smartphone, Upload } from "lucide-react";
+import { Search, Tag, Filter, UserPlus, LayoutGrid, LayoutList, Phone, Mail, MessageSquare, Smartphone, Upload, ChevronDown, ChevronUp, Network } from "lucide-react";
 import { useAllContactTags } from "@/components/ContactTagManager";
 import SmartContactCard from "@/components/SmartContactCard";
 import AddContactContext from "@/components/AddContactContext";
+import { buildGraph } from "@/components/graph/buildGraph";
+import ForceGraph from "@/components/graph/ForceGraph";
+import MiniContactCard from "@/components/graph/MiniContactCard";
+import type { FocusedNode } from "@/components/graph/types";
 
 async function fetchSignals(): Promise<Signal[]> {
   const { data, error } = await supabase
