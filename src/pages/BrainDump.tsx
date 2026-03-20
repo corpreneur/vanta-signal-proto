@@ -265,6 +265,11 @@ export default function BrainDump() {
             <VoiceMemoCapture onCapture={onCapture} />
           </div>
         )}
+        {inputMode === "granola" && (
+          <div className="border border-vanta-border bg-card p-5">
+            <GranolaMeetingImport onCapture={onCapture} />
+          </div>
+        )}
       </div>
 
       {/* ══ Split View Result (Granola-style) ══ */}
@@ -280,6 +285,12 @@ export default function BrainDump() {
             <AskVantaBar noteText={lastRawText} />
           </CaptureResultSplit>
         </div>
+      )}
+
+      {/* ══ Ask AI — Jamie-style persistent chat ══ */}
+      <div className="mb-8">
+        <BrainDumpAskAI captureContext={captureContext} />
+      </div>
       )}
 
       {/* Link result (non-note modes) */}
