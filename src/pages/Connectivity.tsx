@@ -268,47 +268,61 @@ export default function Connectivity() {
 
       {/* Channel cards */}
       <Motion delay={120}>
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
-          {CHANNELS.map((ch) => {
-            const enabled = settings[ch.settingKey] !== false;
-            const count = ch.signalSource
-              ? (counts?.bySource[ch.signalSource] || 0)
-              : (counts?.byType[ch.signalType!] || 0);
+        {(["launch", "fast-follow", "roadmap"] as LaunchTier[]).map((tier) => {
+          const tierChannels = CHANNELS.filter((c) => c.tier === tier);
+          const meta = TIER_META[tier];
+          return (
+            <div key={tier} className="mb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className={`inline-flex items-center gap-1 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider border rounded-sm ${meta.className}`}>
+                  {meta.label}
+                </span>
+                <span className="font-mono text-[9px] text-muted-foreground">{tierChannels.length} source{tierChannels.length !== 1 ? "s" : ""}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+                {tierChannels.map((ch) => {
+                  const enabled = settings[ch.settingKey] !== false;
+                  const count = ch.signalSource
+                    ? (counts?.bySource[ch.signalSource] || 0)
+                    : (counts?.byType[ch.signalType!] || 0);
 
-            return (
-              <Link
-                key={ch.key}
-                to={ch.href}
-                className={`group relative p-5 border bg-card hover:bg-vanta-bg-elevated transition-all duration-200 ${ch.borderClass}`}
-              >
-                <div className="absolute top-4 right-4">
-                  {enabled ? (
-                    <CheckCircle2 className="h-4 w-4 text-[hsl(var(--vanta-signal-green))]" />
-                  ) : (
-                    <XCircle className="h-4 w-4 text-vanta-text-muted" />
-                  )}
-                </div>
+                  return (
+                    <Link
+                      key={ch.key}
+                      to={ch.href}
+                      className={`group relative p-5 border bg-card hover:bg-vanta-bg-elevated transition-all duration-200 ${ch.borderClass}`}
+                    >
+                      <div className="absolute top-4 right-4">
+                        {enabled ? (
+                          <CheckCircle2 className="h-4 w-4 text-[hsl(var(--vanta-signal-green))]" />
+                        ) : (
+                          <XCircle className="h-4 w-4 text-vanta-text-muted" />
+                        )}
+                      </div>
 
-                <div className={`inline-flex items-center justify-center h-10 w-10 mb-4 ${ch.bgClass} border ${ch.borderClass} ring-1 ${ch.ringClass}`}>
-                  <ch.icon className={`h-5 w-5 ${ch.colorClass}`} />
-                </div>
+                      <div className={`inline-flex items-center justify-center h-10 w-10 mb-4 ${ch.bgClass} border ${ch.borderClass} ring-1 ${ch.ringClass}`}>
+                        <ch.icon className={`h-5 w-5 ${ch.colorClass}`} />
+                      </div>
 
-                <p className="font-mono text-[12px] uppercase tracking-wider text-foreground mb-1">{ch.label}</p>
-                <p className="font-mono text-[10px] uppercase tracking-wider text-vanta-text-low mb-3">
-                  {enabled ? "Connected" : "Disconnected"}
-                </p>
+                      <p className="font-mono text-[12px] uppercase tracking-wider text-foreground mb-1">{ch.label}</p>
+                      <p className="font-mono text-[10px] uppercase tracking-wider text-vanta-text-low mb-3">
+                        {enabled ? "Connected" : "Disconnected"}
+                      </p>
 
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-mono text-[9px] uppercase tracking-wider text-vanta-text-low">Signals</p>
-                    <p className={`font-display text-[24px] leading-none ${ch.colorClass}`}>{count}</p>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-vanta-text-muted group-hover:text-foreground group-hover:translate-x-0.5 transition-all" />
-                </div>
-              </Link>
-            );
-          })}
-        </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-mono text-[9px] uppercase tracking-wider text-vanta-text-low">Signals</p>
+                          <p className={`font-display text-[24px] leading-none ${ch.colorClass}`}>{count}</p>
+                        </div>
+                        <ArrowRight className="h-4 w-4 text-vanta-text-muted group-hover:text-foreground group-hover:translate-x-0.5 transition-all" />
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
       </Motion>
     </div>
   );

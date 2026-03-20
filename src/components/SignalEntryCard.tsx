@@ -344,8 +344,8 @@ const SignalEntryCard = ({ signal, onClick, showPromote, contactContext }: Signa
           )}
 
           {signal.riskLevel && (
-            <span className={`px-2 py-0.5 rounded font-bold text-[9px] ${RISK_BADGE[signal.riskLevel] || RISK_BADGE.low}`}>
-              {signal.riskLevel}
+            <span className={`px-2 py-0.5 rounded font-bold text-[9px] ${WEIGHT_BADGE[signal.riskLevel] || WEIGHT_BADGE.low}`}>
+              {signal.riskLevel} weight
             </span>
           )}
           {signal.priority === "high" && !signal.riskLevel && (

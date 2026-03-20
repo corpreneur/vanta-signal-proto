@@ -163,14 +163,14 @@ export default function BrainDump() {
             style={{ animation: "pulse-dot 2s ease-in-out infinite" }}
           />
           <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
-            Fab Five · Idea Capture
+            Fab Five · Capture
           </p>
         </div>
         <h1 className="font-display text-[clamp(24px,5vw,40px)] leading-[1.05] text-foreground mb-2">
-          What's on your mind?
+          Capture
         </h1>
         <p className="font-sans text-[13px] md:text-[14px] text-muted-foreground leading-relaxed max-w-[640px]">
-          Share thoughts, links, or notes. Vanta organizes, collects context, and suggests actions.
+          Drop in anything — a name, a screenshot, a half-formed idea. Vanta processes it into signal for you.
         </p>
       </header>
 

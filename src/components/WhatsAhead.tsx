@@ -122,7 +122,7 @@ const WhatsAhead = () => {
     <Motion delay={100}>
       <section className="mb-8">
         <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-3">
-          What's Ahead
+          Coming Up
         </p>
         <div className="border border-vanta-border divide-y divide-vanta-border">
           {meetings.map((m) => {

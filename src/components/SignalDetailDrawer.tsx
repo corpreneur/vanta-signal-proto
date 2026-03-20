@@ -696,7 +696,7 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
 
             {signal.riskLevel && (
               <span className={`inline-block px-2.5 py-1 rounded-md font-mono text-[9px] font-bold uppercase tracking-wider ${RISK_BADGE[signal.riskLevel]}`}>
-                {signal.riskLevel}
+                {signal.riskLevel} weight
               </span>
             )}
             {signal.priority === "high" && !signal.riskLevel && (

@@ -175,10 +175,10 @@ const Index = () => {
       {!isDnd && (
         <Motion delay={20}>
           <div className="flex items-center gap-5 mb-6 pb-5 border-b border-border overflow-x-auto scrollbar-hide">
-            <Link to="/signals" className="flex items-center gap-2 shrink-0 group">
-              <span className="font-display text-[22px] text-foreground group-hover:text-primary transition-colors">{activeSignals.length}</span>
-              <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground">Signals</span>
-            </Link>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="font-display text-[22px] text-foreground">{peopleCount}</span>
+              <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground">People today</span>
+            </div>
             <span className="w-px h-5 bg-border shrink-0" />
             <Link to="/signals" className="flex items-center gap-2 shrink-0 group">
               <span className="font-display text-[22px] text-primary group-hover:text-foreground transition-colors">{highCount}</span>

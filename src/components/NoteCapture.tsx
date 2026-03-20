@@ -437,11 +437,11 @@ export default function NoteCapture({ inline = false, onCapture, onRawText, temp
         >
           {/* Classification badge */}
           <div className="flex items-center gap-2">
-            <span className={`font-mono text-[10px] uppercase tracking-widest ${colors.text}`}>
-              {SIGNAL_TYPE_LABELS[result.signalType] || result.signalType}
+            <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              Processed →
             </span>
-            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              · {result.priority}
+            <span className={`font-mono text-[10px] uppercase tracking-widest ${colors.text}`}>
+              {SIGNAL_TYPE_LABELS[result.signalType] || result.signalType} signal detected
             </span>
           </div>
 

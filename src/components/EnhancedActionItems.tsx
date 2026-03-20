@@ -225,7 +225,7 @@ export default function EnhancedActionItems({ onSignalClick }: EnhancedActionIte
                                   item.riskLevel === "high" ? "text-amber-600" : "text-muted-foreground"
                                 }`}>
                                   <Shield className="w-3 h-3" />
-                                  {item.riskLevel} risk
+                                  {item.riskLevel} weight
                                 </span>
                               </>
                             )}

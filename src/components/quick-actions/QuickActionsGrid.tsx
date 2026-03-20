@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  StickyNote, Mail, Calendar, Mic, MessageSquare, AlarmClock,
+  StickyNote, Mail, Calendar, Mic, MessageSquare, AlarmClock, Gift,
 } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import NoteCapture from "@/components/NoteCapture";
@@ -11,13 +11,14 @@ import QuickReminderSheet from "./QuickReminderSheet";
 
 type ActionId = "note" | "email" | "invite" | "voice" | "reminder";
 
-const ACTIONS: { id: ActionId | "message"; label: string; icon: React.ElementType; desc: string }[] = [
-  { id: "note", label: "New Note", icon: StickyNote, desc: "Capture a thought" },
+const ACTIONS: { id: ActionId | "message" | "offers"; label: string; icon: React.ElementType; desc: string; comingSoon?: boolean }[] = [
+  { id: "note", label: "Capture Note", icon: StickyNote, desc: "Drop in anything" },
   { id: "email", label: "Draft Email", icon: Mail, desc: "Compose & send" },
   { id: "invite", label: "Calendar Invite", icon: Calendar, desc: "Schedule a meeting" },
   { id: "voice", label: "Voice Memo", icon: Mic, desc: "Record & classify" },
   { id: "message", label: "Send Message", icon: MessageSquare, desc: "Opens Messages" },
   { id: "reminder", label: "Set Reminder", icon: AlarmClock, desc: "Follow-up later" },
+  { id: "offers", label: "Offers", icon: Gift, desc: "Partner actions", comingSoon: true },
 ];
 
 export default function QuickActionsGrid() {
@@ -25,13 +26,13 @@ export default function QuickActionsGrid() {
 
   const close = () => setOpen(null);
 
-  function handleTap(id: ActionId | "message") {
+  function handleTap(id: ActionId | "message" | "offers") {
     if (id === "message") {
-      // Launch native iOS Messages via sms: URI scheme
       window.open("sms:", "_self");
       return;
     }
-    setOpen(id);
+    if (id === "offers") return; // Coming soon
+    setOpen(id as ActionId);
   }
 
   return (
@@ -43,8 +44,16 @@ export default function QuickActionsGrid() {
             <button
               key={a.id}
               onClick={() => handleTap(a.id)}
-              className="group flex flex-col items-center gap-1.5 p-4 border border-border bg-card hover:border-foreground/20 hover:bg-muted transition-all duration-200 text-center"
+              disabled={a.comingSoon}
+              className={`group flex flex-col items-center gap-1.5 p-4 border bg-card hover:border-foreground/20 hover:bg-muted transition-all duration-200 text-center relative ${
+                a.comingSoon ? "border-dashed border-border opacity-60 cursor-default" : "border-border"
+              }`}
             >
+              {a.comingSoon && (
+                <span className="absolute top-1.5 right-1.5 font-mono text-[7px] uppercase tracking-wider text-muted-foreground bg-muted px-1.5 py-0.5 rounded-sm">
+                  Soon
+                </span>
+              )}
               <Icon className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
               <span className="font-mono text-[10px] uppercase tracking-wider text-foreground leading-tight">
                 {a.label}
