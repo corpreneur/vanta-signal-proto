@@ -1,69 +1,112 @@
 import { useState } from "react";
-import { Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import UnifiedCaptureInput, { type CapturePayload } from "@/components/UnifiedCaptureInput";
+import CaptureProcessingReveal from "@/components/CaptureProcessingReveal";
+
+const SIGNAL_LABELS: Record<string, string> = {
+  INTRO: "Introduction", INSIGHT: "Insight", INVESTMENT: "Investment Intel",
+  DECISION: "Decision", CONTEXT: "Context", NOISE: "Noise",
+  MEETING: "Meeting", PHONE_CALL: "Phone Call",
+};
+
+interface ClassificationResult {
+  signalType: string;
+  priority: string;
+  summary: string;
+  suggestedTitle?: string;
+  suggestedTags?: string[];
+  suggestedContacts?: string[];
+  accelerators?: string[];
+}
 
 const InlineBrainDump = () => {
-  const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [rawText, setRawText] = useState("");
+  const [result, setResult] = useState<ClassificationResult | null>(null);
   const queryClient = useQueryClient();
 
-  const handleSubmit = async () => {
-    const trimmed = text.trim();
-    if (!trimmed || loading) return;
+  const handleSubmit = async (payload: CapturePayload) => {
+    if (loading) return;
 
     setLoading(true);
+    setRawText(payload.text || "(image capture)");
+    setResult(null);
+
     try {
-      const { data, error } = await supabase.functions.invoke("brain-dump", {
-        body: { text: trimmed },
-      });
+      let data: { classification?: ClassificationResult } | null = null;
+      let error: Error | null = null;
+
+      if (payload.type === "image" && payload.imageFile) {
+        // Convert image to base64
+        const reader = new FileReader();
+        const base64 = await new Promise<string>((resolve) => {
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(payload.imageFile!);
+        });
+
+        const resp = await supabase.functions.invoke("brain-dump-image", {
+          body: { image: base64, context: payload.text || "" },
+        });
+        data = resp.data;
+        error = resp.error;
+      } else {
+        const resp = await supabase.functions.invoke("brain-dump", {
+          body: payload.type === "url" ? { url: payload.text } : { text: payload.text },
+        });
+        data = resp.data;
+        error = resp.error;
+      }
 
       if (error) throw error;
 
-      setText("");
-      queryClient.invalidateQueries({ queryKey: ["signals-dashboard"] });
-      toast.success(
-        data?.classification?.signal_type
-          ? `Captured as ${data.classification.signal_type}`
-          : "Signal captured"
-      );
+      const classification = data?.classification;
+      if (classification) {
+        // Buffer the reveal — minimum 800ms processing feel
+        await new Promise((r) => setTimeout(r, 300));
+        setResult(classification);
+        queryClient.invalidateQueries({ queryKey: ["signals-dashboard"] });
+        toast.success(
+          `Signal detected · ${SIGNAL_LABELS[classification.signalType] || classification.signalType}`
+        );
+      }
     } catch (err) {
-      console.error("Brain dump error:", err);
-      toast.error("Failed to capture — try again");
+      console.error("Capture error:", err);
+      toast.error("Failed to process — try again");
+      setResult(null);
+      setRawText("");
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="relative mb-6">
-      <div className="flex items-center gap-3 border border-vanta-border bg-card px-4 py-3 transition-colors focus-within:border-primary/30">
-        <Sparkles className="w-4 h-4 text-vanta-text-muted shrink-0" />
-        <input
-          type="text"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              handleSubmit();
-            }
-          }}
-          placeholder="Capture anything — a thought, a screenshot, a name you don't want to forget…"
-          disabled={loading}
-          className="flex-1 bg-transparent font-sans text-[13px] text-foreground placeholder:text-vanta-text-muted focus:outline-none disabled:opacity-50"
+  const handleDismiss = () => {
+    setResult(null);
+    setRawText("");
+  };
+
+  // Show result card if we have one, otherwise show input
+  if (result || loading) {
+    return (
+      <div className="mb-6">
+        <CaptureProcessingReveal
+          rawText={rawText}
+          result={result}
+          processing={loading}
+          onDismiss={handleDismiss}
         />
-        {loading && <Loader2 className="w-4 h-4 text-primary animate-spin shrink-0" />}
-        {!loading && text.trim() && (
-          <button
-            onClick={handleSubmit}
-            className="font-mono text-[9px] uppercase tracking-[0.15em] text-primary hover:text-primary/80 transition-colors shrink-0"
-          >
-            Capture
-          </button>
-        )}
       </div>
+    );
+  }
+
+  return (
+    <div className="mb-6">
+      <UnifiedCaptureInput
+        onSubmit={handleSubmit}
+        loading={loading}
+        compact
+      />
     </div>
   );
 };
