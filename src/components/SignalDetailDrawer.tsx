@@ -137,6 +137,9 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   const [loadingArtifact, setLoadingArtifact] = useState(false);
   const [editingReply, setEditingReply] = useState(false);
   const [showRawPayload, setShowRawPayload] = useState(false);
+  const [aiQuestion, setAiQuestion] = useState("");
+  const [aiAnswer, setAiAnswer] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
   const queryClient = useQueryClient();
 
   useEffect(() => { if (signal?.status) setCurrentStatus(signal.status); }, [signal?.id, signal?.status]);
