@@ -91,7 +91,7 @@ export default function ContextLayerSetup() {
                 <button
                   onClick={addContext}
                   disabled={!inputVal.trim() || contexts.length >= 5}
-                  className="px-4 py-3 bg-[hsl(270_60%_60%)] text-white rounded-sm hover:bg-[hsl(270_60%_50%)] disabled:opacity-30 transition-colors"
+                  className="px-4 py-3 bg-primary text-primary-foreground rounded-sm hover:bg-primary/90 disabled:opacity-30 transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                 </button>
