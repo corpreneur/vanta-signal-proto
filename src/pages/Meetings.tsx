@@ -127,42 +127,30 @@ export default function Meetings() {
         </p>
       </div>
 
-      {/* Stats strip */}
-      <div className="flex flex-wrap gap-3 mb-6">
-        {SOURCE_FILTERS.filter((f) => f.key !== "all").map((f) => {
-          const Logo = f.logoKey ? PARTNER_LOGOS[f.logoKey] : null;
-          return (
-            <div key={f.key} className={`flex items-center gap-2 px-3 py-1.5 rounded-sm border border-border bg-card ${f.comingSoon ? "opacity-50" : ""}`}>
-              {Logo && <Logo className="w-4 h-4" />}
-              <span className="font-mono text-[11px] text-foreground">{counts[f.key]}</span>
-              <span className="font-mono text-[10px] text-muted-foreground">{f.label}</span>
-              {f.comingSoon && <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground/60">soon</span>}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Filter pills */}
+      {/* Source filters */}
       <div className="flex flex-wrap gap-1.5 mb-8">
         {SOURCE_FILTERS.map((f) => {
           const Logo = f.logoKey ? PARTNER_LOGOS[f.logoKey] : null;
-          const disabled = f.comingSoon && counts[f.key] === 0;
+          const isActive = filter === f.key;
+          const count = counts[f.key];
+          const disabled = f.comingSoon && count === 0;
           return (
             <button
               key={f.key}
               onClick={() => !disabled && setFilter(f.key)}
               disabled={disabled}
-              className={`inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.15em] px-3 py-1.5 rounded-sm border transition-all duration-200 ${
+              className={`inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] px-2.5 py-1.5 rounded-sm border transition-all duration-200 ${
                 disabled
-                  ? "opacity-40 cursor-not-allowed bg-transparent border-border text-muted-foreground"
-                  : filter === f.key
+                  ? "opacity-30 cursor-not-allowed bg-transparent border-border text-muted-foreground"
+                  : isActive
                     ? "bg-primary/10 border-primary text-primary"
                     : "bg-transparent border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
               }`}
             >
               {Logo && <Logo className="w-3.5 h-3.5" />}
-              {f.label}
-              <span className="ml-1 opacity-60">{counts[f.key]}</span>
+              {f.key === "all" ? "All" : f.label}
+              <span className={`tabular-nums ${isActive ? "text-primary" : "opacity-50"}`}>{count}</span>
+              {f.comingSoon && <span className="text-[7px] tracking-wider opacity-40">SOON</span>}
             </button>
           );
         })}
