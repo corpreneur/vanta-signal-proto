@@ -30,6 +30,12 @@ export default function SmartNoteFAB() {
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didLongPress = useRef(false);
 
+  // --- Draggable orb state ---
+  const [orbPos, setOrbPos] = useState<{ x: number; y: number } | null>(null);
+  const isDragging = useRef(false);
+  const dragStart = useRef<{ x: number; y: number; orbX: number; orbY: number } | null>(null);
+  const dragMoved = useRef(false);
+
   // Scroll-responsive drift: orb gently floats with scroll direction
   const [scrollDrift, setScrollDrift] = useState(0);
   const lastScrollY = useRef(0);
@@ -37,17 +43,60 @@ export default function SmartNoteFAB() {
 
   useEffect(() => {
     const handleScroll = () => {
+      if (isDragging.current) return;
       const y = window.scrollY;
       const delta = y - lastScrollY.current;
       lastScrollY.current = y;
-      // Clamp drift to ±6px for a subtle float
       setScrollDrift((prev) => Math.max(-6, Math.min(6, prev + delta * 0.15)));
-      // Ease back to center
       if (driftTimeout.current) clearTimeout(driftTimeout.current);
       driftTimeout.current = setTimeout(() => setScrollDrift(0), 400);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Touch drag handlers for iOS
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    const currentX = orbPos?.x ?? window.innerWidth / 2;
+    const currentY = orbPos?.y ?? window.innerHeight - 60;
+    dragStart.current = { x: touch.clientX, y: touch.clientY, orbX: currentX, orbY: currentY };
+    dragMoved.current = false;
+    didLongPress.current = false;
+    longPressTimer.current = setTimeout(() => {
+      didLongPress.current = true;
+      if (!dragMoved.current) setOpen(true);
+    }, 500);
+  }, [orbPos]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!dragStart.current) return;
+    const touch = e.touches[0];
+    const dx = touch.clientX - dragStart.current.x;
+    const dy = touch.clientY - dragStart.current.y;
+    if (!isDragging.current && Math.abs(dx) + Math.abs(dy) > 8) {
+      isDragging.current = true;
+      dragMoved.current = true;
+      if (longPressTimer.current) {
+        clearTimeout(longPressTimer.current);
+        longPressTimer.current = null;
+      }
+    }
+    if (isDragging.current) {
+      e.preventDefault();
+      const newX = Math.max(40, Math.min(window.innerWidth - 40, dragStart.current.orbX + dx));
+      const newY = Math.max(40, Math.min(window.innerHeight - 40, dragStart.current.orbY + dy));
+      setOrbPos({ x: newX, y: newY });
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+    isDragging.current = false;
+    dragStart.current = null;
   }, []);
 
   const handlePointerDown = useCallback(() => {
@@ -66,7 +115,10 @@ export default function SmartNoteFAB() {
   }, []);
 
   const handleClick = useCallback(() => {
-    if (didLongPress.current) return;
+    if (didLongPress.current || dragMoved.current) {
+      dragMoved.current = false;
+      return;
+    }
     setOpen(true);
   }, []);
 
@@ -144,12 +196,27 @@ export default function SmartNoteFAB() {
     <>
       {/* VANTA Orb FAB — translucent glass */}
       <div
-        className="fixed bottom-5 left-1/2 z-40 flex items-center justify-center sm:bottom-6"
+        className="fixed z-40 flex items-center justify-center"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         style={{
           width: 80,
           height: 80,
-          transform: `translateX(-50%) translateY(${scrollDrift}px)`,
-          transition: "transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+          ...(orbPos
+            ? {
+                left: orbPos.x,
+                top: orbPos.y,
+                transform: `translate(-50%, -50%)`,
+                transition: isDragging.current ? "none" : "transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+              }
+            : {
+                bottom: 20,
+                left: "50%",
+                transform: `translateX(-50%) translateY(${scrollDrift}px)`,
+                transition: "transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+              }),
+          touchAction: "none",
         }}
       >
         {/* Outer glow ring */}
