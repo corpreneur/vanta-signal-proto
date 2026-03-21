@@ -8,16 +8,18 @@ import { PARTNER_LOGOS } from "@/components/PartnerLogos";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  Video, FileText, MessageSquare, Sparkles, Image, Film, Mic, Paperclip,
+  Video, FileText, MessageSquare, Sparkles, Image, Film, Mic, MicOff, Paperclip,
   Download, Mail, CalendarPlus, Flag, ListChecks, User, Brain, Edit3,
   Pin, CheckCircle2, Clock, Send, Pencil, ChevronDown, X, Phone, Search,
   AlertTriangle, Lightbulb, BookOpen, Copy, Loader2, Users, Share2, Save,
+  CalendarClock, SmartphoneNfc,
 } from "lucide-react";
 import { format } from "date-fns";
 import FileAttachments from "@/components/FileAttachments";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { SignalType, SignalPriority } from "@/data/signals";
+import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 
 const SIGNAL_TYPES: SignalType[] = ["INTRO", "INSIGHT", "INVESTMENT", "DECISION", "CONTEXT", "NOISE", "MEETING", "PHONE_CALL"];
 const PRIORITIES: SignalPriority[] = ["high", "medium", "low"];
@@ -148,7 +150,10 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   const [savingEdit, setSavingEdit] = useState(false);
   const [transcriptSearch, setTranscriptSearch] = useState("");
   const [transcriptExpanded, setTranscriptExpanded] = useState(false);
+  const [scheduleDate, setScheduleDate] = useState<Date | undefined>(undefined);
+  const [scheduleTime, setScheduleTime] = useState("09:00");
   const queryClient = useQueryClient();
+  const { isListening, isSupported: voiceSupported, startListening, stopListening } = useSpeechRecognition();
 
   // Sync edit texts when signal changes
   useEffect(() => {
@@ -868,12 +873,32 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
 
                 <div className="p-4">
                   {editingReply ? (
-                    <textarea
-                      value={replyMessage}
-                      onChange={(e) => setReplyMessage(e.target.value)}
-                      rows={6}
-                      className="w-full bg-background border border-border text-foreground/80 font-sans text-[13px] px-3 py-2 leading-relaxed focus:outline-none focus:border-primary/40 resize-none rounded"
-                    />
+                    <div className="relative">
+                      <textarea
+                        value={replyMessage}
+                        onChange={(e) => setReplyMessage(e.target.value)}
+                        rows={6}
+                        className={`w-full bg-background border text-foreground/80 font-sans text-[13px] px-3 py-2 pr-10 leading-relaxed focus:outline-none focus:border-primary/40 resize-none rounded ${isListening ? "border-destructive/50 bg-destructive/5" : "border-border"}`}
+                      />
+                      {voiceSupported && (
+                        <button
+                          onClick={() => {
+                            if (isListening) {
+                              stopListening();
+                            } else {
+                              startListening((text) => setReplyMessage(text));
+                            }
+                          }}
+                          className={`absolute top-2 right-2 p-1.5 rounded-md transition-colors ${isListening ? "bg-destructive/10 text-destructive animate-pulse" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
+                          title={isListening ? "Stop dictating" : "Dictate reply"}
+                        >
+                          {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+                        </button>
+                      )}
+                      {isListening && (
+                        <p className="font-mono text-[9px] text-destructive mt-1 uppercase tracking-wider">Listening…</p>
+                      )}
+                    </div>
                   ) : (
                     <p className="font-sans text-[13px] leading-relaxed text-foreground/70 whitespace-pre-wrap">{replyMessage}</p>
                   )}
@@ -890,6 +915,13 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
                     window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
                   }} className="flex items-center gap-1.5 px-3 py-2 rounded-md font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors">
                     <Mail className="w-3.5 h-3.5" /> Email
+                  </button>
+                  <button onClick={() => {
+                    const body = encodeURIComponent(replyMessage);
+                    const phone = senderNumber || "";
+                    window.open(`sms:${phone}${phone ? "?" : ""}body=${body}`, "_blank");
+                  }} className="flex items-center gap-1.5 px-3 py-2 rounded-md font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors">
+                    <SmartphoneNfc className="w-3.5 h-3.5" /> Text
                   </button>
                   {signal.signalType === "PHONE_CALL" && (
                     <button onClick={() => window.open(`tel:${senderNumber}`, "_blank")}
@@ -953,6 +985,48 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
                           toast.success(`Reminder set for ${format(date, "MMM d")}`);
                         } catch { toast.error("Failed to set reminder"); }
                       }} disabled={(date) => date < new Date()} className="p-3 pointer-events-auto" />
+                    </PopoverContent>
+                  </Popover>
+
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="flex items-center gap-1.5 px-3 py-2 rounded-md font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors">
+                        <CalendarClock className="w-3.5 h-3.5" /> Schedule
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-2" align="start">
+                      <p className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground mb-2">Schedule send</p>
+                      <CalendarComponent mode="single" selected={scheduleDate} onSelect={setScheduleDate}
+                        disabled={(date) => date < new Date()} className="p-2 pointer-events-auto" />
+                      {scheduleDate && (
+                        <div className="mt-2 space-y-2 px-1">
+                          <div className="flex items-center gap-2">
+                            <label className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground">Time</label>
+                            <input type="time" value={scheduleTime} onChange={(e) => setScheduleTime(e.target.value)}
+                              className="bg-background border border-border rounded px-2 py-1 font-mono text-[11px] text-foreground focus:outline-none focus:border-primary/40" />
+                          </div>
+                          <button onClick={async () => {
+                            if (!scheduleDate) return;
+                            const [h, m] = scheduleTime.split(":").map(Number);
+                            const scheduled = new Date(scheduleDate);
+                            scheduled.setHours(h, m, 0, 0);
+                            try {
+                              const { error } = await supabase.from("engagement_sequences").insert({
+                                contact_name: signal.sender,
+                                sequence_type: "scheduled_send",
+                                note: replyMessage.trim() || signal.summary,
+                                next_due_at: scheduled.toISOString(),
+                                interval_days: 0,
+                              });
+                              if (error) throw error;
+                              toast.success(`Scheduled for ${format(scheduled, "MMM d 'at' h:mm a")}`);
+                              setScheduleDate(undefined);
+                            } catch { toast.error("Failed to schedule"); }
+                          }} className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-md font-mono text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+                            <CalendarClock className="w-3.5 h-3.5" /> Schedule for {format(scheduleDate, "MMM d")} at {scheduleTime}
+                          </button>
+                        </div>
+                      )}
                     </PopoverContent>
                   </Popover>
                 </div>
