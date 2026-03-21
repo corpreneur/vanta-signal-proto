@@ -1,0 +1,1 @@
+UPDATE sprint_items SET status = 'done', updated_at = now() WHERE id IN ('656fc4af-b41e-4f1d-a93f-4d4ce18fd9c8', 'f0b2282a-87fa-4e44-b740-d21291033795', '846efcf3-65d1-44bb-b748-c11626fa89cc', '15fb5107-dc99-49fb-8bda-55d751566167');
