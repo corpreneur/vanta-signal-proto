@@ -189,13 +189,10 @@ export default function EnhancedActionItems({ onSignalClick }: EnhancedActionIte
                         <button
                           onClick={(e) => handleComplete(item.id, e)}
                           disabled={completing === item.id}
-                          className="mt-0.5 shrink-0 text-muted-foreground hover:text-primary transition-colors disabled:opacity-50"
+                          className="mt-0.5 shrink-0 w-5 h-5 flex items-center justify-center border border-border rounded-sm text-muted-foreground hover:text-primary hover:border-primary hover:bg-primary/10 transition-all disabled:opacity-50"
+                          title="Mark done"
                         >
-                          {completing === item.id ? (
-                            <CheckCircle2 className="w-4 h-4 text-primary" />
-                          ) : (
-                            <Circle className="w-4 h-4" />
-                          )}
+                          <Check className={`w-3 h-3 ${completing === item.id ? "text-primary" : ""}`} />
                         </button>
                         <div className="min-w-0 flex-1">
                           <p className="font-sans text-[13px] text-foreground truncate group-hover:text-primary transition-colors">
