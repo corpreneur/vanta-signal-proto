@@ -259,6 +259,34 @@ export default function FeedbackBacklog() {
     },
   });
 
+  const batchAnalyze = useMutation({
+    mutationFn: async (entriesToAnalyze: FeedbackEntry[]) => {
+      const subject = entriesToAnalyze[0]?.subject || "cluster";
+      setBatchAnalyzing(subject);
+      let success = 0;
+      let failed = 0;
+      for (const entry of entriesToAnalyze) {
+        try {
+          const conversations = (entry.parsed_chatgpt as ParsedChat[]).filter((p) => p.content?.trim());
+          if (conversations.length === 0) continue;
+          const { data, error } = await supabase.functions.invoke("summarize-feedback", {
+            body: { entry_id: entry.id, conversations },
+          });
+          if (error || data?.error) { failed++; continue; }
+          success++;
+        } catch { failed++; }
+      }
+      return { success, failed };
+    },
+    onSuccess: ({ success, failed }) => {
+      queryClient.invalidateQueries({ queryKey: ["feedback-entries"] });
+      if (success > 0) toast.success(`Analyzed ${success} entr${success === 1 ? "y" : "ies"}${failed > 0 ? `, ${failed} failed` : ""}`);
+      else if (failed > 0) toast.error(`All ${failed} analyses failed`);
+      setBatchAnalyzing(null);
+    },
+    onError: () => { toast.error("Batch analysis failed"); setBatchAnalyzing(null); },
+  });
+
   const handleScreenshotUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files?.length) return;
