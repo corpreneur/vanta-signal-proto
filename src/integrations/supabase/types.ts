@@ -141,6 +141,7 @@ export type Database = {
           narrative: string
           parsed_chatgpt: Json | null
           screenshot_urls: string[]
+          sprint_processed: boolean
           status: string
           subject: string
           updated_at: string
@@ -154,6 +155,7 @@ export type Database = {
           narrative?: string
           parsed_chatgpt?: Json | null
           screenshot_urls?: string[]
+          sprint_processed?: boolean
           status?: string
           subject?: string
           updated_at?: string
@@ -167,6 +169,7 @@ export type Database = {
           narrative?: string
           parsed_chatgpt?: Json | null
           screenshot_urls?: string[]
+          sprint_processed?: boolean
           status?: string
           subject?: string
           updated_at?: string
@@ -528,6 +531,59 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      sprint_items: {
+        Row: {
+          ai_reasoning: string | null
+          created_at: string
+          description: string
+          effort: string
+          feedback_entry_id: string | null
+          id: string
+          priority: string
+          sprint_phase: number
+          status: string
+          subject: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          ai_reasoning?: string | null
+          created_at?: string
+          description?: string
+          effort?: string
+          feedback_entry_id?: string | null
+          id?: string
+          priority?: string
+          sprint_phase?: number
+          status?: string
+          subject?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          ai_reasoning?: string | null
+          created_at?: string
+          description?: string
+          effort?: string
+          feedback_entry_id?: string | null
+          id?: string
+          priority?: string
+          sprint_phase?: number
+          status?: string
+          subject?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sprint_items_feedback_entry_id_fkey"
+            columns: ["feedback_entry_id"]
+            isOneToOne: false
+            referencedRelation: "feedback_entries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       system_settings: {
         Row: {
