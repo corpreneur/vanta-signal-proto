@@ -916,6 +916,13 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
                   }} className="flex items-center gap-1.5 px-3 py-2 rounded-md font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors">
                     <Mail className="w-3.5 h-3.5" /> Email
                   </button>
+                  <button onClick={() => {
+                    const body = encodeURIComponent(replyMessage);
+                    const phone = senderNumber || "";
+                    window.open(`sms:${phone}${phone ? "?" : ""}body=${body}`, "_blank");
+                  }} className="flex items-center gap-1.5 px-3 py-2 rounded-md font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors">
+                    <SmartphoneNfc className="w-3.5 h-3.5" /> Text
+                  </button>
                   {signal.signalType === "PHONE_CALL" && (
                     <button onClick={() => window.open(`tel:${senderNumber}`, "_blank")}
                       className="flex items-center gap-1.5 px-3 py-2 rounded-md font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors">
