@@ -83,6 +83,7 @@ async function fetchEntries(): Promise<FeedbackEntry[]> {
   return (data ?? []).map((d: any) => ({
     ...d,
     parsed_chatgpt: Array.isArray(d.parsed_chatgpt) ? d.parsed_chatgpt : [],
+    ai_summaries: Array.isArray(d.ai_summaries) ? d.ai_summaries : [],
   })) as FeedbackEntry[];
 }
 
