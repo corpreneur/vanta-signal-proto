@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import {
   MessageSquare, Link2, Image, Upload, Trash2, ExternalLink,
-  Plus, ChevronDown, ChevronUp, Clock, Loader2, Brain, RefreshCw, Mic, MicOff, Square, Bell,
+  Plus, ChevronDown, ChevronUp, Clock, Loader2, Brain, RefreshCw, Mic, MicOff, Square, Bell, Sparkles, CheckCircle2, Lightbulb, Target,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -40,6 +40,16 @@ interface ParsedChat {
   scraped_at: string;
 }
 
+interface AiSummary {
+  url: string;
+  title: string;
+  decisions: string[];
+  action_items: string[];
+  insights: string[];
+  summary: string;
+  generated_at: string;
+}
+
 interface FeedbackEntry {
   id: string;
   author: string;
@@ -48,6 +58,7 @@ interface FeedbackEntry {
   chatgpt_links: string[];
   screenshot_urls: string[];
   parsed_chatgpt: ParsedChat[];
+  ai_summaries: AiSummary[];
   status: string;
   created_at: string;
   updated_at: string;
@@ -72,6 +83,7 @@ async function fetchEntries(): Promise<FeedbackEntry[]> {
   return (data ?? []).map((d: any) => ({
     ...d,
     parsed_chatgpt: Array.isArray(d.parsed_chatgpt) ? d.parsed_chatgpt : [],
+    ai_summaries: Array.isArray(d.ai_summaries) ? d.ai_summaries : [],
   })) as FeedbackEntry[];
 }
 
@@ -215,6 +227,31 @@ export default function FeedbackBacklog() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["feedback-entries"] });
       toast.success("Entry removed");
+    },
+  });
+
+  const [summarizing, setSummarizing] = useState<string | null>(null);
+
+  const summarizeEntry = useMutation({
+    mutationFn: async (entry: FeedbackEntry) => {
+      setSummarizing(entry.id);
+      const conversations = (entry.parsed_chatgpt as ParsedChat[]).filter((p) => p.content?.trim());
+      if (conversations.length === 0) throw new Error("No scraped conversations to summarize");
+      const { data, error } = await supabase.functions.invoke("summarize-feedback", {
+        body: { entry_id: entry.id, conversations },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["feedback-entries"] });
+      toast.success("AI summaries generated");
+      setSummarizing(null);
+    },
+    onError: (e) => {
+      toast.error(e instanceof Error ? e.message : "Failed to generate summaries");
+      setSummarizing(null);
     },
   });
 
@@ -603,6 +640,84 @@ export default function FeedbackBacklog() {
                           </div>
                         );
                       })}
+                    </div>
+                  )}
+
+                  {/* AI Summary section */}
+                  {(entry.parsed_chatgpt as ParsedChat[]).some((p) => p.content?.trim()) && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <p className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                          <Sparkles className="w-3 h-3" /> AI Analysis
+                        </p>
+                        <button
+                          onClick={() => summarizeEntry.mutate(entry)}
+                          disabled={summarizing === entry.id}
+                          className="flex items-center gap-1 px-2 py-0.5 rounded-sm font-mono text-[9px] uppercase tracking-wider border border-primary/30 text-primary hover:bg-primary/10 transition-colors disabled:opacity-50"
+                        >
+                          {summarizing === entry.id ? (
+                            <><Loader2 className="w-3 h-3 animate-spin" /> Analyzing…</>
+                          ) : entry.ai_summaries.length > 0 ? (
+                            <><RefreshCw className="w-3 h-3" /> Re-analyze</>
+                          ) : (
+                            <><Sparkles className="w-3 h-3" /> Extract insights</>
+                          )}
+                        </button>
+                      </div>
+
+                      {entry.ai_summaries.length > 0 && entry.ai_summaries.map((s, si) => (
+                        <div key={si} className="border border-primary/20 rounded-sm bg-primary/5 p-3 space-y-2.5">
+                          <p className="font-mono text-[9px] uppercase tracking-wider text-primary/60">
+                            {s.title} · {format(new Date(s.generated_at), "MMM d, h:mm a")}
+                          </p>
+                          <p className="font-sans text-[13px] text-foreground/80 leading-relaxed italic">{s.summary}</p>
+
+                          {s.decisions.length > 0 && (
+                            <div>
+                              <p className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground flex items-center gap-1 mb-1">
+                                <Target className="w-3 h-3" /> Decisions
+                              </p>
+                              <ul className="space-y-0.5">
+                                {s.decisions.map((d, di) => (
+                                  <li key={di} className="flex items-start gap-1.5 font-sans text-[12px] text-foreground/70">
+                                    <span className="text-primary mt-0.5">▸</span> {d}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {s.action_items.length > 0 && (
+                            <div>
+                              <p className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground flex items-center gap-1 mb-1">
+                                <CheckCircle2 className="w-3 h-3" /> Action Items
+                              </p>
+                              <ul className="space-y-0.5">
+                                {s.action_items.map((a, ai2) => (
+                                  <li key={ai2} className="flex items-start gap-1.5 font-sans text-[12px] text-foreground/70">
+                                    <span className="text-primary mt-0.5">☐</span> {a}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {s.insights.length > 0 && (
+                            <div>
+                              <p className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground flex items-center gap-1 mb-1">
+                                <Lightbulb className="w-3 h-3" /> Insights
+                              </p>
+                              <ul className="space-y-0.5">
+                                {s.insights.map((ins, ii) => (
+                                  <li key={ii} className="flex items-start gap-1.5 font-sans text-[12px] text-foreground/70">
+                                    <span className="text-primary mt-0.5">◆</span> {ins}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   )}
 
