@@ -118,6 +118,7 @@ export default function FeedbackBacklog() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["feedback-entries"] });
+      setSubject("General");
       setNarrative("");
       setLinks([""]);
       setScreenshots([]);
