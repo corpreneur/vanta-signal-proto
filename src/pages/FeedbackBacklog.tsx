@@ -91,6 +91,8 @@ async function fetchEntries(): Promise<FeedbackEntry[]> {
 
 export default function FeedbackBacklog() {
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
+  const highlightId = searchParams.get("highlight");
   const { data: entries = [], isLoading } = useQuery({ queryKey: ["feedback-entries"], queryFn: fetchEntries });
   const [newCount, setNewCount] = useState(0);
 
