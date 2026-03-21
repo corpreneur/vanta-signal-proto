@@ -143,7 +143,15 @@ export default function SmartNoteFAB() {
   return (
     <>
       {/* VANTA Orb FAB — translucent glass */}
-      <div className="fixed bottom-6 right-6 z-40 flex items-center justify-center" style={{ width: 80, height: 80 }}>
+      <div
+        className="fixed bottom-6 left-1/2 z-40 flex items-center justify-center"
+        style={{
+          width: 80,
+          height: 80,
+          transform: `translateX(-50%) translateY(${scrollDrift}px)`,
+          transition: "transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+        }}
+      >
         {/* Outer glow ring */}
         <div
           className="absolute inset-0 m-auto w-16 h-16 rounded-full pointer-events-none"
