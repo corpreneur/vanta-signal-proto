@@ -30,6 +30,26 @@ export default function SmartNoteFAB() {
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didLongPress = useRef(false);
 
+  // Scroll-responsive drift: orb gently floats with scroll direction
+  const [scrollDrift, setScrollDrift] = useState(0);
+  const lastScrollY = useRef(0);
+  const driftTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const y = window.scrollY;
+      const delta = y - lastScrollY.current;
+      lastScrollY.current = y;
+      // Clamp drift to ±6px for a subtle float
+      setScrollDrift((prev) => Math.max(-6, Math.min(6, prev + delta * 0.15)));
+      // Ease back to center
+      if (driftTimeout.current) clearTimeout(driftTimeout.current);
+      driftTimeout.current = setTimeout(() => setScrollDrift(0), 400);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const handlePointerDown = useCallback(() => {
     didLongPress.current = false;
     longPressTimer.current = setTimeout(() => {
