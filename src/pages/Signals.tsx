@@ -382,7 +382,14 @@ const Signals = () => {
 
       {activeTab === "feed" && (
         <>
-          {/* Signal type grid + filters first */}
+          {/* Context + briefs — top of feed */}
+          <MorningContext signals={feedSignals} />
+
+          {briefs.length > 0 && (
+            <BriefsSection briefs={briefs} />
+          )}
+
+          {/* Signal type grid + filters */}
           <TagBrowser tagCounts={tagCounts} activeType={filters.type} onSelect={handleTagSelect} />
           <SignalFilters filters={filters} onChange={setFilters} senders={senders} />
 
@@ -449,13 +456,6 @@ const Signals = () => {
               );
             })}
           </div>
-
-          {/* Context + briefs */}
-          <MorningContext signals={feedSignals} />
-
-          {briefs.length > 0 && (
-            <BriefsSection briefs={briefs} />
-          )}
 
           <SignalFeed signals={feedSignals} filters={filters} allSignals={signals} />
 
