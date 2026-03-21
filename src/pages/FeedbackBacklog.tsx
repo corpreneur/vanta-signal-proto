@@ -234,6 +234,7 @@ export default function FeedbackBacklog() {
   });
 
   const [summarizing, setSummarizing] = useState<string | null>(null);
+  const [batchAnalyzing, setBatchAnalyzing] = useState<string | null>(null);
 
   const summarizeEntry = useMutation({
     mutationFn: async (entry: FeedbackEntry) => {
