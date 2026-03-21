@@ -121,6 +121,7 @@ export default function FeedbackBacklog() {
   const [uploading, setUploading] = useState(false);
   const [screenshots, setScreenshots] = useState<string[]>([]);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"list" | "cluster">("list");
   const [expandedChats, setExpandedChats] = useState<Record<string, boolean>>({});
   const [scraping, setScraping] = useState(false);
   const [filterSubject, setFilterSubject] = useState<string>("All");
