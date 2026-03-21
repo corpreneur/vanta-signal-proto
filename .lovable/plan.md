@@ -1,109 +1,66 @@
 
 
-# Making Capture Magical
+# Embeddable Feedback Widget
 
-The CMO's insight is clear: capture isn't about "creating a thought." It's a **magic food processor** — you throw in whatever fragment is on your mind (a name, a screenshot, a half-baked idea, something you overheard) and it processes it into structured signal. The current implementation has the right plumbing but the experience doesn't feel magical yet. Here's how to close that gap.
+## What We're Building
+A standalone, lightweight feedback submission widget that can be embedded into any external site via a `<script>` tag or iframe. It exposes the core submission flow from the `/feedback` page (author, subject, narrative, screenshots, ChatGPT links) without requiring the host site to run React or know about the Vanta Signal stack.
 
-## What's Missing Today
-
-The current capture flow is functional but mechanical:
-- Text box → hit enter → toast notification → done
-- The "processing" moment is invisible (just a spinner)
-- Results appear as flat classification cards
-- No sense of transformation happening
-- The FAB orb is beautiful but the sheet it opens is utilitarian
-- Multiple input modes exist but feel like separate tools, not one processor
-
-## The Concept: One Slot, Any Input
-
-Think of it like dropping something into a funnel. You don't pick "note mode" or "image mode" first — you just throw something in. The processor figures out what it is and what to do with it.
-
-### 1. Unified Capture Bar (Replace InlineBrainDump)
-
-Instead of a plain text input, build a **multi-modal capture strip** that accepts text, paste (images from clipboard), and drag-drop — all in one component. No mode tabs needed for the inline version.
-
-- Text input as default, but if you paste an image it instantly shows a thumbnail
-- If you paste a URL it auto-detects and shows a link preview chip
-- Mic button on the right for voice-to-text (already have speech recognition hook)
-- Single "Process" action regardless of input type
-
-### 2. The Processing Moment (The Magic)
-
-This is where the magic lives. When you hit capture:
-
-- The input bar **collapses smoothly** into a compact "processing" state
-- A **shimmer animation** ripples across a card that morphs from raw → structured
-- Text appears to be "typed out" by the AI (letter-by-letter reveal of the summary)
-- Signal type badge **fades in** with a subtle color wash
-- Suggested actions **cascade in** one by one (staggered 150ms)
-- The whole thing takes ~2 seconds of choreographed animation even if the AI responds faster (buffer the reveal)
-
-### 3. Result Card: "Before → After" Split
-
-When processing completes, show a compact **transformation card**:
+## Architecture
 
 ```text
-┌─────────────────────────────────────┐
-│ ◇ What you captured                 │
-│ "ran into james at the thing last   │
-│  night, he's raising a series B,    │
-│  should connect him w/ sarah"       │
-│                                     │
-│ ─ ─ ─ processed into ─ ─ ─         │
-│                                     │
-│ ● Introduction Signal     high      │
-│   James — Series B raise,           │
-│   connect with Sarah                │
-│                                     │
-│ → Send intro email to Sarah         │
-│ → Set reminder: follow up w/ James  │
-│ → Link to existing: Sarah Chen      │
-└─────────────────────────────────────┘
+External Site                         Vanta Signal Backend
+┌──────────────────┐                 ┌─────────────────────┐
+│  <script> tag    │  ── POST ──▶   │  feedback-widget     │
+│  or <iframe>     │                 │  (edge function)     │
+│                  │                 │     ↓                │
+│  Shadow DOM      │  ◀── JSON ──   │  feedback_entries    │
+│  widget UI       │                 │  table insert        │
+└──────────────────┘                 └─────────────────────┘
 ```
 
-### 4. SmartNoteFAB Sheet Simplification
+## Steps
 
-Replace the 5-tab sheet with a **single unified capture surface**:
-- Large text area that also accepts paste/drop
-- Small icon row below for explicit mode switches (camera, mic, link) — but positioned as "input helpers" not "modes"
-- Remove "Granola" and "Email" as primary tabs — fold them into the capture page only
+### 1. Create the edge function `feedback-widget`
+- A new Supabase edge function that accepts POST requests with feedback data (author, subject, narrative, links, screenshot URLs)
+- Inserts into `feedback_entries` table using service role (no auth required for external submitters)
+- CORS headers allowing any origin
+- Optional: triggers the existing scrape + AI analysis pipeline inline or flags for next cron run
+- Returns `{ ok: true, id }` on success
 
-### 5. Micro-copy That Sells the Magic
+### 2. Build the embeddable widget as a standalone HTML/JS bundle
+- Create `public/feedback-widget.js` — a self-contained vanilla JS file (~8KB) that:
+  - Injects a floating feedback button (bottom-right corner)
+  - On click, opens a modal form inside a Shadow DOM (style-isolated from host page)
+  - Form fields: author name (free text), subject dropdown, narrative textarea, ChatGPT link input, screenshot file upload
+  - On submit, POSTs to the `feedback-widget` edge function endpoint
+  - Shows success/error state, then auto-closes
+- No React dependency — pure DOM manipulation for maximum portability
+- Configurable via `data-*` attributes on the script tag (e.g., `data-project`, `data-theme="dark"`)
 
-Update all capture-related copy to reinforce the processor metaphor:
-- Placeholder: "Drop anything here… a name, a screenshot, a fragment of an idea"
-- Processing state: "Processing…"  
-- Result header: "Processed into signal"
-- Toast: "Signal detected · Introduction" (not "Captured as INTRO")
-- Empty state: "Nothing in the processor yet"
+### 3. Create an embed instructions page at `/feedback/embed`
+- A simple page in the app showing:
+  - The `<script>` snippet to copy
+  - An iframe alternative embed code
+  - Live preview of the widget
+  - Configuration options (theme, default author, allowed subjects)
 
-## Implementation Plan
+### 4. Update release notes
+- Add widget entry to `releaseNotes.ts`
 
-### Step 1: Build unified capture input component
-Create `UnifiedCaptureInput.tsx` — a single input that handles text, pasted images, pasted URLs, and voice toggle. No mode tabs. Detects input type automatically.
+## Embed Usage (what external sites will paste)
 
-### Step 2: Build animated processing reveal
-Create `CaptureProcessingReveal.tsx` — the choreographed animation sequence that transforms raw input into structured signal card with typewriter summary, cascading actions, and color wash.
+```html
+<script
+  src="https://vantasignal.lovable.app/feedback-widget.js"
+  data-endpoint="https://fwmrhpayssaiuhqzzeig.supabase.co/functions/v1/feedback-widget"
+  data-theme="dark"
+  defer
+></script>
+```
 
-### Step 3: Redesign InlineBrainDump
-Replace current plain input with `UnifiedCaptureInput` + `CaptureProcessingReveal`. The inline bar on Focus/Signals pages becomes the magic food processor.
-
-### Step 4: Simplify SmartNoteFAB sheet  
-Remove mode tabs. Use `UnifiedCaptureInput` as the single capture surface. Keep small icon helpers (camera, mic) as secondary affordances below the input.
-
-### Step 5: Update all capture micro-copy
-Placeholder text, toast messages, result labels, empty states — all updated to "processor" language per section 5 above.
-
-## Files to Create/Modify
-
-| File | Action |
-|------|--------|
-| `src/components/UnifiedCaptureInput.tsx` | **Create** — multi-modal input (text + paste image + paste URL + voice) |
-| `src/components/CaptureProcessingReveal.tsx` | **Create** — animated before/after transformation card |
-| `src/components/InlineBrainDump.tsx` | **Rewrite** — use UnifiedCaptureInput + ProcessingReveal |
-| `src/components/SmartNoteFAB.tsx` | **Simplify** — remove mode tabs, unified surface |
-| `src/pages/BrainDump.tsx` | **Update** — integrate new components, update copy |
-| `src/index.css` | **Add** — shimmer/typewriter animation keyframes |
-
-No database changes required. All existing edge functions (brain-dump, brain-dump-image) continue to work as-is.
+## Security Considerations
+- The edge function validates input shape and sanitizes text
+- Rate limiting via a simple in-memory counter (10 submissions per IP per hour)
+- No auth token exposed in the widget — the edge function uses service role internally
+- CORS restricted to configurable allowed origins (default: `*` for development)
 
