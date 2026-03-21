@@ -262,7 +262,20 @@ export default function Contacts() {
         </div>
       </Motion>
 
-      {/* Relationship Graph */}
+      {/* Search bar — positioned above graph */}
+      <Motion delay={55}>
+        <div className="relative mb-4">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search contacts…"
+            className="pl-9 font-mono text-xs bg-card border-border"
+          />
+        </div>
+      </Motion>
+
+      {/* Relationship Graph — moved to top, default open */}
       <Motion delay={60}>
         <div className="mb-5">
           <button
@@ -277,9 +290,9 @@ export default function Contacts() {
               {graphData.nodes.length} nodes · {graphData.edges.length} edges
             </span>
             {graphOpen ? (
-              <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" />
+              <ChevronUp className="w-4 h-4 text-foreground transition-transform" />
             ) : (
-              <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+              <ChevronDown className="w-4 h-4 text-muted-foreground animate-pulse transition-transform" />
             )}
           </button>
 
@@ -333,16 +346,7 @@ export default function Contacts() {
       {/* Toolbar */}
       <Motion delay={80}>
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search contacts…"
-              className="pl-9 font-mono text-xs bg-card border-border"
-            />
-          </div>
-          <div className="flex gap-1.5 flex-wrap">
+          <div className="flex gap-1.5 flex-wrap flex-1">
             {(["strength", "recency", "signals", "high", "alpha"] as SortMode[]).map((m) => (
               <button
                 key={m}
