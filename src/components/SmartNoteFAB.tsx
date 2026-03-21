@@ -55,18 +55,13 @@ export default function SmartNoteFAB() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Touch drag handlers for iOS
+  // Touch drag handlers for iOS — drag only, no open
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0];
     const currentX = orbPos?.x ?? window.innerWidth / 2;
     const currentY = orbPos?.y ?? window.innerHeight - 60;
     dragStart.current = { x: touch.clientX, y: touch.clientY, orbX: currentX, orbY: currentY };
     dragMoved.current = false;
-    didLongPress.current = false;
-    longPressTimer.current = setTimeout(() => {
-      didLongPress.current = true;
-      if (!dragMoved.current) setOpen(true);
-    }, 500);
   }, [orbPos]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
@@ -77,10 +72,6 @@ export default function SmartNoteFAB() {
     if (!isDragging.current && Math.abs(dx) + Math.abs(dy) > 8) {
       isDragging.current = true;
       dragMoved.current = true;
-      if (longPressTimer.current) {
-        clearTimeout(longPressTimer.current);
-        longPressTimer.current = null;
-      }
     }
     if (isDragging.current) {
       e.preventDefault();
@@ -91,27 +82,8 @@ export default function SmartNoteFAB() {
   }, []);
 
   const handleTouchEnd = useCallback(() => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
     isDragging.current = false;
     dragStart.current = null;
-  }, []);
-
-  const handlePointerDown = useCallback(() => {
-    didLongPress.current = false;
-    longPressTimer.current = setTimeout(() => {
-      didLongPress.current = true;
-      setOpen(true);
-    }, 500);
-  }, []);
-
-  const handlePointerUp = useCallback(() => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
   }, []);
 
   const handleClick = useCallback(() => {
