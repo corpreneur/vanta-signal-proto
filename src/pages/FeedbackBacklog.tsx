@@ -234,6 +234,7 @@ export default function FeedbackBacklog() {
   });
 
   const [summarizing, setSummarizing] = useState<string | null>(null);
+  const [batchAnalyzing, setBatchAnalyzing] = useState<string | null>(null);
 
   const summarizeEntry = useMutation({
     mutationFn: async (entry: FeedbackEntry) => {
@@ -256,6 +257,34 @@ export default function FeedbackBacklog() {
       toast.error(e instanceof Error ? e.message : "Failed to generate summaries");
       setSummarizing(null);
     },
+  });
+
+  const batchAnalyze = useMutation({
+    mutationFn: async (entriesToAnalyze: FeedbackEntry[]) => {
+      const subject = entriesToAnalyze[0]?.subject || "cluster";
+      setBatchAnalyzing(subject);
+      let success = 0;
+      let failed = 0;
+      for (const entry of entriesToAnalyze) {
+        try {
+          const conversations = (entry.parsed_chatgpt as ParsedChat[]).filter((p) => p.content?.trim());
+          if (conversations.length === 0) continue;
+          const { data, error } = await supabase.functions.invoke("summarize-feedback", {
+            body: { entry_id: entry.id, conversations },
+          });
+          if (error || data?.error) { failed++; continue; }
+          success++;
+        } catch { failed++; }
+      }
+      return { success, failed };
+    },
+    onSuccess: ({ success, failed }) => {
+      queryClient.invalidateQueries({ queryKey: ["feedback-entries"] });
+      if (success > 0) toast.success(`Analyzed ${success} entr${success === 1 ? "y" : "ies"}${failed > 0 ? `, ${failed} failed` : ""}`);
+      else if (failed > 0) toast.error(`All ${failed} analyses failed`);
+      setBatchAnalyzing(null);
+    },
+    onError: () => { toast.error("Batch analysis failed"); setBatchAnalyzing(null); },
   });
 
   const handleScreenshotUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -629,7 +658,7 @@ export default function FeedbackBacklog() {
                           </div>
                         </div>
 
-                        {/* Contributors + date range */}
+                        {/* Contributors + date range + Analyze All */}
                         <div className="flex items-center gap-3 mt-1.5">
                           <span className="font-mono text-[9px] text-muted-foreground">
                             By {[...new Set(items.map((e) => e.author))].join(", ")}
@@ -642,6 +671,27 @@ export default function FeedbackBacklog() {
                               <Sparkles className="w-3 h-3" /> {analyzedCount} analyzed
                             </span>
                           )}
+                          {(() => {
+                            const unanalyzed = items.filter((e) =>
+                              e.ai_summaries.length === 0 &&
+                              (e.parsed_chatgpt as ParsedChat[]).some((p) => p.content?.trim())
+                            );
+                            if (unanalyzed.length === 0) return null;
+                            const isBatching = batchAnalyzing === subject;
+                            return (
+                              <button
+                                onClick={() => batchAnalyze.mutate(unanalyzed)}
+                                disabled={isBatching}
+                                className="flex items-center gap-1 px-2 py-0.5 rounded-sm font-mono text-[9px] uppercase tracking-wider border border-primary/30 text-primary hover:bg-primary/10 transition-colors disabled:opacity-50 ml-auto"
+                              >
+                                {isBatching ? (
+                                  <><Loader2 className="w-3 h-3 animate-spin" /> Analyzing {unanalyzed.length}…</>
+                                ) : (
+                                  <><Sparkles className="w-3 h-3" /> Analyze all ({unanalyzed.length})</>
+                                )}
+                              </button>
+                            );
+                          })()}
                         </div>
                       </div>
 
