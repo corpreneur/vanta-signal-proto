@@ -3,6 +3,7 @@ import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import {
   MessageSquare, Link2, Image, Upload, Trash2, ExternalLink,
   Plus, ChevronDown, ChevronUp, Clock, Loader2, Brain, RefreshCw, Mic, MicOff, Square, Bell, Sparkles, CheckCircle2, Lightbulb, Target,
+  LayoutGrid, List, Layers, TrendingUp,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -120,6 +121,7 @@ export default function FeedbackBacklog() {
   const [uploading, setUploading] = useState(false);
   const [screenshots, setScreenshots] = useState<string[]>([]);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"list" | "cluster">("list");
   const [expandedChats, setExpandedChats] = useState<Record<string, boolean>>({});
   const [scraping, setScraping] = useState(false);
   const [filterSubject, setFilterSubject] = useState<string>("All");
@@ -495,8 +497,33 @@ export default function FeedbackBacklog() {
         </button>
       </div>
 
-      {/* Entries list */}
+      {/* View toggle + Entries */}
       <div className="space-y-3">
+        {/* View mode toggle */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1 p-0.5 rounded-sm border border-border bg-muted/30">
+            <button
+              onClick={() => setViewMode("list")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm font-mono text-[9px] uppercase tracking-wider transition-colors ${
+                viewMode === "list" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <List className="w-3 h-3" /> List
+            </button>
+            <button
+              onClick={() => setViewMode("cluster")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm font-mono text-[9px] uppercase tracking-wider transition-colors ${
+                viewMode === "cluster" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Layers className="w-3 h-3" /> Clusters
+            </button>
+          </div>
+          <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            {filteredEntries.length} {filteredEntries.length === 1 ? "entry" : "entries"}
+          </p>
+        </div>
+
         {/* Filter bar */}
         <div className="space-y-2 p-3 rounded-sm border border-border bg-muted/30">
           {/* Author */}
@@ -537,13 +564,193 @@ export default function FeedbackBacklog() {
           </div>
         </div>
 
-        <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-          {filteredEntries.length} {filteredEntries.length === 1 ? "entry" : "entries"}
-        </p>
-
         {isLoading && <p className="text-muted-foreground text-sm">Loading…</p>}
 
-        {filteredEntries.map((entry) => {
+        {/* CLUSTER VIEW */}
+        {viewMode === "cluster" && !isLoading && (() => {
+          // Group by subject
+          const groups = new Map<string, FeedbackEntry[]>();
+          for (const e of filteredEntries) {
+            const key = e.subject || "Other";
+            if (!groups.has(key)) groups.set(key, []);
+            groups.get(key)!.push(e);
+          }
+
+          return (
+            <div className="space-y-4">
+              {Array.from(groups.entries())
+                .sort((a, b) => b[1].length - a[1].length)
+                .map(([subject, items]) => {
+                  // Aggregate insights across all entries in cluster
+                  const allDecisions: string[] = [];
+                  const allActions: string[] = [];
+                  const allInsights: string[] = [];
+                  const allSummaries: string[] = [];
+                  let analyzedCount = 0;
+
+                  for (const item of items) {
+                    for (const s of item.ai_summaries as AiSummary[]) {
+                      analyzedCount++;
+                      allDecisions.push(...s.decisions);
+                      allActions.push(...s.action_items);
+                      allInsights.push(...s.insights);
+                      if (s.summary) allSummaries.push(s.summary);
+                    }
+                  }
+
+                  const statusCounts = items.reduce((acc, e) => {
+                    acc[e.status] = (acc[e.status] || 0) + 1;
+                    return acc;
+                  }, {} as Record<string, number>);
+
+                  const uniqueDecisions = [...new Set(allDecisions)];
+                  const uniqueActions = [...new Set(allActions)];
+                  const uniqueInsights = [...new Set(allInsights)];
+
+                  return (
+                    <div key={subject} className="border border-border rounded-sm bg-card overflow-hidden">
+                      {/* Cluster header */}
+                      <div className="px-4 py-3 bg-muted/30 border-b border-border">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2.5">
+                            <LayoutGrid className="w-4 h-4 text-primary" />
+                            <h3 className="font-mono text-[12px] font-bold uppercase tracking-wider text-foreground">{subject}</h3>
+                            <span className="px-1.5 py-0.5 rounded-sm bg-primary/10 text-primary font-mono text-[10px] font-bold">
+                              {items.length}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            {Object.entries(statusCounts).map(([s, count]) => (
+                              <span key={s} className={`px-1.5 py-0.5 rounded-sm font-mono text-[8px] uppercase tracking-wider border ${STATUS_STYLES[s as Status] || "bg-muted text-muted-foreground border-border"}`}>
+                                {s} {count}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Contributors + date range */}
+                        <div className="flex items-center gap-3 mt-1.5">
+                          <span className="font-mono text-[9px] text-muted-foreground">
+                            By {[...new Set(items.map((e) => e.author))].join(", ")}
+                          </span>
+                          <span className="font-mono text-[9px] text-muted-foreground">
+                            {format(new Date(items[items.length - 1].created_at), "MMM d")} — {format(new Date(items[0].created_at), "MMM d")}
+                          </span>
+                          {analyzedCount > 0 && (
+                            <span className="flex items-center gap-1 font-mono text-[9px] text-primary/70">
+                              <Sparkles className="w-3 h-3" /> {analyzedCount} analyzed
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Aggregated AI insights */}
+                      {(uniqueDecisions.length > 0 || uniqueActions.length > 0 || uniqueInsights.length > 0) && (
+                        <div className="px-4 py-3 space-y-3 border-b border-border bg-primary/[0.02]">
+                          <div className="flex items-center gap-1.5">
+                            <TrendingUp className="w-3.5 h-3.5 text-primary" />
+                            <p className="font-mono text-[9px] uppercase tracking-wider text-primary">
+                              Aggregated Strategic Insights
+                            </p>
+                          </div>
+
+                          {allSummaries.length > 0 && (
+                            <p className="font-sans text-[12px] text-foreground/70 leading-relaxed italic border-l-2 border-primary/20 pl-3">
+                              {allSummaries[0]}{allSummaries.length > 1 ? ` (+${allSummaries.length - 1} more)` : ""}
+                            </p>
+                          )}
+
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            {uniqueDecisions.length > 0 && (
+                              <div className="space-y-1">
+                                <p className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                                  <Target className="w-3 h-3" /> Decisions ({uniqueDecisions.length})
+                                </p>
+                                {uniqueDecisions.slice(0, 4).map((d, i) => (
+                                  <p key={i} className="flex items-start gap-1 font-sans text-[11px] text-foreground/70">
+                                    <span className="text-primary mt-0.5 shrink-0">▸</span>
+                                    <span className="line-clamp-2">{d}</span>
+                                  </p>
+                                ))}
+                                {uniqueDecisions.length > 4 && (
+                                  <p className="font-mono text-[9px] text-muted-foreground/60">+{uniqueDecisions.length - 4} more</p>
+                                )}
+                              </div>
+                            )}
+
+                            {uniqueActions.length > 0 && (
+                              <div className="space-y-1">
+                                <p className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                                  <CheckCircle2 className="w-3 h-3" /> Actions ({uniqueActions.length})
+                                </p>
+                                {uniqueActions.slice(0, 4).map((a, i) => (
+                                  <p key={i} className="flex items-start gap-1 font-sans text-[11px] text-foreground/70">
+                                    <span className="text-primary mt-0.5 shrink-0">☐</span>
+                                    <span className="line-clamp-2">{a}</span>
+                                  </p>
+                                ))}
+                                {uniqueActions.length > 4 && (
+                                  <p className="font-mono text-[9px] text-muted-foreground/60">+{uniqueActions.length - 4} more</p>
+                                )}
+                              </div>
+                            )}
+
+                            {uniqueInsights.length > 0 && (
+                              <div className="space-y-1">
+                                <p className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                                  <Lightbulb className="w-3 h-3" /> Insights ({uniqueInsights.length})
+                                </p>
+                                {uniqueInsights.slice(0, 4).map((ins, i) => (
+                                  <p key={i} className="flex items-start gap-1 font-sans text-[11px] text-foreground/70">
+                                    <span className="text-primary mt-0.5 shrink-0">◆</span>
+                                    <span className="line-clamp-2">{ins}</span>
+                                  </p>
+                                ))}
+                                {uniqueInsights.length > 4 && (
+                                  <p className="font-mono text-[9px] text-muted-foreground/60">+{uniqueInsights.length - 4} more</p>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Entry list within cluster */}
+                      <div className="divide-y divide-border">
+                        {items.map((entry) => (
+                          <div key={entry.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted/20 transition-colors">
+                            <span className={`shrink-0 px-1.5 py-0.5 rounded-sm font-mono text-[8px] uppercase tracking-wider border ${STATUS_STYLES[entry.status as Status]}`}>
+                              {entry.status}
+                            </span>
+                            <span className="font-mono text-[10px] uppercase tracking-wider text-primary/70">{entry.author}</span>
+                            <span className="flex-1 font-sans text-[12px] text-foreground/80 truncate">
+                              {entry.narrative || "(no narrative)"}
+                            </span>
+                            {entry.ai_summaries.length > 0 && (
+                              <span className="shrink-0 flex items-center gap-0.5 text-primary/60">
+                                <Sparkles className="w-3 h-3" />
+                              </span>
+                            )}
+                            {entry.parsed_chatgpt.length > 0 && (
+                              <span className="shrink-0 flex items-center gap-0.5 px-1 py-0.5 rounded-sm bg-primary/10 text-primary font-mono text-[8px]">
+                                <Brain className="w-2.5 h-2.5" /> {entry.parsed_chatgpt.length}
+                              </span>
+                            )}
+                            <span className="font-mono text-[9px] text-muted-foreground shrink-0">
+                              {format(new Date(entry.created_at), "MMM d")}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          );
+        })()}
+
+        {/* LIST VIEW */}
+        {viewMode === "list" && !isLoading && filteredEntries.map((entry) => {
           const isOpen = expanded === entry.id;
           const status = entry.status as Status;
           const parsedMap = new Map((entry.parsed_chatgpt as ParsedChat[]).map((p) => [p.url, p]));
