@@ -378,33 +378,22 @@ export default function Contacts() {
             </button>
           </div>
 
-          {/* Tag filter */}
+          {/* Tag filter dropdown */}
           {allTags && allTags.size > 0 && (
-            <div className="flex flex-wrap gap-1 items-center">
-              <Filter className="w-3 h-3 text-muted-foreground mr-1" />
-              {Array.from(allTags.keys()).map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => setFilterTag(filterTag === tag ? null : tag)}
-                  className={`px-2 py-1 font-mono text-[9px] uppercase tracking-wider border rounded-sm transition-colors ${
-                    filterTag === tag
-                      ? "border-primary text-primary bg-primary/10"
-                      : "border-border text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <Tag className="w-2.5 h-2.5 inline mr-0.5" />
-                  {tag} ({allTags.get(tag)?.length})
-                </button>
-              ))}
-              {filterTag && (
-                <button
-                  onClick={() => setFilterTag(null)}
-                  className="px-2 py-1 font-mono text-[9px] text-muted-foreground hover:text-foreground"
-                >
-                  Clear
-                </button>
-              )}
-            </div>
+            <Select value={filterTag || "all"} onValueChange={(v) => setFilterTag(v === "all" ? null : v)}>
+              <SelectTrigger className="w-[160px] h-8 font-mono text-[10px] uppercase tracking-wider">
+                <Filter className="w-3 h-3 mr-1" />
+                <SelectValue placeholder="Filter by tag" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Tags</SelectItem>
+                {Array.from(allTags.keys()).map((tag) => (
+                  <SelectItem key={tag} value={tag}>
+                    {tag} ({allTags.get(tag)?.length})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           )}
         </div>
       </Motion>

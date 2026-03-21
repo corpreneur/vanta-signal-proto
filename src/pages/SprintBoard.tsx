@@ -73,8 +73,63 @@ const EFFORT_LABELS: Record<string, string> = {
   medium: "M",
   large: "L",
 };
+function AddItemInline() {
+  const queryClient = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [priority, setPriority] = useState("medium");
+  const ref = useRef<HTMLInputElement>(null);
 
-export default function SprintBoard() {
+  const addItem = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("sprint_items").insert({
+        title,
+        priority,
+        status: "backlog",
+        sprint_phase: 1,
+        effort: "medium",
+        subject: "General",
+        description: "",
+      } as any);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["sprint-items"] });
+      toast.success("Item added");
+      setTitle("");
+      setOpen(false);
+    },
+    onError: () => toast.error("Failed to add item"),
+  });
+
+  if (!open) {
+    return (
+      <Button variant="outline" size="sm" className="font-mono text-[10px] uppercase tracking-wider gap-1.5 h-8" onClick={() => { setOpen(true); setTimeout(() => ref.current?.focus(), 50); }}>
+        <Plus className="h-3 w-3" /> Add Item
+      </Button>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <Input ref={ref} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="New sprint item…" className="h-8 font-mono text-[11px] w-[220px]" onKeyDown={(e) => { if (e.key === "Enter" && title.trim()) addItem.mutate(); if (e.key === "Escape") setOpen(false); }} />
+      <Select value={priority} onValueChange={setPriority}>
+        <SelectTrigger className="w-[90px] h-8 font-mono text-[10px] uppercase tracking-wider">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="high">High</SelectItem>
+          <SelectItem value="medium">Medium</SelectItem>
+          <SelectItem value="low">Low</SelectItem>
+        </SelectContent>
+      </Select>
+      <Button size="sm" className="h-8 font-mono text-[10px] uppercase" disabled={!title.trim()} onClick={() => addItem.mutate()}>Add</Button>
+      <Button variant="ghost" size="sm" className="h-8 font-mono text-[10px]" onClick={() => setOpen(false)}>Cancel</Button>
+    </div>
+  );
+}
+
+
   const queryClient = useQueryClient();
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
