@@ -658,7 +658,7 @@ export default function FeedbackBacklog() {
                           </div>
                         </div>
 
-                        {/* Contributors + date range */}
+                        {/* Contributors + date range + Analyze All */}
                         <div className="flex items-center gap-3 mt-1.5">
                           <span className="font-mono text-[9px] text-muted-foreground">
                             By {[...new Set(items.map((e) => e.author))].join(", ")}
@@ -671,6 +671,27 @@ export default function FeedbackBacklog() {
                               <Sparkles className="w-3 h-3" /> {analyzedCount} analyzed
                             </span>
                           )}
+                          {(() => {
+                            const unanalyzed = items.filter((e) =>
+                              e.ai_summaries.length === 0 &&
+                              (e.parsed_chatgpt as ParsedChat[]).some((p) => p.content?.trim())
+                            );
+                            if (unanalyzed.length === 0) return null;
+                            const isBatching = batchAnalyzing === subject;
+                            return (
+                              <button
+                                onClick={() => batchAnalyze.mutate(unanalyzed)}
+                                disabled={isBatching}
+                                className="flex items-center gap-1 px-2 py-0.5 rounded-sm font-mono text-[9px] uppercase tracking-wider border border-primary/30 text-primary hover:bg-primary/10 transition-colors disabled:opacity-50 ml-auto"
+                              >
+                                {isBatching ? (
+                                  <><Loader2 className="w-3 h-3 animate-spin" /> Analyzing {unanalyzed.length}…</>
+                                ) : (
+                                  <><Sparkles className="w-3 h-3" /> Analyze all ({unanalyzed.length})</>
+                                )}
+                              </button>
+                            );
+                          })()}
                         </div>
                       </div>
 
