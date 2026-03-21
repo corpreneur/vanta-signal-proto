@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -154,6 +155,7 @@ export default function SprintBoard() {
 
   const totalCount = items.length;
   const doneCount = items.filter((i) => i.status === "done").length;
+  const progressPct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
@@ -175,6 +177,19 @@ export default function SprintBoard() {
         >
           <RefreshCw className="h-3 w-3" /> Refresh
         </Button>
+      </div>
+
+      {/* Progress bar */}
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between">
+          <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            Sprint progress
+          </span>
+          <span className="font-mono text-[10px] font-medium text-foreground">
+            {progressPct}%
+          </span>
+        </div>
+        <Progress value={progressPct} className="h-1.5" />
       </div>
 
       {/* Filters */}
