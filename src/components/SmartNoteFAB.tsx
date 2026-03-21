@@ -115,7 +115,10 @@ export default function SmartNoteFAB() {
   }, []);
 
   const handleClick = useCallback(() => {
-    if (didLongPress.current) return;
+    if (didLongPress.current || dragMoved.current) {
+      dragMoved.current = false;
+      return;
+    }
     setOpen(true);
   }, []);
 
