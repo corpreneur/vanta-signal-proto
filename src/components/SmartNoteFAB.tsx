@@ -144,7 +144,7 @@ export default function SmartNoteFAB() {
     <>
       {/* VANTA Orb FAB — translucent glass */}
       <div
-        className="fixed bottom-6 left-1/2 z-40 flex items-center justify-center"
+        className="fixed bottom-5 left-1/2 z-40 flex items-center justify-center sm:bottom-6"
         style={{
           width: 80,
           height: 80,
