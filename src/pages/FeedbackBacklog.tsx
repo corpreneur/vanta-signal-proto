@@ -3,7 +3,7 @@ import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import {
   MessageSquare, Link2, Image, Upload, Trash2, ExternalLink,
   Plus, ChevronDown, ChevronUp, Clock, Loader2, Brain, RefreshCw, Mic, MicOff, Square, Bell, Sparkles, CheckCircle2, Lightbulb, Target,
-  LayoutGrid, List, Layers, TrendingUp,
+  LayoutGrid, List, Layers, TrendingUp, BookOpen, Zap, Globe, Camera, BarChart3,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
