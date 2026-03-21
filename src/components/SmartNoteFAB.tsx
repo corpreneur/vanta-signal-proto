@@ -86,7 +86,7 @@ export default function SmartNoteFAB() {
   }, []);
 
   const handleClick = useCallback(() => {
-    if (didLongPress.current || dragMoved.current) {
+    if (dragMoved.current) {
       dragMoved.current = false;
       return;
     }
