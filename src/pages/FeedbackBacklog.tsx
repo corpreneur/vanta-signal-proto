@@ -244,7 +244,12 @@ export default function FeedbackBacklog() {
 
   const canSubmit = narrative.trim().length > 0 || links.some((l) => l.trim()) || screenshots.length > 0;
 
-  const filteredEntries = filterSubject === "All" ? entries : entries.filter((e) => e.subject === filterSubject);
+  const filteredEntries = entries.filter((e) => {
+    if (filterSubject !== "All" && e.subject !== filterSubject) return false;
+    if (filterAuthor !== "All" && e.author !== filterAuthor) return false;
+    if (filterStatus !== "All" && e.status !== filterStatus) return false;
+    return true;
+  });
 
   const toggleChat = (entryId: string, url: string) => {
     const key = `${entryId}:${url}`;
