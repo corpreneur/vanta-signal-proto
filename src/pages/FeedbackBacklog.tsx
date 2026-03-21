@@ -108,6 +108,7 @@ export default function FeedbackBacklog() {
 
       const { error } = await supabase.from("feedback_entries").insert({
         author,
+        subject,
         narrative: narrative.trim(),
         chatgpt_links: cleanLinks,
         screenshot_urls: screenshots,
