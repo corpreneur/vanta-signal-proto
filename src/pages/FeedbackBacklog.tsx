@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import {
   MessageSquare, Link2, Image, Upload, Trash2, ExternalLink,
