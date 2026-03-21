@@ -27,7 +27,7 @@ export default function SmartNoteFAB() {
 
   const location = useLocation();
   const queryClient = useQueryClient();
-  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
 
   // --- Draggable orb state ---
   const [orbPos, setOrbPos] = useState<{ x: number; y: number } | null>(null);
