@@ -669,3 +669,113 @@ function ActionButton({
     </button>
   );
 }
+
+/* ── Send Later & Follow-up Controls ─────────────────── */
+
+const SCHEDULE_OPTIONS = [
+  { label: "In 1 hour", hours: 1 },
+  { label: "Tomorrow 9am", hours: null, preset: "tomorrow_9am" },
+  { label: "Monday 9am", hours: null, preset: "monday_9am" },
+  { label: "Custom", hours: null, preset: "custom" },
+];
+
+const FOLLOW_UP_WINDOWS = [
+  { label: "24 hours", days: 1 },
+  { label: "3 days", days: 3 },
+  { label: "1 week", days: 7 },
+  { label: "2 weeks", days: 14 },
+];
+
+function SendLaterControls() {
+  const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [selectedSchedule, setSelectedSchedule] = useState<string | null>(null);
+  const [followUpDays, setFollowUpDays] = useState<number | null>(null);
+
+  const handleSchedule = (option: typeof SCHEDULE_OPTIONS[0]) => {
+    setSelectedSchedule(option.label);
+    toast.success(`Send scheduled: ${option.label}`);
+    setScheduleOpen(false);
+  };
+
+  const handleFollowUp = (window: typeof FOLLOW_UP_WINDOWS[0]) => {
+    setFollowUpDays(window.days);
+    toast.success(`Follow-up window set: ${window.label}`);
+  };
+
+  return (
+    <>
+      <div className="grid grid-cols-2 gap-2 mb-6">
+        <button
+          onClick={() => setScheduleOpen(true)}
+          className="flex items-center justify-center gap-2 p-3 border border-border bg-card hover:border-foreground/20 hover:bg-muted transition-all"
+        >
+          <CalendarDays className="w-4 h-4 text-muted-foreground" />
+          <div className="text-left">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-foreground block">
+              Send Later
+            </span>
+            <span className="font-mono text-[8px] text-muted-foreground">
+              {selectedSchedule || "Schedule any message"}
+            </span>
+          </div>
+        </button>
+        <div className="flex items-center justify-center gap-2 p-3 border border-border bg-card">
+          <Timer className="w-4 h-4 text-muted-foreground" />
+          <div className="text-left">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-foreground block">
+              Follow-up
+            </span>
+            <span className="font-mono text-[8px] text-muted-foreground">
+              {followUpDays ? `${followUpDays}d window` : "Set a window"}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Follow-up window pills */}
+      <div className="flex items-center gap-1.5 mb-6 overflow-x-auto scrollbar-hide">
+        <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground shrink-0 mr-1">
+          Follow-up in:
+        </span>
+        {FOLLOW_UP_WINDOWS.map((w) => (
+          <button
+            key={w.days}
+            onClick={() => handleFollowUp(w)}
+            className={`shrink-0 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider border transition-colors rounded-sm ${
+              followUpDays === w.days
+                ? "bg-foreground text-background border-foreground"
+                : "border-border text-muted-foreground hover:text-foreground hover:bg-muted"
+            }`}
+          >
+            {w.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Send Later Sheet */}
+      <Sheet open={scheduleOpen} onOpenChange={setScheduleOpen}>
+        <SheetContent side="bottom" className="max-h-[60vh]">
+          <SheetHeader className="pb-3">
+            <SheetTitle className="font-mono text-xs uppercase tracking-[0.2em] text-foreground">
+              Schedule Send
+            </SheetTitle>
+          </SheetHeader>
+          <div className="space-y-2 pb-4">
+            {SCHEDULE_OPTIONS.map((opt) => (
+              <button
+                key={opt.label}
+                onClick={() => handleSchedule(opt)}
+                className="w-full flex items-center gap-3 p-3 border border-border bg-card hover:border-foreground/20 hover:bg-muted transition-all text-left"
+              >
+                <CalendarDays className="w-4 h-4 text-muted-foreground shrink-0" />
+                <span className="font-mono text-[11px] uppercase tracking-wider text-foreground">
+                  {opt.label}
+                </span>
+              </button>
+            ))}
+          </div>
+        </SheetContent>
+      </Sheet>
+    </>
+  );
+}
