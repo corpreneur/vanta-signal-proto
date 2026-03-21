@@ -77,6 +77,21 @@ const Admin = () => {
     }
   };
 
+  const handleNudge = (email: string) => {
+    const latest = releaseNotes.slice(0, 3);
+    const releaseList = latest
+      .map((r) => `• v${r.version} — ${r.title} (${r.date})`)
+      .join("\n");
+
+    const subject = encodeURIComponent("Vanta Signal — We'd love your feedback");
+    const body = encodeURIComponent(
+      `Hey there,\n\nHope you're well — just a quick nudge to check in.\n\nWe've been shipping fast and would love your take on what's landing and what's not. Here's what's new:\n\n${releaseList}\n\nWhere we need feedback most:\n\n1. Product Concepts — Signal Brief, Context Layer, Focus View, and the Meeting Intelligence Hub are all live. Do these feel useful? Are they solving a real problem for you?\n\n2. Capture & Quick Actions — Brain Dump, Quick Capture (⌘K), and the new Quick Actions panel. Is the capture flow intuitive? Anything missing?\n\n3. Contacts & Relationships — Smart Contact Cards, Engagement Sequences, and the Network Graph. Are these giving you a clearer picture of your relationships?\n\n4. Overall UX — Navigation, information density, and the design system. Does it feel right? Too sparse? Too dense?\n\nEven a quick 2-minute brain dump on what's working and what's rough would be incredibly helpful. You can reply to this email or drop your notes directly in the app at /feedback.\n\nThanks for being part of this — your input shapes the product.\n\nBest,\nThe Vanta Signal Team`
+    );
+
+    window.open(`mailto:${email}?subject=${subject}&body=${body}`, "_blank");
+    toast.success("Nudge email drafted for " + email);
+  };
+
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return "—";
     return new Date(dateStr).toLocaleDateString("en-US", {
