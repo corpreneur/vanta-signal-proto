@@ -9,6 +9,7 @@ import {
   CheckCircle2, Inbox, AlertTriangle, CalendarClock, PinOff,
   Phone, Mail, MessageSquare, FileText, Flame, Target,
   ChevronRight, RotateCcw, Send, Sparkles, CalendarDays, Timer,
+  Video, Globe,
 } from "lucide-react";
 import { Motion } from "@/components/ui/motion";
 import { toast } from "sonner";
