@@ -150,7 +150,10 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
   const [savingEdit, setSavingEdit] = useState(false);
   const [transcriptSearch, setTranscriptSearch] = useState("");
   const [transcriptExpanded, setTranscriptExpanded] = useState(false);
+  const [scheduleDate, setScheduleDate] = useState<Date | undefined>(undefined);
+  const [scheduleTime, setScheduleTime] = useState("09:00");
   const queryClient = useQueryClient();
+  const { isListening, isSupported: voiceSupported, startListening, stopListening } = useSpeechRecognition();
 
   // Sync edit texts when signal changes
   useEffect(() => {
