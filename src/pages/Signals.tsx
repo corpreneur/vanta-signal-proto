@@ -326,7 +326,7 @@ const Signals = () => {
             {showOverdueOnly ? "Show All" : "Show Overdue"}
           </button>
         </div>
-      )
+      )}
 
       {/* Group auto-reply toggle */}
       <div className="flex items-center justify-end gap-2 mb-6 pb-4 border-b border-vanta-border">
