@@ -214,9 +214,6 @@ export default function SmartNoteFAB() {
 
         <button
           onClick={handleClick}
-          onPointerDown={handlePointerDown}
-          onPointerUp={handlePointerUp}
-          onPointerLeave={handlePointerUp}
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
           className="relative z-10 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 border border-primary/25 overflow-hidden"
