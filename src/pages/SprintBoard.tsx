@@ -236,18 +236,8 @@ export default function SprintBoard() {
         </Button>
       </div>
 
-      {/* Progress bar */}
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between">
-          <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-            Sprint progress
-          </span>
-          <span className="font-mono text-[10px] font-medium text-foreground">
-            {progressPct}%
-          </span>
-        </div>
-        <Progress value={progressPct} className="h-1.5" />
-      </div>
+      {/* Sprint compass */}
+      <SprintCompass items={items} />
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
