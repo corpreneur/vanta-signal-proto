@@ -303,6 +303,31 @@ const Signals = () => {
         </p>
       </header>
 
+      {/* Overdue alert banner */}
+      {overdueCount > 0 && (
+        <div className="flex items-center gap-3 px-4 py-3 mb-6 border border-destructive/30 bg-destructive/5 rounded-sm">
+          <AlertTriangle className="w-4 h-4 text-destructive shrink-0" />
+          <div className="flex-1">
+            <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-destructive font-semibold">
+              {overdueCount} overdue signal{overdueCount !== 1 ? "s" : ""}
+            </span>
+            <p className="font-sans text-[12px] text-muted-foreground">
+              Signals past their due date that need attention.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowOverdueOnly(!showOverdueOnly)}
+            className={`font-mono text-[9px] uppercase tracking-[0.15em] px-3 py-1.5 border transition-colors rounded-sm ${
+              showOverdueOnly
+                ? "bg-destructive/10 border-destructive text-destructive"
+                : "border-border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {showOverdueOnly ? "Show All" : "Show Overdue"}
+          </button>
+        </div>
+      )}
+
       {/* Group auto-reply toggle */}
       <div className="flex items-center justify-end gap-2 mb-6 pb-4 border-b border-vanta-border">
         <Users className="w-3.5 h-3.5 text-vanta-text-low" />

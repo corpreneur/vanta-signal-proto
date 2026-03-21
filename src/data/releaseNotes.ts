@@ -10,6 +10,25 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "2.5.0",
+    date: "2026-03-21",
+    title: "Sprint Completion & Full Platform Polish",
+    changes: [
+      { type: "feature", text: "Add Item — inline sprint item creation with priority selection directly on the Sprint Board" },
+      { type: "feature", text: "Overdue Alert Banner — prominent warning on Signal Feed when signals are past due, with one-click filter" },
+      { type: "feature", text: "Tag Filter Dropdown — contacts page tag filter upgraded from inline pills to a compact Select dropdown" },
+      { type: "feature", text: "Channel-Agnostic Comms — initiate Text, Call, Email, Zoom, or LinkedIn outreach from the Command page with pre-filled templates" },
+      { type: "feature", text: "Send Later Controls — schedule messages with time presets (1h, Tomorrow, Monday) and follow-up windows (24h–2w)" },
+      { type: "feature", text: "Meeting Intelligence Hub — stats strip, full-text search, and toggleable Speaker Profiles panel on Meetings page" },
+      { type: "feature", text: "Dashboard Quick Capture — persistent open note field at the top of the dashboard with ⌘+Enter to process" },
+      { type: "improvement", text: "Intelligence Snapshot relocated below the main Signal Feed for better content-first hierarchy" },
+      { type: "improvement", text: "Reverse chronological sorting applied to all communication activity feeds" },
+      { type: "improvement", text: "Overdue signals consistently bubble to the top of the feed across all sort modes" },
+      { type: "improvement", text: "Sprint Board progress bar now accurately tracks all completed items across phases" },
+      { type: "fix", text: "All 42 sprint items from the H1 2026 backlog resolved — 100% sprint completion" },
+    ],
+  },
+  {
     version: "2.4.0",
     date: "2026-03-21",
     title: "Embeddable Feedback Widget",
