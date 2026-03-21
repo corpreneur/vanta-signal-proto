@@ -154,10 +154,15 @@ export default function SmartContactCard({ contact }: { contact: SmartContactCar
           })}
         </div>
 
-        {/* Tags */}
-        <div className="mb-2" onClick={(e) => e.stopPropagation()}>
-          <ContactTagManager contactName={contact.name} compact />
-        </div>
+        {/* Last message preview */}
+        {contact.recentSignals[0] && (
+          <div className="mb-2 px-2 py-1.5 bg-muted/30 border border-border/50">
+            <p className="font-mono text-[9px] text-muted-foreground uppercase tracking-wider mb-0.5">Last message</p>
+            <p className="font-mono text-[10px] text-foreground/80 line-clamp-2 leading-relaxed">
+              {contact.recentSignals[0].sourceMessage?.slice(0, 140) || contact.recentSignals[0].summary}
+            </p>
+          </div>
+        )}
 
         {/* Engagement reminder */}
         {contact.engagementSequence && (
