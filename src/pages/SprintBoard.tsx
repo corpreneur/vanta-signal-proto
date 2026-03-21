@@ -31,6 +31,7 @@ import {
   Pause,
   Trash2,
   RefreshCw,
+  Plus,
 } from "lucide-react";
 
 type SprintItem = {
