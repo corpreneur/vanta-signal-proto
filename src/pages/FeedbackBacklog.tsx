@@ -12,6 +12,19 @@ const AUTHORS = ["Julian", "JG"] as const;
 type Author = (typeof AUTHORS)[number];
 type Status = "new" | "in-progress" | "shipped" | "parked";
 
+const SUBJECTS = [
+  "UX / Design",
+  "Signal Pipeline",
+  "Orb / Capture",
+  "Contacts / Network",
+  "Meetings / Briefs",
+  "Integrations",
+  "AI / Inference",
+  "Strategy",
+  "Bug",
+  "Other",
+] as const;
+
 const STATUS_STYLES: Record<Status, string> = {
   new: "bg-primary/10 text-primary border-primary/20",
   "in-progress": "bg-[hsl(var(--signal-yellow)/.12)] text-[hsl(var(--signal-yellow))] border-[hsl(var(--signal-yellow)/.25)]",
