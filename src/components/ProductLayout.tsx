@@ -13,7 +13,7 @@ interface ProductLayoutProps {
 
 const BREADCRUMB_MAP: Record<string, string> = {
   "/": "Dashboard",
-  "/connectivity": "Fab Five · Connectivity",
+  "/connectivity": "Fab Five · Your Network",
   "/signals": "Fab Five · Signal Feed",
   "/focus": "Fab Five · Filter Modes",
   "/brain-dump": "Fab Five · Idea Capture",
