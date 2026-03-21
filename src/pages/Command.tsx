@@ -261,6 +261,11 @@ export default function Command() {
         <QuickActionsGrid />
       </Motion>
 
+      {/* Send Later & Follow-up Controls */}
+      <Motion delay={40}>
+        <SendLaterControls />
+      </Motion>
+
       {/* Urgency Stats Strip */}
       <Motion delay={50}>
         <div className="grid grid-cols-4 gap-2 mb-6">
