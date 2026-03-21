@@ -179,22 +179,9 @@ export default function SmartContactCard({ contact }: { contact: SmartContactCar
           </div>
         )}
 
-        {/* Recent signal previews */}
-        <div className="space-y-1">
-          {contact.recentSignals.slice(0, 2).map((s) => {
-            const sc = SIGNAL_TYPE_COLORS[s.signalType as keyof typeof SIGNAL_TYPE_COLORS] || SIGNAL_TYPE_COLORS.CONTEXT;
-            return (
-              <div key={s.id} className="flex items-start gap-1.5">
-                <span className={`w-1.5 h-1.5 mt-1.5 rounded-full shrink-0 ${sc.text.replace("text-", "bg-")}`} />
-                <p className="font-mono text-[10px] text-muted-foreground truncate leading-relaxed">
-                  <span className="text-muted-foreground/60 mr-1">
-                    {new Date(s.capturedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                  </span>
-                  {s.summary}
-                </p>
-              </div>
-            );
-          })}
+        {/* Tags — compact, bottom */}
+        <div className="mb-2" onClick={(e) => e.stopPropagation()}>
+          <ContactTagManager contactName={contact.name} compact />
         </div>
 
         {/* CTAs */}

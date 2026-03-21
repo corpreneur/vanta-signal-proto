@@ -228,20 +228,21 @@ export default function EnhancedActionItems({ onSignalClick }: EnhancedActionIte
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-1 shrink-0">
+                        <div className="flex items-center gap-0.5 shrink-0">
                           <button
                             onClick={(e) => handleDelete(item.id, e)}
                             disabled={deleting === item.id}
-                            className="text-muted-foreground hover:text-destructive transition-colors p-1 opacity-0 group-hover:opacity-100 disabled:opacity-50"
-                            title="Delete signal"
+                            className="w-5 h-5 flex items-center justify-center border border-border rounded-sm text-muted-foreground hover:text-destructive hover:border-destructive hover:bg-destructive/10 transition-all opacity-0 group-hover:opacity-100 disabled:opacity-50"
+                            title="Dismiss"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <X className="w-3 h-3" />
                           </button>
                           <button
                             onClick={(e) => { e.stopPropagation(); setExpandedId(isExpanded ? null : item.id); }}
-                            className="text-muted-foreground hover:text-foreground transition-colors p-1"
+                            className="w-5 h-5 flex items-center justify-center border border-border rounded-sm text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-all"
+                            title="Snooze / details"
                           >
-                            {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                            <Clock className="w-3 h-3" />
                           </button>
                         </div>
                       </button>
