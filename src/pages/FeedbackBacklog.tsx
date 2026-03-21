@@ -380,13 +380,34 @@ export default function FeedbackBacklog() {
 
       {/* Entries list */}
       <div className="space-y-3">
+        {/* Subject filter */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Filter</p>
+          {["All", ...SUBJECTS].map((s) => {
+            const count = s === "All" ? entries.length : entries.filter((e) => e.subject === s).length;
+            return (
+              <button
+                key={s}
+                onClick={() => setFilterSubject(s)}
+                className={`px-2 py-0.5 rounded-sm font-mono text-[9px] uppercase tracking-wider border transition-colors ${
+                  filterSubject === s
+                    ? "bg-primary/15 text-primary border-primary/30"
+                    : "bg-transparent text-muted-foreground border-border hover:border-primary/20"
+                }`}
+              >
+                {s} <span className="opacity-50">{count}</span>
+              </button>
+            );
+          })}
+        </div>
+
         <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-          {entries.length} {entries.length === 1 ? "entry" : "entries"}
+          {filteredEntries.length} {filteredEntries.length === 1 ? "entry" : "entries"}
         </p>
 
         {isLoading && <p className="text-muted-foreground text-sm">Loading…</p>}
 
-        {entries.map((entry) => {
+        {filteredEntries.map((entry) => {
           const isOpen = expanded === entry.id;
           const status = entry.status as Status;
           const parsedMap = new Map(entry.parsed_chatgpt.map((p) => [p.url, p]));
