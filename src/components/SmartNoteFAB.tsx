@@ -193,12 +193,27 @@ export default function SmartNoteFAB() {
     <>
       {/* VANTA Orb FAB — translucent glass */}
       <div
-        className="fixed bottom-5 left-1/2 z-40 flex items-center justify-center sm:bottom-6"
+        className="fixed z-40 flex items-center justify-center"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         style={{
           width: 80,
           height: 80,
-          transform: `translateX(-50%) translateY(${scrollDrift}px)`,
-          transition: "transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+          ...(orbPos
+            ? {
+                left: orbPos.x,
+                top: orbPos.y,
+                transform: `translate(-50%, -50%)`,
+                transition: isDragging.current ? "none" : "transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+              }
+            : {
+                bottom: 20,
+                left: "50%",
+                transform: `translateX(-50%) translateY(${scrollDrift}px)`,
+                transition: "transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+              }),
+          touchAction: "none",
         }}
       >
         {/* Outer glow ring */}
