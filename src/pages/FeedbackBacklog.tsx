@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import {
   MessageSquare, Link2, Image, Upload, Trash2, ExternalLink,
-  Plus, ChevronDown, ChevronUp, Clock,
+  Plus, ChevronDown, ChevronUp, Clock, Loader2, Brain, RefreshCw,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -19,15 +19,33 @@ const STATUS_STYLES: Record<Status, string> = {
   parked: "bg-muted text-muted-foreground border-border",
 };
 
+interface ParsedChat {
+  url: string;
+  title: string;
+  content: string;
+  scraped_at: string;
+}
+
 interface FeedbackEntry {
   id: string;
   author: string;
   narrative: string;
   chatgpt_links: string[];
   screenshot_urls: string[];
+  parsed_chatgpt: ParsedChat[];
   status: string;
   created_at: string;
   updated_at: string;
+}
+
+async function scrapeLink(url: string): Promise<ParsedChat> {
+  const { data, error } = await supabase.functions.invoke("firecrawl-scrape", {
+    body: { url, options: { formats: ["markdown"], onlyMainContent: true } },
+  });
+  if (error) throw error;
+  const markdown = data?.data?.markdown || data?.markdown || "";
+  const title = data?.data?.metadata?.title || data?.metadata?.title || url;
+  return { url, title, content: markdown, scraped_at: new Date().toISOString() };
 }
 
 async function fetchEntries(): Promise<FeedbackEntry[]> {
@@ -36,7 +54,10 @@ async function fetchEntries(): Promise<FeedbackEntry[]> {
     .select("*")
     .order("created_at", { ascending: false });
   if (error) throw error;
-  return (data ?? []) as FeedbackEntry[];
+  return (data ?? []).map((d: any) => ({
+    ...d,
+    parsed_chatgpt: Array.isArray(d.parsed_chatgpt) ? d.parsed_chatgpt : [],
+  })) as FeedbackEntry[];
 }
 
 export default function FeedbackBacklog() {
@@ -49,16 +70,32 @@ export default function FeedbackBacklog() {
   const [uploading, setUploading] = useState(false);
   const [screenshots, setScreenshots] = useState<string[]>([]);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [expandedChats, setExpandedChats] = useState<Record<string, boolean>>({});
+  const [scraping, setScraping] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const insertMutation = useMutation({
     mutationFn: async () => {
       const cleanLinks = links.map((l) => l.trim()).filter(Boolean);
+      setScraping(true);
+
+      // Scrape all ChatGPT links
+      let parsed: ParsedChat[] = [];
+      if (cleanLinks.length > 0) {
+        const results = await Promise.allSettled(cleanLinks.map(scrapeLink));
+        parsed = results
+          .filter((r): r is PromiseFulfilledResult<ParsedChat> => r.status === "fulfilled")
+          .map((r) => r.value);
+        const failures = results.filter((r) => r.status === "rejected").length;
+        if (failures > 0) toast.warning(`${failures} link(s) could not be scraped`);
+      }
+
       const { error } = await supabase.from("feedback_entries").insert({
         author,
         narrative: narrative.trim(),
         chatgpt_links: cleanLinks,
         screenshot_urls: screenshots,
+        parsed_chatgpt: parsed as any,
       });
       if (error) throw error;
     },
@@ -67,9 +104,38 @@ export default function FeedbackBacklog() {
       setNarrative("");
       setLinks([""]);
       setScreenshots([]);
-      toast.success("Feedback submitted");
+      setScraping(false);
+      toast.success("Feedback submitted with parsed conversations");
     },
-    onError: () => toast.error("Failed to submit feedback"),
+    onError: () => {
+      setScraping(false);
+      toast.error("Failed to submit feedback");
+    },
+  });
+
+  const rescrape = useMutation({
+    mutationFn: async ({ id, url }: { id: string; url: string }) => {
+      const parsed = await scrapeLink(url);
+      // Get existing entry
+      const { data: existing } = await supabase
+        .from("feedback_entries")
+        .select("parsed_chatgpt")
+        .eq("id", id)
+        .single();
+      const current: ParsedChat[] = Array.isArray((existing as any)?.parsed_chatgpt) ? (existing as any).parsed_chatgpt : [];
+      const updated = current.filter((p: ParsedChat) => p.url !== url);
+      updated.push(parsed);
+      const { error } = await supabase
+        .from("feedback_entries")
+        .update({ parsed_chatgpt: updated as any })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["feedback-entries"] });
+      toast.success("Link re-scraped");
+    },
+    onError: () => toast.error("Failed to re-scrape link"),
   });
 
   const updateStatus = useMutation({
@@ -117,6 +183,11 @@ export default function FeedbackBacklog() {
 
   const canSubmit = narrative.trim().length > 0 || links.some((l) => l.trim()) || screenshots.length > 0;
 
+  const toggleChat = (entryId: string, url: string) => {
+    const key = `${entryId}:${url}`;
+    setExpandedChats((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
   return (
     <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6">
       {/* Header */}
@@ -132,6 +203,7 @@ export default function FeedbackBacklog() {
         </h1>
         <p className="font-sans text-[15px] text-muted-foreground max-w-[600px] leading-relaxed">
           Julian & JG's product observations, ChatGPT session links, and annotated screenshots — the source of truth for prototype evolution.
+          ChatGPT links are automatically scraped and parsed on submission.
         </p>
       </div>
 
@@ -176,6 +248,7 @@ export default function FeedbackBacklog() {
           <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground block mb-1.5">
             <Link2 className="inline w-3 h-3 mr-1 -mt-0.5" />
             ChatGPT Links
+            <span className="ml-2 text-primary/50 normal-case tracking-normal">(auto-scraped on submit)</span>
           </label>
           <div className="space-y-2">
             {links.map((link, i) => (
@@ -253,8 +326,17 @@ export default function FeedbackBacklog() {
           disabled={!canSubmit || insertMutation.isPending}
           className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-sm font-mono text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
         >
-          <Plus className="w-3.5 h-3.5" />
-          {insertMutation.isPending ? "Submitting…" : "Submit Feedback"}
+          {insertMutation.isPending ? (
+            <>
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              {scraping ? "Scraping ChatGPT links…" : "Submitting…"}
+            </>
+          ) : (
+            <>
+              <Plus className="w-3.5 h-3.5" />
+              Submit Feedback
+            </>
+          )}
         </button>
       </div>
 
@@ -269,6 +351,8 @@ export default function FeedbackBacklog() {
         {entries.map((entry) => {
           const isOpen = expanded === entry.id;
           const status = entry.status as Status;
+          const parsedMap = new Map(entry.parsed_chatgpt.map((p) => [p.url, p]));
+
           return (
             <div key={entry.id} className="border border-border rounded-sm bg-card overflow-hidden">
               <button
@@ -282,6 +366,11 @@ export default function FeedbackBacklog() {
                 <span className="flex-1 font-sans text-[13px] text-foreground truncate">
                   {entry.narrative || "(no narrative)"}
                 </span>
+                {entry.parsed_chatgpt.length > 0 && (
+                  <span className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded-sm bg-primary/10 text-primary font-mono text-[9px]">
+                    <Brain className="w-3 h-3" /> {entry.parsed_chatgpt.length}
+                  </span>
+                )}
                 <span className="flex items-center gap-1 font-mono text-[9px] text-muted-foreground shrink-0">
                   <Clock className="w-3 h-3" />
                   {format(new Date(entry.created_at), "MMM d")}
@@ -295,20 +384,66 @@ export default function FeedbackBacklog() {
                     <p className="font-sans text-[13px] text-foreground/80 leading-relaxed whitespace-pre-wrap">{entry.narrative}</p>
                   )}
 
+                  {/* Parsed ChatGPT conversations */}
                   {entry.chatgpt_links?.length > 0 && (
-                    <div className="space-y-1">
-                      <p className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground">ChatGPT Links</p>
-                      {entry.chatgpt_links.map((link, i) => (
-                        <a
-                          key={i}
-                          href={link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1.5 font-mono text-[11px] text-primary hover:underline"
-                        >
-                          <ExternalLink className="w-3 h-3" /> {link}
-                        </a>
-                      ))}
+                    <div className="space-y-2">
+                      <p className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                        <Brain className="w-3 h-3" /> ChatGPT Conversations
+                      </p>
+                      {entry.chatgpt_links.map((link, i) => {
+                        const parsed = parsedMap.get(link);
+                        const chatKey = `${entry.id}:${link}`;
+                        const isChatOpen = expandedChats[chatKey];
+
+                        return (
+                          <div key={i} className="border border-border rounded-sm overflow-hidden">
+                            <div className="flex items-center gap-2 px-3 py-2 bg-muted/30">
+                              <a
+                                href={link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1 font-mono text-[11px] text-primary hover:underline truncate flex-1"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <ExternalLink className="w-3 h-3 shrink-0" />
+                                {parsed?.title || link}
+                              </a>
+                              <button
+                                onClick={() => rescrape.mutate({ id: entry.id, url: link })}
+                                disabled={rescrape.isPending}
+                                className="shrink-0 p-1 rounded-sm text-muted-foreground hover:text-primary transition-colors"
+                                title="Re-scrape this link"
+                              >
+                                <RefreshCw className={`w-3 h-3 ${rescrape.isPending ? "animate-spin" : ""}`} />
+                              </button>
+                              {parsed && (
+                                <button
+                                  onClick={() => toggleChat(entry.id, link)}
+                                  className="shrink-0 px-2 py-0.5 rounded-sm font-mono text-[9px] uppercase tracking-wider border border-border text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors"
+                                >
+                                  {isChatOpen ? "Collapse" : "View stream"}
+                                </button>
+                              )}
+                              {!parsed && (
+                                <span className="shrink-0 font-mono text-[9px] text-muted-foreground/50 uppercase">not scraped</span>
+                              )}
+                            </div>
+
+                            {parsed && isChatOpen && (
+                              <div className="border-t border-border px-3 py-3 max-h-[500px] overflow-y-auto">
+                                <div className="font-mono text-[9px] text-muted-foreground/60 mb-2">
+                                  Scraped {format(new Date(parsed.scraped_at), "MMM d, h:mm a")}
+                                </div>
+                                <div className="prose prose-sm prose-invert max-w-none">
+                                  <div className="font-sans text-[13px] text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                                    {parsed.content || "(empty response from scraper)"}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
 
