@@ -220,6 +220,9 @@ export default function SprintBoard() {
             ))}
           </SelectContent>
         </Select>
+
+        {/* Add new item */}
+        <AddItemInline />
       </div>
 
       {/* Phase columns */}
