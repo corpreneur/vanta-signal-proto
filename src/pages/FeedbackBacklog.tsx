@@ -423,6 +423,7 @@ export default function FeedbackBacklog() {
                 <span className={`shrink-0 px-2 py-0.5 rounded-sm font-mono text-[9px] uppercase tracking-wider border ${STATUS_STYLES[status]}`}>
                   {status}
                 </span>
+                <span className="shrink-0 px-2 py-0.5 rounded-sm font-mono text-[9px] uppercase tracking-wider border border-border bg-muted/50 text-muted-foreground">{entry.subject}</span>
                 <span className="font-mono text-[11px] uppercase tracking-wider text-primary/70">{entry.author}</span>
                 <span className="flex-1 font-sans text-[13px] text-foreground truncate">
                   {entry.narrative || "(no narrative)"}
