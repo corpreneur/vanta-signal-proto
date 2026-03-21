@@ -128,8 +128,7 @@ function AddItemInline() {
     </div>
   );
 }
-
-
+export default function SprintBoard() {
   const queryClient = useQueryClient();
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
