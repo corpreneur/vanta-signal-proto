@@ -8,16 +8,18 @@ import { PARTNER_LOGOS } from "@/components/PartnerLogos";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  Video, FileText, MessageSquare, Sparkles, Image, Film, Mic, Paperclip,
+  Video, FileText, MessageSquare, Sparkles, Image, Film, Mic, MicOff, Paperclip,
   Download, Mail, CalendarPlus, Flag, ListChecks, User, Brain, Edit3,
   Pin, CheckCircle2, Clock, Send, Pencil, ChevronDown, X, Phone, Search,
   AlertTriangle, Lightbulb, BookOpen, Copy, Loader2, Users, Share2, Save,
+  CalendarClock, SmartphoneNfc,
 } from "lucide-react";
 import { format } from "date-fns";
 import FileAttachments from "@/components/FileAttachments";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { SignalType, SignalPriority } from "@/data/signals";
+import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 
 const SIGNAL_TYPES: SignalType[] = ["INTRO", "INSIGHT", "INVESTMENT", "DECISION", "CONTEXT", "NOISE", "MEETING", "PHONE_CALL"];
 const PRIORITIES: SignalPriority[] = ["high", "medium", "low"];
