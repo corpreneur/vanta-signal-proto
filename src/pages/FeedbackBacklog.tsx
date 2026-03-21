@@ -3,7 +3,7 @@ import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import {
   MessageSquare, Link2, Image, Upload, Trash2, ExternalLink,
   Plus, ChevronDown, ChevronUp, Clock, Loader2, Brain, RefreshCw, Mic, MicOff, Square, Bell, Sparkles, CheckCircle2, Lightbulb, Target,
-  LayoutGrid, List, Layers, TrendingUp,
+  LayoutGrid, List, Layers, TrendingUp, BookOpen, Zap, Globe, Camera, BarChart3,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -124,6 +124,7 @@ export default function FeedbackBacklog() {
   const [viewMode, setViewMode] = useState<"list" | "cluster">("list");
   const [clusterExpanded, setClusterExpanded] = useState<string | null>(null);
   const [expandedChats, setExpandedChats] = useState<Record<string, boolean>>({});
+  const [quickRefOpen, setQuickRefOpen] = useState(false);
   const [scraping, setScraping] = useState(false);
   const [submitStep, setSubmitStep] = useState<"idle" | "scraping" | "saving" | "analyzing">("idle");
   const [filterSubject, setFilterSubject] = useState<string>("All");
@@ -362,6 +363,57 @@ export default function FeedbackBacklog() {
           Julian & JG's product observations, ChatGPT session links, and annotated screenshots — the source of truth for prototype evolution.
           ChatGPT links are automatically scraped and parsed on submission.
         </p>
+      </div>
+
+      {/* Quick Reference Card */}
+      <div className="border border-border rounded-sm bg-card mb-8 overflow-hidden">
+        <button
+          onClick={() => setQuickRefOpen((o) => !o)}
+          className="w-full flex items-center justify-between px-5 py-3 hover:bg-muted/30 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <BookOpen className="w-3.5 h-3.5 text-primary" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-foreground font-medium">
+              Quick Reference
+            </span>
+            <span className="font-mono text-[9px] text-muted-foreground">— How this page works</span>
+          </div>
+          {quickRefOpen ? <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />}
+        </button>
+        {quickRefOpen && (
+          <div className="px-5 pb-5 pt-1 border-t border-border space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[
+                { icon: MessageSquare, title: "Submit Feedback", desc: "Pick author + subject, write narrative or use Voice Tour for hands-free dictation." },
+                { icon: Globe, title: "ChatGPT Auto-Scrape", desc: "Paste shared links — they're scraped via Firecrawl and parsed automatically on submit." },
+                { icon: Camera, title: "Screenshots", desc: "Attach annotated screenshots that get stored in cloud storage." },
+                { icon: Brain, title: "AI Analysis", desc: "Each entry is analyzed by Gemini Flash to extract decisions, action items & insights." },
+                { icon: Zap, title: "Feedback → Sprint", desc: "A daily cron auto-triages new feedback into sprint items with priority & effort." },
+                { icon: BarChart3, title: "Cluster View", desc: "Switch to cluster view to see feedback grouped by subject with aggregated AI insights." },
+              ].map(({ icon: Icon, title, desc }) => (
+                <div key={title} className="flex gap-2.5">
+                  <div className="w-7 h-7 rounded-sm bg-primary/8 flex items-center justify-center shrink-0 mt-0.5">
+                    <Icon className="w-3.5 h-3.5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-mono text-[10px] uppercase tracking-wider text-foreground font-medium leading-tight">{title}</p>
+                    <p className="font-sans text-[12px] text-muted-foreground leading-snug mt-0.5">{desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center gap-4 pt-2 border-t border-border">
+              <div className="flex gap-1.5">
+                {(["new", "in-progress", "shipped", "parked"] as Status[]).map((s) => (
+                  <span key={s} className={`px-2 py-0.5 rounded-sm font-mono text-[8px] uppercase tracking-wider border ${STATUS_STYLES[s]}`}>
+                    {s}
+                  </span>
+                ))}
+              </div>
+              <span className="font-mono text-[9px] text-muted-foreground">← Status lifecycle for each entry</span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Submission form */}
