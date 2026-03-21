@@ -534,17 +534,43 @@ export default function FeedbackBacklog() {
           className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-sm font-mono text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
         >
           {insertMutation.isPending ? (
-            <>
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              {scraping ? "Scraping ChatGPT links…" : "Submitting…"}
-            </>
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
           ) : (
-            <>
-              <Plus className="w-3.5 h-3.5" />
-              Submit Feedback
-            </>
+            <Plus className="w-3.5 h-3.5" />
           )}
+          {insertMutation.isPending
+            ? submitStep === "scraping" ? "Scraping links…"
+            : submitStep === "saving" ? "Saving entry…"
+            : submitStep === "analyzing" ? "Running AI analysis…"
+            : "Processing…"
+            : "Submit Feedback"}
         </button>
+        {insertMutation.isPending && (
+          <div className="space-y-1.5 pt-1">
+            <div className="flex items-center gap-4 font-mono text-[9px] uppercase tracking-wider">
+              {(["scraping", "saving", "analyzing"] as const).map((step) => {
+                const labels = { scraping: "Scrape links", saving: "Save entry", analyzing: "AI analysis" };
+                const stepOrder = { scraping: 0, saving: 1, analyzing: 2 };
+                const currentOrder = stepOrder[submitStep] ?? -1;
+                const thisOrder = stepOrder[step];
+                const isDone = thisOrder < currentOrder;
+                const isActive = step === submitStep;
+                return (
+                  <span key={step} className={`flex items-center gap-1 transition-colors ${isDone ? "text-[hsl(var(--signal-green))]" : isActive ? "text-primary" : "text-muted-foreground/40"}`}>
+                    {isDone ? <CheckCircle2 className="w-3 h-3" /> : isActive ? <Loader2 className="w-3 h-3 animate-spin" /> : <span className="w-3 h-3 rounded-full border border-current inline-block" />}
+                    {labels[step]}
+                  </span>
+                );
+              })}
+            </div>
+            <div className="w-full h-1 rounded-full bg-muted overflow-hidden">
+              <div
+                className="h-full bg-primary rounded-full transition-all duration-500 ease-out"
+                style={{ width: submitStep === "scraping" ? "20%" : submitStep === "saving" ? "55%" : submitStep === "analyzing" ? "85%" : "0%" }}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* View toggle + Entries */}
