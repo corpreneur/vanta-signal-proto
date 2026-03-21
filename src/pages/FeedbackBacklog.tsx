@@ -124,6 +124,7 @@ export default function FeedbackBacklog() {
   const [viewMode, setViewMode] = useState<"list" | "cluster">("list");
   const [clusterExpanded, setClusterExpanded] = useState<string | null>(null);
   const [expandedChats, setExpandedChats] = useState<Record<string, boolean>>({});
+  const [quickRefOpen, setQuickRefOpen] = useState(false);
   const [scraping, setScraping] = useState(false);
   const [submitStep, setSubmitStep] = useState<"idle" | "scraping" | "saving" | "analyzing">("idle");
   const [filterSubject, setFilterSubject] = useState<string>("All");
