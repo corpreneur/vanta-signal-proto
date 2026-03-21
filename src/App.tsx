@@ -28,6 +28,7 @@ import Meetings from "./pages/Meetings";
 import Command from "./pages/Command";
 import LatestFeatures from "./pages/LatestFeatures";
 import ReleaseV19 from "./pages/ReleaseV19";
+import FeedbackBacklog from "./pages/FeedbackBacklog";
 
 import Settings from "./pages/Settings";
 import PersonalInfo from "./pages/PersonalInfo";
@@ -105,6 +106,7 @@ const AppRoutes = () => {
       <Route path="/architecture" element={<ProtectedRoute session={session}><ProductLayout><Architecture /></ProductLayout></ProtectedRoute>} />
       <Route path="/brain-dump" element={<ProtectedRoute session={session}><ProductLayout><BrainDump /></ProductLayout></ProtectedRoute>} />
       <Route path="/releases" element={<ProtectedRoute session={session}><ProductLayout><ReleaseNotes /></ProductLayout></ProtectedRoute>} />
+      <Route path="/feedback" element={<ProtectedRoute session={session}><ProductLayout><FeedbackBacklog /></ProductLayout></ProtectedRoute>} />
       <Route path="/meetings" element={<ProtectedRoute session={session}><ProductLayout><Meetings /></ProductLayout></ProtectedRoute>} />
       <Route path="/audit" element={<Navigate to="/settings?tab=audit" replace />} />
       <Route path="/settings" element={<ProtectedRoute session={session}><ProductLayout><Settings /></ProductLayout></ProtectedRoute>} />

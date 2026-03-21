@@ -131,6 +131,39 @@ export type Database = {
         }
         Relationships: []
       }
+      feedback_entries: {
+        Row: {
+          author: string
+          chatgpt_links: string[]
+          created_at: string
+          id: string
+          narrative: string
+          screenshot_urls: string[]
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          author: string
+          chatgpt_links?: string[]
+          created_at?: string
+          id?: string
+          narrative?: string
+          screenshot_urls?: string[]
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string
+          chatgpt_links?: string[]
+          created_at?: string
+          id?: string
+          narrative?: string
+          screenshot_urls?: string[]
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       meeting_artifacts: {
         Row: {
           attendees: Json | null
