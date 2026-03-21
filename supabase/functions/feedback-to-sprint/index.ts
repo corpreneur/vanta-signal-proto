@@ -111,10 +111,10 @@ Return ONLY valid JSON array, no markdown.`;
         });
       }
 
-      // Mark feedback as processed
+      // Mark feedback as processed and update status to in-progress
       await supabase
         .from("feedback_entries")
-        .update({ sprint_processed: true })
+        .update({ sprint_processed: true, status: "in-progress" })
         .eq("id", entry.id);
     }
 
