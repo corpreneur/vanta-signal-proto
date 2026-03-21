@@ -294,46 +294,22 @@ const Signals = () => {
         </p>
       </header>
 
-      {/* Stats strip */}
-      <div className="flex flex-wrap gap-6 mb-6 pb-6 border-b border-vanta-border">
-        <div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Signals Captured</p>
-          <p className="font-display text-[24px] text-vanta-text">{feedSignals.length}</p>
-        </div>
-        <div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">High Strength</p>
-          <p className="font-display text-[24px] text-vanta-accent">{highCount}</p>
-        </div>
-        <div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Actions Fired</p>
-          <p className="font-display text-[24px] text-vanta-text">{actionCount}</p>
-        </div>
-        <div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Filtered</p>
-          <p className="font-display text-[24px] text-muted-foreground">{noiseSignals.length}</p>
-        </div>
-        {overdueCount > 0 && (
-          <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-muted mb-1">Overdue</p>
-            <p className="font-display text-[24px] text-destructive">{overdueCount}</p>
-          </div>
-        )}
-        <div className="ml-auto flex items-center gap-2">
-          <Users className="w-3.5 h-3.5 text-vanta-text-low" />
-          <label
-            htmlFor="group-autoreply"
-            className="font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low cursor-pointer select-none"
-          >
-            Group Auto-Reply
-          </label>
-          <Switch
-            id="group-autoreply"
-            checked={groupAutoReply}
-            onCheckedChange={(checked) => toggleGroupAutoReply.mutate(checked)}
-            disabled={toggleGroupAutoReply.isPending}
-            className="data-[state=checked]:bg-vanta-accent"
-          />
-        </div>
+      {/* Group auto-reply toggle */}
+      <div className="flex items-center justify-end gap-2 mb-6 pb-4 border-b border-vanta-border">
+        <Users className="w-3.5 h-3.5 text-vanta-text-low" />
+        <label
+          htmlFor="group-autoreply"
+          className="font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-text-low cursor-pointer select-none"
+        >
+          Group Auto-Reply
+        </label>
+        <Switch
+          id="group-autoreply"
+          checked={groupAutoReply}
+          onCheckedChange={(checked) => toggleGroupAutoReply.mutate(checked)}
+          disabled={toggleGroupAutoReply.isPending}
+          className="data-[state=checked]:bg-vanta-accent"
+        />
       </div>
 
       {/* Tabs */}
