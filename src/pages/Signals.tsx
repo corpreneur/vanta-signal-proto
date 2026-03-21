@@ -433,6 +433,15 @@ const Signals = () => {
           )}
 
           <SignalFeed signals={feedSignals} filters={filters} allSignals={signals} />
+
+          {/* Intelligence Snapshot — positioned below signal feed */}
+          <SignalSnapshot
+            signalsCaptured={feedSignals.length}
+            highStrength={highCount}
+            actionsFired={actionCount}
+            filtered={noiseSignals.length}
+            overdue={overdueCount}
+          />
         </>
       )}
 
@@ -454,16 +463,7 @@ const Signals = () => {
             </>
           )}
         </>
-      )}
-
-      {/* Intelligence Snapshot — collapsible at bottom */}
-      <SignalSnapshot
-        signalsCaptured={feedSignals.length}
-        highStrength={highCount}
-        actionsFired={actionCount}
-        filtered={noiseSignals.length}
-        overdue={overdueCount}
-      />
+      )
     </div>
   );
 };

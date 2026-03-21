@@ -257,6 +257,11 @@ export default function Command() {
         </header>
       </Motion>
 
+      {/* Channel-Agnostic Communication */}
+      <Motion delay={25}>
+        <ChannelAgnosticComms />
+      </Motion>
+
       {/* Quick Actions Grid */}
       <Motion delay={30}>
         <QuickActionsGrid />
