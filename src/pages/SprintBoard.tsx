@@ -133,6 +133,7 @@ function AddItemInline() {
 }
 export default function SprintBoard() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
