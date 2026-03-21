@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import {
   MessageSquare, Link2, Image, Upload, Trash2, ExternalLink,
