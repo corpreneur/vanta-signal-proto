@@ -111,6 +111,8 @@ export default function FeedbackBacklog() {
   const [expandedChats, setExpandedChats] = useState<Record<string, boolean>>({});
   const [scraping, setScraping] = useState(false);
   const [filterSubject, setFilterSubject] = useState<string>("All");
+  const [filterAuthor, setFilterAuthor] = useState<string>("All");
+  const [filterStatus, setFilterStatus] = useState<string>("All");
   const fileRef = useRef<HTMLInputElement>(null);
   const { isListening, transcript: voiceTranscript, isSupported: voiceSupported, startListening, stopListening, resetTranscript } = useSpeechRecognition();
   const [voiceTouring, setVoiceTouring] = useState(false);
