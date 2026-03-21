@@ -40,6 +40,16 @@ interface ParsedChat {
   scraped_at: string;
 }
 
+interface AiSummary {
+  url: string;
+  title: string;
+  decisions: string[];
+  action_items: string[];
+  insights: string[];
+  summary: string;
+  generated_at: string;
+}
+
 interface FeedbackEntry {
   id: string;
   author: string;
@@ -48,6 +58,7 @@ interface FeedbackEntry {
   chatgpt_links: string[];
   screenshot_urls: string[];
   parsed_chatgpt: ParsedChat[];
+  ai_summaries: AiSummary[];
   status: string;
   created_at: string;
   updated_at: string;
