@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Trash2, KeyRound, RefreshCw, AlertTriangle } from "lucide-react";
+import { Shield, Trash2, KeyRound, RefreshCw, AlertTriangle, Mail } from "lucide-react";
 import { toast } from "sonner";
+import { releaseNotes } from "@/data/releaseNotes";
 
 interface AdminUser {
   id: string;
@@ -74,6 +75,21 @@ const Admin = () => {
     } finally {
       setActionLoading(null);
     }
+  };
+
+  const handleNudge = (email: string) => {
+    const latest = releaseNotes.slice(0, 3);
+    const releaseList = latest
+      .map((r) => `• v${r.version} — ${r.title} (${r.date})`)
+      .join("\n");
+
+    const subject = encodeURIComponent("Vanta Signal — We'd love your feedback");
+    const body = encodeURIComponent(
+      `Hey there,\n\nHope you're well — just a quick nudge to check in.\n\nWe've been shipping fast and would love your take on what's landing and what's not. Here's what's new:\n\n${releaseList}\n\nWhere we need feedback most:\n\n1. Product Concepts — Signal Brief, Context Layer, Focus View, and the Meeting Intelligence Hub are all live. Do these feel useful? Are they solving a real problem for you?\n\n2. Capture & Quick Actions — Brain Dump, Quick Capture (⌘K), and the new Quick Actions panel. Is the capture flow intuitive? Anything missing?\n\n3. Contacts & Relationships — Smart Contact Cards, Engagement Sequences, and the Network Graph. Are these giving you a clearer picture of your relationships?\n\n4. Overall UX — Navigation, information density, and the design system. Does it feel right? Too sparse? Too dense?\n\nEven a quick 2-minute brain dump on what's working and what's rough would be incredibly helpful. You can reply to this email or drop your notes directly in the app at /feedback.\n\nThanks for being part of this — your input shapes the product.\n\nBest,\nThe Vanta Signal Team`
+    );
+
+    window.open(`mailto:${email}?subject=${subject}&body=${body}`, "_blank");
+    toast.success("Nudge email drafted for " + email);
   };
 
   const formatDate = (dateStr: string | null) => {
@@ -173,6 +189,15 @@ const Admin = () => {
                   </div>
                 ) : (
                   <>
+                    <button
+                      onClick={() => handleNudge(user.email)}
+                      disabled={actionLoading === user.id}
+                      title="Send feedback nudge email"
+                      className="flex items-center gap-1 px-2 py-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-vanta-text-low hover:text-foreground border border-vanta-border hover:border-foreground/30 transition-colors disabled:opacity-50"
+                    >
+                      <Mail className="h-3 w-3" />
+                      <span className="hidden sm:inline">Nudge</span>
+                    </button>
                     <button
                       onClick={() => handleResetPassword(user.email!, user.id)}
                       disabled={actionLoading === user.id}
