@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
-import { StickyNote } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState, useRef, useCallback } from "react";
+import { StickyNote, PenLine, Send as SendIcon } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
@@ -13,6 +13,7 @@ import WhatsAhead from "@/components/WhatsAhead";
 import EnhancedActionItems from "@/components/EnhancedActionItems";
 import DailyTimeline from "@/components/DailyTimeline";
 import SignalEntryCard from "@/components/SignalEntryCard";
+import { toast } from "sonner";
 import {
   MessageSquare, Phone, Video, Mail, Calendar,
   Shield, Sparkles, Moon, ArrowRight,
