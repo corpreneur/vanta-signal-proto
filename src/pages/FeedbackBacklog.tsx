@@ -412,7 +412,7 @@ export default function FeedbackBacklog() {
         {filteredEntries.map((entry) => {
           const isOpen = expanded === entry.id;
           const status = entry.status as Status;
-          const parsedMap = new Map(entry.parsed_chatgpt.map((p) => [p.url, p]));
+          const parsedMap = new Map((entry.parsed_chatgpt as ParsedChat[]).map((p) => [p.url, p]));
 
           return (
             <div key={entry.id} className="border border-border rounded-sm bg-card overflow-hidden">
