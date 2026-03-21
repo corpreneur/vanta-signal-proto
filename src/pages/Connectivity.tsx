@@ -173,11 +173,11 @@ export default function Connectivity() {
               style={{ animation: "pulse-dot 2s ease-in-out infinite" }}
             />
             <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
-              Fab Five · Connectivity
+              Fab Five · Your Network
             </p>
           </div>
           <h1 className="font-display text-[clamp(28px,5vw,40px)] leading-[1.05] text-foreground mb-2">
-            Connectivity Hub
+            Your Network
           </h1>
           <p className="font-sans text-[15px] text-vanta-text-mid max-w-[600px] leading-relaxed mb-10">
             Vanta is an MVNO-first platform — a dedicated mobile number that captures every voice call, 
