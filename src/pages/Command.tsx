@@ -676,6 +676,60 @@ function ActionButton({
   );
 }
 
+/* ── Channel-Agnostic Communication ──────────────────── */
+
+const COMM_CHANNELS = [
+  { key: "text", label: "Text", icon: MessageSquare, color: "text-primary", uri: (name: string) => `sms:?body=Hi ${encodeURIComponent(name)},` },
+  { key: "call", label: "Call", icon: Phone, color: "text-vanta-accent-phone", uri: (_name: string) => `tel:` },
+  { key: "email", label: "Email", icon: Mail, color: "text-vanta-accent-teal", uri: (name: string) => `mailto:?subject=${encodeURIComponent(`Following up — ${name}`)}` },
+  { key: "video", label: "Zoom", icon: Video, color: "text-vanta-accent-zoom", uri: () => `https://zoom.us/start/videomeeting` },
+  { key: "linkedin", label: "LinkedIn", icon: Globe, color: "text-vanta-accent-violet", uri: (name: string) => `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(name)}` },
+];
+
+function ChannelAgnosticComms() {
+  const [contactName, setContactName] = useState("");
+
+  const handleChannel = (ch: typeof COMM_CHANNELS[0]) => {
+    const name = contactName.trim() || "there";
+    window.open(ch.uri(name), "_blank");
+    if (contactName.trim()) {
+      toast.success(`Opening ${ch.label} for ${contactName.trim()}`);
+    }
+  };
+
+  return (
+    <div className="mb-6 border border-border bg-card p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <Send className="w-3.5 h-3.5 text-primary" />
+        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
+          Reach Out
+        </span>
+      </div>
+
+      <input
+        type="text"
+        value={contactName}
+        onChange={(e) => setContactName(e.target.value)}
+        placeholder="Contact name (optional)"
+        className="w-full bg-transparent border border-border px-3 py-2 mb-3 font-sans text-sm text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/40 transition-colors"
+      />
+
+      <div className="flex items-center gap-2 flex-wrap">
+        {COMM_CHANNELS.map((ch) => (
+          <button
+            key={ch.key}
+            onClick={() => handleChannel(ch)}
+            className="flex items-center gap-1.5 px-3 py-2 border border-border bg-card hover:bg-muted hover:border-foreground/20 transition-all font-mono text-[10px] uppercase tracking-wider"
+          >
+            <ch.icon className={`w-3.5 h-3.5 ${ch.color}`} />
+            {ch.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ── Send Later & Follow-up Controls ─────────────────── */
 
 const SCHEDULE_OPTIONS = [
