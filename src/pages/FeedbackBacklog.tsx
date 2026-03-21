@@ -12,6 +12,19 @@ const AUTHORS = ["Julian", "JG"] as const;
 type Author = (typeof AUTHORS)[number];
 type Status = "new" | "in-progress" | "shipped" | "parked";
 
+const SUBJECTS = [
+  "UX / Design",
+  "Signal Pipeline",
+  "Orb / Capture",
+  "Contacts / Network",
+  "Meetings / Briefs",
+  "Integrations",
+  "AI / Inference",
+  "Strategy",
+  "Bug",
+  "Other",
+] as const;
+
 const STATUS_STYLES: Record<Status, string> = {
   new: "bg-primary/10 text-primary border-primary/20",
   "in-progress": "bg-[hsl(var(--signal-yellow)/.12)] text-[hsl(var(--signal-yellow))] border-[hsl(var(--signal-yellow)/.25)]",
@@ -29,6 +42,7 @@ interface ParsedChat {
 interface FeedbackEntry {
   id: string;
   author: string;
+  subject: string;
   narrative: string;
   chatgpt_links: string[];
   screenshot_urls: string[];
@@ -65,6 +79,7 @@ export default function FeedbackBacklog() {
   const { data: entries = [], isLoading } = useQuery({ queryKey: ["feedback-entries"], queryFn: fetchEntries });
 
   const [author, setAuthor] = useState<Author>("Julian");
+  const [subject, setSubject] = useState<string>("General");
   const [narrative, setNarrative] = useState("");
   const [links, setLinks] = useState<string[]>([""]);
   const [uploading, setUploading] = useState(false);
@@ -72,6 +87,7 @@ export default function FeedbackBacklog() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [expandedChats, setExpandedChats] = useState<Record<string, boolean>>({});
   const [scraping, setScraping] = useState(false);
+  const [filterSubject, setFilterSubject] = useState<string>("All");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const insertMutation = useMutation({
@@ -92,6 +108,7 @@ export default function FeedbackBacklog() {
 
       const { error } = await supabase.from("feedback_entries").insert({
         author,
+        subject,
         narrative: narrative.trim(),
         chatgpt_links: cleanLinks,
         screenshot_urls: screenshots,
@@ -101,6 +118,7 @@ export default function FeedbackBacklog() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["feedback-entries"] });
+      setSubject("General");
       setNarrative("");
       setLinks([""]);
       setScreenshots([]);
@@ -183,6 +201,8 @@ export default function FeedbackBacklog() {
 
   const canSubmit = narrative.trim().length > 0 || links.some((l) => l.trim()) || screenshots.length > 0;
 
+  const filteredEntries = filterSubject === "All" ? entries : entries.filter((e) => e.subject === filterSubject);
+
   const toggleChat = (entryId: string, url: string) => {
     const key = `${entryId}:${url}`;
     setExpandedChats((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -223,6 +243,26 @@ export default function FeedbackBacklog() {
                 }`}
               >
                 {a}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Subject */}
+        <div className="flex items-center gap-3">
+          <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Subject</p>
+          <div className="flex flex-wrap gap-1.5">
+            {SUBJECTS.map((s) => (
+              <button
+                key={s}
+                onClick={() => setSubject(s)}
+                className={`px-2.5 py-1 rounded-sm font-mono text-[9px] uppercase tracking-wider border transition-colors ${
+                  subject === s
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-transparent text-muted-foreground border-border hover:border-primary/30"
+                }`}
+              >
+                {s}
               </button>
             ))}
           </div>
@@ -342,16 +382,37 @@ export default function FeedbackBacklog() {
 
       {/* Entries list */}
       <div className="space-y-3">
+        {/* Subject filter */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Filter</p>
+          {["All", ...SUBJECTS].map((s) => {
+            const count = s === "All" ? entries.length : entries.filter((e) => e.subject === s).length;
+            return (
+              <button
+                key={s}
+                onClick={() => setFilterSubject(s)}
+                className={`px-2 py-0.5 rounded-sm font-mono text-[9px] uppercase tracking-wider border transition-colors ${
+                  filterSubject === s
+                    ? "bg-primary/15 text-primary border-primary/30"
+                    : "bg-transparent text-muted-foreground border-border hover:border-primary/20"
+                }`}
+              >
+                {s} <span className="opacity-50">{count}</span>
+              </button>
+            );
+          })}
+        </div>
+
         <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-          {entries.length} {entries.length === 1 ? "entry" : "entries"}
+          {filteredEntries.length} {filteredEntries.length === 1 ? "entry" : "entries"}
         </p>
 
         {isLoading && <p className="text-muted-foreground text-sm">Loading…</p>}
 
-        {entries.map((entry) => {
+        {filteredEntries.map((entry) => {
           const isOpen = expanded === entry.id;
           const status = entry.status as Status;
-          const parsedMap = new Map(entry.parsed_chatgpt.map((p) => [p.url, p]));
+          const parsedMap = new Map((entry.parsed_chatgpt as ParsedChat[]).map((p) => [p.url, p]));
 
           return (
             <div key={entry.id} className="border border-border rounded-sm bg-card overflow-hidden">
@@ -362,6 +423,7 @@ export default function FeedbackBacklog() {
                 <span className={`shrink-0 px-2 py-0.5 rounded-sm font-mono text-[9px] uppercase tracking-wider border ${STATUS_STYLES[status]}`}>
                   {status}
                 </span>
+                <span className="shrink-0 px-2 py-0.5 rounded-sm font-mono text-[9px] uppercase tracking-wider border border-border bg-muted/50 text-muted-foreground">{entry.subject}</span>
                 <span className="font-mono text-[11px] uppercase tracking-wider text-primary/70">{entry.author}</span>
                 <span className="flex-1 font-sans text-[13px] text-foreground truncate">
                   {entry.narrative || "(no narrative)"}

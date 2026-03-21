@@ -141,6 +141,7 @@ export type Database = {
           parsed_chatgpt: Json | null
           screenshot_urls: string[]
           status: string
+          subject: string
           updated_at: string
         }
         Insert: {
@@ -152,6 +153,7 @@ export type Database = {
           parsed_chatgpt?: Json | null
           screenshot_urls?: string[]
           status?: string
+          subject?: string
           updated_at?: string
         }
         Update: {
@@ -163,6 +165,7 @@ export type Database = {
           parsed_chatgpt?: Json | null
           screenshot_urls?: string[]
           status?: string
+          subject?: string
           updated_at?: string
         }
         Relationships: []
