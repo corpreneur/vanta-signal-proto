@@ -190,6 +190,15 @@ const Admin = () => {
                 ) : (
                   <>
                     <button
+                      onClick={() => handleNudge(user.email)}
+                      disabled={actionLoading === user.id}
+                      title="Send feedback nudge email"
+                      className="flex items-center gap-1 px-2 py-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-vanta-text-low hover:text-foreground border border-vanta-border hover:border-foreground/30 transition-colors disabled:opacity-50"
+                    >
+                      <Mail className="h-3 w-3" />
+                      <span className="hidden sm:inline">Nudge</span>
+                    </button>
+                    <button
                       onClick={() => handleResetPassword(user.email!, user.id)}
                       disabled={actionLoading === user.id}
                       title="Send password reset email"
