@@ -344,6 +344,19 @@ export default function SprintBoard() {
                                 <span className="font-mono text-[9px] text-muted-foreground">
                                   {item.subject}
                                 </span>
+                                {item.feedback_entry_id && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      navigate(`/feedback?highlight=${item.feedback_entry_id}`);
+                                    }}
+                                    title="View source feedback"
+                                    className="inline-flex items-center gap-0.5 font-mono text-[9px] text-primary/70 hover:text-primary transition-colors"
+                                  >
+                                    <ExternalLink className="h-2.5 w-2.5" />
+                                    <span>Source</span>
+                                  </button>
+                                )}
                               </div>
 
                               {expanded && (
