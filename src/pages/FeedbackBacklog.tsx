@@ -154,7 +154,8 @@ export default function FeedbackBacklog() {
       const cleanLinks = links.map((l) => l.trim()).filter(Boolean);
       setScraping(true);
 
-      // Scrape all ChatGPT links
+      // Step 1: Scrape
+      setSubmitStep(cleanLinks.length > 0 ? "scraping" : "saving");
       let parsed: ParsedChat[] = [];
       if (cleanLinks.length > 0) {
         const results = await Promise.allSettled(cleanLinks.map(scrapeLink));
@@ -165,6 +166,8 @@ export default function FeedbackBacklog() {
         if (failures > 0) toast.warning(`${failures} link(s) could not be scraped`);
       }
 
+      // Step 2: Save
+      setSubmitStep("saving");
       const { data: inserted, error } = await supabase.from("feedback_entries").insert({
         author,
         subject,
@@ -175,9 +178,10 @@ export default function FeedbackBacklog() {
       }).select().single();
       if (error) throw error;
 
-      // Auto-analyze if we have scraped content
+      // Step 3: Auto-analyze
       const analyzable = parsed.filter((p) => p.content?.trim());
       if (analyzable.length > 0 && inserted) {
+        setSubmitStep("analyzing");
         try {
           const { error: aiErr } = await supabase.functions.invoke("summarize-feedback", {
             body: { entry_id: inserted.id, conversations: analyzable },
@@ -195,10 +199,12 @@ export default function FeedbackBacklog() {
       setLinks([""]);
       setScreenshots([]);
       setScraping(false);
+      setSubmitStep("idle");
       toast.success("Feedback submitted & analyzed");
     },
     onError: () => {
       setScraping(false);
+      setSubmitStep("idle");
       toast.error("Failed to submit feedback");
     },
   });
