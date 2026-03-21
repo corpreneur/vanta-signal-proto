@@ -8,11 +8,12 @@ import {
   Zap, Check, Clock, Pin, ArrowRight, AlarmClock,
   CheckCircle2, Inbox, AlertTriangle, CalendarClock, PinOff,
   Phone, Mail, MessageSquare, FileText, Flame, Target,
-  ChevronRight, RotateCcw, Send, Sparkles,
+  ChevronRight, RotateCcw, Send, Sparkles, CalendarDays, Timer,
 } from "lucide-react";
 import { Motion } from "@/components/ui/motion";
 import { toast } from "sonner";
 import QuickActionsGrid from "@/components/quick-actions/QuickActionsGrid";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 /* ── Data fetching ──────────────────────────────────────── */
 
