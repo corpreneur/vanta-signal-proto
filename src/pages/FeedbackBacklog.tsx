@@ -78,6 +78,28 @@ async function fetchEntries(): Promise<FeedbackEntry[]> {
 export default function FeedbackBacklog() {
   const queryClient = useQueryClient();
   const { data: entries = [], isLoading } = useQuery({ queryKey: ["feedback-entries"], queryFn: fetchEntries });
+  const [newCount, setNewCount] = useState(0);
+
+  // Realtime subscription for live notifications
+  useEffect(() => {
+    const channel = supabase
+      .channel("feedback-realtime")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "feedback_entries" },
+        (payload) => {
+          queryClient.invalidateQueries({ queryKey: ["feedback-entries"] });
+          const entry = payload.new as any;
+          setNewCount((c) => c + 1);
+          toast.info(`New feedback from ${entry.author}`, {
+            description: `${entry.subject} — ${(entry.narrative || "").slice(0, 80)}${(entry.narrative || "").length > 80 ? "…" : ""}`,
+            icon: <Bell className="w-4 h-4" />,
+          });
+        }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [queryClient]);
 
   const [author, setAuthor] = useState<Author>("Julian");
   const [subject, setSubject] = useState<string>("General");
