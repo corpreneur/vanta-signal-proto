@@ -750,9 +750,7 @@ export default function FeedbackBacklog() {
         })()}
 
         {/* LIST VIEW */}
-        {viewMode === "list" && !isLoading &&
-
-        {filteredEntries.map((entry) => {
+        {viewMode === "list" && !isLoading && filteredEntries.map((entry) => {
           const isOpen = expanded === entry.id;
           const status = entry.status as Status;
           const parsedMap = new Map((entry.parsed_chatgpt as ParsedChat[]).map((p) => [p.url, p]));
