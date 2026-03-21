@@ -460,25 +460,44 @@ export default function FeedbackBacklog() {
 
       {/* Entries list */}
       <div className="space-y-3">
-        {/* Subject filter */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Filter</p>
-          {["All", ...SUBJECTS].map((s) => {
-            const count = s === "All" ? entries.length : entries.filter((e) => e.subject === s).length;
-            return (
-              <button
-                key={s}
-                onClick={() => setFilterSubject(s)}
-                className={`px-2 py-0.5 rounded-sm font-mono text-[9px] uppercase tracking-wider border transition-colors ${
-                  filterSubject === s
-                    ? "bg-primary/15 text-primary border-primary/30"
-                    : "bg-transparent text-muted-foreground border-border hover:border-primary/20"
-                }`}
-              >
-                {s} <span className="opacity-50">{count}</span>
-              </button>
-            );
-          })}
+        {/* Filter bar */}
+        <div className="space-y-2 p-3 rounded-sm border border-border bg-muted/30">
+          {/* Author */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground w-14">Author</p>
+            {["All", ...AUTHORS].map((a) => {
+              const count = a === "All" ? entries.length : entries.filter((e) => e.author === a).length;
+              return (
+                <button key={a} onClick={() => setFilterAuthor(a)} className={`px-2 py-0.5 rounded-sm font-mono text-[9px] uppercase tracking-wider border transition-colors ${filterAuthor === a ? "bg-primary/15 text-primary border-primary/30" : "bg-transparent text-muted-foreground border-border hover:border-primary/20"}`}>
+                  {a} <span className="opacity-50">{count}</span>
+                </button>
+              );
+            })}
+          </div>
+          {/* Status */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground w-14">Status</p>
+            {["All", "new", "in-progress", "shipped", "parked"].map((s) => {
+              const count = s === "All" ? entries.length : entries.filter((e) => e.status === s).length;
+              return (
+                <button key={s} onClick={() => setFilterStatus(s)} className={`px-2 py-0.5 rounded-sm font-mono text-[9px] uppercase tracking-wider border transition-colors ${filterStatus === s ? "bg-primary/15 text-primary border-primary/30" : "bg-transparent text-muted-foreground border-border hover:border-primary/20"}`}>
+                  {s} <span className="opacity-50">{count}</span>
+                </button>
+              );
+            })}
+          </div>
+          {/* Subject */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground w-14">Subject</p>
+            {["All", ...SUBJECTS].map((s) => {
+              const count = s === "All" ? entries.length : entries.filter((e) => e.subject === s).length;
+              return (
+                <button key={s} onClick={() => setFilterSubject(s)} className={`px-2 py-0.5 rounded-sm font-mono text-[9px] uppercase tracking-wider border transition-colors ${filterSubject === s ? "bg-primary/15 text-primary border-primary/30" : "bg-transparent text-muted-foreground border-border hover:border-primary/20"}`}>
+                  {s} <span className="opacity-50">{count}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
