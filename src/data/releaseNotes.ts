@@ -10,6 +10,17 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "2.4.0",
+    date: "2026-03-21",
+    title: "Embeddable Feedback Widget",
+    changes: [
+      { type: "feature", text: "Feedback Widget — embeddable vanilla JS widget (Shadow DOM, ~8KB) that any external site can load via a single <script> tag" },
+      { type: "feature", text: "feedback-widget edge function — unauthenticated POST endpoint with input sanitization, rate limiting (10/hr per IP), and service-role insert" },
+      { type: "feature", text: "Embed instructions page at /feedback/embed — copy-paste code snippets, configuration docs, and security notes" },
+      { type: "improvement", text: "Widget supports light/dark themes via data-theme attribute and auto-resets form after successful submission" },
+    ],
+  },
+  {
     version: "2.3.0",
     date: "2026-03-21",
     title: "Feedback-to-Sprint Pipeline & Intelligence Snapshot",

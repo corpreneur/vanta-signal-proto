@@ -57,5 +57,8 @@ verify_jwt = false
 [functions.ask-meeting]
 verify_jwt = false
 
+[functions.feedback-widget]
+verify_jwt = false
+
 [functions.meeting-summary-email]
 verify_jwt = false
