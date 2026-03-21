@@ -289,16 +289,46 @@ export default function FeedbackBacklog() {
 
         {/* Narrative */}
         <div>
-          <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground block mb-1.5">
-            <MessageSquare className="inline w-3 h-3 mr-1 -mt-0.5" />
-            Narrative / Feedback
-          </label>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              <MessageSquare className="inline w-3 h-3 mr-1 -mt-0.5" />
+              Narrative / Feedback
+            </label>
+            {voiceSupported && (
+              <div className="flex items-center gap-2">
+                {voiceTouring && (
+                  <span className="font-mono text-[10px] text-destructive animate-pulse">
+                    ● REC {Math.floor(voiceElapsed / 60)}:{String(voiceElapsed % 60).padStart(2, "0")}
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={voiceTouring ? stopVoiceTour : startVoiceTour}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm font-mono text-[9px] uppercase tracking-wider border transition-colors ${
+                    voiceTouring
+                      ? "bg-destructive/10 text-destructive border-destructive/30 hover:bg-destructive/20"
+                      : "bg-transparent text-muted-foreground border-border hover:border-primary/30 hover:text-primary"
+                  }`}
+                >
+                  {voiceTouring ? <Square className="w-3 h-3" /> : <Mic className="w-3 h-3" />}
+                  {voiceTouring ? "Stop tour" : "Voice tour"}
+                </button>
+              </div>
+            )}
+          </div>
+          {voiceTouring && (
+            <p className="text-[11px] text-muted-foreground/70 mb-1.5 italic">
+              Speak your feedback — the transcript appears below in real time…
+            </p>
+          )}
           <textarea
             value={narrative}
             onChange={(e) => setNarrative(e.target.value)}
-            rows={4}
-            placeholder="Describe what you observed, what should change, and why…"
-            className="w-full bg-background border border-border rounded-sm px-3 py-2 font-sans text-[13px] text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/40 resize-none"
+            rows={voiceTouring ? 8 : 4}
+            placeholder={voiceTouring ? "Listening… speak your feedback now" : "Describe what you observed, what should change, and why…"}
+            className={`w-full bg-background border rounded-sm px-3 py-2 font-sans text-[13px] text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/40 resize-none transition-all ${
+              voiceTouring ? "border-destructive/30 ring-1 ring-destructive/10" : "border-border"
+            }`}
           />
         </div>
 
