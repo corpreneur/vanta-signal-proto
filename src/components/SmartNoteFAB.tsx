@@ -27,8 +27,7 @@ export default function SmartNoteFAB() {
 
   const location = useLocation();
   const queryClient = useQueryClient();
-  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const didLongPress = useRef(false);
+  
 
   // --- Draggable orb state ---
   const [orbPos, setOrbPos] = useState<{ x: number; y: number } | null>(null);
@@ -55,18 +54,13 @@ export default function SmartNoteFAB() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Touch drag handlers for iOS
+  // Touch drag handlers for iOS — drag only, no open
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0];
     const currentX = orbPos?.x ?? window.innerWidth / 2;
     const currentY = orbPos?.y ?? window.innerHeight - 60;
     dragStart.current = { x: touch.clientX, y: touch.clientY, orbX: currentX, orbY: currentY };
     dragMoved.current = false;
-    didLongPress.current = false;
-    longPressTimer.current = setTimeout(() => {
-      didLongPress.current = true;
-      if (!dragMoved.current) setOpen(true);
-    }, 500);
   }, [orbPos]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
@@ -77,10 +71,6 @@ export default function SmartNoteFAB() {
     if (!isDragging.current && Math.abs(dx) + Math.abs(dy) > 8) {
       isDragging.current = true;
       dragMoved.current = true;
-      if (longPressTimer.current) {
-        clearTimeout(longPressTimer.current);
-        longPressTimer.current = null;
-      }
     }
     if (isDragging.current) {
       e.preventDefault();
@@ -91,31 +81,12 @@ export default function SmartNoteFAB() {
   }, []);
 
   const handleTouchEnd = useCallback(() => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
     isDragging.current = false;
     dragStart.current = null;
   }, []);
 
-  const handlePointerDown = useCallback(() => {
-    didLongPress.current = false;
-    longPressTimer.current = setTimeout(() => {
-      didLongPress.current = true;
-      setOpen(true);
-    }, 500);
-  }, []);
-
-  const handlePointerUp = useCallback(() => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-  }, []);
-
   const handleClick = useCallback(() => {
-    if (didLongPress.current || dragMoved.current) {
+    if (dragMoved.current) {
       dragMoved.current = false;
       return;
     }
@@ -242,9 +213,6 @@ export default function SmartNoteFAB() {
 
         <button
           onClick={handleClick}
-          onPointerDown={handlePointerDown}
-          onPointerUp={handlePointerUp}
-          onPointerLeave={handlePointerUp}
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
           className="relative z-10 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 border border-primary/25 overflow-hidden"
