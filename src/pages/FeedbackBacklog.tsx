@@ -117,6 +117,18 @@ export default function FeedbackBacklog() {
     return () => { supabase.removeChannel(channel); };
   }, [queryClient]);
 
+  // Auto-expand and scroll to highlighted feedback entry from sprint board link
+  useEffect(() => {
+    if (highlightId && !isLoading) {
+      setExpanded(highlightId);
+      setViewMode("list");
+      setTimeout(() => {
+        const el = document.getElementById(`feedback-${highlightId}`);
+        el?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 200);
+    }
+  }, [highlightId, isLoading]);
+
   const [author, setAuthor] = useState<Author>("Julian");
   const [subject, setSubject] = useState<string>("General");
   const [narrative, setNarrative] = useState("");
