@@ -79,6 +79,7 @@ export default function FeedbackBacklog() {
   const { data: entries = [], isLoading } = useQuery({ queryKey: ["feedback-entries"], queryFn: fetchEntries });
 
   const [author, setAuthor] = useState<Author>("Julian");
+  const [subject, setSubject] = useState<string>("General");
   const [narrative, setNarrative] = useState("");
   const [links, setLinks] = useState<string[]>([""]);
   const [uploading, setUploading] = useState(false);
@@ -86,6 +87,7 @@ export default function FeedbackBacklog() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [expandedChats, setExpandedChats] = useState<Record<string, boolean>>({});
   const [scraping, setScraping] = useState(false);
+  const [filterSubject, setFilterSubject] = useState<string>("All");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const insertMutation = useMutation({
