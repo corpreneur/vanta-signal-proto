@@ -230,7 +230,31 @@ export default function FeedbackBacklog() {
     },
   });
 
-  const handleScreenshotUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [summarizing, setSummarizing] = useState<string | null>(null);
+
+  const summarizeEntry = useMutation({
+    mutationFn: async (entry: FeedbackEntry) => {
+      setSummarizing(entry.id);
+      const conversations = (entry.parsed_chatgpt as ParsedChat[]).filter((p) => p.content?.trim());
+      if (conversations.length === 0) throw new Error("No scraped conversations to summarize");
+      const { data, error } = await supabase.functions.invoke("summarize-feedback", {
+        body: { entry_id: entry.id, conversations },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["feedback-entries"] });
+      toast.success("AI summaries generated");
+      setSummarizing(null);
+    },
+    onError: (e) => {
+      toast.error(e instanceof Error ? e.message : "Failed to generate summaries");
+      setSummarizing(null);
+    },
+  });
+
     const files = e.target.files;
     if (!files?.length) return;
     setUploading(true);
