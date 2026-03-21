@@ -122,23 +122,26 @@ export default function SmartNoteFAB() {
 
   return (
     <>
-      {/* VANTA Orb FAB */}
+      {/* VANTA Orb FAB — translucent glass */}
       <div className="fixed bottom-6 right-6 z-40 flex items-center justify-center" style={{ width: 80, height: 80 }}>
+        {/* Outer glow ring */}
         <div
-          className="absolute inset-0 m-auto w-14 h-14 rounded-full pointer-events-none"
+          className="absolute inset-0 m-auto w-16 h-16 rounded-full pointer-events-none"
           style={{ animation: "vanta-glow-pulse 3s ease-in-out infinite" }}
         />
+        {/* Breathing halo */}
         <div
-          className="absolute inset-0 m-auto w-[72px] h-[72px] rounded-full border-2 border-primary/30 pointer-events-none"
+          className="absolute inset-0 m-auto w-[72px] h-[72px] rounded-full border border-primary/20 pointer-events-none"
           style={{ animation: "vanta-breathe 3s ease-in-out infinite" }}
         />
+        {/* Orbiting dot */}
         <div
           className="absolute inset-0 m-auto w-20 h-20 pointer-events-none"
           style={{ animation: "vanta-orbit 6s linear infinite" }}
         >
           <div
-            className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-primary"
-            style={{ opacity: 0.9, boxShadow: "0 0 6px 1px hsl(var(--primary) / 0.5)" }}
+            className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-primary"
+            style={{ opacity: 0.7, boxShadow: "0 0 4px 1px hsl(var(--primary) / 0.4)" }}
           />
         </div>
 
@@ -149,17 +152,55 @@ export default function SmartNoteFAB() {
           onPointerLeave={handlePointerUp}
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
-          className="relative z-10 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center transition-transform duration-300 hover:scale-105 active:scale-95"
+          className="relative z-10 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 border border-primary/25 overflow-hidden"
+          style={{
+            background: "linear-gradient(135deg, hsl(var(--primary) / 0.12) 0%, hsl(var(--primary) / 0.06) 100%)",
+            backdropFilter: "blur(16px) saturate(1.4)",
+            WebkitBackdropFilter: "blur(16px) saturate(1.4)",
+            boxShadow: "0 8px 32px -4px hsl(var(--primary) / 0.15), inset 0 1px 0 0 hsl(var(--primary) / 0.1)",
+          }}
           aria-label="Quick Capture — long press for voice"
         >
-          <PenLine className="w-5 h-5 transition-transform duration-300" style={{ transform: hovered ? "rotate(-8deg)" : "none" }} />
+          {/* Inner glass highlight */}
+          <div
+            className="absolute inset-0 rounded-full pointer-events-none"
+            style={{
+              background: "radial-gradient(ellipse 60% 40% at 35% 25%, hsl(var(--primary) / 0.15), transparent)",
+            }}
+          />
+
+          {/* V monogram — visible by default, fades on hover */}
+          <span
+            className="absolute font-mono font-bold text-lg tracking-tight transition-all duration-300 select-none"
+            style={{
+              color: "hsl(var(--primary))",
+              opacity: hovered ? 0 : 0.8,
+              transform: hovered ? "scale(0.6) rotate(12deg)" : "scale(1) rotate(0deg)",
+              textShadow: "0 0 12px hsl(var(--primary) / 0.3)",
+            }}
+          >
+            V
+          </span>
+
+          {/* Note icon — appears on hover */}
+          <PenLine
+            className="absolute w-4.5 h-4.5 transition-all duration-300"
+            style={{
+              color: "hsl(var(--primary))",
+              opacity: hovered ? 0.9 : 0,
+              transform: hovered ? "scale(1) rotate(0deg)" : "scale(0.5) rotate(-12deg)",
+              filter: "drop-shadow(0 0 6px hsl(var(--primary) / 0.3))",
+            }}
+          />
         </button>
 
+        {/* CAPTURE whisper label */}
         <span
-          className="absolute -bottom-1 left-1/2 font-mono text-[9px] uppercase tracking-[0.2em] text-primary/70 transition-all duration-300 pointer-events-none whitespace-nowrap"
+          className="absolute -bottom-1 left-1/2 font-mono text-[8px] uppercase tracking-[0.25em] transition-all duration-300 pointer-events-none whitespace-nowrap"
           style={{
+            color: "hsl(var(--primary) / 0.5)",
             opacity: hovered ? 1 : 0,
-            transform: hovered ? "translateX(-50%) translateY(4px)" : "translateX(-50%) translateY(0)",
+            transform: hovered ? "translateX(-50%) translateY(6px)" : "translateX(-50%) translateY(0)",
           }}
         >
           Capture
