@@ -133,6 +133,7 @@ export type Database = {
       }
       feedback_entries: {
         Row: {
+          ai_summaries: Json | null
           author: string
           chatgpt_links: string[]
           created_at: string
@@ -145,6 +146,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          ai_summaries?: Json | null
           author: string
           chatgpt_links?: string[]
           created_at?: string
@@ -157,6 +159,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          ai_summaries?: Json | null
           author?: string
           chatgpt_links?: string[]
           created_at?: string

@@ -1,0 +1,1 @@
+ALTER TABLE public.feedback_entries ADD COLUMN ai_summaries jsonb DEFAULT '[]'::jsonb;
