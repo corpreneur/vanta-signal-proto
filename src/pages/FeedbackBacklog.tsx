@@ -1044,7 +1044,7 @@ export default function FeedbackBacklog() {
           const parsedMap = new Map((entry.parsed_chatgpt as ParsedChat[]).map((p) => [p.url, p]));
 
           return (
-            <div key={entry.id} className="border border-border rounded-sm bg-card overflow-hidden">
+            <div key={entry.id} id={`feedback-${entry.id}`} className={`border rounded-sm bg-card overflow-hidden transition-colors ${highlightId === entry.id ? "border-primary ring-1 ring-primary/30" : "border-border"}`}>
               <button
                 onClick={() => setExpanded(isOpen ? null : entry.id)}
                 className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/30 transition-colors"
