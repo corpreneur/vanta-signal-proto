@@ -42,6 +42,7 @@ interface ParsedChat {
 interface FeedbackEntry {
   id: string;
   author: string;
+  subject: string;
   narrative: string;
   chatgpt_links: string[];
   screenshot_urls: string[];
