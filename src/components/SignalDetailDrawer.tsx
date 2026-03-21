@@ -873,12 +873,32 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
 
                 <div className="p-4">
                   {editingReply ? (
-                    <textarea
-                      value={replyMessage}
-                      onChange={(e) => setReplyMessage(e.target.value)}
-                      rows={6}
-                      className="w-full bg-background border border-border text-foreground/80 font-sans text-[13px] px-3 py-2 leading-relaxed focus:outline-none focus:border-primary/40 resize-none rounded"
-                    />
+                    <div className="relative">
+                      <textarea
+                        value={replyMessage}
+                        onChange={(e) => setReplyMessage(e.target.value)}
+                        rows={6}
+                        className={`w-full bg-background border text-foreground/80 font-sans text-[13px] px-3 py-2 pr-10 leading-relaxed focus:outline-none focus:border-primary/40 resize-none rounded ${isListening ? "border-destructive/50 bg-destructive/5" : "border-border"}`}
+                      />
+                      {voiceSupported && (
+                        <button
+                          onClick={() => {
+                            if (isListening) {
+                              stopListening();
+                            } else {
+                              startListening((text) => setReplyMessage(text));
+                            }
+                          }}
+                          className={`absolute top-2 right-2 p-1.5 rounded-md transition-colors ${isListening ? "bg-destructive/10 text-destructive animate-pulse" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
+                          title={isListening ? "Stop dictating" : "Dictate reply"}
+                        >
+                          {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+                        </button>
+                      )}
+                      {isListening && (
+                        <p className="font-mono text-[9px] text-destructive mt-1 uppercase tracking-wider">Listening…</p>
+                      )}
+                    </div>
                   ) : (
                     <p className="font-sans text-[13px] leading-relaxed text-foreground/70 whitespace-pre-wrap">{replyMessage}</p>
                   )}
