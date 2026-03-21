@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { PenLine, Image, Mic, X } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,6 +29,26 @@ export default function SmartNoteFAB() {
   const queryClient = useQueryClient();
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didLongPress = useRef(false);
+
+  // Scroll-responsive drift: orb gently floats with scroll direction
+  const [scrollDrift, setScrollDrift] = useState(0);
+  const lastScrollY = useRef(0);
+  const driftTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const y = window.scrollY;
+      const delta = y - lastScrollY.current;
+      lastScrollY.current = y;
+      // Clamp drift to ±6px for a subtle float
+      setScrollDrift((prev) => Math.max(-6, Math.min(6, prev + delta * 0.15)));
+      // Ease back to center
+      if (driftTimeout.current) clearTimeout(driftTimeout.current);
+      driftTimeout.current = setTimeout(() => setScrollDrift(0), 400);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handlePointerDown = useCallback(() => {
     didLongPress.current = false;
@@ -123,7 +143,15 @@ export default function SmartNoteFAB() {
   return (
     <>
       {/* VANTA Orb FAB — translucent glass */}
-      <div className="fixed bottom-6 right-6 z-40 flex items-center justify-center" style={{ width: 80, height: 80 }}>
+      <div
+        className="fixed bottom-6 left-1/2 z-40 flex items-center justify-center"
+        style={{
+          width: 80,
+          height: 80,
+          transform: `translateX(-50%) translateY(${scrollDrift}px)`,
+          transition: "transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+        }}
+      >
         {/* Outer glow ring */}
         <div
           className="absolute inset-0 m-auto w-16 h-16 rounded-full pointer-events-none"
