@@ -110,6 +110,7 @@ const AppRoutes = () => {
       <Route path="/releases" element={<ProtectedRoute session={session}><ProductLayout><ReleaseNotes /></ProductLayout></ProtectedRoute>} />
       <Route path="/feedback" element={<ProtectedRoute session={session}><ProductLayout><FeedbackBacklog /></ProductLayout></ProtectedRoute>} />
       <Route path="/feedback/embed" element={<ProtectedRoute session={session}><ProductLayout><FeedbackEmbed /></ProductLayout></ProtectedRoute>} />
+      <Route path="/sprints" element={<ProtectedRoute session={session}><ProductLayout><SprintBoard /></ProductLayout></ProtectedRoute>} />
       <Route path="/meetings" element={<ProtectedRoute session={session}><ProductLayout><Meetings /></ProductLayout></ProtectedRoute>} />
       <Route path="/audit" element={<Navigate to="/settings?tab=audit" replace />} />
       <Route path="/settings" element={<ProtectedRoute session={session}><ProductLayout><Settings /></ProductLayout></ProtectedRoute>} />
