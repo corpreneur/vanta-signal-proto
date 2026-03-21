@@ -90,6 +90,24 @@ export default function FeedbackBacklog() {
   const [scraping, setScraping] = useState(false);
   const [filterSubject, setFilterSubject] = useState<string>("All");
   const fileRef = useRef<HTMLInputElement>(null);
+  const { isListening, transcript: voiceTranscript, isSupported: voiceSupported, startListening, stopListening, resetTranscript } = useSpeechRecognition();
+  const [voiceTouring, setVoiceTouring] = useState(false);
+  const [voiceElapsed, setVoiceElapsed] = useState(0);
+  const voiceTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startVoiceTour = useCallback(() => {
+    setVoiceTouring(true);
+    setVoiceElapsed(0);
+    resetTranscript();
+    voiceTimerRef.current = setInterval(() => setVoiceElapsed((s) => s + 1), 1000);
+    startListening((text) => setNarrative(text));
+  }, [startListening, resetTranscript]);
+
+  const stopVoiceTour = useCallback(() => {
+    stopListening();
+    setVoiceTouring(false);
+    if (voiceTimerRef.current) clearInterval(voiceTimerRef.current);
+  }, [stopListening]);
 
   const insertMutation = useMutation({
     mutationFn: async () => {
