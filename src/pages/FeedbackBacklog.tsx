@@ -721,6 +721,7 @@ export default function FeedbackBacklog() {
                     </div>
                   )}
 
+                  {entry.screenshot_urls?.length > 0 && (
                     <div className="space-y-1">
                       <p className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground">Screenshots</p>
                       <div className="flex flex-wrap gap-2">
