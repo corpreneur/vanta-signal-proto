@@ -20,6 +20,7 @@ const BREADCRUMB_MAP: Record<string, string> = {
   "/command": "Fab Five · Easy Actions",
   "/contacts": "Product · Smart Contacts",
   "/graph": "Product · Relationship Graph",
+  "/feedback": "Strategy · Feedback Backlog",
   "/insights": "Product · Insight Engine",
   "/investments": "Product · Investment Intel",
   "/decisions": "Product · Decision Capture",
