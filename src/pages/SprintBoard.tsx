@@ -34,6 +34,7 @@ import {
   Trash2,
   RefreshCw,
   Plus,
+  ExternalLink,
 } from "lucide-react";
 
 type SprintItem = {
