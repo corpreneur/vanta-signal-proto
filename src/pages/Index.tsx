@@ -147,7 +147,7 @@ const Index = () => {
 
       {/* ══ Hero ══ */}
       <Motion>
-        <header className="mb-6">
+        <header className="mb-4">
           <div className="flex items-center gap-2 mb-3">
             <span className="w-1.5 h-1.5 bg-primary animate-pulse-dot rounded-full" />
             <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
@@ -170,6 +170,13 @@ const Index = () => {
           )}
         </header>
       </Motion>
+
+      {/* ══ Open Note — always-visible capture field ══ */}
+      {!isDnd && (
+        <Motion delay={10}>
+          <OpenNoteField />
+        </Motion>
+      )}
 
       {/* ══ Inline stat strip ══ */}
       {!isDnd && (
