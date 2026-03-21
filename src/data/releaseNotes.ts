@@ -10,6 +10,20 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "2.3.0",
+    date: "2026-03-21",
+    title: "Feedback-to-Sprint Pipeline & Intelligence Snapshot",
+    changes: [
+      { type: "feature", text: "Feedback → Sprint cron — daily AI triage reads new feedback entries, extracts actionable sprint items with priority, effort, and phase via Gemini Flash" },
+      { type: "feature", text: "Sprint Items table — structured backlog with feedback linkage, priority (high/med/low), effort (small/med/large), and sprint phase (1/2/3)" },
+      { type: "feature", text: "Intelligence Snapshot — collapsible footer on Signal Feed with animated count-up stats: signals captured, high-strength, actions fired, noise filtered" },
+      { type: "feature", text: "Quick Reference card — collapsible guide at the top of /feedback explaining all page capabilities (submit, auto-scrape, AI analysis, sprint pipeline, cluster view)" },
+      { type: "improvement", text: "Signal Feed reordered — type grid and search filters moved to top, stats snapshot moved to bottom for navigation-first hierarchy" },
+      { type: "improvement", text: "Value-extracted framing — stats reframed from inbox-count to accumulation metaphor with count-up animations from zero" },
+      { type: "feature", text: "use-count-up hook — reusable animation hook with cubic ease-out for numeric value transitions" },
+    ],
+  },
+  {
     version: "2.2.0",
     date: "2026-03-20",
     title: "Ultra-Crisp Dashboard & Meeting Data Population",
