@@ -443,6 +443,15 @@ const Signals = () => {
           )}
         </>
       )}
+
+      {/* Intelligence Snapshot — collapsible at bottom */}
+      <SignalSnapshot
+        signalsCaptured={feedSignals.length}
+        highStrength={highCount}
+        actionsFired={actionCount}
+        filtered={noiseSignals.length}
+        overdue={overdueCount}
+      />
     </div>
   );
 };
