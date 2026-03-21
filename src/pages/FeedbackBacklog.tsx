@@ -246,6 +246,26 @@ export default function FeedbackBacklog() {
           </div>
         </div>
 
+        {/* Subject */}
+        <div className="flex items-center gap-3">
+          <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Subject</p>
+          <div className="flex flex-wrap gap-1.5">
+            {SUBJECTS.map((s) => (
+              <button
+                key={s}
+                onClick={() => setSubject(s)}
+                className={`px-2.5 py-1 rounded-sm font-mono text-[9px] uppercase tracking-wider border transition-colors ${
+                  subject === s
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-transparent text-muted-foreground border-border hover:border-primary/30"
+                }`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Narrative */}
         <div>
           <label className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground block mb-1.5">
