@@ -164,15 +164,28 @@ export default function FeedbackBacklog() {
         if (failures > 0) toast.warning(`${failures} link(s) could not be scraped`);
       }
 
-      const { error } = await supabase.from("feedback_entries").insert({
+      const { data: inserted, error } = await supabase.from("feedback_entries").insert({
         author,
         subject,
         narrative: narrative.trim(),
         chatgpt_links: cleanLinks,
         screenshot_urls: screenshots,
         parsed_chatgpt: parsed as any,
-      });
+      }).select().single();
       if (error) throw error;
+
+      // Auto-analyze if we have scraped content
+      const analyzable = parsed.filter((p) => p.content?.trim());
+      if (analyzable.length > 0 && inserted) {
+        try {
+          const { error: aiErr } = await supabase.functions.invoke("summarize-feedback", {
+            body: { entry_id: inserted.id, conversations: analyzable },
+          });
+          if (aiErr) console.warn("Auto-analyze failed:", aiErr);
+        } catch (e) {
+          console.warn("Auto-analyze failed:", e);
+        }
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["feedback-entries"] });
@@ -181,7 +194,7 @@ export default function FeedbackBacklog() {
       setLinks([""]);
       setScreenshots([]);
       setScraping(false);
-      toast.success("Feedback submitted with parsed conversations");
+      toast.success("Feedback submitted & analyzed");
     },
     onError: () => {
       setScraping(false);
