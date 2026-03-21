@@ -125,6 +125,7 @@ export default function FeedbackBacklog() {
   const [clusterExpanded, setClusterExpanded] = useState<string | null>(null);
   const [expandedChats, setExpandedChats] = useState<Record<string, boolean>>({});
   const [scraping, setScraping] = useState(false);
+  const [submitStep, setSubmitStep] = useState<"idle" | "scraping" | "saving" | "analyzing">("idle");
   const [filterSubject, setFilterSubject] = useState<string>("All");
   const [filterAuthor, setFilterAuthor] = useState<string>("All");
   const [filterStatus, setFilterStatus] = useState<string>("All");
