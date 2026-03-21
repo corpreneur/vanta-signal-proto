@@ -221,16 +221,25 @@ const Signals = () => {
       items = items.filter((s) => s.dueDate && s.dueDate < today && s.status !== "Complete");
     }
 
-    // Sort
+    // Sort — overdue signals always bubble to top
+    const today = new Date().toISOString().split("T")[0];
     if (sortMode === "due_date") {
       return items.sort((a, b) => {
+        const aOverdue = a.dueDate && a.dueDate < today && a.status !== "Complete" ? 1 : 0;
+        const bOverdue = b.dueDate && b.dueDate < today && b.status !== "Complete" ? 1 : 0;
+        if (bOverdue !== aOverdue) return bOverdue - aOverdue;
         if (!a.dueDate && !b.dueDate) return new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime();
         if (!a.dueDate) return 1;
         if (!b.dueDate) return -1;
         return a.dueDate.localeCompare(b.dueDate);
       });
     }
-    return items.sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime());
+    return items.sort((a, b) => {
+      const aOverdue = a.dueDate && a.dueDate < today && a.status !== "Complete" ? 1 : 0;
+      const bOverdue = b.dueDate && b.dueDate < today && b.status !== "Complete" ? 1 : 0;
+      if (bOverdue !== aOverdue) return bOverdue - aOverdue;
+      return new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime();
+    });
   }, [signals, sortMode, showOverdueOnly, isExecutive, priorityLens, showQuickTasks]);
 
   const noiseSignals = useMemo(
