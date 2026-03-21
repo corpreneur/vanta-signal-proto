@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import {
   MessageSquare, Link2, Image, Upload, Trash2, ExternalLink,
@@ -90,6 +91,8 @@ async function fetchEntries(): Promise<FeedbackEntry[]> {
 
 export default function FeedbackBacklog() {
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
+  const highlightId = searchParams.get("highlight");
   const { data: entries = [], isLoading } = useQuery({ queryKey: ["feedback-entries"], queryFn: fetchEntries });
   const [newCount, setNewCount] = useState(0);
 
@@ -113,6 +116,18 @@ export default function FeedbackBacklog() {
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [queryClient]);
+
+  // Auto-expand and scroll to highlighted feedback entry from sprint board link
+  useEffect(() => {
+    if (highlightId && !isLoading) {
+      setExpanded(highlightId);
+      setViewMode("list");
+      setTimeout(() => {
+        const el = document.getElementById(`feedback-${highlightId}`);
+        el?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 200);
+    }
+  }, [highlightId, isLoading]);
 
   const [author, setAuthor] = useState<Author>("Julian");
   const [subject, setSubject] = useState<string>("General");
@@ -1029,7 +1044,7 @@ export default function FeedbackBacklog() {
           const parsedMap = new Map((entry.parsed_chatgpt as ParsedChat[]).map((p) => [p.url, p]));
 
           return (
-            <div key={entry.id} className="border border-border rounded-sm bg-card overflow-hidden">
+            <div key={entry.id} id={`feedback-${entry.id}`} className={`border rounded-sm bg-card overflow-hidden transition-colors ${highlightId === entry.id ? "border-primary ring-1 ring-primary/30" : "border-border"}`}>
               <button
                 onClick={() => setExpanded(isOpen ? null : entry.id)}
                 className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/30 transition-colors"

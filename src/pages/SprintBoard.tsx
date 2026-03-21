@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import SprintCompass from "@/components/sprint/SprintCompass";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,6 +34,7 @@ import {
   Trash2,
   RefreshCw,
   Plus,
+  ExternalLink,
 } from "lucide-react";
 
 type SprintItem = {
@@ -131,6 +133,7 @@ function AddItemInline() {
 }
 export default function SprintBoard() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
@@ -341,6 +344,19 @@ export default function SprintBoard() {
                                 <span className="font-mono text-[9px] text-muted-foreground">
                                   {item.subject}
                                 </span>
+                                {item.feedback_entry_id && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      navigate(`/feedback?highlight=${item.feedback_entry_id}`);
+                                    }}
+                                    title="View source feedback"
+                                    className="inline-flex items-center gap-0.5 font-mono text-[9px] text-primary/70 hover:text-primary transition-colors"
+                                  >
+                                    <ExternalLink className="h-2.5 w-2.5" />
+                                    <span>Source</span>
+                                  </button>
+                                )}
                               </div>
 
                               {expanded && (
