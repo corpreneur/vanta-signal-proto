@@ -255,6 +255,7 @@ export default function FeedbackBacklog() {
     },
   });
 
+  const handleScreenshotUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files?.length) return;
     setUploading(true);
