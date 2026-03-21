@@ -718,30 +718,154 @@ export default function FeedbackBacklog() {
 
                       {/* Entry list within cluster */}
                       <div className="divide-y divide-border">
-                        {items.map((entry) => (
-                          <div key={entry.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted/20 transition-colors">
-                            <span className={`shrink-0 px-1.5 py-0.5 rounded-sm font-mono text-[8px] uppercase tracking-wider border ${STATUS_STYLES[entry.status as Status]}`}>
-                              {entry.status}
-                            </span>
-                            <span className="font-mono text-[10px] uppercase tracking-wider text-primary/70">{entry.author}</span>
-                            <span className="flex-1 font-sans text-[12px] text-foreground/80 truncate">
-                              {entry.narrative || "(no narrative)"}
-                            </span>
-                            {entry.ai_summaries.length > 0 && (
-                              <span className="shrink-0 flex items-center gap-0.5 text-primary/60">
-                                <Sparkles className="w-3 h-3" />
-                              </span>
-                            )}
-                            {entry.parsed_chatgpt.length > 0 && (
-                              <span className="shrink-0 flex items-center gap-0.5 px-1 py-0.5 rounded-sm bg-primary/10 text-primary font-mono text-[8px]">
-                                <Brain className="w-2.5 h-2.5" /> {entry.parsed_chatgpt.length}
-                              </span>
-                            )}
-                            <span className="font-mono text-[9px] text-muted-foreground shrink-0">
-                              {format(new Date(entry.created_at), "MMM d")}
-                            </span>
-                          </div>
-                        ))}
+                        {items.map((entry) => {
+                          const isClusterOpen = clusterExpanded === entry.id;
+                          const parsedMap = new Map((entry.parsed_chatgpt as ParsedChat[]).map((p) => [p.url, p]));
+
+                          return (
+                            <div key={entry.id}>
+                              <button
+                                onClick={() => setClusterExpanded(isClusterOpen ? null : entry.id)}
+                                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-muted/20 transition-colors text-left"
+                              >
+                                <span className={`shrink-0 px-1.5 py-0.5 rounded-sm font-mono text-[8px] uppercase tracking-wider border ${STATUS_STYLES[entry.status as Status]}`}>
+                                  {entry.status}
+                                </span>
+                                <span className="font-mono text-[10px] uppercase tracking-wider text-primary/70">{entry.author}</span>
+                                <span className="flex-1 font-sans text-[12px] text-foreground/80 truncate">
+                                  {entry.narrative || "(no narrative)"}
+                                </span>
+                                {entry.ai_summaries.length > 0 && (
+                                  <span className="shrink-0 flex items-center gap-0.5 text-primary/60">
+                                    <Sparkles className="w-3 h-3" />
+                                  </span>
+                                )}
+                                {entry.parsed_chatgpt.length > 0 && (
+                                  <span className="shrink-0 flex items-center gap-0.5 px-1 py-0.5 rounded-sm bg-primary/10 text-primary font-mono text-[8px]">
+                                    <Brain className="w-2.5 h-2.5" /> {entry.parsed_chatgpt.length}
+                                  </span>
+                                )}
+                                <span className="font-mono text-[9px] text-muted-foreground shrink-0">
+                                  {format(new Date(entry.created_at), "MMM d")}
+                                </span>
+                                {isClusterOpen ? <ChevronUp className="w-3 h-3 text-muted-foreground shrink-0" /> : <ChevronDown className="w-3 h-3 text-muted-foreground shrink-0" />}
+                              </button>
+
+                              {isClusterOpen && (
+                                <div className="border-t border-border bg-muted/10 px-4 py-3 space-y-3 animate-fade-in">
+                                  {entry.narrative && (
+                                    <p className="font-sans text-[13px] text-foreground/80 leading-relaxed whitespace-pre-wrap">{entry.narrative}</p>
+                                  )}
+
+                                  {/* ChatGPT conversations */}
+                                  {entry.chatgpt_links?.length > 0 && (
+                                    <div className="space-y-2">
+                                      <p className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                                        <Brain className="w-3 h-3" /> ChatGPT Conversations
+                                      </p>
+                                      {entry.chatgpt_links.map((link, i) => {
+                                        const parsed = parsedMap.get(link);
+                                        const chatKey = `${entry.id}:${link}`;
+                                        const isChatOpen = expandedChats[chatKey];
+                                        return (
+                                          <div key={i} className="border border-border rounded-sm overflow-hidden">
+                                            <div className="flex items-center gap-2 px-3 py-2 bg-muted/30">
+                                              <a href={link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 font-mono text-[11px] text-primary hover:underline truncate flex-1" onClick={(e) => e.stopPropagation()}>
+                                                <ExternalLink className="w-3 h-3 shrink-0" />
+                                                {parsed?.title || link}
+                                              </a>
+                                              <button onClick={(e) => { e.stopPropagation(); rescrape.mutate({ id: entry.id, url: link }); }} disabled={rescrape.isPending} className="shrink-0 p-1 rounded-sm text-muted-foreground hover:text-primary transition-colors" title="Re-scrape">
+                                                <RefreshCw className={`w-3 h-3 ${rescrape.isPending ? "animate-spin" : ""}`} />
+                                              </button>
+                                              {parsed && (
+                                                <button onClick={(e) => { e.stopPropagation(); toggleChat(entry.id, link); }} className="shrink-0 px-2 py-0.5 rounded-sm font-mono text-[9px] uppercase tracking-wider border border-border text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors">
+                                                  {isChatOpen ? "Collapse" : "View stream"}
+                                                </button>
+                                              )}
+                                              {!parsed && <span className="shrink-0 font-mono text-[9px] text-muted-foreground/50 uppercase">not scraped</span>}
+                                            </div>
+                                            {parsed && isChatOpen && (
+                                              <div className="border-t border-border px-3 py-3 max-h-[500px] overflow-y-auto">
+                                                <div className="font-mono text-[9px] text-muted-foreground/60 mb-2">Scraped {format(new Date(parsed.scraped_at), "MMM d, h:mm a")}</div>
+                                                <div className="font-sans text-[13px] text-foreground/80 leading-relaxed whitespace-pre-wrap">{parsed.content || "(empty response from scraper)"}</div>
+                                              </div>
+                                            )}
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  )}
+
+                                  {/* AI summaries */}
+                                  {(entry.parsed_chatgpt as ParsedChat[]).some((p) => p.content?.trim()) && (
+                                    <div className="space-y-2">
+                                      <div className="flex items-center gap-2">
+                                        <p className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                                          <Sparkles className="w-3 h-3" /> AI Analysis
+                                        </p>
+                                        <button onClick={(e) => { e.stopPropagation(); summarizeEntry.mutate(entry); }} disabled={summarizing === entry.id} className="flex items-center gap-1 px-2 py-0.5 rounded-sm font-mono text-[9px] uppercase tracking-wider border border-primary/30 text-primary hover:bg-primary/10 transition-colors disabled:opacity-50">
+                                          {summarizing === entry.id ? (<><Loader2 className="w-3 h-3 animate-spin" /> Analyzing…</>) : entry.ai_summaries.length > 0 ? (<><RefreshCw className="w-3 h-3" /> Re-analyze</>) : (<><Sparkles className="w-3 h-3" /> Extract insights</>)}
+                                        </button>
+                                      </div>
+                                      {entry.ai_summaries.length > 0 && entry.ai_summaries.map((s, si) => (
+                                        <div key={si} className="border border-primary/20 rounded-sm bg-primary/5 p-3 space-y-2.5">
+                                          <p className="font-mono text-[9px] uppercase tracking-wider text-primary/60">{s.title} · {format(new Date(s.generated_at), "MMM d, h:mm a")}</p>
+                                          <p className="font-sans text-[13px] text-foreground/80 leading-relaxed italic">{s.summary}</p>
+                                          {s.decisions.length > 0 && (
+                                            <div>
+                                              <p className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground flex items-center gap-1 mb-1"><Target className="w-3 h-3" /> Decisions</p>
+                                              <ul className="space-y-0.5">{s.decisions.map((d, di) => (<li key={di} className="flex items-start gap-1.5 font-sans text-[12px] text-foreground/70"><span className="text-primary mt-0.5">▸</span> {d}</li>))}</ul>
+                                            </div>
+                                          )}
+                                          {s.action_items.length > 0 && (
+                                            <div>
+                                              <p className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground flex items-center gap-1 mb-1"><CheckCircle2 className="w-3 h-3" /> Action Items</p>
+                                              <ul className="space-y-0.5">{s.action_items.map((a, ai2) => (<li key={ai2} className="flex items-start gap-1.5 font-sans text-[12px] text-foreground/70"><span className="text-primary mt-0.5">☐</span> {a}</li>))}</ul>
+                                            </div>
+                                          )}
+                                          {s.insights.length > 0 && (
+                                            <div>
+                                              <p className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground flex items-center gap-1 mb-1"><Lightbulb className="w-3 h-3" /> Insights</p>
+                                              <ul className="space-y-0.5">{s.insights.map((ins, ii) => (<li key={ii} className="flex items-start gap-1.5 font-sans text-[12px] text-foreground/70"><span className="text-primary mt-0.5">◆</span> {ins}</li>))}</ul>
+                                            </div>
+                                          )}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+
+                                  {/* Screenshots */}
+                                  {entry.screenshot_urls?.length > 0 && (
+                                    <div className="space-y-1">
+                                      <p className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground">Screenshots</p>
+                                      <div className="flex flex-wrap gap-2">
+                                        {entry.screenshot_urls.map((url, i) => (
+                                          <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block w-28 h-28 rounded-sm overflow-hidden border border-border hover:border-primary/30 transition-colors">
+                                            <img src={url} alt="" className="w-full h-full object-cover" />
+                                          </a>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Status + Delete */}
+                                  <div className="flex items-center gap-2 pt-2 border-t border-border">
+                                    <p className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground mr-1">Status</p>
+                                    {(["new", "in-progress", "shipped", "parked"] as Status[]).map((s) => (
+                                      <button key={s} onClick={(e) => { e.stopPropagation(); updateStatus.mutate({ id: entry.id, status: s }); }} className={`px-2 py-1 rounded-sm font-mono text-[9px] uppercase tracking-wider border transition-colors ${entry.status === s ? STATUS_STYLES[s] : "bg-transparent text-muted-foreground border-border hover:border-primary/20"}`}>
+                                        {s}
+                                      </button>
+                                    ))}
+                                    <div className="flex-1" />
+                                    <button onClick={(e) => { e.stopPropagation(); deleteEntry.mutate(entry.id); }} className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-wider text-muted-foreground hover:text-destructive transition-colors">
+                                      <Trash2 className="w-3 h-3" /> Remove
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   );
