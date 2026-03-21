@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Trash2, KeyRound, RefreshCw, AlertTriangle } from "lucide-react";
+import { Shield, Trash2, KeyRound, RefreshCw, AlertTriangle, Mail } from "lucide-react";
 import { toast } from "sonner";
+import { releaseNotes } from "@/data/releaseNotes";
 
 interface AdminUser {
   id: string;
