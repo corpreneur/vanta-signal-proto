@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
-import { StickyNote } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState, useRef, useCallback } from "react";
+import { StickyNote, PenLine, Send as SendIcon } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { Signal } from "@/data/signals";
@@ -13,6 +13,7 @@ import WhatsAhead from "@/components/WhatsAhead";
 import EnhancedActionItems from "@/components/EnhancedActionItems";
 import DailyTimeline from "@/components/DailyTimeline";
 import SignalEntryCard from "@/components/SignalEntryCard";
+import { toast } from "sonner";
 import {
   MessageSquare, Phone, Video, Mail, Calendar,
   Shield, Sparkles, Moon, ArrowRight,
@@ -105,6 +106,82 @@ function getPeopleCount(signals: Signal[]): number {
   return new Set(todaySignals.map((s) => s.sender)).size;
 }
 
+/* ── Open Note Field ───────────────────────────────────── */
+
+function OpenNoteField() {
+  const [text, setText] = useState("");
+  const [loading, setLoading] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const queryClient = useQueryClient();
+
+  const handleSubmit = useCallback(async () => {
+    const trimmed = text.trim();
+    if (!trimmed || loading) return;
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("brain-dump", {
+        body: { text: trimmed },
+      });
+      if (error) throw error;
+      const cls = data?.classification;
+      if (cls) {
+        toast.success(`Signal captured · ${cls.signalType}`);
+        queryClient.invalidateQueries({ queryKey: ["signals-dashboard"] });
+      }
+      setText("");
+    } catch {
+      toast.error("Failed to capture — try again");
+    } finally {
+      setLoading(false);
+    }
+  }, [text, loading, queryClient]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
+  return (
+    <div className="mb-6 border border-border bg-card p-3 transition-all focus-within:border-primary/40">
+      <div className="flex items-start gap-2">
+        <PenLine className="w-4 h-4 text-muted-foreground mt-1 shrink-0" />
+        <textarea
+          ref={textareaRef}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Capture a thought, a name, a fragment…"
+          rows={1}
+          className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/60 resize-none outline-none min-h-[28px] max-h-[120px] leading-relaxed font-sans"
+          style={{ fieldSizing: "content" } as React.CSSProperties}
+          disabled={loading}
+        />
+        {text.trim() && (
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="shrink-0 p-1.5 bg-foreground text-background rounded-sm hover:bg-foreground/90 transition-colors disabled:opacity-50"
+            title="Send (⌘↵)"
+          >
+            {loading ? (
+              <div className="w-3.5 h-3.5 border border-background/40 border-t-background rounded-full animate-spin" />
+            ) : (
+              <SendIcon className="w-3.5 h-3.5" />
+            )}
+          </button>
+        )}
+      </div>
+      {text.trim() && (
+        <p className="font-mono text-[8px] text-muted-foreground/50 mt-1.5 ml-6">
+          ⌘↵ to capture
+        </p>
+      )}
+    </div>
+  );
+}
+
 /* ── component ─────────────────────────────────────────── */
 
 const Index = () => {
@@ -147,7 +224,7 @@ const Index = () => {
 
       {/* ══ Hero ══ */}
       <Motion>
-        <header className="mb-6">
+        <header className="mb-4">
           <div className="flex items-center gap-2 mb-3">
             <span className="w-1.5 h-1.5 bg-primary animate-pulse-dot rounded-full" />
             <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
@@ -170,6 +247,13 @@ const Index = () => {
           )}
         </header>
       </Motion>
+
+      {/* ══ Open Note — always-visible capture field ══ */}
+      {!isDnd && (
+        <Motion delay={10}>
+          <OpenNoteField />
+        </Motion>
+      )}
 
       {/* ══ Inline stat strip ══ */}
       {!isDnd && (
