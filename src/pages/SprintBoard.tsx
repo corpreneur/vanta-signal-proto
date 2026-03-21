@@ -155,6 +155,7 @@ export default function SprintBoard() {
 
   const totalCount = items.length;
   const doneCount = items.filter((i) => i.status === "done").length;
+  const progressPct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
