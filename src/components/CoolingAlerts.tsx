@@ -44,7 +44,7 @@ export default function CoolingAlerts() {
   if (alerts.length === 0) return null;
 
   return (
-    <div className="space-y-2 mb-6">
+    <div className="space-y-2 mb-6" data-testid="cooling-alerts">
       <h3 className="font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-signal-yellow flex items-center gap-1.5">
         <AlertTriangle className="w-3 h-3" />
         Cooling Relationships

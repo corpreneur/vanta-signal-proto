@@ -110,6 +110,7 @@ const Login = () => {
           onSubmit={handleSubmit}
           className="w-full space-y-4 opacity-0"
           style={{ animation: "fadeUp 0.7s ease-out 0.8s forwards" }}
+          data-testid="auth-form"
         >
           <div>
             <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-low mb-2">
@@ -123,6 +124,7 @@ const Login = () => {
               placeholder="you@example.com"
               autoComplete="email"
               required
+              data-testid="email-input"
             />
           </div>
 
@@ -140,17 +142,19 @@ const Login = () => {
                 autoComplete={mode === "signup" ? "new-password" : "current-password"}
                 required
                 minLength={mode === "signup" ? 8 : undefined}
+                data-testid="password-input"
               />
             </div>
           )}
 
-          {error && <p className="font-mono text-[11px] text-destructive">{error}</p>}
-          {message && <p className="font-mono text-[11px] text-vanta-accent">{message}</p>}
+          {error && <p className="font-mono text-[11px] text-destructive" data-testid="auth-error">{error}</p>}
+          {message && <p className="font-mono text-[11px] text-vanta-accent" data-testid="auth-message">{message}</p>}
 
           <button
             type="submit"
             disabled={loading}
             className="w-full h-11 bg-foreground text-background font-mono text-[11px] uppercase tracking-[0.15em] hover:bg-foreground/90 transition-colors disabled:opacity-50 mt-2"
+            data-testid="auth-submit"
           >
             {loading
               ? "Processing..."

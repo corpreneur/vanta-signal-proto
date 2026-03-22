@@ -94,7 +94,7 @@ export default function WorkflowBuilder() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="workflow-builder">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-vanta-text-low border-b border-vanta-border pb-2 mb-1">
@@ -107,6 +107,7 @@ export default function WorkflowBuilder() {
         <button
           onClick={() => setShowBuilder(!showBuilder)}
           className="flex items-center gap-1.5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest border border-vanta-accent text-vanta-accent hover:bg-vanta-accent-faint transition-colors"
+          data-testid="new-workflow-btn"
         >
           <Plus className="w-3 h-3" />
           New
@@ -121,6 +122,7 @@ export default function WorkflowBuilder() {
             onChange={(e) => setNewName(e.target.value)}
             placeholder="Workflow name…"
             className="w-full bg-background border border-vanta-border px-3 py-2 font-mono text-xs text-foreground focus:outline-none focus:border-vanta-accent-border"
+            data-testid="workflow-name-input"
           />
 
           {/* Triggers */}
@@ -196,6 +198,7 @@ export default function WorkflowBuilder() {
               onClick={() => createMutation.mutate()}
               disabled={!newName.trim() || createMutation.isPending}
               className="px-4 py-1.5 bg-vanta-accent text-vanta-bg font-mono text-[10px] uppercase tracking-widest hover:bg-vanta-accent/90 disabled:opacity-50"
+              data-testid="create-workflow-submit"
             >
               Create Workflow
             </button>

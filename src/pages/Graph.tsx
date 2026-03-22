@@ -37,7 +37,7 @@ export default function Graph() {
   const { data: signals = [], isLoading } = useQuery({ queryKey: ["signals-graph"], queryFn: fetchSignals });
 
   return (
-    <div className="max-w-[960px] mx-auto px-4 pt-12 pb-16">
+    <div className="max-w-[960px] mx-auto px-4 pt-12 pb-16" data-testid="graph-page">
       <header className="mb-8">
         <h1 className="font-display text-2xl md:text-3xl text-foreground tracking-tight">
           Relationship Graph
