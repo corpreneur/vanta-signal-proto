@@ -1,0 +1,21 @@
+{
+  "event": "meeting.ended",
+  "payload": {
+    "object": {
+      "id": "zoom-meeting-001",
+      "topic": "Board Strategy Session",
+      "participants": [
+        { "name": "Morgan Blake", "email": "morgan@board.co" },
+        { "name": "Alex Rivera", "email": "alex@example.com" }
+      ],
+      "transcript": [
+        { "speaker": "Morgan Blake", "text": "Let's review the strategic plan.", "timestamp": "00:00:05" },
+        { "speaker": "Alex Rivera", "text": "I've prepared three scenarios.", "timestamp": "00:00:18" }
+      ],
+      "recording_files": [
+        { "file_type": "MP4", "download_url": "https://zoom.us/rec/download/abc123", "recording_type": "shared_screen_with_speaker_view" }
+      ],
+      "end_time": "2026-03-18T20:00:00Z"
+    }
+  }
+}

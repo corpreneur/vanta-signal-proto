@@ -1,0 +1,19 @@
+{
+  "event": "Transcription completed",
+  "data": {
+    "fireflies_meeting_id": "ff-meeting-001",
+    "title": "Investor Update Call",
+    "meeting_summary": "Discussed Series B progress and runway projections.",
+    "attendees": [
+      { "name": "Sam Chen", "email": "sam@fund.vc" },
+      { "name": "Alex Rivera", "email": "alex@example.com" }
+    ],
+    "sentences": [
+      { "speaker_name": "Sam Chen", "text": "How's the runway looking?", "start_time": 0 },
+      { "speaker_name": "Alex Rivera", "text": "We have 18 months with current burn.", "start_time": 8 },
+      { "speaker_name": "Sam Chen", "text": "Solid. Let's discuss the term sheet.", "start_time": 20 }
+    ],
+    "audio_url": "https://fireflies.ai/audio/ff-001.mp3",
+    "date": "2026-03-19T15:30:00Z"
+  }
+}

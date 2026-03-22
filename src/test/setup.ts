@@ -1,4 +1,10 @@
 import "@testing-library/jest-dom";
+import { server } from "./mocks/server";
+
+// MSW server lifecycle
+beforeAll(() => server.listen({ onUnhandledRequest: "warn" }));
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
 
 Object.defineProperty(window, "matchMedia", {
   writable: true,
