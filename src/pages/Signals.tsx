@@ -80,7 +80,6 @@ const SIGNAL_TYPES_ORDER: SignalType[] = ["INTRO", "INSIGHT", "INVESTMENT", "DEC
 
 type Tab = "feed" | "filtered";
 type SortMode = "captured" | "due_date";
-type PriorityLens = "all" | "time" | "money" | "urgency";
 
 const LENS_CONFIG: Record<PriorityLens, { label: string; icon: typeof BarChart3; description: string; types: SignalType[] }> = {
   all: { label: "All Signals", icon: BarChart3, description: "Full curated feed", types: [] },
