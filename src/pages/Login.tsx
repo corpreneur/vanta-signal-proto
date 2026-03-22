@@ -147,8 +147,8 @@ const Login = () => {
             </div>
           )}
 
-          {error && <p className="font-mono text-[11px] text-destructive">{error}</p>}
-          {message && <p className="font-mono text-[11px] text-vanta-accent">{message}</p>}
+          {error && <p className="font-mono text-[11px] text-destructive" data-testid="auth-error">{error}</p>}
+          {message && <p className="font-mono text-[11px] text-vanta-accent" data-testid="auth-message">{message}</p>}
 
           <button
             type="submit"
