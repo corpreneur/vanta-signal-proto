@@ -14,6 +14,8 @@ import SignalSnapshot from "@/components/SignalSnapshot";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { useUserMode } from "@/hooks/use-user-mode";
+import { filterFeedSignals, sortSignals, getNoiseSignals, countOverdue } from "@/lib/signalFilters";
+import type { PriorityLens } from "@/lib/signalFilters";
 
 function BriefsSection({ briefs }: { briefs: any[] }) {
   const [expanded, setExpanded] = useState(false);
@@ -78,7 +80,6 @@ const SIGNAL_TYPES_ORDER: SignalType[] = ["INTRO", "INSIGHT", "INVESTMENT", "DEC
 
 type Tab = "feed" | "filtered";
 type SortMode = "captured" | "due_date";
-type PriorityLens = "all" | "time" | "money" | "urgency";
 
 const LENS_CONFIG: Record<PriorityLens, { label: string; icon: typeof BarChart3; description: string; types: SignalType[] }> = {
   all: { label: "All Signals", icon: BarChart3, description: "Full curated feed", types: [] },
@@ -189,70 +190,20 @@ const Signals = () => {
 
   // Split signals into feed (non-noise) and filtered (noise)
   const feedSignals = useMemo(() => {
-    let items = signals.filter((s) => s.signalType !== "NOISE");
-
-    // Executive mode: only HIGH priority
-    if (isExecutive) {
-      items = items.filter((s) => s.priority === "high");
-    }
-
-    // Priority Lens filtering
-    if (priorityLens === "time") {
-      items = items.filter((s) => LENS_CONFIG.time.types.includes(s.signalType) || s.dueDate);
-    } else if (priorityLens === "money") {
-      items = items.filter((s) => LENS_CONFIG.money.types.includes(s.signalType));
-    } else if (priorityLens === "urgency") {
-      const today = new Date().toISOString().split("T")[0];
-      items = items.filter((s) => s.priority === "high" || (s.dueDate && s.dueDate <= today) || s.riskLevel === "high" || s.riskLevel === "critical");
-    }
-
-    // Quick Tasks filter: short, actionable items
-    if (showQuickTasks) {
-      items = items.filter((s) =>
-        (s.priority === "low" || s.priority === "medium") &&
-        (s.signalType === "CONTEXT" || s.signalType === "INTRO") &&
-        s.summary.length < 120
-      );
-    }
-
-    // Overdue filter
-    if (showOverdueOnly) {
-      const today = new Date().toISOString().split("T")[0];
-      items = items.filter((s) => s.dueDate && s.dueDate < today && s.status !== "Complete");
-    }
-
-    // Sort — overdue signals always bubble to top
-    const today = new Date().toISOString().split("T")[0];
-    if (sortMode === "due_date") {
-      return items.sort((a, b) => {
-        const aOverdue = a.dueDate && a.dueDate < today && a.status !== "Complete" ? 1 : 0;
-        const bOverdue = b.dueDate && b.dueDate < today && b.status !== "Complete" ? 1 : 0;
-        if (bOverdue !== aOverdue) return bOverdue - aOverdue;
-        if (!a.dueDate && !b.dueDate) return new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime();
-        if (!a.dueDate) return 1;
-        if (!b.dueDate) return -1;
-        return a.dueDate.localeCompare(b.dueDate);
-      });
-    }
-    return items.sort((a, b) => {
-      const aOverdue = a.dueDate && a.dueDate < today && a.status !== "Complete" ? 1 : 0;
-      const bOverdue = b.dueDate && b.dueDate < today && b.status !== "Complete" ? 1 : 0;
-      if (bOverdue !== aOverdue) return bOverdue - aOverdue;
-      return new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime();
+    const filtered = filterFeedSignals(signals, {
+      isExecutive,
+      priorityLens,
+      showQuickTasks,
+      showOverdueOnly,
     });
+    return sortSignals(filtered, sortMode);
   }, [signals, sortMode, showOverdueOnly, isExecutive, priorityLens, showQuickTasks]);
 
-  const noiseSignals = useMemo(
-    () => [...signals].filter((s) => s.signalType === "NOISE").sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime()),
-    [signals]
-  );
+  const noiseSignals = useMemo(() => getNoiseSignals(signals), [signals]);
+
+  const overdueCount = useMemo(() => countOverdue(signals), [signals]);
 
   const activeSignals = activeTab === "feed" ? feedSignals : noiseSignals;
-
-  const overdueCount = useMemo(() => {
-    const today = new Date().toISOString().split("T")[0];
-    return signals.filter((s) => s.signalType !== "NOISE" && s.dueDate && s.dueDate < today && s.status !== "Complete").length;
-  }, [signals]);
 
   const senders = useMemo(
     () => [...new Set(activeSignals.map((s) => s.sender))].sort(),
