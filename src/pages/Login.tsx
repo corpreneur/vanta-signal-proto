@@ -110,6 +110,7 @@ const Login = () => {
           onSubmit={handleSubmit}
           className="w-full space-y-4 opacity-0"
           style={{ animation: "fadeUp 0.7s ease-out 0.8s forwards" }}
+          data-testid="auth-form"
         >
           <div>
             <label className="block font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-text-low mb-2">
