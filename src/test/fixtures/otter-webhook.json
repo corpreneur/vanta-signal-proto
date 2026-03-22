@@ -1,0 +1,16 @@
+{
+  "otter_id": "otter-meeting-001",
+  "title": "Weekly Product Sync",
+  "otterLink": "https://otter.ai/u/abc123",
+  "summary": "Team discussed Q2 priorities and feature roadmap.",
+  "attendees": [
+    { "name": "Alex Rivera", "email": "alex@example.com" },
+    { "name": "Jordan Lee", "email": "jordan@example.com" }
+  ],
+  "transcript": [
+    { "speaker": "Alex Rivera", "text": "Let's review the Q2 roadmap.", "start": 0 },
+    { "speaker": "Jordan Lee", "text": "I've drafted the priorities doc.", "start": 12 },
+    { "speaker": "Alex Rivera", "text": "Great, let's align on the top three items.", "start": 25 }
+  ],
+  "ended_at": "2026-03-20T17:00:00Z"
+}
