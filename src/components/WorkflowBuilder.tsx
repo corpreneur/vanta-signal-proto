@@ -122,6 +122,7 @@ export default function WorkflowBuilder() {
             onChange={(e) => setNewName(e.target.value)}
             placeholder="Workflow name…"
             className="w-full bg-background border border-vanta-border px-3 py-2 font-mono text-xs text-foreground focus:outline-none focus:border-vanta-accent-border"
+            data-testid="workflow-name-input"
           />
 
           {/* Triggers */}
