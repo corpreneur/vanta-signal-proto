@@ -94,7 +94,7 @@ export default function WorkflowBuilder() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="workflow-builder">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-vanta-text-low border-b border-vanta-border pb-2 mb-1">
