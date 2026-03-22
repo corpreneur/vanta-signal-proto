@@ -124,6 +124,7 @@ const Login = () => {
               placeholder="you@example.com"
               autoComplete="email"
               required
+              data-testid="email-input"
             />
           </div>
 
