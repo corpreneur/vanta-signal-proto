@@ -107,6 +107,7 @@ export default function WorkflowBuilder() {
         <button
           onClick={() => setShowBuilder(!showBuilder)}
           className="flex items-center gap-1.5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest border border-vanta-accent text-vanta-accent hover:bg-vanta-accent-faint transition-colors"
+          data-testid="new-workflow-btn"
         >
           <Plus className="w-3 h-3" />
           New
