@@ -220,7 +220,7 @@ const Index = () => {
   const isExecutive = mode === "executive";
 
   return (
-    <div className="max-w-[960px] mx-auto px-4 py-8 md:px-10 relative overflow-x-hidden">
+    <div className="max-w-[960px] mx-auto px-4 py-8 md:px-10 relative overflow-x-hidden" data-testid="dashboard-root">
 
       {/* ══ Hero ══ */}
       <Motion>
