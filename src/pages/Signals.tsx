@@ -203,6 +203,8 @@ const Signals = () => {
 
   const overdueCount = useMemo(() => countOverdue(signals), [signals]);
 
+  const activeSignals = activeTab === "feed" ? feedSignals : noiseSignals;
+
   const senders = useMemo(
     () => [...new Set(activeSignals.map((s) => s.sender))].sort(),
     [activeSignals]
