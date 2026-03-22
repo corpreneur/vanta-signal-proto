@@ -142,6 +142,7 @@ const Login = () => {
                 autoComplete={mode === "signup" ? "new-password" : "current-password"}
                 required
                 minLength={mode === "signup" ? 8 : undefined}
+                data-testid="password-input"
               />
             </div>
           )}
