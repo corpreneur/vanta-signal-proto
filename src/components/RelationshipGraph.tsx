@@ -72,7 +72,7 @@ export default function RelationshipGraph({ signals }: RelationshipGraphProps) {
       </div>
 
       {/* Force graph */}
-      <div ref={containerRef} className="relative w-full border border-vanta-border bg-vanta-bg">
+      <div ref={containerRef} className="relative w-full border border-vanta-border bg-vanta-bg" data-testid="force-graph-container">
         <ForceGraph
           nodes={nodes}
           edges={edges}

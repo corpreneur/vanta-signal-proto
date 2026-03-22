@@ -154,6 +154,7 @@ const Login = () => {
             type="submit"
             disabled={loading}
             className="w-full h-11 bg-foreground text-background font-mono text-[11px] uppercase tracking-[0.15em] hover:bg-foreground/90 transition-colors disabled:opacity-50 mt-2"
+            data-testid="auth-submit"
           >
             {loading
               ? "Processing..."

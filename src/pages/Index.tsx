@@ -236,7 +236,7 @@ const Index = () => {
             </span>
           </div>
 
-          <h1 className="font-display text-[clamp(32px,5.5vw,48px)] leading-[1.02] text-foreground mb-2">
+          <h1 className="font-display text-[clamp(32px,5.5vw,48px)] leading-[1.02] text-foreground mb-2" data-testid="dashboard-greeting">
             {greeting()}
           </h1>
 

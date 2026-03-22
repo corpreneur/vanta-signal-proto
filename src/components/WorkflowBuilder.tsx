@@ -198,6 +198,7 @@ export default function WorkflowBuilder() {
               onClick={() => createMutation.mutate()}
               disabled={!newName.trim() || createMutation.isPending}
               className="px-4 py-1.5 bg-vanta-accent text-vanta-bg font-mono text-[10px] uppercase tracking-widest hover:bg-vanta-accent/90 disabled:opacity-50"
+              data-testid="create-workflow-submit"
             >
               Create Workflow
             </button>
