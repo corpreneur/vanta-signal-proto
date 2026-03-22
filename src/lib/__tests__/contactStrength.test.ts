@@ -124,11 +124,11 @@ describe("computeStrength", () => {
 
   it("labels Cooling for 25-49 range", () => {
     const result = computeStrength({
-      signalCount: 3,
-      highPriority: 0,
-      daysSinceLast: 20,
-      sentimentAvg: 0.3,
-      sourceDiversity: 1,
+      signalCount: 5,
+      highPriority: 1,
+      daysSinceLast: 15,
+      sentimentAvg: 0.4,
+      sourceDiversity: 2,
     });
     expect(result.strength).toBeGreaterThanOrEqual(25);
     expect(result.strength).toBeLessThan(50);
