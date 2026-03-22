@@ -14,6 +14,8 @@ import SignalSnapshot from "@/components/SignalSnapshot";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { useUserMode } from "@/hooks/use-user-mode";
+import { filterFeedSignals, sortSignals, getNoiseSignals, countOverdue } from "@/lib/signalFilters";
+import type { PriorityLens } from "@/lib/signalFilters";
 
 function BriefsSection({ briefs }: { briefs: any[] }) {
   const [expanded, setExpanded] = useState(false);
