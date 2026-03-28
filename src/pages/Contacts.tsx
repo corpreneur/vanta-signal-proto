@@ -118,6 +118,7 @@ export default function Contacts() {
   const [mergeOpen, setMergeOpen] = useState(false);
   const [contactFilters, setContactFilters] = useState<ContactFilterState>(DEFAULT_CONTACT_FILTERS);
   const [postCallPrompt, setPostCallPrompt] = useState<{ contactName: string; signalId: string } | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [graphOpen, setGraphOpen] = useState(false);
   const [focused, setFocused] = useState<FocusedNode | null>(null);
   const graphContainerRef = useRef<HTMLDivElement>(null);
