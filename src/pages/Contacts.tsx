@@ -9,7 +9,7 @@ import { computeStrength, daysBetween, recencyLabel } from "@/lib/contactStrengt
 import { Motion } from "@/components/ui/motion";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Tag, Filter, UserPlus, LayoutGrid, LayoutList, Phone, Mail, MessageSquare, Smartphone, Upload, ChevronDown, ChevronUp, Network } from "lucide-react";
+import { Search, Filter, UserPlus, LayoutGrid, LayoutList, Phone, Mail, MessageSquare, Smartphone, Upload, ChevronDown, ChevronUp, Network } from "lucide-react";
 import { useAllContactTags } from "@/components/ContactTagManager";
 import SmartContactCard from "@/components/SmartContactCard";
 import AddContactContext from "@/components/AddContactContext";
@@ -17,6 +17,10 @@ import { buildGraph } from "@/components/graph/buildGraph";
 import ForceGraph from "@/components/graph/ForceGraph";
 import MiniContactCard from "@/components/graph/MiniContactCard";
 import type { FocusedNode } from "@/components/graph/types";
+import { useContactProfiles } from "@/hooks/use-contact-profiles";
+import PinnedContactsRail from "@/components/contacts/PinnedContactsRail";
+import ReEngageTray from "@/components/contacts/ReEngageTray";
+import NewPeopleTray from "@/components/contacts/NewPeopleTray";
 
 async function fetchSignals(): Promise<Signal[]> {
   const { data, error } = await supabase
@@ -152,6 +156,8 @@ export default function Contacts() {
     refetchInterval: 60_000,
   });
 
+  const { data: profiles = [] } = useContactProfiles();
+
   const contacts = useMemo(() => buildContacts(signals), [signals]);
   const graphData = useMemo(() => buildGraph(signals), [signals]);
 
@@ -199,18 +205,25 @@ export default function Contacts() {
             </h1>
             <div className="flex items-center gap-1.5 shrink-0">
               <button
+                onClick={() => setAddingContact(!addingContact)}
+                className="flex items-center gap-1 px-2.5 py-2 font-mono text-[9px] uppercase tracking-[0.12em] bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-sm"
+              >
+                <UserPlus className="w-3 h-3" />
+                <span className="hidden sm:inline">Add</span>
+              </button>
+              <button
                 onClick={() => setImportOpen(true)}
                 className="flex items-center gap-1 px-2.5 py-2 font-mono text-[9px] uppercase tracking-[0.12em] border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors rounded-sm"
               >
                 <Upload className="w-3 h-3" />
-                <span className="hidden sm:inline">Import .vcf</span>
+                <span className="hidden sm:inline">Import</span>
               </button>
               <Link
                 to="/contacts/sync"
                 className="flex items-center gap-1 px-2.5 py-2 font-mono text-[9px] uppercase tracking-[0.12em] border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors rounded-sm"
               >
                 <Smartphone className="w-3 h-3" />
-                <span className="hidden sm:inline">iPhone Sync</span>
+                <span className="hidden sm:inline">Sync</span>
               </Link>
             </div>
           </div>
@@ -241,6 +254,23 @@ export default function Contacts() {
         </header>
       </Motion>
 
+      {/* Pinned Contacts Rail */}
+      {profiles.length > 0 && (
+        <Motion delay={30}>
+          <PinnedContactsRail profiles={profiles} />
+        </Motion>
+      )}
+
+      {/* Re-engage Tray */}
+      <Motion delay={35}>
+        <ReEngageTray contacts={contacts.map((c) => ({ name: c.name, daysSinceLast: c.daysSinceLast, strength: c.strength }))} />
+      </Motion>
+
+      {/* New People Tray */}
+      <Motion delay={38}>
+        <NewPeopleTray signals={signals} existingProfiles={profiles} />
+      </Motion>
+
       {/* Stats */}
       <Motion delay={40}>
         <div className="grid grid-cols-4 gap-3 mb-5 pb-4 border-b border-border">
@@ -263,7 +293,7 @@ export default function Contacts() {
         </div>
       </Motion>
 
-      {/* Search bar — positioned above graph */}
+      {/* Search */}
       <Motion delay={55}>
         <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
@@ -276,7 +306,7 @@ export default function Contacts() {
         </div>
       </Motion>
 
-      {/* Relationship Graph — moved to top, default open */}
+      {/* Relationship Graph */}
       <Motion delay={60}>
         <div className="mb-5">
           <button
@@ -299,46 +329,23 @@ export default function Contacts() {
 
           {graphOpen && graphData.nodes.length > 0 && (
             <div className="border border-t-0 border-border bg-card">
-              {/* Legend */}
               <div className="flex flex-wrap gap-3 px-3 py-2 border-b border-border text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 bg-primary inline-block rounded-full" /> &lt; 2d
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 bg-vanta-accent-teal inline-block rounded-full" /> &lt; 7d
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 bg-vanta-accent-amber inline-block rounded-full" /> &lt; 30d
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 bg-muted-foreground inline-block rounded-full" /> 30d+
-                </span>
-                <span className="ml-auto text-muted-foreground/60">
-                  scroll zoom · drag pan · click node
-                </span>
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 bg-primary inline-block rounded-full" /> &lt; 2d</span>
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 bg-vanta-accent-teal inline-block rounded-full" /> &lt; 7d</span>
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 bg-vanta-accent-amber inline-block rounded-full" /> &lt; 30d</span>
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 bg-muted-foreground inline-block rounded-full" /> 30d+</span>
+                <span className="ml-auto text-muted-foreground/60">scroll zoom · drag pan · click node</span>
               </div>
-
-              {/* Canvas */}
               <div ref={graphContainerRef} className="relative w-full">
-                <ForceGraph
-                  nodes={graphData.nodes}
-                  edges={graphData.edges}
-                  width={graphDims.w}
-                  height={graphDims.h}
-                  onFocus={handleFocus}
-                />
-                {focused && (
-                  <MiniContactCard focused={focused} onClose={() => setFocused(null)} />
-                )}
+                <ForceGraph nodes={graphData.nodes} edges={graphData.edges} width={graphDims.w} height={graphDims.h} onFocus={handleFocus} />
+                {focused && <MiniContactCard focused={focused} onClose={() => setFocused(null)} />}
               </div>
             </div>
           )}
 
           {graphOpen && graphData.nodes.length === 0 && (
             <div className="border border-t-0 border-border bg-card px-3 py-8 text-center">
-              <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                No relationship data to visualize
-              </p>
+              <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">No relationship data to visualize</p>
             </div>
           )}
         </div>
@@ -363,7 +370,6 @@ export default function Contacts() {
             ))}
           </div>
 
-          {/* View toggle */}
           <div className="flex gap-1">
             <button
               onClick={() => setViewMode("list")}
@@ -379,7 +385,6 @@ export default function Contacts() {
             </button>
           </div>
 
-          {/* Tag filter dropdown */}
           {allTags && allTags.size > 0 && (
             <Select value={filterTag || "all"} onValueChange={(v) => setFilterTag(v === "all" ? null : v)}>
               <SelectTrigger className="w-[160px] h-8 font-mono text-[10px] uppercase tracking-wider">
@@ -389,9 +394,7 @@ export default function Contacts() {
               <SelectContent>
                 <SelectItem value="all">All Tags</SelectItem>
                 {Array.from(allTags.keys()).map((tag) => (
-                  <SelectItem key={tag} value={tag}>
-                    {tag} ({allTags.get(tag)?.length})
-                  </SelectItem>
+                  <SelectItem key={tag} value={tag}>{tag} ({allTags.get(tag)?.length})</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -442,44 +445,30 @@ export default function Contacts() {
                   onClick={() => navigate(`/contact/${encodeURIComponent(contact.name)}`)}
                   className="border border-border bg-card hover:border-primary/30 transition-all cursor-pointer p-4 flex flex-col group"
                 >
-                  {/* Avatar + Name */}
                   <div className="flex items-center gap-3 mb-3">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center text-primary-foreground font-mono text-sm font-bold ${strengthColor}`}>
                       {contact.name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2)}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="font-mono text-[13px] text-foreground font-semibold truncate group-hover:translate-x-0.5 transition-transform">
-                        {contact.name}
-                      </p>
-                      <p className="font-mono text-[9px] text-muted-foreground">
-                        {recencyLabel(contact.daysSinceLast)} · {contact.signalCount} signals
-                      </p>
+                      <p className="font-mono text-[13px] text-foreground font-semibold truncate group-hover:translate-x-0.5 transition-transform">{contact.name}</p>
+                      <p className="font-mono text-[9px] text-muted-foreground">{recencyLabel(contact.daysSinceLast)} · {contact.signalCount} signals</p>
                     </div>
-                    <span className={`font-mono text-lg font-bold ${strengthTextColor}`}>
-                      {contact.strength}
-                    </span>
+                    <span className={`font-mono text-lg font-bold ${strengthTextColor}`}>{contact.strength}</span>
                   </div>
 
-                  {/* Signal type chips */}
                   <div className="flex flex-wrap gap-1 mb-3">
                     {Object.entries(contact.signalTypes).slice(0, 3).map(([type, count]) => {
                       const tc = SIGNAL_TYPE_COLORS[type as keyof typeof SIGNAL_TYPE_COLORS] || SIGNAL_TYPE_COLORS.CONTEXT;
                       return (
-                        <span key={type} className={`${tc.bg} ${tc.text} text-[8px] font-mono px-1.5 py-0.5 border ${tc.border} uppercase tracking-wider`}>
-                          {type} {count}
-                        </span>
+                        <span key={type} className={`${tc.bg} ${tc.text} text-[8px] font-mono px-1.5 py-0.5 border ${tc.border} uppercase tracking-wider`}>{type} {count}</span>
                       );
                     })}
                   </div>
 
-                  {/* Latest signal preview */}
                   {contact.recentSignals[0] && (
-                    <p className="font-mono text-[10px] text-muted-foreground line-clamp-2 leading-relaxed mb-3 flex-1">
-                      {contact.recentSignals[0].summary}
-                    </p>
+                    <p className="font-mono text-[10px] text-muted-foreground line-clamp-2 leading-relaxed mb-3 flex-1">{contact.recentSignals[0].summary}</p>
                   )}
 
-                  {/* Quick action buttons */}
                   <div className="flex gap-1.5 pt-2 border-t border-border/50" onClick={(e) => e.stopPropagation()}>
                     <button className="flex items-center gap-1 px-2 py-1 font-mono text-[8px] uppercase tracking-wider border border-border text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-colors flex-1 justify-center">
                       <MessageSquare className="w-3 h-3" /> Text

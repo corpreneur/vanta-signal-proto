@@ -106,12 +106,21 @@ function computeStrength(signalCount: number, highCount: number, daysSinceLast: 
 }
 
 type ViewMode = "timeline" | "by-type";
+type SourceFilter = "all" | "calls" | "messages" | "notes";
+
+const SOURCE_FILTER_MAP: Record<SourceFilter, string[]> = {
+  all: [],
+  calls: ["phone"],
+  messages: ["linq", "gmail"],
+  notes: ["manual"],
+};
 
 export default function ContactTimeline() {
   const { name } = useParams<{ name: string }>();
   const navigate = useNavigate();
   const decodedName = decodeURIComponent(name || "");
   const [viewMode, setViewMode] = useState<ViewMode>("timeline");
+  const [sourceFilter, setSourceFilter] = useState<SourceFilter>("all");
   const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
   const [loadingBrief, setLoadingBrief] = useState(false);
   const [relationshipBrief, setRelationshipBrief] = useState<string | null>(null);
@@ -128,8 +137,12 @@ export default function ContactTimeline() {
     staleTime: 120_000,
   });
 
-  const grouped = groupByDate(signals);
-  const byType = groupByType(signals);
+  const filteredSignals = sourceFilter === "all"
+    ? signals
+    : signals.filter((s) => SOURCE_FILTER_MAP[sourceFilter].includes(s.source));
+
+  const grouped = groupByDate(filteredSignals);
+  const byType = groupByType(filteredSignals);
 
   const highCount = signals.filter((s) => s.priority === "high").length;
   const sources = [...new Set(signals.map((s) => s.source))];
@@ -304,22 +317,39 @@ export default function ContactTimeline() {
         </div>
       </Motion>
 
-      {/* View mode toggle */}
+      {/* View mode + Source filter toggles */}
       <Motion delay={110}>
-        <div className="flex gap-1 mb-6">
-          {(["timeline", "by-type"] as ViewMode[]).map((m) => (
-            <button
-              key={m}
-              onClick={() => setViewMode(m)}
-              className={`px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider border transition-colors ${
-                viewMode === m
-                  ? "border-foreground text-foreground bg-card"
-                  : "border-border text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {m === "timeline" ? "Timeline" : "By Type"}
-            </button>
-          ))}
+        <div className="flex flex-col gap-2 mb-6">
+          <div className="flex gap-1">
+            {(["timeline", "by-type"] as ViewMode[]).map((m) => (
+              <button
+                key={m}
+                onClick={() => setViewMode(m)}
+                className={`px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider border transition-colors ${
+                  viewMode === m
+                    ? "border-foreground text-foreground bg-card"
+                    : "border-border text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {m === "timeline" ? "Timeline" : "By Type"}
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-1">
+            {(["all", "calls", "messages", "notes"] as SourceFilter[]).map((f) => (
+              <button
+                key={f}
+                onClick={() => setSourceFilter(f)}
+                className={`px-2.5 py-1 rounded-full font-mono text-[9px] uppercase tracking-wider transition-colors ${
+                  sourceFilter === f
+                    ? "bg-foreground text-background"
+                    : "border border-border text-muted-foreground hover:text-foreground hover:border-foreground/20"
+                }`}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
         </div>
       </Motion>
 
