@@ -278,6 +278,15 @@ export default function Contacts() {
                 <Upload className="w-3 h-3" />
                 <span className="hidden sm:inline">Import</span>
               </button>
+              {duplicateGroups.length > 0 && (
+                <button
+                  onClick={() => setMergeOpen(true)}
+                  className="flex items-center gap-1 px-2.5 py-2 font-mono text-[9px] uppercase tracking-[0.12em] border border-amber-500/30 text-amber-600 dark:text-amber-400 hover:border-amber-500/50 transition-colors rounded-sm"
+                >
+                  <GitMerge className="w-3 h-3" />
+                  <span className="hidden sm:inline">{duplicateGroups.length}</span>
+                </button>
+              )}
               <Link
                 to="/contacts/sync"
                 className="flex items-center gap-1 px-2.5 py-2 font-mono text-[9px] uppercase tracking-[0.12em] border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors rounded-sm"
