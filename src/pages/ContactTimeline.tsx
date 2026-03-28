@@ -106,12 +106,21 @@ function computeStrength(signalCount: number, highCount: number, daysSinceLast: 
 }
 
 type ViewMode = "timeline" | "by-type";
+type SourceFilter = "all" | "calls" | "messages" | "notes";
+
+const SOURCE_FILTER_MAP: Record<SourceFilter, string[]> = {
+  all: [],
+  calls: ["phone"],
+  messages: ["linq", "gmail"],
+  notes: ["manual"],
+};
 
 export default function ContactTimeline() {
   const { name } = useParams<{ name: string }>();
   const navigate = useNavigate();
   const decodedName = decodeURIComponent(name || "");
   const [viewMode, setViewMode] = useState<ViewMode>("timeline");
+  const [sourceFilter, setSourceFilter] = useState<SourceFilter>("all");
   const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
   const [loadingBrief, setLoadingBrief] = useState(false);
   const [relationshipBrief, setRelationshipBrief] = useState<string | null>(null);

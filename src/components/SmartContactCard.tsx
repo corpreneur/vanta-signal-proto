@@ -1,13 +1,14 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { SIGNAL_TYPE_COLORS } from "@/data/signals";
 import type { Signal } from "@/data/signals";
-import { computeStrength, daysBetween, recencyLabel } from "@/lib/contactStrength";
-import { MessageSquare, Phone, Video, Mail, StickyNote, Clock, Bell, ArrowRight, TrendingDown, TrendingUp, Download, ExternalLink } from "lucide-react";
+import { daysBetween, recencyLabel } from "@/lib/contactStrength";
+import { MessageSquare, Phone, Video, Mail, StickyNote, Clock, Bell, ArrowRight, TrendingDown, TrendingUp, Download, ExternalLink, Sparkles, Loader2 } from "lucide-react";
 import { downloadVCard } from "@/lib/vcard";
 import ContactTagManager from "@/components/ContactTagManager";
+import { useContactProfile, RELATIONSHIP_LABELS } from "@/hooks/use-contact-profiles";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const SOURCE_ICONS: Record<string, React.ElementType> = {
   linq: MessageSquare, phone: Phone, recall: Video, gmail: Mail, manual: StickyNote,
@@ -30,15 +31,37 @@ interface SmartContactCardProps {
 
 export default function SmartContactCard({ contact }: { contact: SmartContactCardProps }) {
   const navigate = useNavigate();
+  const profile = useContactProfile(contact.name);
+  const [loadingBrief, setLoadingBrief] = useState(false);
   const colors = SIGNAL_TYPE_COLORS[contact.dominantType as keyof typeof SIGNAL_TYPE_COLORS] || SIGNAL_TYPE_COLORS.CONTEXT;
 
   const strengthTrend = contact.daysSinceLast <= 3 ? "up" : contact.daysSinceLast > 14 ? "down" : "stable";
 
-  // Compute interaction velocity (signals per week over last 30 days)
   const recentCount = contact.recentSignals.filter(
     (s) => daysBetween(s.capturedAt) <= 30
   ).length;
   const velocity = Math.round((recentCount / 4.3) * 10) / 10;
+
+  // Call stats derived from signals
+  const callSignals = contact.recentSignals.filter((s) => s.source === "phone");
+  const totalCalls = Object.entries(contact.signalTypes).reduce(
+    (acc, [type, count]) => type === "PHONE_CALL" ? acc + count : acc, 0
+  );
+
+  const handlePrepare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setLoadingBrief(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("relationship-brief", {
+        body: { contact_name: contact.name },
+      });
+      if (error) throw error;
+      toast.success(data?.brief || "No brief available.", { duration: 8000 });
+    } catch {
+      toast.error("Failed to generate brief");
+    }
+    setLoadingBrief(false);
+  };
 
   return (
     <div
@@ -49,18 +72,36 @@ export default function SmartContactCard({ contact }: { contact: SmartContactCar
         {/* Top row */}
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className={`w-10 h-10 shrink-0 flex items-center justify-center border ${colors.border} ${colors.bg} rounded-full`}>
-              <span className={`${colors.text} font-mono text-[12px] font-bold`}>
-                {contact.name.charAt(0).toUpperCase()}
-              </span>
+            <div className={`w-10 h-10 shrink-0 flex items-center justify-center border ${colors.border} ${colors.bg} rounded-full overflow-hidden`}>
+              {profile?.photo_url ? (
+                <img src={profile.photo_url} alt={contact.name} className="w-full h-full object-cover" />
+              ) : (
+                <span className={`${colors.text} font-mono text-[12px] font-bold`}>
+                  {contact.name.charAt(0).toUpperCase()}
+                </span>
+              )}
             </div>
             <div className="min-w-0">
               <p className="font-mono text-[13px] text-foreground font-semibold truncate group-hover:translate-x-0.5 transition-transform">
                 {contact.name}
               </p>
-              <p className="font-mono text-[9px] text-muted-foreground uppercase tracking-wider">
-                {recencyLabel(contact.daysSinceLast)} · {contact.signalCount} signals
-              </p>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {profile?.title && (
+                  <span className="font-mono text-[9px] text-muted-foreground truncate max-w-[120px]">
+                    {profile.title}{profile.company ? ` · ${profile.company}` : ""}
+                  </span>
+                )}
+                {!profile?.title && (
+                  <span className="font-mono text-[9px] text-muted-foreground uppercase tracking-wider">
+                    {recencyLabel(contact.daysSinceLast)} · {contact.signalCount} signals
+                  </span>
+                )}
+                {profile?.relationship_type && profile.relationship_type !== "personal" && (
+                  <span className="px-1 py-0.5 font-mono text-[7px] uppercase tracking-wider border border-primary/20 bg-primary/5 text-primary">
+                    {RELATIONSHIP_LABELS[profile.relationship_type] || profile.relationship_type}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
@@ -110,9 +151,7 @@ export default function SmartContactCard({ contact }: { contact: SmartContactCar
               {weeks.map((count, i) => (
                 <div
                   key={i}
-                  className={`flex-1 rounded-[1px] transition-all ${
-                    count > 0 ? "bg-primary" : "bg-muted"
-                  }`}
+                  className={`flex-1 rounded-[1px] transition-all ${count > 0 ? "bg-primary" : "bg-muted"}`}
                   style={{
                     height: count > 0 ? `${Math.max(20, (count / max) * 100)}%` : "15%",
                     opacity: count > 0 ? 0.4 + (count / max) * 0.6 : 0.3,
@@ -129,6 +168,12 @@ export default function SmartContactCard({ contact }: { contact: SmartContactCar
             <Clock className="w-3 h-3 text-muted-foreground" />
             <span className="font-mono text-[9px] text-muted-foreground">{velocity}/wk</span>
           </div>
+          {totalCalls > 0 && (
+            <div className="flex items-center gap-1">
+              <Phone className="w-3 h-3 text-muted-foreground" />
+              <span className="font-mono text-[9px] text-muted-foreground">{totalCalls} calls</span>
+            </div>
+          )}
           {contact.highPriority > 0 && (
             <span className="px-1.5 py-0.5 font-mono text-[9px] text-destructive border border-destructive/30 bg-destructive/5">
               {contact.highPriority} HIGH
@@ -179,15 +224,23 @@ export default function SmartContactCard({ contact }: { contact: SmartContactCar
           </div>
         )}
 
-        {/* Tags — compact, bottom */}
+        {/* Tags */}
         <div className="mb-2" onClick={(e) => e.stopPropagation()}>
           <ContactTagManager contactName={contact.name} compact />
         </div>
 
-        {/* CTAs */}
-        <div className="flex items-center gap-3 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
+        {/* CTAs — consolidated quick actions */}
+        <div className="flex items-center gap-2 mt-3 pt-2 border-t border-border/50">
           <button className="flex items-center gap-1 font-mono text-[8px] uppercase tracking-wider text-primary">
-            View Timeline <ArrowRight className="w-3 h-3" />
+            View <ArrowRight className="w-3 h-3" />
+          </button>
+          <button
+            onClick={handlePrepare}
+            disabled={loadingBrief}
+            className="flex items-center gap-1 font-mono text-[8px] uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors disabled:opacity-50"
+          >
+            {loadingBrief ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+            Prepare
           </button>
           <button
             onClick={(e) => {
@@ -196,14 +249,14 @@ export default function SmartContactCard({ contact }: { contact: SmartContactCar
             }}
             className="flex items-center gap-1 font-mono text-[8px] uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors"
           >
-            <Download className="w-3 h-3" /> Save .vcf
+            <Download className="w-3 h-3" /> .vcf
           </button>
           <a
             href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(contact.name)}`}
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="flex items-center gap-1 font-mono text-[8px] uppercase tracking-wider text-[#0A66C2] hover:text-[#0A66C2]/80 transition-colors"
+            className="flex items-center gap-1 font-mono text-[8px] uppercase tracking-wider text-[#0A66C2] hover:text-[#0A66C2]/80 transition-colors ml-auto"
           >
             <ExternalLink className="w-3 h-3" /> LinkedIn
           </a>

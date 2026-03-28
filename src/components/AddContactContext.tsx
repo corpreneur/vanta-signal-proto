@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { UserPlus, MapPin, Calendar, Lightbulb, X, Save, Tag } from "lucide-react";
+import { UserPlus, MapPin, Lightbulb, X, Save, Tag, Briefcase, Building2, Mail, Phone as PhoneIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RELATIONSHIP_TYPES, RELATIONSHIP_LABELS } from "@/hooks/use-contact-profiles";
 
 interface AddContactContextProps {
   contactName: string;
@@ -10,6 +12,7 @@ interface AddContactContextProps {
 }
 
 const TAG_SUGGESTIONS = ["investor", "founder", "advisor", "friend", "colleague", "partner", "client", "media"];
+const SOURCE_TAG_OPTIONS = ["manual", "imessage", "call", "import", "linkedin", "event"] as const;
 
 export default function AddContactContext({ contactName, onClose }: AddContactContextProps) {
   const [where, setWhere] = useState("");
@@ -17,6 +20,12 @@ export default function AddContactContext({ contactName, onClose }: AddContactCo
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
   const [saving, setSaving] = useState(false);
+  const [relationshipType, setRelationshipType] = useState("personal");
+  const [sourceTag, setSourceTag] = useState("manual");
+  const [title, setTitle] = useState("");
+  const [company, setCompany] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const queryClient = useQueryClient();
 
   const addTag = (tag: string) => {
@@ -34,12 +43,39 @@ export default function AddContactContext({ contactName, onClose }: AddContactCo
     }
     setSaving(true);
 
+    // Check for duplicates
+    const { data: existing } = await supabase
+      .from("contact_profiles" as any)
+      .select("id, name")
+      .eq("name", contactName)
+      .maybeSingle();
+
+    if (existing) {
+      toast.error(`${contactName} already exists in your contacts`);
+      setSaving(false);
+      return;
+    }
+
+    // Create profile
+    const { error: profileError } = await supabase.from("contact_profiles" as any).insert({
+      name: contactName,
+      title: title || null,
+      company: company || null,
+      email: email || null,
+      phone: phone || null,
+      relationship_type: relationshipType,
+      how_we_met: where || null,
+      source_tag: sourceTag,
+      private_notes: keyDetail || null,
+    });
+
+    // Also create a CONTEXT signal for backward compat
     const contextNote = [
       where && `Met at: ${where}`,
       keyDetail && `Key detail: ${keyDetail}`,
     ].filter(Boolean).join("\n");
 
-    const { error } = await supabase.from("signals").insert({
+    const { error: signalError } = await supabase.from("signals").insert({
       sender: contactName,
       summary: `Contact context: ${keyDetail || where}`,
       source_message: contextNote,
@@ -55,7 +91,7 @@ export default function AddContactContext({ contactName, onClose }: AddContactCo
     });
 
     // Save tags if any
-    if (!error && tags.length > 0) {
+    if (!signalError && tags.length > 0) {
       const TAG_COLORS = ["bg-primary/10 text-primary border-primary/20", "bg-emerald-500/10 text-emerald-600 border-emerald-500/20", "bg-amber-500/10 text-amber-600 border-amber-500/20", "bg-sky-500/10 text-sky-600 border-sky-500/20"];
       const tagRows = tags.map((tag, i) => ({
         contact_name: contactName,
@@ -67,13 +103,14 @@ export default function AddContactContext({ contactName, onClose }: AddContactCo
 
     setSaving(false);
 
-    if (error) {
-      toast.error("Failed to save context");
+    if (profileError || signalError) {
+      toast.error("Failed to save contact");
     } else {
+      queryClient.invalidateQueries({ queryKey: ["contact-profiles"] });
       queryClient.invalidateQueries({ queryKey: ["contacts-signals"] });
       queryClient.invalidateQueries({ queryKey: ["signals"] });
       queryClient.invalidateQueries({ queryKey: ["contact-tags"] });
-      toast.success("Contact context saved");
+      toast.success("Contact saved");
       onClose?.();
     }
   };
@@ -84,7 +121,7 @@ export default function AddContactContext({ contactName, onClose }: AddContactCo
         <div className="flex items-center gap-2">
           <UserPlus className="w-3.5 h-3.5 text-primary" />
           <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-primary">
-            Add Context · {contactName}
+            Add contact · {contactName}
           </span>
         </div>
         {onClose && (
@@ -94,10 +131,98 @@ export default function AddContactContext({ contactName, onClose }: AddContactCo
         )}
       </div>
 
+      {/* Role & Company */}
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1 flex items-center gap-1">
+            <Briefcase className="w-3 h-3" /> Title
+          </label>
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="e.g. CEO, VP Product…"
+            className="w-full bg-background border border-border px-3 py-2 font-mono text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
+          />
+        </div>
+        <div>
+          <label className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1 flex items-center gap-1">
+            <Building2 className="w-3 h-3" /> Company
+          </label>
+          <input
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+            placeholder="e.g. Acme Corp…"
+            className="w-full bg-background border border-border px-3 py-2 font-mono text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
+          />
+        </div>
+      </div>
+
+      {/* Email & Phone */}
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1 flex items-center gap-1">
+            <Mail className="w-3 h-3" /> Email
+          </label>
+          <input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="email@example.com"
+            type="email"
+            className="w-full bg-background border border-border px-3 py-2 font-mono text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
+          />
+        </div>
+        <div>
+          <label className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1 flex items-center gap-1">
+            <PhoneIcon className="w-3 h-3" /> Phone
+          </label>
+          <input
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="+1 555 0123"
+            type="tel"
+            className="w-full bg-background border border-border px-3 py-2 font-mono text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
+          />
+        </div>
+      </div>
+
+      {/* Relationship type & Source */}
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">
+            Relationship
+          </label>
+          <Select value={relationshipType} onValueChange={setRelationshipType}>
+            <SelectTrigger className="h-8 font-mono text-[10px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {RELATIONSHIP_TYPES.map((rt) => (
+                <SelectItem key={rt} value={rt}>{RELATIONSHIP_LABELS[rt]}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <label className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">
+            Source
+          </label>
+          <Select value={sourceTag} onValueChange={setSourceTag}>
+            <SelectTrigger className="h-8 font-mono text-[10px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {SOURCE_TAG_OPTIONS.map((s) => (
+                <SelectItem key={s} value={s}>{s}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
       {/* Where did you meet? */}
       <div>
         <label className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1 flex items-center gap-1">
-          <MapPin className="w-3 h-3" /> Where / How did you meet?
+          <MapPin className="w-3 h-3" /> How did you meet?
         </label>
         <input
           value={where}
@@ -110,17 +235,17 @@ export default function AddContactContext({ contactName, onClose }: AddContactCo
       {/* Key detail */}
       <div>
         <label className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1 flex items-center gap-1">
-          <Lightbulb className="w-3 h-3" /> Key detail or fact
+          <Lightbulb className="w-3 h-3" /> Key detail or note
         </label>
         <input
           value={keyDetail}
           onChange={(e) => setKeyDetail(e.target.value)}
-          placeholder="e.g. CEO of Acme, launching new fund Q3, knows Sarah…"
+          placeholder="e.g. Launching new fund Q3, knows Sarah…"
           className="w-full bg-background border border-border px-3 py-2 font-mono text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
         />
       </div>
 
-      {/* Tag assignment */}
+      {/* Tags */}
       <div>
         <label className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1 flex items-center gap-1">
           <Tag className="w-3 h-3" /> Tags
@@ -151,21 +276,13 @@ export default function AddContactContext({ contactName, onClose }: AddContactCo
         </div>
       </div>
 
-      {/* Timestamp shown automatically */}
-      <div className="flex items-center gap-1.5 text-muted-foreground">
-        <Calendar className="w-3 h-3" />
-        <span className="font-mono text-[9px]">
-          {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-        </span>
-      </div>
-
       <button
         onClick={handleSave}
         disabled={saving}
         className="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-primary text-primary-foreground font-mono text-[10px] uppercase tracking-[0.15em] hover:bg-primary/90 transition-colors disabled:opacity-50"
       >
         <Save className="w-3 h-3" />
-        {saving ? "Saving…" : "Save Context"}
+        {saving ? "Saving…" : "Save contact"}
       </button>
     </div>
   );
