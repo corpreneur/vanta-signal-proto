@@ -9,7 +9,7 @@ import { computeStrength, daysBetween, recencyLabel } from "@/lib/contactStrengt
 import { Motion } from "@/components/ui/motion";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter, UserPlus, LayoutGrid, LayoutList, Phone, Mail, MessageSquare, Smartphone, Upload, ChevronDown, ChevronUp, Network } from "lucide-react";
+import { Search, Filter, UserPlus, LayoutGrid, LayoutList, Phone, Mail, MessageSquare, Smartphone, Upload, ChevronDown, ChevronUp, Network, GitMerge } from "lucide-react";
 import { useAllContactTags } from "@/components/ContactTagManager";
 import SmartContactCard from "@/components/SmartContactCard";
 import AddContactContext from "@/components/AddContactContext";
@@ -21,6 +21,9 @@ import { useContactProfiles } from "@/hooks/use-contact-profiles";
 import PinnedContactsRail from "@/components/contacts/PinnedContactsRail";
 import ReEngageTray from "@/components/contacts/ReEngageTray";
 import NewPeopleTray from "@/components/contacts/NewPeopleTray";
+import DuplicateMergeDialog, { findDuplicates } from "@/components/contacts/DuplicateMergeDialog";
+import ContactFilterChips, { DEFAULT_CONTACT_FILTERS, applyContactFilters, type ContactFilterState } from "@/components/contacts/ContactFilterChips";
+import PostCallNotePrompt from "@/components/contacts/PostCallNotePrompt";
 
 async function fetchSignals(): Promise<Signal[]> {
   const { data, error } = await supabase
@@ -112,6 +115,9 @@ export default function Contacts() {
   const [addingContact, setAddingContact] = useState(false);
   const [newContactName, setNewContactName] = useState("");
   const [importOpen, setImportOpen] = useState(false);
+  const [mergeOpen, setMergeOpen] = useState(false);
+  const [contactFilters, setContactFilters] = useState<ContactFilterState>(DEFAULT_CONTACT_FILTERS);
+  const [postCallPrompt, setPostCallPrompt] = useState<{ contactName: string; signalId: string } | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [graphOpen, setGraphOpen] = useState(false);
   const [focused, setFocused] = useState<FocusedNode | null>(null);
@@ -161,6 +167,49 @@ export default function Contacts() {
   const contacts = useMemo(() => buildContacts(signals), [signals]);
   const graphData = useMemo(() => buildGraph(signals), [signals]);
 
+  // Signal counts per contact name (for duplicate merge)
+  const signalCountMap = useMemo(() => {
+    const m: Record<string, number> = {};
+    contacts.forEach((c) => { m[c.name] = c.signalCount; });
+    return m;
+  }, [contacts]);
+
+  // Profile map for filter chips
+  const profileMap = useMemo(() => {
+    const m = new Map<string, { relationship_type: string }>();
+    profiles.forEach((p) => m.set(p.name, { relationship_type: p.relationship_type }));
+    return m;
+  }, [profiles]);
+
+  // Relationship type counts
+  const relationshipCounts = useMemo(() => {
+    const m = new Map<string, number>();
+    profiles.forEach((p) => m.set(p.relationship_type, (m.get(p.relationship_type) || 0) + 1));
+    return m;
+  }, [profiles]);
+
+  // Duplicate groups
+  const duplicateGroups = useMemo(() => findDuplicates(profiles, signalCountMap), [profiles, signalCountMap]);
+
+  // Detect recent phone calls for post-call prompt
+  useEffect(() => {
+    if (postCallPrompt) return;
+    const recentCall = signals.find(
+      (s) => s.source === "phone" && s.signalType === "PHONE_CALL" && daysBetween(s.capturedAt) === 0
+    );
+    if (recentCall) {
+      // Check if we already have a post-call note for this signal
+      const hasNote = signals.some(
+        (s) => s.source === "manual" && s.signalType === "CONTEXT" &&
+          (s.rawPayload as Record<string, unknown>)?._vanta_post_call_note === true &&
+          (s.rawPayload as Record<string, unknown>)?.call_signal_id === recentCall.id
+      );
+      if (!hasNote) {
+        setPostCallPrompt({ contactName: recentCall.sender, signalId: recentCall.id });
+      }
+    }
+  }, [signals, postCallPrompt]);
+
   const filtered = useMemo(() => {
     let list = contacts;
     if (search) {
@@ -171,6 +220,17 @@ export default function Contacts() {
       const tagContacts = allTags.get(filterTag) || [];
       list = list.filter((c) => tagContacts.includes(c.name));
     }
+    // Apply relationship + recency filter chips
+    if (contactFilters.relationshipType || contactFilters.recency !== "all") {
+      const names = new Set(
+        applyContactFilters(
+          list.map((c) => ({ name: c.name, daysSinceLast: c.daysSinceLast })),
+          contactFilters,
+          profileMap
+        ).map((c) => c.name)
+      );
+      list = list.filter((c) => names.has(c.name));
+    }
     const sortFns: Record<SortMode, (a: ContactSummary, b: ContactSummary) => number> = {
       strength: (a, b) => b.strength - a.strength,
       signals: (a, b) => b.signalCount - a.signalCount,
@@ -179,7 +239,7 @@ export default function Contacts() {
       high: (a, b) => b.highPriority - a.highPriority,
     };
     return [...list].sort(sortFns[sort]);
-  }, [contacts, search, sort, filterTag, allTags]);
+  }, [contacts, search, sort, filterTag, allTags, contactFilters, profileMap]);
 
   const totalContacts = contacts.length;
   const activeContacts = contacts.filter((c) => c.daysSinceLast <= 7).length;
@@ -218,6 +278,15 @@ export default function Contacts() {
                 <Upload className="w-3 h-3" />
                 <span className="hidden sm:inline">Import</span>
               </button>
+              {duplicateGroups.length > 0 && (
+                <button
+                  onClick={() => setMergeOpen(true)}
+                  className="flex items-center gap-1 px-2.5 py-2 font-mono text-[9px] uppercase tracking-[0.12em] border border-amber-500/30 text-amber-600 dark:text-amber-400 hover:border-amber-500/50 transition-colors rounded-sm"
+                >
+                  <GitMerge className="w-3 h-3" />
+                  <span className="hidden sm:inline">{duplicateGroups.length}</span>
+                </button>
+              )}
               <Link
                 to="/contacts/sync"
                 className="flex items-center gap-1 px-2.5 py-2 font-mono text-[9px] uppercase tracking-[0.12em] border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors rounded-sm"
@@ -305,6 +374,30 @@ export default function Contacts() {
           />
         </div>
       </Motion>
+
+      {/* Filter Chips */}
+      <Motion delay={57}>
+        <div className="mb-4 overflow-x-auto pb-1">
+          <ContactFilterChips
+            filters={contactFilters}
+            onChange={setContactFilters}
+            relationshipCounts={relationshipCounts}
+          />
+        </div>
+      </Motion>
+
+      {/* Post-call note prompt */}
+      {postCallPrompt && (
+        <Motion delay={58}>
+          <div className="mb-4">
+            <PostCallNotePrompt
+              contactName={postCallPrompt.contactName}
+              callSignalId={postCallPrompt.signalId}
+              onDismiss={() => setPostCallPrompt(null)}
+            />
+          </div>
+        </Motion>
+      )}
 
       {/* Relationship Graph */}
       <Motion delay={60}>
@@ -496,6 +589,7 @@ export default function Contacts() {
       )}
 
       <VCardImportDialog open={importOpen} onClose={() => setImportOpen(false)} />
+      <DuplicateMergeDialog open={mergeOpen} onClose={() => setMergeOpen(false)} duplicates={duplicateGroups} />
     </div>
   );
 }
