@@ -330,19 +330,21 @@ const Index = () => {
         </Motion>
       ) : isExecutive ? (
         <>
+          {/* Executive: meetings first, then action items (high-only timeline), cooling alerts */}
           <WhatsAhead />
+          <EnhancedActionItems onSignalClick={(s) => setDrawerSignal(s)} />
           <Motion delay={40}>
             <DailyTimeline signals={activeSignals} onSignalClick={(s) => setDrawerSignal(s)} highOnly />
           </Motion>
-          <EnhancedActionItems onSignalClick={(s) => setDrawerSignal(s)} />
           <CoolingAlerts />
         </>
       ) : (
         <>
-          <WhatsAhead />
+          {/* Creative: timeline first (all signals), then what's ahead, then actions */}
           <Motion delay={40}>
             <DailyTimeline signals={activeSignals} onSignalClick={(s) => setDrawerSignal(s)} highOnly={false} />
           </Motion>
+          <WhatsAhead />
           <EnhancedActionItems onSignalClick={(s) => setDrawerSignal(s)} />
           <CoolingAlerts />
         </>
