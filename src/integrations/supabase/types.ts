@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      contact_profiles: {
+        Row: {
+          company: string | null
+          created_at: string
+          display_name: string | null
+          email: string | null
+          how_we_met: string | null
+          id: string
+          name: string
+          phone: string | null
+          photo_url: string | null
+          pinned: boolean
+          pinned_order: number | null
+          private_notes: string | null
+          relationship_type: string
+          source_tag: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          how_we_met?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          photo_url?: string | null
+          pinned?: boolean
+          pinned_order?: number | null
+          private_notes?: string | null
+          relationship_type?: string
+          source_tag?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          how_we_met?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          photo_url?: string | null
+          pinned?: boolean
+          pinned_order?: number | null
+          private_notes?: string | null
+          relationship_type?: string
+          source_tag?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contact_tags: {
         Row: {
           color: string
