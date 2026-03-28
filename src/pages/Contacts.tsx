@@ -9,7 +9,7 @@ import { computeStrength, daysBetween, recencyLabel } from "@/lib/contactStrengt
 import { Motion } from "@/components/ui/motion";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter, UserPlus, LayoutGrid, LayoutList, Phone, Mail, MessageSquare, Smartphone, Upload, ChevronDown, ChevronUp, Network } from "lucide-react";
+import { Search, Filter, UserPlus, LayoutGrid, LayoutList, Phone, Mail, MessageSquare, Smartphone, Upload, ChevronDown, ChevronUp, Network, GitMerge } from "lucide-react";
 import { useAllContactTags } from "@/components/ContactTagManager";
 import SmartContactCard from "@/components/SmartContactCard";
 import AddContactContext from "@/components/AddContactContext";
@@ -21,6 +21,9 @@ import { useContactProfiles } from "@/hooks/use-contact-profiles";
 import PinnedContactsRail from "@/components/contacts/PinnedContactsRail";
 import ReEngageTray from "@/components/contacts/ReEngageTray";
 import NewPeopleTray from "@/components/contacts/NewPeopleTray";
+import DuplicateMergeDialog, { findDuplicates } from "@/components/contacts/DuplicateMergeDialog";
+import ContactFilterChips, { DEFAULT_CONTACT_FILTERS, applyContactFilters, type ContactFilterState } from "@/components/contacts/ContactFilterChips";
+import PostCallNotePrompt from "@/components/contacts/PostCallNotePrompt";
 
 async function fetchSignals(): Promise<Signal[]> {
   const { data, error } = await supabase
