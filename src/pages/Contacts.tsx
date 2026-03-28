@@ -475,7 +475,7 @@ export default function Contacts() {
               <button
                 key={m}
                 onClick={() => setSort(m)}
-                className={`px-3 py-1.5 rounded-full font-mono text-[10px] uppercase tracking-wider transition-colors ${
+                className={`px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider transition-colors ${
                   sort === m
                     ? "bg-foreground text-background"
                     : "border border-border text-muted-foreground hover:text-foreground hover:border-foreground/20"
@@ -576,7 +576,7 @@ export default function Contacts() {
                     {Object.entries(contact.signalTypes).slice(0, 3).map(([type, count]) => {
                       const tc = SIGNAL_TYPE_COLORS[type as keyof typeof SIGNAL_TYPE_COLORS] || SIGNAL_TYPE_COLORS.CONTEXT;
                       return (
-                        <span key={type} className={`${tc.bg} ${tc.text} text-[8px] font-mono px-1.5 py-0.5 border ${tc.border} uppercase tracking-wider`}>{type} {count}</span>
+                        <span key={type} className={`${tc.text} text-[8px] font-mono uppercase tracking-wider`}>{type} {count}</span>
                       );
                     })}
                   </div>
