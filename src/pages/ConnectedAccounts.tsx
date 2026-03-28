@@ -93,6 +93,13 @@ const INITIAL_INTEGRATIONS: Integration[] = [
     icon: "O",
     connected: false,
   },
+  {
+    id: "asana",
+    name: "Asana",
+    description: "Task management and project tracking integration",
+    icon: "A",
+    connected: false,
+  },
 ];
 
 const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
