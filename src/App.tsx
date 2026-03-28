@@ -46,7 +46,7 @@ import Contacts from "./pages/Contacts";
 import NoiseQueue from "./pages/NoiseQueue";
 import UserModes from "./pages/UserModes";
 import Focus from "./pages/Focus";
-import FileVault from "./pages/FileVault";
+
 import MyRulesHub from "./pages/MyRulesHub";
 import TaskIntegration from "./pages/TaskIntegration";
 // QuickCaptureExtension merged into BrainDump
@@ -130,7 +130,7 @@ const AppRoutes = () => {
       <Route path="/contacts/sync" element={<ProtectedRoute session={session}><ProductLayout><NativeContactSync /></ProductLayout></ProtectedRoute>} />
       <Route path="/noise-queue" element={<Navigate to="/focus?tab=noise" replace />} />
       <Route path="/focus" element={<ProtectedRoute session={session}><ProductLayout><Focus /></ProductLayout></ProtectedRoute>} />
-      <Route path="/files" element={<ProtectedRoute session={session}><ProductLayout><FileVault /></ProductLayout></ProtectedRoute>} />
+      
       <Route path="/my-rules" element={<ProtectedRoute session={session}><ProductLayout><MyRulesHub /></ProductLayout></ProtectedRoute>} />
       <Route path="/settings/tasks" element={<ProtectedRoute session={session}><ProductLayout><TaskIntegration /></ProductLayout></ProtectedRoute>} />
       <Route path="/quick-capture" element={<Navigate to="/brain-dump" replace />} />

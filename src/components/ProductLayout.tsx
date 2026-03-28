@@ -44,7 +44,7 @@ const BREADCRUMB_MAP: Record<string, string> = {
   "/settings/privacy": "Settings · Privacy & Data",
   "/admin": "Admin",
   "/my-rules": "My Rules",
-  "/files": "File Vault",
+  
 };
 
 function HeaderBar({ breadcrumb }: { breadcrumb: string }) {
