@@ -24,6 +24,7 @@ import NewPeopleTray from "@/components/contacts/NewPeopleTray";
 import DuplicateMergeDialog, { findDuplicates } from "@/components/contacts/DuplicateMergeDialog";
 import ContactFilterChips, { DEFAULT_CONTACT_FILTERS, applyContactFilters, type ContactFilterState } from "@/components/contacts/ContactFilterChips";
 import PostCallNotePrompt from "@/components/contacts/PostCallNotePrompt";
+import ContactGroups from "@/components/contacts/ContactGroups";
 
 async function fetchSignals(): Promise<Signal[]> {
   const { data, error } = await supabase
@@ -338,6 +339,13 @@ export default function Contacts() {
       {/* New People Tray */}
       <Motion delay={38}>
         <NewPeopleTray signals={signals} existingProfiles={profiles} />
+      </Motion>
+
+      {/* Contact Groups */}
+      <Motion delay={39}>
+        <div className="mb-5">
+          <ContactGroups />
+        </div>
       </Motion>
 
       {/* Stats */}
