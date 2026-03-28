@@ -25,7 +25,7 @@ import {
   Shield,
   Radio,
   SlidersHorizontal,
-  FolderOpen,
+  
   Kanban,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
