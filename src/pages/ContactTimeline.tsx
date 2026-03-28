@@ -137,8 +137,12 @@ export default function ContactTimeline() {
     staleTime: 120_000,
   });
 
-  const grouped = groupByDate(signals);
-  const byType = groupByType(signals);
+  const filteredSignals = sourceFilter === "all"
+    ? signals
+    : signals.filter((s) => SOURCE_FILTER_MAP[sourceFilter].includes(s.source));
+
+  const grouped = groupByDate(filteredSignals);
+  const byType = groupByType(filteredSignals);
 
   const highCount = signals.filter((s) => s.priority === "high").length;
   const sources = [...new Set(signals.map((s) => s.source))];
