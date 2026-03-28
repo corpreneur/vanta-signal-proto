@@ -116,11 +116,85 @@ export default function CalendarSyncSettings() {
         </div>
       </Motion>
 
+      {/* Synced events preview */}
+      <Motion delay={100}>
+        <div className="border border-border bg-card mb-5">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
+              Synced events
+            </p>
+            {syncDirection === "two-way" && (
+              <button
+                onClick={() => setShowCreateEvent(!showCreateEvent)}
+                className="inline-flex items-center gap-1 font-mono text-[9px] text-primary hover:underline"
+              >
+                <Plus className="w-2.5 h-2.5" />
+                Create event
+              </button>
+            )}
+          </div>
+
+          {showCreateEvent && (
+            <div className="p-4 border-b border-border bg-muted/30">
+              <p className="font-mono text-[10px] text-muted-foreground mb-2">
+                Create an event from Vanta and push it to Google Calendar
+              </p>
+              <div className="flex gap-2">
+                <input
+                  placeholder="Meeting title…"
+                  className="flex-1 px-3 py-2 border border-border bg-background font-mono text-xs text-foreground placeholder:text-muted-foreground/50"
+                />
+                <button
+                  onClick={() => { setShowCreateEvent(false); toast.info("Event creation requires connected Google Calendar"); }}
+                  className="px-3 py-2 bg-primary text-primary-foreground font-mono text-[10px] uppercase tracking-wider"
+                >
+                  Push
+                </button>
+              </div>
+            </div>
+          )}
+
+          {events.length === 0 ? (
+            <div className="p-8 text-center">
+              <Calendar className="w-5 h-5 text-muted-foreground mx-auto mb-2" />
+              <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
+                No upcoming events
+              </p>
+            </div>
+          ) : (
+            <div className="divide-y divide-border">
+              {events.map((ev) => (
+                <div key={ev.id} className="px-4 py-3 flex items-center gap-3 hover:bg-muted/30 transition-colors">
+                  {ev.hasConflict && (
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-sans text-[13px] text-foreground truncate">{ev.title}</p>
+                    <p className="font-mono text-[9px] text-muted-foreground">
+                      {formatEventTime(ev.startsAt)}
+                      {ev.attendees > 0 && ` · ${ev.attendees} attendee${ev.attendees !== 1 ? "s" : ""}`}
+                    </p>
+                  </div>
+                  {ev.hasConflict && (
+                    <span className="font-mono text-[8px] uppercase tracking-wider text-amber-500 border border-amber-500/20 bg-amber-500/10 px-1.5 py-0.5">
+                      Conflict
+                    </span>
+                  )}
+                  {syncDirection === "two-way" && (
+                    <ArrowLeftRight className="w-3 h-3 text-muted-foreground shrink-0" />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </Motion>
+
       {/* Permissions preview */}
       <Motion delay={120}>
-        <div className="border border-vanta-border bg-card p-6">
-          <h3 className="font-mono text-[10px] uppercase tracking-[0.2em] text-vanta-text-low mb-4 border-b border-vanta-border pb-2">
-            Required Permissions
+        <div className="border border-border bg-card p-6">
+          <h3 className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-4 border-b border-border pb-2">
+            Required permissions
           </h3>
           <div className="space-y-3">
             {[
@@ -129,10 +203,10 @@ export default function CalendarSyncSettings() {
               { icon: Shield, label: "Manage events (two-way only)", desc: "Create and update events on your behalf" },
             ].map((perm, i) => (
               <div key={i} className="flex items-start gap-3">
-                <perm.icon className="w-4 h-4 text-vanta-text-muted mt-0.5 shrink-0" />
+                <perm.icon className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                 <div>
                   <p className="font-mono text-[11px] text-foreground">{perm.label}</p>
-                  <p className="font-mono text-[9px] text-vanta-text-muted">{perm.desc}</p>
+                  <p className="font-mono text-[9px] text-muted-foreground">{perm.desc}</p>
                 </div>
               </div>
             ))}
@@ -142,3 +216,4 @@ export default function CalendarSyncSettings() {
     </div>
   );
 }
+

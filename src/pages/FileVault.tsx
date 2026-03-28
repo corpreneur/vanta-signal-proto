@@ -1,10 +1,11 @@
-import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useMemo, useRef } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, FileText, Image, File, Download, ExternalLink, Paperclip, FolderOpen } from "lucide-react";
+import { Search, FileText, Image, File, Download, ExternalLink, Paperclip, FolderOpen, Upload, X } from "lucide-react";
 import { Motion } from "@/components/ui/motion";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 interface VaultFile {
   name: string;
@@ -62,6 +63,30 @@ async function fetchAllFiles(): Promise<VaultFile[]> {
 
 export default function FileVault() {
   const [search, setSearch] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
+
+  const handleUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        const folder = `manual-${Date.now()}`;
+        const { error } = await supabase.storage
+          .from("signal-attachments")
+          .upload(`${folder}/${file.name}`, file);
+        if (error) throw error;
+      }
+      toast.success(`${files.length} file${files.length > 1 ? "s" : ""} uploaded`);
+      queryClient.invalidateQueries({ queryKey: ["file-vault"] });
+    } catch (err) {
+      toast.error("Upload failed — try again");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const { data: files = [], isLoading } = useQuery({
     queryKey: ["file-vault"],
