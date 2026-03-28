@@ -72,7 +72,7 @@ const productItems = [
   { title: "Meetings", url: "/meetings", icon: Video },
   { title: "Smart Contacts", url: "/contacts", icon: Users },
   { title: "Relationship Graph", url: "/graph", icon: Network },
-  { title: "File Vault", url: "/files", icon: FolderOpen },
+  
   { title: "My Rules", url: "/my-rules", icon: BookOpen },
   { title: "Insight Engine", url: "/insights", icon: Lightbulb },
   { title: "Investment Intel", url: "/investments", icon: TrendingUp },
