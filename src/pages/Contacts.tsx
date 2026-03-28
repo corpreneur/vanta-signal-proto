@@ -68,9 +68,29 @@ function computeContactStrength(c: Omit<ContactSummary, "strength" | "strengthLa
   });
 }
 
+// Senders that are bots, services, or non-human entities — excluded from contacts view
+const EXCLUDED_SENDERS = new Set([
+  "Brain Dump",
+  "Calendar Bot",
+  "Slack Bot",
+  "Newsletter Bot",
+  "LinkedIn",
+  "LinkedIn Notification",
+  "Industry Newsletter",
+  "Weekly Digest",
+  "Spam Filter",
+  "Q2 Board Prep",
+  "Q2 Planning",
+  "Investor Sync",
+  "Board Meeting",
+  "Portfolio Review",
+  "Team Standup",
+]);
+
 function buildContacts(signals: Signal[]): ContactSummary[] {
   const map = new Map<string, Omit<ContactSummary, "strength" | "strengthLabel">>();
   for (const s of signals) {
+    if (EXCLUDED_SENDERS.has(s.sender)) continue;
     const existing = map.get(s.sender);
     if (existing) {
       existing.signalCount++;
