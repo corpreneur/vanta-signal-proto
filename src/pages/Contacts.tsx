@@ -375,6 +375,30 @@ export default function Contacts() {
         </div>
       </Motion>
 
+      {/* Filter Chips */}
+      <Motion delay={57}>
+        <div className="mb-4 overflow-x-auto pb-1">
+          <ContactFilterChips
+            filters={contactFilters}
+            onChange={setContactFilters}
+            relationshipCounts={relationshipCounts}
+          />
+        </div>
+      </Motion>
+
+      {/* Post-call note prompt */}
+      {postCallPrompt && (
+        <Motion delay={58}>
+          <div className="mb-4">
+            <PostCallNotePrompt
+              contactName={postCallPrompt.contactName}
+              callSignalId={postCallPrompt.signalId}
+              onDismiss={() => setPostCallPrompt(null)}
+            />
+          </div>
+        </Motion>
+      )}
+
       {/* Relationship Graph */}
       <Motion delay={60}>
         <div className="mb-5">
