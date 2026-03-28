@@ -1,10 +1,11 @@
-import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useMemo, useRef } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, FileText, Image, File, Download, ExternalLink, Paperclip, FolderOpen } from "lucide-react";
+import { Search, FileText, Image, File, Download, ExternalLink, Paperclip, FolderOpen, Upload, X } from "lucide-react";
 import { Motion } from "@/components/ui/motion";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 interface VaultFile {
   name: string;
@@ -62,6 +63,30 @@ async function fetchAllFiles(): Promise<VaultFile[]> {
 
 export default function FileVault() {
   const [search, setSearch] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
+
+  const handleUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        const folder = `manual-${Date.now()}`;
+        const { error } = await supabase.storage
+          .from("signal-attachments")
+          .upload(`${folder}/${file.name}`, file);
+        if (error) throw error;
+      }
+      toast.success(`${files.length} file${files.length > 1 ? "s" : ""} uploaded`);
+      queryClient.invalidateQueries({ queryKey: ["file-vault"] });
+    } catch (err) {
+      toast.error("Upload failed — try again");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const { data: files = [], isLoading } = useQuery({
     queryKey: ["file-vault"],
@@ -107,11 +132,45 @@ export default function FileVault() {
         </header>
       </Motion>
 
+      {/* Upload drop zone */}
+      <Motion delay={30}>
+        <div
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={(e) => { e.preventDefault(); setDragOver(false); handleUpload(e.dataTransfer.files); }}
+          className={`border-2 border-dashed p-4 mb-6 text-center transition-colors ${
+            dragOver ? "border-primary bg-primary/5" : "border-border"
+          }`}
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            className="hidden"
+            onChange={(e) => handleUpload(e.target.files)}
+          />
+          {uploading ? (
+            <div className="flex items-center justify-center gap-2 py-2">
+              <div className="w-2 h-2 bg-primary animate-pulse" />
+              <span className="font-mono text-[10px] text-muted-foreground">Uploading…</span>
+            </div>
+          ) : (
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="inline-flex items-center gap-2 font-mono text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Upload className="w-3.5 h-3.5" />
+              Drop files here or click to upload
+            </button>
+          )}
+        </div>
+      </Motion>
+
       {/* Stats + Search */}
       <Motion delay={40}>
         <div className="flex items-center gap-4 mb-6">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-vanta-text-muted" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -120,11 +179,11 @@ export default function FileVault() {
             />
           </div>
           <div className="flex items-center gap-3 shrink-0">
-            <span className="font-mono text-[10px] text-vanta-text-muted">
+            <span className="font-mono text-[10px] text-muted-foreground">
               <Paperclip className="w-3 h-3 inline mr-1" />
               {files.length} files
             </span>
-            <span className="font-mono text-[10px] text-vanta-text-muted">
+            <span className="font-mono text-[10px] text-muted-foreground">
               {formatSize(totalSize)} total
             </span>
           </div>
