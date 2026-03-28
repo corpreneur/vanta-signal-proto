@@ -167,6 +167,49 @@ export default function Contacts() {
   const contacts = useMemo(() => buildContacts(signals), [signals]);
   const graphData = useMemo(() => buildGraph(signals), [signals]);
 
+  // Signal counts per contact name (for duplicate merge)
+  const signalCountMap = useMemo(() => {
+    const m: Record<string, number> = {};
+    contacts.forEach((c) => { m[c.name] = c.signalCount; });
+    return m;
+  }, [contacts]);
+
+  // Profile map for filter chips
+  const profileMap = useMemo(() => {
+    const m = new Map<string, { relationship_type: string }>();
+    profiles.forEach((p) => m.set(p.name, { relationship_type: p.relationship_type }));
+    return m;
+  }, [profiles]);
+
+  // Relationship type counts
+  const relationshipCounts = useMemo(() => {
+    const m = new Map<string, number>();
+    profiles.forEach((p) => m.set(p.relationship_type, (m.get(p.relationship_type) || 0) + 1));
+    return m;
+  }, [profiles]);
+
+  // Duplicate groups
+  const duplicateGroups = useMemo(() => findDuplicates(profiles, signalCountMap), [profiles, signalCountMap]);
+
+  // Detect recent phone calls for post-call prompt
+  useEffect(() => {
+    if (postCallPrompt) return;
+    const recentCall = signals.find(
+      (s) => s.source === "phone" && s.signalType === "PHONE_CALL" && daysBetween(s.capturedAt) === 0
+    );
+    if (recentCall) {
+      // Check if we already have a post-call note for this signal
+      const hasNote = signals.some(
+        (s) => s.source === "manual" && s.signalType === "CONTEXT" &&
+          (s.rawPayload as Record<string, unknown>)?._vanta_post_call_note === true &&
+          (s.rawPayload as Record<string, unknown>)?.call_signal_id === recentCall.id
+      );
+      if (!hasNote) {
+        setPostCallPrompt({ contactName: recentCall.sender, signalId: recentCall.id });
+      }
+    }
+  }, [signals, postCallPrompt]);
+
   const filtered = useMemo(() => {
     let list = contacts;
     if (search) {
@@ -177,6 +220,17 @@ export default function Contacts() {
       const tagContacts = allTags.get(filterTag) || [];
       list = list.filter((c) => tagContacts.includes(c.name));
     }
+    // Apply relationship + recency filter chips
+    if (contactFilters.relationshipType || contactFilters.recency !== "all") {
+      const names = new Set(
+        applyContactFilters(
+          list.map((c) => ({ name: c.name, daysSinceLast: c.daysSinceLast })),
+          contactFilters,
+          profileMap
+        ).map((c) => c.name)
+      );
+      list = list.filter((c) => names.has(c.name));
+    }
     const sortFns: Record<SortMode, (a: ContactSummary, b: ContactSummary) => number> = {
       strength: (a, b) => b.strength - a.strength,
       signals: (a, b) => b.signalCount - a.signalCount,
@@ -185,7 +239,7 @@ export default function Contacts() {
       high: (a, b) => b.highPriority - a.highPriority,
     };
     return [...list].sort(sortFns[sort]);
-  }, [contacts, search, sort, filterTag, allTags]);
+  }, [contacts, search, sort, filterTag, allTags, contactFilters, profileMap]);
 
   const totalContacts = contacts.length;
   const activeContacts = contacts.filter((c) => c.daysSinceLast <= 7).length;
