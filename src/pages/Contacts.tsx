@@ -589,6 +589,7 @@ export default function Contacts() {
       )}
 
       <VCardImportDialog open={importOpen} onClose={() => setImportOpen(false)} />
+      <DuplicateMergeDialog open={mergeOpen} onClose={() => setMergeOpen(false)} duplicates={duplicateGroups} />
     </div>
   );
 }
