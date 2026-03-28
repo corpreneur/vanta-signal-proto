@@ -97,7 +97,7 @@ export default function SmartContactCard({ contact }: { contact: SmartContactCar
                   </span>
                 )}
                 {profile?.relationship_type && profile.relationship_type !== "personal" && (
-                  <span className="px-1 py-0.5 font-mono text-[7px] uppercase tracking-wider border border-primary/20 bg-primary/5 text-primary">
+                  <span className="font-mono text-[8px] uppercase tracking-wider text-primary/70">
                     {RELATIONSHIP_LABELS[profile.relationship_type] || profile.relationship_type}
                   </span>
                 )}
@@ -175,8 +175,8 @@ export default function SmartContactCard({ contact }: { contact: SmartContactCar
             </div>
           )}
           {contact.highPriority > 0 && (
-            <span className="px-1.5 py-0.5 font-mono text-[9px] text-destructive border border-destructive/30 bg-destructive/5">
-              {contact.highPriority} HIGH
+            <span className="font-mono text-[9px] text-destructive">
+              {contact.highPriority} high
             </span>
           )}
           <div className="flex gap-1 ml-auto">
@@ -187,12 +187,12 @@ export default function SmartContactCard({ contact }: { contact: SmartContactCar
           </div>
         </div>
 
-        {/* Signal type chips */}
-        <div className="flex flex-wrap gap-1 mb-2">
+        {/* Signal type summary */}
+        <div className="flex flex-wrap gap-3 mb-2">
           {Object.entries(contact.signalTypes).map(([type, count]) => {
             const tc = SIGNAL_TYPE_COLORS[type as keyof typeof SIGNAL_TYPE_COLORS] || SIGNAL_TYPE_COLORS.CONTEXT;
             return (
-              <span key={type} className={`${tc.bg} ${tc.text} text-[8px] font-mono px-1.5 py-0.5 border ${tc.border} uppercase tracking-wider`}>
+              <span key={type} className={`${tc.text} text-[9px] font-mono uppercase tracking-wider`}>
                 {type} {count}
               </span>
             );

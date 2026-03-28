@@ -69,9 +69,9 @@ export default function ContactFilterChips({ filters, onChange, relationshipCoun
           <button
             key={rt}
             onClick={() => onChange({ ...filters, relationshipType: active ? null : rt })}
-            className={`px-2.5 py-1 rounded-full font-mono text-[9px] uppercase tracking-wider transition-colors ${
+            className={`px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider transition-colors ${
               active
-                ? "bg-primary text-primary-foreground"
+                ? "bg-foreground text-background"
                 : "border border-border text-muted-foreground hover:text-foreground hover:border-foreground/20"
             }`}
           >
@@ -91,7 +91,7 @@ export default function ContactFilterChips({ filters, onChange, relationshipCoun
           <button
             key={opt.value}
             onClick={() => onChange({ ...filters, recency: active ? "all" : opt.value })}
-            className={`px-2.5 py-1 rounded-full font-mono text-[9px] uppercase tracking-wider transition-colors ${
+            className={`px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider transition-colors ${
               active
                 ? "bg-foreground text-background"
                 : "border border-border text-muted-foreground hover:text-foreground hover:border-foreground/20"
