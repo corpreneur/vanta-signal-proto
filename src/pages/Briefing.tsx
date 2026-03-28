@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -107,6 +108,7 @@ async function fetchBriefing(id: string) {
 
 export default function Briefing() {
   const { id } = useParams<{ id: string }>();
+  const [emailing, setEmailing] = useState(false);
   const { data, isLoading, error } = useQuery({
     queryKey: ["briefing", id],
     queryFn: () => fetchBriefing(id!),
@@ -131,8 +133,6 @@ export default function Briefing() {
 
   const { brief, meeting, attendeeSignals } = data;
   const attendees = Object.entries(brief.attendee_context);
-
-  const [emailing, setEmailing] = useState(false);
 
   const handleExportPdf = () => {
     document.body.classList.add("print-brief");
