@@ -12,6 +12,7 @@ import InlineBrainDump from "@/components/InlineBrainDump";
 import WhatsAhead from "@/components/WhatsAhead";
 import EnhancedActionItems from "@/components/EnhancedActionItems";
 import DailyTimeline from "@/components/DailyTimeline";
+import TimelineView from "@/components/timeline/TimelineView";
 import SignalEntryCard from "@/components/SignalEntryCard";
 import { toast } from "sonner";
 import {
@@ -330,20 +331,16 @@ const Index = () => {
         </Motion>
       ) : isExecutive ? (
         <>
-          {/* Executive: meetings first, then action items (high-only timeline), cooling alerts */}
+          {/* Executive: meetings first, action items, hour-by-hour timeline, cooling */}
           <WhatsAhead />
           <EnhancedActionItems onSignalClick={(s) => setDrawerSignal(s)} />
-          <Motion delay={40}>
-            <DailyTimeline signals={activeSignals} onSignalClick={(s) => setDrawerSignal(s)} highOnly />
-          </Motion>
+          <TimelineView signals={activeSignals} onSignalClick={(s) => setDrawerSignal(s)} compact />
           <CoolingAlerts />
         </>
       ) : (
         <>
-          {/* Creative: timeline first (all signals), then what's ahead, then actions */}
-          <Motion delay={40}>
-            <DailyTimeline signals={activeSignals} onSignalClick={(s) => setDrawerSignal(s)} highOnly={false} />
-          </Motion>
+          {/* Creative: scrollable timeline first, then what's ahead, then actions */}
+          <TimelineView signals={activeSignals} onSignalClick={(s) => setDrawerSignal(s)} compact />
           <WhatsAhead />
           <EnhancedActionItems onSignalClick={(s) => setDrawerSignal(s)} />
           <CoolingAlerts />
