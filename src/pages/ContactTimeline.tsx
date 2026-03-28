@@ -317,22 +317,39 @@ export default function ContactTimeline() {
         </div>
       </Motion>
 
-      {/* View mode toggle */}
+      {/* View mode + Source filter toggles */}
       <Motion delay={110}>
-        <div className="flex gap-1 mb-6">
-          {(["timeline", "by-type"] as ViewMode[]).map((m) => (
-            <button
-              key={m}
-              onClick={() => setViewMode(m)}
-              className={`px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider border transition-colors ${
-                viewMode === m
-                  ? "border-foreground text-foreground bg-card"
-                  : "border-border text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {m === "timeline" ? "Timeline" : "By Type"}
-            </button>
-          ))}
+        <div className="flex flex-col gap-2 mb-6">
+          <div className="flex gap-1">
+            {(["timeline", "by-type"] as ViewMode[]).map((m) => (
+              <button
+                key={m}
+                onClick={() => setViewMode(m)}
+                className={`px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider border transition-colors ${
+                  viewMode === m
+                    ? "border-foreground text-foreground bg-card"
+                    : "border-border text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {m === "timeline" ? "Timeline" : "By Type"}
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-1">
+            {(["all", "calls", "messages", "notes"] as SourceFilter[]).map((f) => (
+              <button
+                key={f}
+                onClick={() => setSourceFilter(f)}
+                className={`px-2.5 py-1 rounded-full font-mono text-[9px] uppercase tracking-wider transition-colors ${
+                  sourceFilter === f
+                    ? "bg-foreground text-background"
+                    : "border border-border text-muted-foreground hover:text-foreground hover:border-foreground/20"
+                }`}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
         </div>
       </Motion>
 
