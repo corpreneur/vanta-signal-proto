@@ -53,13 +53,14 @@ function HeaderBar({ breadcrumb }: { breadcrumb: string }) {
 
   return (
     <>
-      <header className="sticky top-0 z-50 h-12 flex items-center justify-between border-b border-border bg-background/95 backdrop-blur-md px-3">
+      <header className="sticky top-0 z-50 h-12 flex items-center justify-between border-b border-border bg-background/95 backdrop-blur-md px-3" role="banner">
         <Button
           variant="ghost"
           onClick={toggleSidebar}
+          aria-label="Toggle navigation menu"
           className="flex items-center gap-2 h-auto px-3 py-1.5 rounded-md bg-muted/50 border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
         >
-          <Menu className="h-4 w-4 shrink-0" />
+          <Menu className="h-4 w-4 shrink-0" aria-hidden="true" />
           <span className="font-mono text-[10px] uppercase tracking-[0.15em]">
             {breadcrumb.split(" · ").pop()}
           </span>
@@ -68,9 +69,10 @@ function HeaderBar({ breadcrumb }: { breadcrumb: string }) {
         {/* Profile avatar button */}
         <button
           onClick={() => setProfileOpen(true)}
+          aria-label="Open profile menu"
           className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center ring-1 ring-primary/20 hover:ring-primary/40 transition-all"
         >
-          <User className="w-4 h-4 text-primary" />
+          <User className="w-4 h-4 text-primary" aria-hidden="true" />
         </button>
       </header>
 
@@ -90,7 +92,7 @@ export default function ProductLayout({ children }: ProductLayoutProps) {
         <ProductSidebar />
         <div className="flex-1 flex flex-col min-w-0">
           <HeaderBar breadcrumb={breadcrumb} />
-          <main className="flex-1">
+          <main id="main-content" className="flex-1" role="main">
             {children}
           </main>
           <SmartNoteFAB />
