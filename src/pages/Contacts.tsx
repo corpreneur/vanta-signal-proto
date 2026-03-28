@@ -342,11 +342,6 @@ export default function Contacts() {
       </Motion>
 
       {/* Contact Groups */}
-      <Motion delay={39}>
-        <div className="mb-5">
-          <ContactGroups />
-        </div>
-      </Motion>
 
       {/* Stats */}
       <Motion delay={40}>
