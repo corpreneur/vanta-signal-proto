@@ -38,10 +38,19 @@ export default function MyRulesHub() {
     <div className="max-w-[960px] mx-auto px-4 pt-6 pb-16">
       <Motion>
         <header className="mb-6">
-          <h1 className="font-display text-2xl md:text-3xl text-foreground tracking-tight">
+          <div className="flex items-center gap-3 mb-2">
+            <div
+              className="w-2 h-2 bg-primary"
+              style={{ animation: "pulse-dot 2s ease-in-out infinite" }}
+            />
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
+              Platform · Personal Ontology
+            </p>
+          </div>
+          <h1 className="font-display text-[clamp(28px,5vw,40px)] leading-[1.05] text-foreground mb-1">
             My Rules
           </h1>
-          <p className="text-muted-foreground text-xs font-mono mt-1.5 max-w-md">
+          <p className="font-sans text-[14px] text-muted-foreground leading-relaxed max-w-[640px]">
             Your personal ontology. How Vanta classifies, prioritizes, and acts on your behalf.
           </p>
         </header>
