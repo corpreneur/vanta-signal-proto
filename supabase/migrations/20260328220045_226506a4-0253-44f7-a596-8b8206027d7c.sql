@@ -1,0 +1,1 @@
+UPDATE contact_profiles SET photo_url = 'https://i.pravatar.cc/150?u=' || encode(name::bytea, 'base64') WHERE photo_url IS NULL;
