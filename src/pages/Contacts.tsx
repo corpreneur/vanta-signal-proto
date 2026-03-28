@@ -90,6 +90,7 @@ const EXCLUDED_SENDERS = new Set([
 function buildContacts(signals: Signal[]): ContactSummary[] {
   const map = new Map<string, Omit<ContactSummary, "strength" | "strengthLabel">>();
   for (const s of signals) {
+    if (EXCLUDED_SENDERS.has(s.sender)) continue;
     const existing = map.get(s.sender);
     if (existing) {
       existing.signalCount++;
