@@ -80,6 +80,12 @@ const DEMO_SIGNALS: DetectedSignal[] = [
   },
 ];
 
+const ATTENDEE_META = [
+  { name: "You", initials: "WT", role: "Host", company: "Vanta" },
+  { name: "Sarah Chen", initials: "SC", role: "GP", company: "Acme VC" },
+  { name: "Marcus Rivera", initials: "MR", role: "MD", company: "Portfolio Capital" },
+];
+
 const SUMMARY_POINTS = [
   "Series A terms locked at $12M pre-money valuation.",
   "Target close date held at Q3 with a dual-lead structure.",
