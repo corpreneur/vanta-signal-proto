@@ -95,7 +95,7 @@ export default function ProductLayout({ children }: ProductLayoutProps) {
           <main id="main-content" className="flex-1" role="main">
             {children}
           </main>
-          <SmartNoteFAB />
+          {path !== "/product/zoom-demo" && path !== "/zoom-demo" && <SmartNoteFAB />}
         </div>
       </div>
     </SidebarProvider>
