@@ -5,6 +5,9 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import PreSessionDossier from "@/components/zoom-demo/PreSessionDossier";
+import VideoGrid from "@/components/zoom-demo/VideoGrid";
+import PostSessionSummary from "@/components/zoom-demo/PostSessionSummary";
 
 /* ── Types ── */
 type Phase = "idle" | "generating" | "jwt-ready" | "inviting" | "invited" | "streaming" | "detecting" | "complete";
@@ -221,6 +224,9 @@ export default function ZoomDemo() {
         ))}
       </div>
 
+      {/* ── Pre-Meeting Dossier ── */}
+      <PreSessionDossier dimmed={phase !== "idle" && phase !== "generating"} />
+
       {/* ── Step 1: JWT Generation ── */}
       <section className="border border-border bg-card p-4 space-y-3">
         <div className="flex items-center gap-2">
@@ -350,6 +356,14 @@ export default function ZoomDemo() {
           </button>
         )}
 
+        {/* Live Video Grid */}
+        {(rtmsStatus === "streaming" || phase === "detecting") && (
+          <VideoGrid
+            activeSpeaker={TRANSCRIPT_LINES[Math.max(0, transcriptIndex - 1)]?.speaker || ""}
+            isStreaming={rtmsStatus === "streaming"}
+          />
+        )}
+
         {/* Live Transcript */}
         {transcriptIndex > 0 && (
           <div className="border border-border bg-muted p-3 max-h-48 overflow-y-auto space-y-1.5">
@@ -417,31 +431,7 @@ export default function ZoomDemo() {
       </section>
 
       {/* ── Complete State ── */}
-      {phase === "complete" && (
-        <div className="border border-border bg-card p-4 space-y-3">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-            <h2 className="font-mono text-xs uppercase tracking-wider text-foreground">Session complete</h2>
-          </div>
-          <p className="font-mono text-[10px] text-muted-foreground leading-relaxed">
-            3 signals captured, meeting artifact stored, attendee profiles enriched. Pre-meeting briefs for follow-up calls will include today's context automatically.
-          </p>
-          <div className="flex gap-2">
-            <button
-              onClick={resetDemo}
-              className="font-mono text-[10px] uppercase tracking-wider px-4 py-2 border border-border text-foreground hover:bg-muted transition-colors"
-            >
-              Reset demo
-            </button>
-            <a
-              href="/product/zoom-sdk"
-              className="font-mono text-[10px] uppercase tracking-wider px-4 py-2 bg-foreground text-background hover:bg-foreground/90 transition-colors inline-flex items-center gap-1.5"
-            >
-              Product concept →
-            </a>
-          </div>
-        </div>
-      )}
+      {phase === "complete" && <PostSessionSummary onReset={resetDemo} />}
     </div>
   );
 }
