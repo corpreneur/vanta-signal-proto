@@ -39,51 +39,6 @@ interface DetectedSignal {
   ts: string;
 }
 
-interface DossierAttendee {
-  name: string;
-  title: string;
-  company: string;
-  strength: number;
-  lastInteraction: string;
-  matchedSignals: { text: string; ago: string }[];
-  openCommitment: string;
-}
-
-const MOCK_JWT =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBfa2V5IjoiVmFudGFfU2lnbmFsIiwiaWF0IjoxNzEyMTgwMDAwLCJleHAiOjE3MTIxODM2MDAsInRwYyI6InZhbnRhLXNlc3Npb24tMDAxIiwicm9sZV90eXBlIjoxLCJ1c2VyX2lkZW50aXR5IjoiV2lsbGlhbSBUcmF5bG9yIn0.fake_signature_for_demo";
-
-const BASE_PARTICIPANTS: Participant[] = [
-  { name: "Sarah Chen", email: "sarah@acme.vc", joined: false },
-  { name: "Marcus Rivera", email: "marcus@portfolio.co", joined: false },
-];
-
-const DOSSIER_ATTENDEES: DossierAttendee[] = [
-  {
-    name: "Sarah Chen",
-    title: "General Partner",
-    company: "Acme Ventures",
-    strength: 82,
-    lastInteraction: "3 days ago via Email",
-    matchedSignals: [
-      { text: "Mentioned Series A timing — targeting Q2 close", ago: "3 weeks ago" },
-      { text: "Shared thesis on vertical SaaS market dynamics", ago: "5 weeks ago" },
-      { text: "Agreed to co-lead with Acme's seed fund", ago: "2 months ago" },
-    ],
-    openCommitment: "Send updated cap table by end of week",
-  },
-  {
-    name: "Marcus Rivera",
-    title: "Managing Director",
-    company: "Portfolio Capital",
-    strength: 64,
-    lastInteraction: "12 days ago via Zoom",
-    matchedSignals: [
-      { text: "Discussed portfolio allocation strategy for H2", ago: "2 weeks ago" },
-      { text: "Expressed interest in $1.5–2M allocation", ago: "1 month ago" },
-    ],
-    openCommitment: "Follow up on LP approval timeline",
-  },
-];
 
 const TRANSCRIPT_LINES: TranscriptLine[] = [
   { speaker: "You", text: "Thanks for joining. Let's walk through the current term structure." },
