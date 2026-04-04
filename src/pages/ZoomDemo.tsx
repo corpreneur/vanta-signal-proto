@@ -356,6 +356,14 @@ export default function ZoomDemo() {
           </button>
         )}
 
+        {/* Live Video Grid */}
+        {(rtmsStatus === "streaming" || phase === "detecting") && (
+          <VideoGrid
+            activeSpeaker={TRANSCRIPT_LINES[Math.max(0, transcriptIndex - 1)]?.speaker || ""}
+            isStreaming={rtmsStatus === "streaming"}
+          />
+        )}
+
         {/* Live Transcript */}
         {transcriptIndex > 0 && (
           <div className="border border-border bg-muted p-3 max-h-48 overflow-y-auto space-y-1.5">
