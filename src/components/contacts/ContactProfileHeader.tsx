@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Phone, MessageSquare, Mail, Edit3, Check, X, Building2, Briefcase, ExternalLink } from "lucide-react";
+import { Phone, MessageSquare, Mail, Edit3, Check, X, Building2, Briefcase, ExternalLink, Video } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
