@@ -84,7 +84,7 @@ const useCaseItems = [
   { title: "Investment Intel", url: "/investments", icon: TrendingUp },
   { title: "Decision Capture", url: "/decisions", icon: Gavel },
   { title: "Phone FMC Demo", url: "/product/phone-fmc-demo", icon: Phone },
-  { title: "Smart Embed", url: "/product/smart-embed", icon: Headphones },
+  { title: "Smart Embed", url: "/product/smart-embed", icon: Phone },
 ];
 
 const platformItems = [
