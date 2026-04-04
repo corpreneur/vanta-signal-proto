@@ -89,6 +89,7 @@ const platformItems = [
   { title: "Phone", url: "/product/phone-call", icon: Phone },
   { title: "Zoom", url: "/product/meeting", icon: Video },
   { title: "Vanta Zoom", url: "/product/zoom-sdk", icon: Video },
+  { title: "Zoom Demo", url: "/zoom-demo", icon: Video },
   { title: "Email", url: "/product/email", icon: Mail },
   { title: "Calendar", url: "/product/calendar", icon: Calendar },
 ];
