@@ -242,9 +242,7 @@ export default function ZoomDemo() {
         ))}
       </div>
 
-      <ZoomSectionBoundary title="Pre-meeting dossier">
-        <PreSessionDossier dimmed={phase !== "idle" && phase !== "generating"} />
-      </ZoomSectionBoundary>
+      <PreSessionDossier dimmed={phase !== "idle" && phase !== "generating"} />
 
       <section className="space-y-3 border border-border bg-card p-4">
         <div className="flex items-center gap-2">
