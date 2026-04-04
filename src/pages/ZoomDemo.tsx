@@ -69,6 +69,7 @@ export default function ZoomDemo() {
   const [phase, setPhase] = useState<Phase>("idle");
   const [jwt, setJwt] = useState("");
   const [sessionId, setSessionId] = useState("");
+  const [meetingDbId, setMeetingDbId] = useState<string | null>(null);
   const [participants, setParticipants] = useState<Participant[]>(MOCK_PARTICIPANTS.map(p => ({ ...p })));
   const [transcriptIndex, setTranscriptIndex] = useState(0);
   const [detectedSignals, setDetectedSignals] = useState<DetectedSignal[]>([]);
