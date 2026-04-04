@@ -140,6 +140,7 @@ const AppRoutes = () => {
       <Route path="/case-02" element={<Navigate to="/case/02" replace />} />
       <Route path="/case-03" element={<Navigate to="/case/03" replace />} />
       <Route path="/orb-demo" element={<OrbDemo />} />
+      <Route path="/zoom-demo" element={<ProtectedRoute session={session}><ProductLayout><ZoomDemo /></ProductLayout></ProtectedRoute>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
