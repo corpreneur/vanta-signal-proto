@@ -69,27 +69,31 @@ const channelItems = [
 ];
 
 const productItems = [
+  /* Meetings & Video */
   { title: "Meetings", url: "/meetings", icon: Video },
   { title: "Zoom Demo", url: "/product/zoom-demo", icon: Video },
+  { title: "Vanta Zoom", url: "/product/zoom-sdk", icon: Video },
+  /* People & Relationships */
   { title: "Smart Contacts", url: "/contacts", icon: Users },
   { title: "Relationship Graph", url: "/graph", icon: Network },
-  
-  { title: "My Rules", url: "/my-rules", icon: BookOpen },
+  /* Intelligence */
   { title: "Insight Engine", url: "/insights", icon: Lightbulb },
   { title: "Investment Intel", url: "/investments", icon: TrendingUp },
   { title: "Decision Capture", url: "/decisions", icon: Gavel },
+  { title: "My Rules", url: "/my-rules", icon: BookOpen },
 ];
 
 const platformItems = [
+  /* Architecture & Processing */
   { title: "Context Layer", url: "/product/context", icon: FileText },
   { title: "Noise Filter", url: "/product/noise", icon: Volume2 },
   { title: "Ontology", url: "/ontology", icon: Layers },
-  { title: "Phone FMC", url: "/phone-fmc", icon: BookOpen },
   { title: "Architecture", url: "/architecture", icon: FileCode },
+  /* Channel Sources */
   { title: "iMessage", url: "/product/intro", icon: MessageSquare },
   { title: "Phone", url: "/product/phone-call", icon: Phone },
+  { title: "Phone FMC", url: "/phone-fmc", icon: BookOpen },
   { title: "Zoom", url: "/product/meeting", icon: Video },
-  { title: "Vanta Zoom", url: "/product/zoom-sdk", icon: Video },
   { title: "Email", url: "/product/email", icon: Mail },
   { title: "Calendar", url: "/product/calendar", icon: Calendar },
 ];
