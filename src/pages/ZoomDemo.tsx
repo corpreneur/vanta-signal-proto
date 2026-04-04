@@ -84,49 +84,6 @@ const FOLLOW_UPS = [
   "You: prepare the revised cap table and closing checklist.",
 ];
 
-function DossierCard({ attendee }: { attendee: DossierAttendee }) {
-  return (
-    <article className="space-y-3 border border-border bg-card p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h3 className="font-mono text-[11px] font-bold text-foreground">{attendee.name}</h3>
-          <p className="font-mono text-[9px] text-muted-foreground">
-            {attendee.title} · {attendee.company}
-          </p>
-        </div>
-        <div className="text-right">
-          <p className="font-mono text-[10px] font-bold text-foreground">{attendee.strength} / 100</p>
-          <p className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground">Relationship</p>
-        </div>
-      </div>
-
-      <div className="h-1 w-full overflow-hidden bg-muted">
-        <div className="h-full bg-foreground" style={{ width: `${attendee.strength}%` }} />
-      </div>
-
-      <div className="flex items-center gap-1.5 font-mono text-[9px] text-muted-foreground">
-        <Clock className="h-3 w-3" />
-        <span>Last: {attendee.lastInteraction}</span>
-      </div>
-
-      <div className="space-y-2">
-        <p className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground">Matched signals</p>
-        {attendee.matchedSignals.map((signal) => (
-          <div key={`${attendee.name}-${signal.text}`} className="flex items-start justify-between gap-3">
-            <p className="font-mono text-[9px] leading-relaxed text-foreground">{signal.text}</p>
-            <span className="shrink-0 font-mono text-[8px] text-muted-foreground">{signal.ago}</span>
-          </div>
-        ))}
-      </div>
-
-      <div className="border-t border-border pt-3">
-        <p className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground">Open commitment</p>
-        <p className="mt-1 font-mono text-[10px] text-foreground">{attendee.openCommitment}</p>
-      </div>
-    </article>
-  );
-}
-
 function VideoTile({ name, active, muted }: { name: string; active: boolean; muted: boolean }) {
   return (
     <div className={`relative flex min-h-24 flex-col items-center justify-center gap-2 border p-3 ${active ? "border-foreground bg-muted" : "border-border bg-card"}`}>
