@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  StickyNote, Mail, Calendar, Mic, MessageSquare, AlarmClock, Gift,
+  StickyNote, Mail, Calendar, Mic, MessageSquare, AlarmClock, Video,
 } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import NoteCapture from "@/components/NoteCapture";
