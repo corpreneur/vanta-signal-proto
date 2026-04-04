@@ -27,7 +27,7 @@ function formatTime(iso: string) {
 interface HourBlockProps {
   hour: number;
   signals: Signal[];
-  meetings: Array<{ id: string; title: string; starts_at: string; ends_at: string | null }>;
+  meetings: Array<{ id: string; title: string; starts_at: string; ends_at: string | null; zoom_meeting_id?: string | null }>;
   isCurrentHour: boolean;
   onSignalClick: (s: Signal) => void;
   onDelete: (id: string, e: React.MouseEvent) => void;
