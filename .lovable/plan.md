@@ -1,77 +1,73 @@
 
 
-# Plan: Zoom Launch Buttons + RTMS Integration
+# Plan: Vanta Zoom Product Concept Page
 
 ## What We're Building
 
-Two connected workstreams: (1) surface "Launch Zoom" / "Start Meeting" buttons across every relevant touchpoint in the app, and (2) wire those launches to trigger RTMS stream activation so Vanta captures live meeting intelligence automatically.
+A dedicated product concept page at `/product/zoom` that articulates the vision for Vanta's native Zoom meeting experience, built on the Zoom Video SDK (iOS). This follows the existing `ProductSignalPage` pattern used for iMessage, Phone, Email, Calendar, etc. -- and gets wired into the sidebar under the existing "Platform" or "Channels" nav groups.
 
-## RTMS Architecture (from Zoom docs)
+## Why Video SDK, Not Meeting SDK
 
-RTMS streams can launch three ways:
-- **Automatically** -- when a user joins/hosts a meeting
-- **On-demand** -- via REST API with meeting ID
-- **From a Zoom App** -- using `startRTMS()` in the Zoom Apps SDK
+The Zoom Video SDK is fundamentally different from the standard Zoom client integration:
+- **Session-based** (not meeting-based) -- no Zoom account required for participants
+- **Full UI control** -- Vanta owns the entire video experience, no Zoom chrome
+- **Raw data access** -- direct audio/video streams for real-time AI processing
+- **RTMS built-in** -- live transcription, speaker diarization, command channel
+- **Up to 5,000 participants** per session
+- **iOS native** via Swift/Obj-C with Metal renderer support
 
-For Vanta, the flow is: user taps "Launch Zoom" in our UI → we open `zoommtg://` deep link or `https://zoom.us/j/{id}` → a webhook fires `meeting.started` → our backend calls the RTMS REST API to start streaming → live transcript data flows via WebSocket to our edge function → signals are classified and stored in real-time.
-
-## Surface Points for Zoom Launch Buttons
-
-### 1. WhatsAhead (Dashboard "Coming Up" section)
-Each meeting row gets a "Launch" button (Video icon) on the right side, next to the existing Brief link. Taps open the Zoom meeting via `zoom_meeting_id` from `upcoming_meetings` table or fall back to creating a new meeting.
-
-### 2. Timeline HourBlock (meetings in the day view)
-Each meeting bar in the timeline gets a small Video launch icon. Clicking opens Zoom for that meeting.
-
-### 3. PreMeetingBriefCard
-Add a "Join Meeting" button in the actions row alongside "Full Dossier". This is the highest-intent moment -- user is reviewing the brief right before the call.
-
-### 4. QuickActionsGrid
-Replace the "Offers" (coming soon) slot with a "Start Zoom" action that launches a new Zoom meeting via `https://zoom.us/start/videomeeting`. Or add it as a new entry in the grid.
-
-### 5. ContactProfileHeader
-Add a Video/Zoom icon to the quick-action buttons row (alongside Call, Text, Email, LinkedIn). Launches a Zoom meeting with the contact.
-
-### 6. Command Page -- ChannelAgnosticComms
-Already has a Zoom channel button. Verify it works; no changes needed here.
-
-### 7. Signal Detail Drawer (meeting cards)
-For MEETING-type signals, add a "Rejoin" or "Open Recording" button that links to the Zoom recording or meeting URL.
-
-## Backend: RTMS Webhook Listener
-
-### New Edge Function: `rtms-webhook`
-Receives RTMS events from Zoom's WebSocket relay:
-- `meeting.rtms.started` -- log that stream is active
-- `meeting.rtms.stopped` -- finalize transcript
-- Transcript chunks arrive via WebSocket with speaker labels and timestamps
-- Each chunk is buffered and periodically classified using the existing Haiku triage + Sonnet detection pipeline
-
-### Database Changes
-- Add `rtms_stream_id` column to `upcoming_meetings` to track active streams
-- Add `rtms_status` enum column (`idle`, `streaming`, `completed`) to `upcoming_meetings`
-
-### New Edge Function: `start-rtms-stream`
-Called after user launches Zoom. Takes a `meeting_id`, calls Zoom's RTMS REST API to start the stream. Requires Zoom OAuth credentials (already partially scaffolded via the zoom-webhook function).
+This means Vanta can build a fully branded, intelligence-first meeting experience where signal capture is architectural, not bolted on.
 
 ## Implementation Steps
 
-1. **Create a shared `ZoomLaunchButton` component** -- accepts `meetingId?`, `meetingUrl?`, `contactName?`, renders the Zoom-blue video icon button. Handles deep link logic (`zoommtg://` for native, `https://zoom.us/j/` for web). Fires a toast confirmation and optionally calls `start-rtms-stream`.
+### 1. Add "zoom-sdk" product definition to `ProductSignalPage.tsx`
 
-2. **Wire the button into all 6 surface points** listed above.
+Add a new entry to the `PRODUCTS` record with key `"zoom-sdk"`:
 
-3. **Create `start-rtms-stream` edge function** -- calls Zoom REST API to initiate RTMS. Requires `ZOOM_CLIENT_ID`, `ZOOM_CLIENT_SECRET`, `ZOOM_ACCOUNT_ID` secrets.
+- **type**: `MEETING`
+- **label**: "Vanta Zoom"
+- **icon**: `Video`
+- **tagline**: "Your meetings, your intelligence layer... a fully native Zoom experience inside Vanta."
+- **channels**: `["Zoom Video SDK (iOS)", "RTMS Live Transcription", "Command Channel"]`
+- **narrative**: 3 paragraphs covering:
+  - Why a native SDK integration matters vs. just joining Zoom links
+  - Session-based architecture: no Zoom accounts needed for guests, Vanta owns the UI
+  - Real-time intelligence: RTMS streams feed live transcription into the signal pipeline, signals are detected during the call not after
+- **howItWorks**: 5 steps:
+  1. Session Creation -- Vanta backend generates a Video SDK JWT and creates a session
+  2. Native Launch -- iOS app joins the session via Zoom Video SDK with custom Vanta UI
+  3. RTMS Stream -- Live audio/video routed through RTMS for real-time transcription with speaker attribution
+  4. Live Signal Detection -- Transcript chunks classified in real-time: decisions, commitments, action items surfaced during the call
+  5. Post-Session Intelligence -- Full transcript processed through deep analysis pipeline, meeting artifact stored with signals linked to attendee profiles
+- **signalExamples**: 3 examples showing live in-call signal detection
+- **whyItMatters**: Quote about owning the video layer = owning the intelligence layer
 
-4. **Create `rtms-webhook` edge function** -- receives streaming transcript data, buffers it, classifies in chunks, writes signals to DB in near-real-time.
+### 2. Add route entry
 
-5. **Add DB migration** -- `rtms_stream_id` and `rtms_status` on `upcoming_meetings`.
+The existing route `<Route path="product/:signalType" element={<ProductSignalPage />} />` already handles dynamic product pages. The key `"zoom-sdk"` will resolve automatically at `/product/zoom-sdk`.
 
-6. **Update `supabase/config.toml`** -- add `[functions.rtms-webhook]` and `[functions.start-rtms-stream]` with `verify_jwt = false`.
+### 3. Add sidebar navigation entry
+
+Add `{ title: "Vanta Zoom", url: "/product/zoom-sdk", icon: Video }` to the `channelItems` or `platformItems` array in `ProductSidebar.tsx`. Place it alongside the existing Zoom entry or replace it, since this represents the evolved product concept.
+
+### 4. Add iOS-specific feature callouts
+
+Extend the product definition with additional detail about iOS Video SDK capabilities:
+- HD video with virtual backgrounds
+- Multiple camera support
+- Screen sharing with annotation
+- Whiteboard collaboration
+- Cloud recording
+- Live streaming via RTMP
+- Apple Metal renderer for optimized iOS performance
+- Apple Vision Pro support (visionOS)
+
+These will render naturally through the existing `howItWorks` and `signalExamples` sections.
 
 ## Technical Notes
 
-- The `ZoomLaunchButton` component uses the existing `vanta-accent-zoom` color tokens already defined in the design system
-- RTMS requires a Zoom General App with RTMS scopes (`rtms:media:read`). The PRD already calls for submitting this app for approval
-- Until RTMS is approved, the launch buttons still work -- they just open Zoom without the live stream. The Recall.ai fallback continues to handle post-meeting processing
-- No pills. All buttons use the existing square-edged mono-font pattern
+- No new files needed -- this extends the existing `PRODUCTS` record in `ProductSignalPage.tsx` and adds a nav link in `ProductSidebar.tsx`
+- The `MEETING` signal type already has color tokens defined in `SIGNAL_TYPE_COLORS`
+- The page follows the exact same rendering pattern as all other product concept pages (narrative, how-it-works steps, signal examples, why-it-matters quote)
+- iOS-only positioning is captured in the narrative and channels, not as a separate UI element
 
