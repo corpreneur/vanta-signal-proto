@@ -161,10 +161,10 @@ export default function ReleaseNotes() {
           <Zap className="w-4 h-4 text-primary shrink-0" />
           <div>
             <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-primary">
-              Latest Drop · v2.4…v2.5
+              Latest Drop · v2.6
             </span>
             <p className="font-sans text-[13px] text-muted-foreground leading-snug">
-              Sprint Completion, Overdue Alerts, Channel-Agnostic Comms & Meeting Intelligence Hub.
+              Navigation consolidation, sidebar reorg & Context Commander reference.
             </p>
           </div>
         </div>
