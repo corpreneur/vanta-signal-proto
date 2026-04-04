@@ -161,10 +161,10 @@ export default function ReleaseNotes() {
           <Zap className="w-4 h-4 text-primary shrink-0" />
           <div>
             <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-primary">
-              Latest Drop · v2.6
+              Latest Drop · v2.8
             </span>
             <p className="font-sans text-[13px] text-muted-foreground leading-snug">
-              Navigation consolidation, sidebar reorg & Context Commander reference.
+              Zoom RTMS live intelligence, Vanta Zoom concept & Phone FMC Demo.
             </p>
           </div>
         </div>
