@@ -213,6 +213,8 @@ export function ProductSidebar() {
         <CollapsibleNavGroup label="Product Concepts" items={productItems} collapsed={collapsed} currentPath={currentPath} />
         <CollapsibleNavGroup label="Platform" items={platformItems} collapsed={collapsed} currentPath={currentPath} />
 
+        <CollapsibleNavGroup label="Use Cases" items={useCaseItems} collapsed={collapsed} currentPath={currentPath} />
+
         {/* Cases */}
         <Collapsible defaultOpen={currentPath.startsWith("/case/")}>
           <SidebarGroup>
