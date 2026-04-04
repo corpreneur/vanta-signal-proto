@@ -224,6 +224,9 @@ export default function ZoomDemo() {
         ))}
       </div>
 
+      {/* ── Pre-Meeting Dossier ── */}
+      <PreSessionDossier dimmed={phase !== "idle" && phase !== "generating"} />
+
       {/* ── Step 1: JWT Generation ── */}
       <section className="border border-border bg-card p-4 space-y-3">
         <div className="flex items-center gap-2">
