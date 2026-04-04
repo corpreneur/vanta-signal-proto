@@ -34,6 +34,7 @@ import FeedbackBacklog from "./pages/FeedbackBacklog";
 import FeedbackEmbed from "./pages/FeedbackEmbed";
 import SprintBoard from "./pages/SprintBoard";
 import PhoneFMCDemo from "./pages/PhoneFMCDemo";
+import SmartEmbedConcept from "./pages/SmartEmbedConcept";
 
 import Settings from "./pages/Settings";
 import PersonalInfo from "./pages/PersonalInfo";
