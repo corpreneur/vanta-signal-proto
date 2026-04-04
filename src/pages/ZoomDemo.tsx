@@ -39,6 +39,14 @@ interface DetectedSignal {
   ts: string;
 }
 
+const MOCK_JWT =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBfa2V5IjoiVmFudGFfU2lnbmFsIiwiaWF0IjoxNzEyMTgwMDAwLCJleHAiOjE3MTIxODM2MDAsInRwYyI6InZhbnRhLXNlc3Npb24tMDAxIiwicm9sZV90eXBlIjoxLCJ1c2VyX2lkZW50aXR5IjoiV2lsbGlhbSBUcmF5bG9yIn0.fake_signature_for_demo";
+
+const BASE_PARTICIPANTS: Participant[] = [
+  { name: "Sarah Chen", email: "sarah@acme.vc", joined: false },
+  { name: "Marcus Rivera", email: "marcus@portfolio.co", joined: false },
+];
+
 
 const TRANSCRIPT_LINES: TranscriptLine[] = [
   { speaker: "You", text: "Thanks for joining. Let's walk through the current term structure." },
