@@ -10,6 +10,33 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "2.8.0",
+    date: "2026-04-04",
+    title: "Zoom RTMS Live Intelligence & Vanta Zoom",
+    changes: [
+      { type: "feature", text: "ZoomLaunchButton — one-click meeting launch deployed across Signal Feed, Contacts, Pre-meeting Briefs, Timeline, Meetings, and WhatsAhead surfaces" },
+      { type: "feature", text: "Vanta Zoom concept page — native Zoom SDK experience at /product/zoom-sdk with pre-session dossier, live video grid, and post-session summary" },
+      { type: "feature", text: "RTMS webhook — real-time transcript ingestion from Zoom RTMS with Gemini-based signal classification pipeline" },
+      { type: "feature", text: "start-rtms-stream edge function — initiates live media stream capture when launching a Zoom meeting from the UI" },
+      { type: "improvement", text: "Meeting state tracking via rtms_stream_id and rtms_status fields (idle → streaming → completed) in upcoming_meetings" },
+      { type: "feature", text: "Phone FMC Demo — dedicated concept page showcasing first-mile capture from phone calls with live transcript cards" },
+    ],
+  },
+  {
+    version: "2.7.0",
+    date: "2026-03-28",
+    title: "Smart Contacts Evolution & Relationship Intelligence",
+    changes: [
+      { type: "feature", text: "contact_profiles table — persistent identity layer decoupled from transient signals with photo, title, company, relationship type, and private notes" },
+      { type: "feature", text: "Contacts home redesign — Pinned Rail (top 5), Re-engage Tray (dormant >30d), and New People Tray for unsaved INTRO signals" },
+      { type: "feature", text: "SmartContactCard v2 — relationship badges, 8-week activity sparkline, AI 'Prepare' button for on-demand relationship briefs" },
+      { type: "feature", text: "Post-Call Note prompt — automated inline capture modal triggered when a phone signal is detected without a corresponding manual note" },
+      { type: "feature", text: "Duplicate merge system — identifies overlapping contact records by name, email, or phone digit overlap for one-click consolidation" },
+      { type: "improvement", text: "Contact filtering by relationship type and recency (7d, 30d, 90d, Stale) using square-edged filter chips" },
+      { type: "improvement", text: "Timeline dashboard with collapsible hour blocks and toggle between timeline and list views" },
+    ],
+  },
+  {
     version: "2.6.0",
     date: "2026-04-04",
     title: "Navigation Consolidation & Context Commander Reference",
