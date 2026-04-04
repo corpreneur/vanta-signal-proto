@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, AlertTriangle, ChevronRight } from "lucide-react";
+import { Calendar, AlertTriangle, ChevronRight, Video } from "lucide-react";
 import ZoomLaunchButton from "@/components/ZoomLaunchButton";
 import { Link } from "react-router-dom";
 import { Motion } from "@/components/ui/motion";
