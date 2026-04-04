@@ -13,6 +13,7 @@ interface Meeting {
   title: string;
   starts_at: string;
   ends_at: string | null;
+  zoom_meeting_id?: string | null;
 }
 
 interface TimelineViewProps {
