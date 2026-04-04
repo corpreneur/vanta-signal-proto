@@ -76,11 +76,13 @@ const productItems = [
   /* People & Relationships */
   { title: "Smart Contacts", url: "/contacts", icon: Users },
   { title: "Relationship Graph", url: "/graph", icon: Network },
-  /* Intelligence */
+  { title: "My Rules", url: "/my-rules", icon: BookOpen },
+];
+
+const useCaseItems = [
   { title: "Insight Engine", url: "/insights", icon: Lightbulb },
   { title: "Investment Intel", url: "/investments", icon: TrendingUp },
   { title: "Decision Capture", url: "/decisions", icon: Gavel },
-  { title: "My Rules", url: "/my-rules", icon: BookOpen },
 ];
 
 const platformItems = [
@@ -209,6 +211,7 @@ export function ProductSidebar() {
         <div className="mx-3 border-t border-vanta-border" />
 
         <CollapsibleNavGroup label="Product Concepts" items={productItems} collapsed={collapsed} currentPath={currentPath} />
+        <CollapsibleNavGroup label="Use Cases" items={useCaseItems} collapsed={collapsed} currentPath={currentPath} />
         <CollapsibleNavGroup label="Platform" items={platformItems} collapsed={collapsed} currentPath={currentPath} />
 
         {/* Cases */}
