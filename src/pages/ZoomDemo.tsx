@@ -1,15 +1,26 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, type ReactNode } from "react";
 import {
-  Video, Shield, Users, Radio, CheckCircle2, Copy, Loader2,
-  Mic, MonitorUp, Pen, Cloud, Eye, Zap,
+  Video,
+  Shield,
+  Users,
+  Radio,
+  CheckCircle2,
+  Copy,
+  Loader2,
+  Mic,
+  MonitorUp,
+  Pen,
+  Cloud,
+  Eye,
+  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import PreSessionDossier from "@/components/zoom-demo/PreSessionDossier";
 import VideoGrid from "@/components/zoom-demo/VideoGrid";
 import PostSessionSummary from "@/components/zoom-demo/PostSessionSummary";
 
-/* ── Types ── */
 type Phase = "idle" | "generating" | "jwt-ready" | "inviting" | "invited" | "streaming" | "detecting" | "complete";
 
 interface Participant {
@@ -25,8 +36,8 @@ interface DetectedSignal {
   ts: string;
 }
 
-/* ── Mock data ── */
-const MOCK_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBfa2V5IjoiVmFudGFfU2lnbmFsIiwiaWF0IjoxNzEyMTgwMDAwLCJleHAiOjE3MTIxODM2MDAsInRwYyI6InZhbnRhLXNlc3Npb24tMDAxIiwicm9sZV90eXBlIjoxLCJ1c2VyX2lkZW50aXR5IjoiV2lsbGlhbSBUcmF5bG9yIn0.fake_signature_for_demo";
+const MOCK_JWT =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBfa2V5IjoiVmFudGFfU2lnbmFsIiwiaWF0IjoxNzEyMTgwMDAwLCJleHAiOjE3MTIxODM2MDAsInRwYyI6InZhbnRhLXNlc3Npb24tMDAxIiwicm9sZV90eXBlIjoxLCJ1c2VyX2lkZW50aXR5IjoiV2lsbGlhbSBUcmF5bG9yIn0.fake_signature_for_demo";
 
 const MOCK_PARTICIPANTS: Participant[] = [
   { name: "Sarah Chen", email: "sarah@acme.vc", joined: false },
@@ -50,7 +61,6 @@ const TRANSCRIPT_LINES = [
   { speaker: "Sarah Chen", text: "The vertical SaaS play gives us three-x better unit economics than horizontal." },
 ];
 
-/* ── Helpers ── */
 const SIGNAL_COLORS: Record<string, { bg: string; text: string; border: string }> = {
   DECISION: { bg: "bg-amber-500/10", text: "text-amber-400", border: "border-amber-500/20" },
   INVESTMENT: { bg: "bg-emerald-500/10", text: "text-emerald-400", border: "border-emerald-500/20" },
@@ -67,22 +77,21 @@ const SDK_FEATURES = [
   { icon: Mic, label: "Speaker ID", desc: "Real-time diarisation" },
 ];
 
-/* ── Component ── */
 export default function ZoomDemo() {
   const [phase, setPhase] = useState<Phase>("idle");
   const [jwt, setJwt] = useState("");
   const [sessionId, setSessionId] = useState("");
   const [meetingDbId, setMeetingDbId] = useState<string | null>(null);
-  const [participants, setParticipants] = useState<Participant[]>(MOCK_PARTICIPANTS.map(p => ({ ...p })));
+  const [participants, setParticipants] = useState<Participant[]>(MOCK_PARTICIPANTS.map((participant) => ({ ...participant })));
   const [transcriptIndex, setTranscriptIndex] = useState(0);
   const [detectedSignals, setDetectedSignals] = useState<DetectedSignal[]>([]);
   const [rtmsStatus, setRtmsStatus] = useState<"idle" | "connecting" | "streaming" | "completed">("idle");
 
-  /* Phase: Generate JWT — creates a real meeting in the DB */
   const handleGenerateJwt = useCallback(async () => {
     setPhase("generating");
     const sid = `vanta-session-${Date.now().toString(36)}`;
     setSessionId(sid);
+
     try {
       const startsAt = new Date(Date.now() + 5 * 60_000).toISOString();
       const { data, error } = await supabase
@@ -92,36 +101,34 @@ export default function ZoomDemo() {
           starts_at: startsAt,
           ends_at: new Date(Date.now() + 35 * 60_000).toISOString(),
           zoom_meeting_id: sid,
-          attendees: MOCK_PARTICIPANTS.map(p => ({ name: p.name, email: p.email })),
+          attendees: MOCK_PARTICIPANTS.map((participant) => ({ name: participant.name, email: participant.email })),
         })
         .select("id")
         .single();
 
       if (error) throw error;
+
       setMeetingDbId(data.id);
       setJwt(MOCK_JWT);
       setPhase("jwt-ready");
       toast.success("Session created & JWT generated");
     } catch (err) {
       console.error("JWT generation failed:", err);
-      // Graceful fallback to mock flow
       setJwt(MOCK_JWT);
       setPhase("jwt-ready");
       toast.success("Video SDK JWT generated (demo mode)");
     }
   }, []);
 
-  /* Phase: Send invites */
   const handleInvite = useCallback(() => {
     setPhase("inviting");
     setTimeout(() => {
-      setParticipants(prev => prev.map(p => ({ ...p, joined: true })));
+      setParticipants((prev) => prev.map((participant) => ({ ...participant, joined: true })));
       setPhase("invited");
       toast.success("Participants joined the session");
     }, 2200);
   }, []);
 
-  /* Phase: Start RTMS — calls the real edge function */
   const handleStartRtms = useCallback(async () => {
     setPhase("streaming");
     setRtmsStatus("connecting");
@@ -131,39 +138,46 @@ export default function ZoomDemo() {
         const { data, error } = await supabase.functions.invoke("start-rtms-stream", {
           body: { meeting_id: meetingDbId },
         });
+
         if (error) throw error;
         console.log("RTMS response:", data);
 
         if (data?.status === "streaming") {
           toast.success("RTMS stream activated");
         } else {
-          toast("RTMS unavailable — running demo simulation", { description: data?.reason || data?.status });
+          toast("RTMS unavailable — running demo simulation", {
+            description: data?.reason || data?.status,
+          });
         }
       } catch (err) {
         console.error("RTMS start failed:", err);
-        toast("RTMS not available — simulating stream", { description: "Zoom credentials not configured" });
+        toast("RTMS not available — simulating stream", {
+          description: "Zoom credentials not configured",
+        });
       }
     }
 
     setTimeout(() => setRtmsStatus("streaming"), 1200);
-  }, []);
+  }, [meetingDbId]);
 
-  /* Transcript simulation */
   useEffect(() => {
     if (rtmsStatus !== "streaming") return;
+
     if (transcriptIndex >= TRANSCRIPT_LINES.length) {
       setPhase("detecting");
       return;
     }
+
     const timer = setTimeout(() => {
-      setTranscriptIndex(i => i + 1);
+      setTranscriptIndex((index) => index + 1);
     }, 1600);
+
     return () => clearTimeout(timer);
   }, [rtmsStatus, transcriptIndex]);
 
-  /* Signal detection simulation */
   useEffect(() => {
     if (phase !== "detecting") return;
+
     let idx = 0;
     const timer = setInterval(() => {
       if (idx >= MOCK_SIGNALS.length) {
@@ -173,9 +187,11 @@ export default function ZoomDemo() {
         toast.success("Session complete — 3 signals captured");
         return;
       }
-      setDetectedSignals(prev => [...prev, MOCK_SIGNALS[idx]]);
-      idx++;
+
+      setDetectedSignals((prev) => [...prev, MOCK_SIGNALS[idx]]);
+      idx += 1;
     }, 1400);
+
     return () => clearInterval(timer);
   }, [phase]);
 
@@ -189,15 +205,14 @@ export default function ZoomDemo() {
     setJwt("");
     setSessionId("");
     setMeetingDbId(null);
-    setParticipants(MOCK_PARTICIPANTS.map(p => ({ ...p })));
+    setParticipants(MOCK_PARTICIPANTS.map((participant) => ({ ...participant })));
     setTranscriptIndex(0);
     setDetectedSignals([]);
     setRtmsStatus("idle");
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-      {/* Header */}
+    <div className="mx-auto max-w-4xl space-y-8 px-4 py-8">
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Video className="h-5 w-5 text-[hsl(var(--vanta-accent-zoom,213_100%_50%))]" />
@@ -205,45 +220,44 @@ export default function ZoomDemo() {
             Zoom Video SDK · iOS
           </span>
         </div>
-        <h1 className="font-sans text-2xl font-extrabold tracking-tight text-foreground uppercase">
+        <h1 className="font-sans text-2xl font-extrabold uppercase tracking-tight text-foreground">
           Vanta Zoom — Session Demo
         </h1>
-        <p className="font-mono text-xs text-muted-foreground max-w-xl leading-relaxed">
+        <p className="max-w-xl font-mono text-xs leading-relaxed text-muted-foreground">
           Interactive walkthrough of the Zoom Video SDK integration. Create a session, invite participants, activate RTMS, and watch live signal detection in action.
         </p>
       </div>
 
-      {/* SDK Feature Grid */}
-      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-        {SDK_FEATURES.map(f => (
-          <div key={f.label} className="flex flex-col items-center gap-1 p-3 border border-border bg-card">
-            <f.icon className="h-4 w-4 text-muted-foreground" />
-            <span className="font-mono text-[9px] uppercase tracking-wider text-foreground">{f.label}</span>
-            <span className="font-mono text-[7px] text-muted-foreground text-center leading-tight">{f.desc}</span>
+      <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+        {SDK_FEATURES.map((feature) => (
+          <div key={feature.label} className="flex flex-col items-center gap-1 border border-border bg-card p-3">
+            <feature.icon className="h-4 w-4 text-muted-foreground" />
+            <span className="font-mono text-[9px] uppercase tracking-wider text-foreground">{feature.label}</span>
+            <span className="text-center font-mono text-[7px] leading-tight text-muted-foreground">{feature.desc}</span>
           </div>
         ))}
       </div>
 
-      {/* ── Pre-Meeting Dossier ── */}
-      <PreSessionDossier dimmed={phase !== "idle" && phase !== "generating"} />
+      <ZoomSectionBoundary title="Pre-meeting dossier">
+        <PreSessionDossier dimmed={phase !== "idle" && phase !== "generating"} />
+      </ZoomSectionBoundary>
 
-      {/* ── Step 1: JWT Generation ── */}
-      <section className="border border-border bg-card p-4 space-y-3">
+      <section className="space-y-3 border border-border bg-card p-4">
         <div className="flex items-center gap-2">
-          <div className={`w-6 h-6 flex items-center justify-center border text-[10px] font-mono font-bold ${phase !== "idle" && phase !== "generating" ? "bg-foreground text-background border-foreground" : "border-border text-muted-foreground"}`}>
+          <div className={`flex h-6 w-6 items-center justify-center border text-[10px] font-mono font-bold ${phase !== "idle" && phase !== "generating" ? "border-foreground bg-foreground text-background" : "border-border text-muted-foreground"}`}>
             {phase !== "idle" && phase !== "generating" ? <CheckCircle2 className="h-3.5 w-3.5" /> : "1"}
           </div>
           <h2 className="font-mono text-xs uppercase tracking-wider text-foreground">Session Creation & JWT</h2>
-          <Shield className="h-3.5 w-3.5 text-muted-foreground ml-auto" />
+          <Shield className="ml-auto h-3.5 w-3.5 text-muted-foreground" />
         </div>
-        <p className="font-mono text-[10px] text-muted-foreground leading-relaxed">
+        <p className="font-mono text-[10px] leading-relaxed text-muted-foreground">
           Vanta backend generates a Video SDK JWT with session topic, role type, and user identity. No Zoom accounts required.
         </p>
 
         {phase === "idle" && (
           <button
             onClick={handleGenerateJwt}
-            className="font-mono text-[10px] uppercase tracking-wider px-4 py-2 bg-foreground text-background hover:bg-foreground/90 transition-colors"
+            className="bg-foreground px-4 py-2 font-mono text-[10px] uppercase tracking-wider text-background transition-colors hover:bg-foreground/90"
           >
             Generate session JWT
           </button>
@@ -252,7 +266,7 @@ export default function ZoomDemo() {
         {phase === "generating" && (
           <div className="flex items-center gap-2 py-2">
             <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
-            <span className="font-mono text-[10px] text-muted-foreground animate-pulse">Generating JWT…</span>
+            <span className="animate-pulse font-mono text-[10px] text-muted-foreground">Generating JWT…</span>
           </div>
         )}
 
@@ -263,12 +277,12 @@ export default function ZoomDemo() {
               <code className="font-mono text-[10px] text-foreground">{sessionId}</code>
             </div>
             <div className="relative">
-              <pre className="font-mono text-[9px] text-muted-foreground bg-muted p-3 overflow-x-auto max-h-16 leading-relaxed">
+              <pre className="max-h-16 overflow-x-auto bg-muted p-3 font-mono text-[9px] leading-relaxed text-muted-foreground">
                 {jwt}
               </pre>
               <button
                 onClick={copyJwt}
-                className="absolute top-1.5 right-1.5 p-1 hover:bg-muted-foreground/10 transition-colors"
+                className="absolute right-1.5 top-1.5 p-1 transition-colors hover:bg-muted-foreground/10"
                 aria-label="Copy JWT"
               >
                 <Copy className="h-3 w-3 text-muted-foreground" />
@@ -278,28 +292,27 @@ export default function ZoomDemo() {
         )}
       </section>
 
-      {/* ── Step 2: Participant Invite ── */}
-      <section className={`border bg-card p-4 space-y-3 transition-opacity duration-300 ${phase === "idle" || phase === "generating" ? "opacity-40 pointer-events-none" : ""} border-border`}>
+      <section className={`space-y-3 border border-border bg-card p-4 transition-opacity duration-300 ${phase === "idle" || phase === "generating" ? "pointer-events-none opacity-40" : ""}`}>
         <div className="flex items-center gap-2">
-          <div className={`w-6 h-6 flex items-center justify-center border text-[10px] font-mono font-bold ${["invited", "streaming", "detecting", "complete"].includes(phase) ? "bg-foreground text-background border-foreground" : "border-border text-muted-foreground"}`}>
+          <div className={`flex h-6 w-6 items-center justify-center border text-[10px] font-mono font-bold ${["invited", "streaming", "detecting", "complete"].includes(phase) ? "border-foreground bg-foreground text-background" : "border-border text-muted-foreground"}`}>
             {["invited", "streaming", "detecting", "complete"].includes(phase) ? <CheckCircle2 className="h-3.5 w-3.5" /> : "2"}
           </div>
           <h2 className="font-mono text-xs uppercase tracking-wider text-foreground">Participant Invite</h2>
-          <Users className="h-3.5 w-3.5 text-muted-foreground ml-auto" />
+          <Users className="ml-auto h-3.5 w-3.5 text-muted-foreground" />
         </div>
-        <p className="font-mono text-[10px] text-muted-foreground leading-relaxed">
+        <p className="font-mono text-[10px] leading-relaxed text-muted-foreground">
           Share the session link. Participants join directly — no Zoom account or download required.
         </p>
 
         <div className="space-y-1.5">
-          {participants.map(p => (
-            <div key={p.email} className="flex items-center justify-between px-3 py-2 border border-border">
+          {participants.map((participant) => (
+            <div key={participant.email} className="flex items-center justify-between border border-border px-3 py-2">
               <div>
-                <span className="font-mono text-[11px] text-foreground">{p.name}</span>
-                <span className="font-mono text-[9px] text-muted-foreground ml-2">{p.email}</span>
+                <span className="font-mono text-[11px] text-foreground">{participant.name}</span>
+                <span className="ml-2 font-mono text-[9px] text-muted-foreground">{participant.email}</span>
               </div>
-              {p.joined ? (
-                <span className="font-mono text-[9px] uppercase tracking-wider text-emerald-400 flex items-center gap-1">
+              {participant.joined ? (
+                <span className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-wider text-emerald-400">
                   <CheckCircle2 className="h-3 w-3" /> Joined
                 </span>
               ) : (
@@ -312,7 +325,7 @@ export default function ZoomDemo() {
         {phase === "jwt-ready" && (
           <button
             onClick={handleInvite}
-            className="font-mono text-[10px] uppercase tracking-wider px-4 py-2 bg-foreground text-background hover:bg-foreground/90 transition-colors"
+            className="bg-foreground px-4 py-2 font-mono text-[10px] uppercase tracking-wider text-background transition-colors hover:bg-foreground/90"
           >
             Send invites & launch session
           </button>
@@ -321,55 +334,59 @@ export default function ZoomDemo() {
         {phase === "inviting" && (
           <div className="flex items-center gap-2 py-2">
             <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
-            <span className="font-mono text-[10px] text-muted-foreground animate-pulse">Launching session…</span>
+            <span className="animate-pulse font-mono text-[10px] text-muted-foreground">Launching session…</span>
           </div>
         )}
       </section>
 
-      {/* ── Step 3: RTMS Stream Activation ── */}
-      <section className={`border bg-card p-4 space-y-3 transition-opacity duration-300 ${!["invited", "streaming", "detecting", "complete"].includes(phase) ? "opacity-40 pointer-events-none" : ""} border-border`}>
+      <section className={`space-y-3 border border-border bg-card p-4 transition-opacity duration-300 ${!["invited", "streaming", "detecting", "complete"].includes(phase) ? "pointer-events-none opacity-40" : ""}`}>
         <div className="flex items-center gap-2">
-          <div className={`w-6 h-6 flex items-center justify-center border text-[10px] font-mono font-bold ${["streaming", "detecting", "complete"].includes(phase) ? "bg-foreground text-background border-foreground" : "border-border text-muted-foreground"}`}>
+          <div className={`flex h-6 w-6 items-center justify-center border text-[10px] font-mono font-bold ${["streaming", "detecting", "complete"].includes(phase) ? "border-foreground bg-foreground text-background" : "border-border text-muted-foreground"}`}>
             {["streaming", "detecting", "complete"].includes(phase) ? <CheckCircle2 className="h-3.5 w-3.5" /> : "3"}
           </div>
           <h2 className="font-mono text-xs uppercase tracking-wider text-foreground">RTMS Stream</h2>
-          <Radio className="h-3.5 w-3.5 text-muted-foreground ml-auto" />
+          <Radio className="ml-auto h-3.5 w-3.5 text-muted-foreground" />
         </div>
-        <p className="font-mono text-[10px] text-muted-foreground leading-relaxed">
-          Real-Time Media Service streams live audio with speaker attribution to Vanta's classification engine.
+        <p className="font-mono text-[10px] leading-relaxed text-muted-foreground">
+          Real-Time Media Service streams live audio with speaker attribution to Vanta&apos;s classification engine.
         </p>
 
-        {/* RTMS Status */}
         <div className="flex items-center gap-2">
-          <div className={`w-2 h-2 ${rtmsStatus === "streaming" ? "bg-emerald-400 animate-pulse" : rtmsStatus === "completed" ? "bg-foreground" : rtmsStatus === "connecting" ? "bg-amber-400 animate-pulse" : "bg-muted-foreground"}`} />
+          <div className={`h-2 w-2 ${rtmsStatus === "streaming" ? "animate-pulse bg-emerald-400" : rtmsStatus === "completed" ? "bg-foreground" : rtmsStatus === "connecting" ? "animate-pulse bg-amber-400" : "bg-muted-foreground"}`} />
           <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-            {rtmsStatus === "idle" ? "Awaiting activation" : rtmsStatus === "connecting" ? "Connecting to RTMS…" : rtmsStatus === "streaming" ? "Streaming — live transcription active" : "Stream complete"}
+            {rtmsStatus === "idle"
+              ? "Awaiting activation"
+              : rtmsStatus === "connecting"
+                ? "Connecting to RTMS…"
+                : rtmsStatus === "streaming"
+                  ? "Streaming — live transcription active"
+                  : "Stream complete"}
           </span>
         </div>
 
         {phase === "invited" && (
           <button
             onClick={handleStartRtms}
-            className="font-mono text-[10px] uppercase tracking-wider px-4 py-2 bg-foreground text-background hover:bg-foreground/90 transition-colors"
+            className="bg-foreground px-4 py-2 font-mono text-[10px] uppercase tracking-wider text-background transition-colors hover:bg-foreground/90"
           >
             Activate RTMS stream
           </button>
         )}
 
-        {/* Live Video Grid */}
         {(rtmsStatus === "streaming" || phase === "detecting") && (
-          <VideoGrid
-            activeSpeaker={TRANSCRIPT_LINES[Math.max(0, transcriptIndex - 1)]?.speaker || ""}
-            isStreaming={rtmsStatus === "streaming"}
-          />
+          <ZoomSectionBoundary title="Session video">
+            <VideoGrid
+              activeSpeaker={TRANSCRIPT_LINES[Math.max(0, transcriptIndex - 1)]?.speaker || ""}
+              isStreaming={rtmsStatus === "streaming"}
+            />
+          </ZoomSectionBoundary>
         )}
 
-        {/* Live Transcript */}
         {transcriptIndex > 0 && (
-          <div className="border border-border bg-muted p-3 max-h-48 overflow-y-auto space-y-1.5">
+          <div className="max-h-48 space-y-1.5 overflow-y-auto border border-border bg-muted p-3">
             <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground">Live transcript</span>
-            {TRANSCRIPT_LINES.slice(0, transcriptIndex).map((line, i) => (
-              <div key={i} className="font-mono text-[10px] leading-relaxed">
+            {TRANSCRIPT_LINES.slice(0, transcriptIndex).map((line, index) => (
+              <div key={index} className="font-mono text-[10px] leading-relaxed">
                 <span className={`font-bold ${line.speaker === "You" ? "text-foreground" : "text-muted-foreground"}`}>
                   {line.speaker}:
                 </span>{" "}
@@ -378,44 +395,48 @@ export default function ZoomDemo() {
             ))}
             {phase === "streaming" && (
               <div className="flex items-center gap-1.5 pt-1">
-                <div className="w-1.5 h-1.5 bg-emerald-400 animate-pulse" />
-                <span className="font-mono text-[8px] text-muted-foreground animate-pulse">Listening…</span>
+                <div className="h-1.5 w-1.5 animate-pulse bg-emerald-400" />
+                <span className="animate-pulse font-mono text-[8px] text-muted-foreground">Listening…</span>
               </div>
             )}
           </div>
         )}
       </section>
 
-      {/* ── Step 4: Live Signal Detection ── */}
-      <section className={`border bg-card p-4 space-y-3 transition-opacity duration-300 ${!["detecting", "complete"].includes(phase) ? "opacity-40 pointer-events-none" : ""} border-border`}>
+      <section className={`space-y-3 border border-border bg-card p-4 transition-opacity duration-300 ${!["detecting", "complete"].includes(phase) ? "pointer-events-none opacity-40" : ""}`}>
         <div className="flex items-center gap-2">
-          <div className={`w-6 h-6 flex items-center justify-center border text-[10px] font-mono font-bold ${phase === "complete" ? "bg-foreground text-background border-foreground" : "border-border text-muted-foreground"}`}>
+          <div className={`flex h-6 w-6 items-center justify-center border text-[10px] font-mono font-bold ${phase === "complete" ? "border-foreground bg-foreground text-background" : "border-border text-muted-foreground"}`}>
             {phase === "complete" ? <CheckCircle2 className="h-3.5 w-3.5" /> : "4"}
           </div>
           <h2 className="font-mono text-xs uppercase tracking-wider text-foreground">Live Signal Detection</h2>
-          <Zap className="h-3.5 w-3.5 text-muted-foreground ml-auto" />
+          <Zap className="ml-auto h-3.5 w-3.5 text-muted-foreground" />
         </div>
-        <p className="font-mono text-[10px] text-muted-foreground leading-relaxed">
+        <p className="font-mono text-[10px] leading-relaxed text-muted-foreground">
           Transcript chunks classified in real-time. Decisions, commitments, and insights surface during the call.
         </p>
 
         {detectedSignals.length > 0 && (
           <div className="space-y-2">
-            {detectedSignals.map((sig, i) => {
-              const colors = SIGNAL_COLORS[sig.type];
+            {detectedSignals.map((signal, index) => {
+              const colors = SIGNAL_COLORS[signal.type] ?? {
+                bg: "bg-muted",
+                text: "text-muted-foreground",
+                border: "border-border",
+              };
+
               return (
                 <div
-                  key={i}
-                  className={`border ${colors.border} ${colors.bg} p-3 space-y-1 animate-in fade-in slide-in-from-bottom-2 duration-300`}
+                  key={index}
+                  className={`animate-in fade-in slide-in-from-bottom-2 space-y-1 border p-3 duration-300 ${colors.border} ${colors.bg}`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className={`font-mono text-[9px] uppercase tracking-wider font-bold ${colors.text}`}>
-                      {sig.type}
+                    <span className={`font-mono text-[9px] font-bold uppercase tracking-wider ${colors.text}`}>
+                      {signal.type}
                     </span>
-                    <span className="font-mono text-[8px] text-muted-foreground">{sig.ts}</span>
+                    <span className="font-mono text-[8px] text-muted-foreground">{signal.ts}</span>
                   </div>
-                  <p className="font-mono text-[11px] text-foreground leading-relaxed">"{sig.text}"</p>
-                  <span className="font-mono text-[9px] text-muted-foreground">— {sig.speaker}</span>
+                  <p className="font-mono text-[11px] leading-relaxed text-foreground">&quot;{signal.text}&quot;</p>
+                  <span className="font-mono text-[9px] text-muted-foreground">— {signal.speaker}</span>
                 </div>
               );
             })}
@@ -425,13 +446,33 @@ export default function ZoomDemo() {
         {phase === "detecting" && detectedSignals.length < MOCK_SIGNALS.length && (
           <div className="flex items-center gap-2 py-1">
             <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
-            <span className="font-mono text-[10px] text-muted-foreground animate-pulse">Classifying transcript…</span>
+            <span className="animate-pulse font-mono text-[10px] text-muted-foreground">Classifying transcript…</span>
           </div>
         )}
       </section>
 
-      {/* ── Complete State ── */}
-      {phase === "complete" && <PostSessionSummary key="post-session" onReset={resetDemo} />}
+      {phase === "complete" && (
+        <ZoomSectionBoundary title="Post-session summary">
+          <PostSessionSummary key="post-session" onReset={resetDemo} />
+        </ZoomSectionBoundary>
+      )}
     </div>
+  );
+}
+
+function ZoomSectionBoundary({ children, title }: { children: ReactNode; title: string }) {
+  return (
+    <ErrorBoundary
+      fallback={
+        <div className="space-y-2 border border-border bg-card p-4">
+          <p className="font-mono text-[10px] uppercase tracking-wider text-foreground">{title}</p>
+          <p className="font-mono text-[10px] text-muted-foreground">
+            This section hit a render issue, but the rest of the demo is still available.
+          </p>
+        </div>
+      }
+    >
+      {children}
+    </ErrorBoundary>
   );
 }
