@@ -76,11 +76,13 @@ const productItems = [
   /* People & Relationships */
   { title: "Smart Contacts", url: "/contacts", icon: Users },
   { title: "Relationship Graph", url: "/graph", icon: Network },
-  /* Intelligence */
+  { title: "My Rules", url: "/my-rules", icon: BookOpen },
+];
+
+const useCaseItems = [
   { title: "Insight Engine", url: "/insights", icon: Lightbulb },
   { title: "Investment Intel", url: "/investments", icon: TrendingUp },
   { title: "Decision Capture", url: "/decisions", icon: Gavel },
-  { title: "My Rules", url: "/my-rules", icon: BookOpen },
 ];
 
 const platformItems = [
