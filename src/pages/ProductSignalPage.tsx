@@ -229,6 +229,31 @@ const PRODUCTS: Record<string, ProductDef> = {
     ],
     whyItMatters: "Email is where commitments are formalised and records are created. Missing a signal in your inbox isn't just inefficiency… it's liability. Vanta ensures nothing consequential is ever buried.",
   },
+  "zoom-sdk": {
+    type: "MEETING",
+    label: "Vanta Zoom",
+    icon: Video,
+    tagline: "Your meetings, your intelligence layer… a fully native Zoom experience inside Vanta.",
+    channels: ["Zoom Video SDK (iOS)", "RTMS Live Transcription", "Command Channel"],
+    narrative: [
+      "Most meeting integrations bolt intelligence on after the fact… a bot joins, records, and sends you a summary hours later. Vanta Zoom is architecturally different. Built on the Zoom Video SDK, Vanta owns the entire video experience: the UI, the data streams, and the intelligence pipeline. No Zoom chrome. No third-party bots. Just your meeting, running natively inside Vanta on iOS.",
+      "The Zoom Video SDK is session-based, not meeting-based. That means participants don't need Zoom accounts. You generate a session, share a link, and anyone can join from any device. Vanta controls the rendering layer via Apple Metal, the layout, the participant controls, and crucially… the raw audio and video streams that feed the intelligence pipeline.",
+      "Real-time intelligence is the core differentiator. RTMS (Real-Time Media Service) streams live transcription with speaker diarisation directly to Vanta's classification engine. Decisions, commitments, action items, and insights are detected during the call… not after. By the time you hang up, the meeting artifact is already built, signals are already logged, and follow-up actions are already queued.",
+    ],
+    howItWorks: [
+      { step: "Session Creation", desc: "Vanta backend generates a Video SDK JWT and creates a session. No Zoom accounts required for any participant… just a shareable link." },
+      { step: "Native Launch", desc: "iOS app joins the session via the Zoom Video SDK with a custom Vanta-branded interface. HD video, virtual backgrounds, screen sharing, and whiteboard… all rendered through Apple Metal." },
+      { step: "RTMS Stream", desc: "Live audio is routed through Zoom's Real-Time Media Service for continuous transcription with speaker attribution. The command channel enables bidirectional data exchange during the session." },
+      { step: "Live Signal Detection", desc: "Transcript chunks are classified in real-time through the Gemini pipeline. Decisions, commitments, investment language, and action items surface as they happen… not after the call ends." },
+      { step: "Post-Session Intel", desc: "Full transcript processed through deep analysis. Meeting artifact stored with signals linked to attendee profiles. Pre-meeting briefs for follow-up calls are automatically enriched." },
+    ],
+    signalExamples: [
+      "Mid-call: a partner says 'let's lock in the three-year exclusive'… DECISION signal surfaces in real-time with speaker attribution",
+      "An investor references Series B timing during a pitch… INVESTMENT signal flagged and linked to their contact profile before the call ends",
+      "A collaborator articulates a new market positioning framework… INSIGHT captured with full transcript context and timestamp",
+    ],
+    whyItMatters: "Owning the video layer means owning the intelligence layer. When Vanta controls the session, the UI, and the data streams… meeting intelligence isn't a feature. It's the architecture.",
+  },
   calendar: {
     type: "MEETING",
     label: "Calendar",
