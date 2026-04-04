@@ -78,7 +78,6 @@ const productItems = [
   /* People & Relationships */
   { title: "Smart Contacts", url: "/contacts", icon: Users },
   { title: "Relationship Graph", url: "/graph", icon: Network },
-  { title: "My Rules", url: "/my-rules", icon: BookOpen },
 ];
 
 const useCaseItems = [
