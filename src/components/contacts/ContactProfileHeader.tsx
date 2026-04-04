@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Phone, MessageSquare, Mail, Edit3, Check, X, Building2, Briefcase, ExternalLink } from "lucide-react";
+import { Phone, MessageSquare, Mail, Edit3, Check, X, Building2, Briefcase, ExternalLink, Video } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -259,6 +259,12 @@ export default function ContactProfileHeader({ name, strength, strengthLabel, si
           )}
           <button className="flex items-center gap-1.5 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors">
             <MessageSquare className="w-3 h-3" /> Text
+          </button>
+          <button
+            onClick={() => window.open("https://zoom.us/start/videomeeting", "_blank", "noopener,noreferrer")}
+            className="flex items-center gap-1.5 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest border border-vanta-accent-zoom-border text-vanta-accent-zoom hover:bg-vanta-accent-zoom-faint transition-colors"
+          >
+            <Video className="w-3 h-3" /> Zoom
           </button>
           <a
             href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(name)}`}

@@ -62,3 +62,9 @@ verify_jwt = false
 
 [functions.meeting-summary-email]
 verify_jwt = false
+
+[functions.start-rtms-stream]
+verify_jwt = false
+
+[functions.rtms-webhook]
+verify_jwt = false

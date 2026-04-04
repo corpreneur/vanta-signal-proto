@@ -1,5 +1,6 @@
 import type { Signal } from "@/data/signals";
 import { MessageSquare, Phone, Video, Mail, StickyNote, Trash2 } from "lucide-react";
+import ZoomLaunchButton from "@/components/ZoomLaunchButton";
 
 const SOURCE_ICONS: Record<string, typeof MessageSquare> = {
   linq: MessageSquare,
@@ -26,7 +27,7 @@ function formatTime(iso: string) {
 interface HourBlockProps {
   hour: number;
   signals: Signal[];
-  meetings: Array<{ id: string; title: string; starts_at: string; ends_at: string | null }>;
+  meetings: Array<{ id: string; title: string; starts_at: string; ends_at: string | null; zoom_meeting_id?: string | null }>;
   isCurrentHour: boolean;
   onSignalClick: (s: Signal) => void;
   onDelete: (id: string, e: React.MouseEvent) => void;
@@ -91,7 +92,8 @@ export default function HourBlock({
                 <span className="font-mono text-[10px] text-muted-foreground shrink-0">
                   {formatTime(m.starts_at)}
                 </span>
-                <span className="font-sans text-[13px] text-foreground truncate">{m.title}</span>
+                <span className="font-sans text-[13px] text-foreground truncate flex-1">{m.title}</span>
+                <ZoomLaunchButton meetingId={m.id} zoomMeetingId={m.zoom_meeting_id} variant="icon" />
               </div>
             ))}
 

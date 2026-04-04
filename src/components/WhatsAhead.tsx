@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Calendar, AlertTriangle, ChevronRight, Video } from "lucide-react";
+import ZoomLaunchButton from "@/components/ZoomLaunchButton";
 import { Link } from "react-router-dom";
 import { Motion } from "@/components/ui/motion";
 
@@ -11,6 +12,7 @@ interface Meeting {
   starts_at: string;
   ends_at: string | null;
   attendees: unknown[];
+  zoom_meeting_id?: string | null;
 }
 
 interface CoolingAlert {
@@ -30,7 +32,7 @@ const fetchUpcoming = async (): Promise<Meeting[]> => {
   const cutoff = new Date(now.getTime() + 48 * 60 * 60 * 1000);
   const { data, error } = await supabase
     .from("upcoming_meetings")
-    .select("id, title, starts_at, ends_at, attendees")
+    .select("id, title, starts_at, ends_at, attendees, zoom_meeting_id")
     .gte("starts_at", now.toISOString())
     .lte("starts_at", cutoff.toISOString())
     .order("starts_at", { ascending: true })
@@ -153,6 +155,12 @@ const WhatsAhead = () => {
                       </span>
                     </div>
                   </div>
+                  <ZoomLaunchButton
+                    meetingId={m.id}
+                    zoomMeetingId={m.zoom_meeting_id}
+                    variant="icon"
+                    className="shrink-0"
+                  />
                   {hasCooling && (
                     <span className="flex items-center gap-1 px-2 py-0.5 font-mono text-[8px] uppercase tracking-wider text-destructive border border-destructive/20 bg-destructive/5 shrink-0">
                       <AlertTriangle className="w-3 h-3" />

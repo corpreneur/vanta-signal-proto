@@ -821,18 +821,28 @@ const SignalDetailDrawer = ({ signal, open, onClose }: SignalDetailDrawerProps) 
             </div>
           </section>
 
-          {/* Share button for meetings */}
+          {/* Zoom + Share buttons for meetings */}
           {isMeeting && (
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
+              <button
+                onClick={() => {
+                  const url = signal.meetingId ? `https://zoom.us/j/${signal.meetingId}` : "https://zoom.us/start/videomeeting";
+                  window.open(url, "_blank", "noopener,noreferrer");
+                  toast("Launching Zoom meeting");
+                }}
+                className="flex items-center gap-1.5 px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-vanta-accent-zoom border border-vanta-accent-zoom-border hover:bg-vanta-accent-zoom-faint transition-colors"
+              >
+                <Video className="w-3.5 h-3.5" /> {artifact?.recordingUrl ? "Open Recording" : "Rejoin"}
+              </button>
               <button onClick={handleShareMeeting}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-md font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors">
+                className="flex items-center gap-1.5 px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors">
                 <Share2 className="w-3.5 h-3.5" /> Share Summary
               </button>
               <button onClick={() => {
                 const subject = encodeURIComponent(`Meeting Notes: ${signal.summary}`);
                 const body = encodeURIComponent(`${signal.summary}\n\n${artifact?.summaryText || signal.sourceMessage}\n\n— Vanta Signal`);
                 window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
-              }} className="flex items-center gap-1.5 px-3 py-2 rounded-md font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors">
+              }} className="flex items-center gap-1.5 px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-colors">
                 <Mail className="w-3.5 h-3.5" /> Email Notes
               </button>
             </div>

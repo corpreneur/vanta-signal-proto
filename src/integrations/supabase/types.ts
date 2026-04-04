@@ -668,6 +668,8 @@ export type Database = {
           created_at: string
           ends_at: string | null
           id: string
+          rtms_status: string
+          rtms_stream_id: string | null
           starts_at: string
           title: string
           zoom_meeting_id: string | null
@@ -679,6 +681,8 @@ export type Database = {
           created_at?: string
           ends_at?: string | null
           id?: string
+          rtms_status?: string
+          rtms_stream_id?: string | null
           starts_at: string
           title: string
           zoom_meeting_id?: string | null
@@ -690,6 +694,8 @@ export type Database = {
           created_at?: string
           ends_at?: string | null
           id?: string
+          rtms_status?: string
+          rtms_stream_id?: string | null
           starts_at?: string
           title?: string
           zoom_meeting_id?: string | null
