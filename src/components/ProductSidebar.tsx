@@ -70,6 +70,7 @@ const channelItems = [
 
 const productItems = [
   { title: "Meetings", url: "/meetings", icon: Video },
+  { title: "Zoom Demo", url: "/product/zoom-demo", icon: Video },
   { title: "Smart Contacts", url: "/contacts", icon: Users },
   { title: "Relationship Graph", url: "/graph", icon: Network },
   
