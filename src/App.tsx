@@ -33,6 +33,7 @@ import ReleaseV19 from "./pages/ReleaseV19";
 import FeedbackBacklog from "./pages/FeedbackBacklog";
 import FeedbackEmbed from "./pages/FeedbackEmbed";
 import SprintBoard from "./pages/SprintBoard";
+import PhoneFMCDemo from "./pages/PhoneFMCDemo";
 
 import Settings from "./pages/Settings";
 import PersonalInfo from "./pages/PersonalInfo";

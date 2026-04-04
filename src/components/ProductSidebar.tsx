@@ -83,6 +83,7 @@ const useCaseItems = [
   { title: "Insight Engine", url: "/insights", icon: Lightbulb },
   { title: "Investment Intel", url: "/investments", icon: TrendingUp },
   { title: "Decision Capture", url: "/decisions", icon: Gavel },
+  { title: "Phone FMC Demo", url: "/product/phone-fmc-demo", icon: Phone },
 ];
 
 const platformItems = [
