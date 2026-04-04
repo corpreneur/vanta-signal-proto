@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, type ReactNode } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Video,
   Shield,
@@ -13,13 +13,17 @@ import {
   Cloud,
   Eye,
   Zap,
+  Clock,
+  FileText,
+  Download,
+  ArrowRight,
+  UserCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import ErrorBoundary from "@/components/ErrorBoundary";
+import { Link } from "react-router-dom";
 import PreSessionDossier from "@/components/zoom-demo/PreSessionDossier";
 import VideoGrid from "@/components/zoom-demo/VideoGrid";
-import PostSessionSummary from "@/components/zoom-demo/PostSessionSummary";
 
 type Phase = "idle" | "generating" | "jwt-ready" | "inviting" | "invited" | "streaming" | "detecting" | "complete";
 
@@ -238,9 +242,7 @@ export default function ZoomDemo() {
         ))}
       </div>
 
-      <ZoomSectionBoundary title="Pre-meeting dossier">
-        <PreSessionDossier dimmed={phase !== "idle" && phase !== "generating"} />
-      </ZoomSectionBoundary>
+      <PreSessionDossier dimmed={phase !== "idle" && phase !== "generating"} />
 
       <section className="space-y-3 border border-border bg-card p-4">
         <div className="flex items-center gap-2">
@@ -374,12 +376,10 @@ export default function ZoomDemo() {
         )}
 
         {(rtmsStatus === "streaming" || phase === "detecting") && (
-          <ZoomSectionBoundary title="Session video">
-            <VideoGrid
-              activeSpeaker={TRANSCRIPT_LINES[Math.max(0, transcriptIndex - 1)]?.speaker || ""}
-              isStreaming={rtmsStatus === "streaming"}
-            />
-          </ZoomSectionBoundary>
+          <VideoGrid
+            activeSpeaker={TRANSCRIPT_LINES[Math.max(0, transcriptIndex - 1)]?.speaker || ""}
+            isStreaming={rtmsStatus === "streaming"}
+          />
         )}
 
         {transcriptIndex > 0 && (
@@ -427,7 +427,7 @@ export default function ZoomDemo() {
               return (
                 <div
                   key={index}
-                  className={`animate-in fade-in slide-in-from-bottom-2 space-y-1 border p-3 duration-300 ${colors.border} ${colors.bg}`}
+                  className={`space-y-1 border p-3 ${colors.border} ${colors.bg}`}
                 >
                   <div className="flex items-center justify-between">
                     <span className={`font-mono text-[9px] font-bold uppercase tracking-wider ${colors.text}`}>
@@ -452,27 +452,130 @@ export default function ZoomDemo() {
       </section>
 
       {phase === "complete" && (
-        <ZoomSectionBoundary title="Post-session summary">
-          <PostSessionSummary key="post-session" onReset={resetDemo} />
-        </ZoomSectionBoundary>
+        <div className="border border-border bg-card p-4 space-y-4">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+            <h2 className="font-mono text-xs uppercase tracking-wider text-foreground">
+              Session complete — AI summary
+            </h2>
+          </div>
+
+          <div className="flex gap-4 border border-border p-2">
+            <div className="flex items-center gap-1.5">
+              <Clock className="h-3 w-3 text-muted-foreground" />
+              <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground">Duration</span>
+              <span className="font-mono text-[11px] font-bold text-foreground">11m 08s</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Users className="h-3 w-3 text-muted-foreground" />
+              <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground">Participants</span>
+              <span className="font-mono text-[11px] font-bold text-foreground">3</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Zap className="h-3 w-3 text-muted-foreground" />
+              <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground">Signals</span>
+              <span className="font-mono text-[11px] font-bold text-foreground">3</span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground">Meeting narrative</span>
+            <p className="font-mono text-[10px] text-foreground/80 leading-relaxed">
+              Series A terms were discussed and agreed at $12M pre-money valuation. Sarah Chen from Acme
+              Ventures confirmed willingness to move fast on the deal structure, while Marcus Rivera
+              committed a $2M allocation from Portfolio Capital targeting a Q3 close.
+            </p>
+            <p className="font-mono text-[10px] text-foreground/80 leading-relaxed">
+              The group validated the vertical SaaS thesis, noting three-times better unit economics
+              compared to horizontal alternatives. Both parties expressed strong conviction in the
+              go-to-market strategy and current retention metrics.
+            </p>
+          </div>
+
+          <div className="space-y-1.5">
+            <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground">Key takeaways</span>
+            {["Series A terms locked at $12M pre-money valuation",
+              "Target close date set for Q3 with dual-lead structure",
+              "Portfolio Capital allocating $2M from Fund III",
+              "Vertical SaaS thesis validated — 3x unit economics advantage over horizontal",
+            ].map((t, i) => (
+              <div key={i} className="flex items-start gap-1.5">
+                <div className="w-1 h-1 mt-1.5 bg-foreground shrink-0" />
+                <span className="font-mono text-[10px] text-foreground leading-relaxed">{t}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="space-y-1.5">
+            <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground">Action items</span>
+            {[
+              { assignee: "Sarah Chen", task: "Send updated term sheet by Friday" },
+              { assignee: "Marcus Rivera", task: "Confirm LP approval timeline within 48 hours" },
+              { assignee: "You", task: "Prepare revised cap table reflecting new allocation" },
+              { assignee: "You", task: "Schedule follow-up with legal counsel for closing docs" },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-2 px-2 py-1.5 border border-border">
+                <div className="w-3 h-3 border border-muted-foreground shrink-0" />
+                <span className="font-mono text-[10px] text-foreground">
+                  <span className="font-bold">{item.assignee}:</span> {item.task}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div className="space-y-1.5">
+            <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground">Profiles enriched</span>
+            {[
+              { name: "Sarah Chen", newSignals: 2, types: ["DECISION", "INSIGHT"] },
+              { name: "Marcus Rivera", newSignals: 1, types: ["INVESTMENT"] },
+            ].map((p) => (
+              <div key={p.name} className="flex items-center gap-2 px-2 py-1.5 border border-border">
+                <UserCheck className="h-3 w-3 text-emerald-400 shrink-0" />
+                <span className="font-mono text-[10px] text-foreground font-bold">{p.name}</span>
+                <span className="font-mono text-[9px] text-muted-foreground">
+                  +{p.newSignals} signal{p.newSignals > 1 ? "s" : ""}
+                </span>
+                <div className="flex gap-1 ml-auto">
+                  {p.types.map((t) => {
+                    const sc = SIGNAL_COLORS[t] ?? { bg: "bg-muted", text: "text-muted-foreground", border: "border-border" };
+                    return (
+                      <span key={t} className={`font-mono text-[7px] uppercase tracking-wider px-1.5 py-0.5 ${sc.bg} ${sc.text}`}>
+                        {t}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap gap-2 pt-1">
+            <button
+              onClick={resetDemo}
+              className="font-mono text-[10px] uppercase tracking-wider px-4 py-2 border border-border text-foreground hover:bg-muted transition-colors"
+            >
+              Reset demo
+            </button>
+            <Link
+              to="/meetings"
+              className="font-mono text-[10px] uppercase tracking-wider px-4 py-2 bg-foreground text-background hover:bg-foreground/90 transition-colors inline-flex items-center gap-1.5"
+            >
+              <FileText className="h-3 w-3" /> View artifact
+            </Link>
+            <button
+              className="font-mono text-[10px] uppercase tracking-wider px-4 py-2 border border-border text-foreground hover:bg-muted transition-colors inline-flex items-center gap-1.5"
+            >
+              <Download className="h-3 w-3" /> Export PDF
+            </button>
+            <Link
+              to="/product/zoom-sdk"
+              className="font-mono text-[10px] uppercase tracking-wider px-4 py-2 border border-border text-foreground hover:bg-muted transition-colors inline-flex items-center gap-1.5"
+            >
+              Product concept <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+        </div>
       )}
     </div>
-  );
-}
-
-function ZoomSectionBoundary({ children, title }: { children: ReactNode; title: string }) {
-  return (
-    <ErrorBoundary
-      fallback={
-        <div className="space-y-2 border border-border bg-card p-4">
-          <p className="font-mono text-[10px] uppercase tracking-wider text-foreground">{title}</p>
-          <p className="font-mono text-[10px] text-muted-foreground">
-            This section hit a render issue, but the rest of the demo is still available.
-          </p>
-        </div>
-      }
-    >
-      {children}
-    </ErrorBoundary>
   );
 }
