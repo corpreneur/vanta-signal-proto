@@ -185,6 +185,7 @@ export default function ZoomDemo() {
     setPhase("idle");
     setJwt("");
     setSessionId("");
+    setMeetingDbId(null);
     setParticipants(MOCK_PARTICIPANTS.map(p => ({ ...p })));
     setTranscriptIndex(0);
     setDetectedSignals([]);
