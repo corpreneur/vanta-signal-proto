@@ -416,21 +416,6 @@ export default function ZoomDemo() {
         </p>
       </header>
 
-      <section className={`space-y-4 border border-border bg-card p-4 transition-opacity ${phase !== "idle" && phase !== "generating" ? "pointer-events-none opacity-40" : "opacity-100"}`}>
-        <div className="flex items-center gap-2">
-          <Users className="h-4 w-4 text-muted-foreground" />
-          <h2 className="font-mono text-xs uppercase tracking-wider text-foreground">Pre-meeting dossier</h2>
-        </div>
-        <p className="font-mono text-[10px] leading-relaxed text-muted-foreground">
-          Attendee intelligence compiled from recent signals so you can review context before the session begins.
-        </p>
-        <div className="grid gap-4">
-          {DOSSIER_ATTENDEES.map((attendee) => (
-            <DossierCard key={attendee.name} attendee={attendee} />
-          ))}
-        </div>
-      </section>
-
       <section className="space-y-3 border border-border bg-card p-4">
         <div className="flex items-center gap-2">
           <div className={`flex h-6 w-6 items-center justify-center border text-[10px] font-mono font-bold ${phase !== "idle" && phase !== "generating" ? "border-foreground bg-foreground text-background" : "border-border text-muted-foreground"}`}>
