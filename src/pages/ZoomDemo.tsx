@@ -4,6 +4,7 @@ import {
   Mic, MonitorUp, Pen, Cloud, Eye, Zap,
 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 /* ── Types ── */
 type Phase = "idle" | "generating" | "jwt-ready" | "inviting" | "invited" | "streaming" | "detecting" | "complete";
@@ -68,20 +69,43 @@ export default function ZoomDemo() {
   const [phase, setPhase] = useState<Phase>("idle");
   const [jwt, setJwt] = useState("");
   const [sessionId, setSessionId] = useState("");
+  const [meetingDbId, setMeetingDbId] = useState<string | null>(null);
   const [participants, setParticipants] = useState<Participant[]>(MOCK_PARTICIPANTS.map(p => ({ ...p })));
   const [transcriptIndex, setTranscriptIndex] = useState(0);
   const [detectedSignals, setDetectedSignals] = useState<DetectedSignal[]>([]);
   const [rtmsStatus, setRtmsStatus] = useState<"idle" | "connecting" | "streaming" | "completed">("idle");
 
-  /* Phase: Generate JWT */
-  const handleGenerateJwt = useCallback(() => {
+  /* Phase: Generate JWT — creates a real meeting in the DB */
+  const handleGenerateJwt = useCallback(async () => {
     setPhase("generating");
-    setSessionId(`vanta-session-${Date.now().toString(36)}`);
-    setTimeout(() => {
+    const sid = `vanta-session-${Date.now().toString(36)}`;
+    setSessionId(sid);
+    try {
+      const startsAt = new Date(Date.now() + 5 * 60_000).toISOString();
+      const { data, error } = await supabase
+        .from("upcoming_meetings")
+        .insert({
+          title: `Vanta Zoom Demo — ${sid}`,
+          starts_at: startsAt,
+          ends_at: new Date(Date.now() + 35 * 60_000).toISOString(),
+          zoom_meeting_id: sid,
+          attendees: MOCK_PARTICIPANTS.map(p => ({ name: p.name, email: p.email })),
+        })
+        .select("id")
+        .single();
+
+      if (error) throw error;
+      setMeetingDbId(data.id);
       setJwt(MOCK_JWT);
       setPhase("jwt-ready");
-      toast.success("Video SDK JWT generated");
-    }, 1800);
+      toast.success("Session created & JWT generated");
+    } catch (err) {
+      console.error("JWT generation failed:", err);
+      // Graceful fallback to mock flow
+      setJwt(MOCK_JWT);
+      setPhase("jwt-ready");
+      toast.success("Video SDK JWT generated (demo mode)");
+    }
   }, []);
 
   /* Phase: Send invites */
@@ -94,10 +118,30 @@ export default function ZoomDemo() {
     }, 2200);
   }, []);
 
-  /* Phase: Start RTMS */
-  const handleStartRtms = useCallback(() => {
+  /* Phase: Start RTMS — calls the real edge function */
+  const handleStartRtms = useCallback(async () => {
     setPhase("streaming");
     setRtmsStatus("connecting");
+
+    if (meetingDbId) {
+      try {
+        const { data, error } = await supabase.functions.invoke("start-rtms-stream", {
+          body: { meeting_id: meetingDbId },
+        });
+        if (error) throw error;
+        console.log("RTMS response:", data);
+
+        if (data?.status === "streaming") {
+          toast.success("RTMS stream activated");
+        } else {
+          toast("RTMS unavailable — running demo simulation", { description: data?.reason || data?.status });
+        }
+      } catch (err) {
+        console.error("RTMS start failed:", err);
+        toast("RTMS not available — simulating stream", { description: "Zoom credentials not configured" });
+      }
+    }
+
     setTimeout(() => setRtmsStatus("streaming"), 1200);
   }, []);
 
@@ -141,6 +185,7 @@ export default function ZoomDemo() {
     setPhase("idle");
     setJwt("");
     setSessionId("");
+    setMeetingDbId(null);
     setParticipants(MOCK_PARTICIPANTS.map(p => ({ ...p })));
     setTranscriptIndex(0);
     setDetectedSignals([]);
