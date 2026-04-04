@@ -376,12 +376,10 @@ export default function ZoomDemo() {
         )}
 
         {(rtmsStatus === "streaming" || phase === "detecting") && (
-          <ZoomSectionBoundary title="Session video">
-            <VideoGrid
-              activeSpeaker={TRANSCRIPT_LINES[Math.max(0, transcriptIndex - 1)]?.speaker || ""}
-              isStreaming={rtmsStatus === "streaming"}
-            />
-          </ZoomSectionBoundary>
+          <VideoGrid
+            activeSpeaker={TRANSCRIPT_LINES[Math.max(0, transcriptIndex - 1)]?.speaker || ""}
+            isStreaming={rtmsStatus === "streaming"}
+          />
         )}
 
         {transcriptIndex > 0 && (
