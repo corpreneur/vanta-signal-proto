@@ -33,6 +33,7 @@ import ReleaseV19 from "./pages/ReleaseV19";
 import FeedbackBacklog from "./pages/FeedbackBacklog";
 import FeedbackEmbed from "./pages/FeedbackEmbed";
 import SprintBoard from "./pages/SprintBoard";
+import PhoneFMCDemo from "./pages/PhoneFMCDemo";
 
 import Settings from "./pages/Settings";
 import PersonalInfo from "./pages/PersonalInfo";
@@ -140,6 +141,7 @@ const AppRoutes = () => {
       <Route path="/case-02" element={<Navigate to="/case/02" replace />} />
       <Route path="/case-03" element={<Navigate to="/case/03" replace />} />
       <Route path="/orb-demo" element={<OrbDemo />} />
+      <Route path="/product/phone-fmc-demo" element={<ProtectedRoute session={session}><ProductLayout><PhoneFMCDemo /></ProductLayout></ProtectedRoute>} />
       <Route path="/product/zoom-demo" element={<ProtectedRoute session={session}><ProductLayout><ZoomDemo /></ProductLayout></ProtectedRoute>} />
       <Route path="/zoom-demo" element={<Navigate to="/product/zoom-demo" replace />} />
       <Route path="*" element={<NotFound />} />
