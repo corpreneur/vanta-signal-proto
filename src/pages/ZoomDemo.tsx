@@ -431,7 +431,7 @@ export default function ZoomDemo() {
       </section>
 
       {/* ── Complete State ── */}
-      {phase === "complete" && <PostSessionSummary onReset={resetDemo} />}
+      {phase === "complete" && <PostSessionSummary key="post-session" onReset={resetDemo} />}
     </div>
   );
 }

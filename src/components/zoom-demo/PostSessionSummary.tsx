@@ -2,6 +2,7 @@ import {
   CheckCircle2, Clock, Users, Zap, FileText, Download,
   ArrowRight, UserCheck,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const SIGNAL_COLORS: Record<string, { bg: string; text: string }> = {
   DECISION: { bg: "bg-amber-500/10", text: "text-amber-400" },
@@ -27,6 +28,16 @@ const ENRICHED_PROFILES = [
   { name: "Sarah Chen", newSignals: 2, types: ["DECISION", "INSIGHT"] },
   { name: "Marcus Rivera", newSignals: 1, types: ["INVESTMENT"] },
 ];
+
+function MetaItem({ icon: Icon, label, value }: { icon: typeof Clock; label: string; value: string }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <Icon className="h-3 w-3 text-muted-foreground" />
+      <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground">{label}</span>
+      <span className="font-mono text-[11px] font-bold text-foreground">{value}</span>
+    </div>
+  );
+}
 
 interface Props {
   onReset: () => void;
@@ -110,14 +121,17 @@ export default function PostSessionSummary({ onReset }: Props) {
               +{p.newSignals} signal{p.newSignals > 1 ? "s" : ""}
             </span>
             <div className="flex gap-1 ml-auto">
-              {p.types.map((t) => (
-                <span
-                  key={t}
-                  className={`font-mono text-[7px] uppercase tracking-wider px-1.5 py-0.5 ${SIGNAL_COLORS[t]?.bg} ${SIGNAL_COLORS[t]?.text}`}
-                >
-                  {t}
-                </span>
-              ))}
+              {p.types.map((t) => {
+                const colors = SIGNAL_COLORS[t] ?? { bg: "bg-muted", text: "text-muted-foreground" };
+                return (
+                  <span
+                    key={t}
+                    className={`font-mono text-[7px] uppercase tracking-wider px-1.5 py-0.5 ${colors.bg} ${colors.text}`}
+                  >
+                    {t}
+                  </span>
+                );
+              })}
             </div>
           </div>
         ))}
@@ -131,35 +145,25 @@ export default function PostSessionSummary({ onReset }: Props) {
         >
           Reset demo
         </button>
-        <a
-          href="/meetings"
+        <Link
+          to="/meetings"
           className="font-mono text-[10px] uppercase tracking-wider px-4 py-2 bg-foreground text-background hover:bg-foreground/90 transition-colors inline-flex items-center gap-1.5"
         >
           <FileText className="h-3 w-3" /> View artifact
-        </a>
+        </Link>
         <button
           onClick={() => {}}
           className="font-mono text-[10px] uppercase tracking-wider px-4 py-2 border border-border text-foreground hover:bg-muted transition-colors inline-flex items-center gap-1.5"
         >
           <Download className="h-3 w-3" /> Export PDF
         </button>
-        <a
-          href="/product/zoom-sdk"
+        <Link
+          to="/product/zoom-sdk"
           className="font-mono text-[10px] uppercase tracking-wider px-4 py-2 border border-border text-foreground hover:bg-muted transition-colors inline-flex items-center gap-1.5"
         >
           Product concept <ArrowRight className="h-3 w-3" />
-        </a>
+        </Link>
       </div>
-    </div>
-  );
-}
-
-function MetaItem({ icon: Icon, label, value }: { icon: typeof Clock; label: string; value: string }) {
-  return (
-    <div className="flex items-center gap-1.5">
-      <Icon className="h-3 w-3 text-muted-foreground" />
-      <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground">{label}</span>
-      <span className="font-mono text-[11px] font-bold text-foreground">{value}</span>
     </div>
   );
 }
