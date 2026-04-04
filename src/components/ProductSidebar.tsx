@@ -70,7 +70,7 @@ const channelItems = [
 
 const productItems = [
   /* Meetings & Video */
-  { title: "Meetings", url: "/meetings", icon: Video },
+  { title: "Meeting Intelligence", url: "/meetings", icon: Video },
   { title: "Zoom Demo", url: "/product/zoom-demo", icon: Video },
   { title: "Vanta Zoom", url: "/product/zoom-sdk", icon: Video },
   /* People & Relationships */
