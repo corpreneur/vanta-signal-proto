@@ -11,14 +11,14 @@ import QuickReminderSheet from "./QuickReminderSheet";
 
 type ActionId = "note" | "email" | "invite" | "voice" | "reminder";
 
-const ACTIONS: { id: ActionId | "message" | "offers"; label: string; icon: React.ElementType; desc: string; comingSoon?: boolean }[] = [
+const ACTIONS: { id: ActionId | "message" | "zoom"; label: string; icon: React.ElementType; desc: string; comingSoon?: boolean }[] = [
   { id: "note", label: "Capture Note", icon: StickyNote, desc: "Drop in anything" },
   { id: "email", label: "Draft Email", icon: Mail, desc: "Compose & send" },
   { id: "invite", label: "Calendar Invite", icon: Calendar, desc: "Schedule a meeting" },
   { id: "voice", label: "Voice Memo", icon: Mic, desc: "Record & classify" },
   { id: "message", label: "Send Message", icon: MessageSquare, desc: "Opens Messages" },
   { id: "reminder", label: "Set Reminder", icon: AlarmClock, desc: "Follow-up later" },
-  { id: "offers", label: "Offers", icon: Gift, desc: "Partner actions", comingSoon: true },
+  { id: "zoom", label: "Start Zoom", icon: Video, desc: "Launch meeting" },
 ];
 
 export default function QuickActionsGrid() {
