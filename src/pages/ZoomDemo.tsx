@@ -39,16 +39,6 @@ interface DetectedSignal {
   ts: string;
 }
 
-interface DossierAttendee {
-  name: string;
-  title: string;
-  company: string;
-  strength: number;
-  lastInteraction: string;
-  matchedSignals: { text: string; ago: string }[];
-  openCommitment: string;
-}
-
 const MOCK_JWT =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBfa2V5IjoiVmFudGFfU2lnbmFsIiwiaWF0IjoxNzEyMTgwMDAwLCJleHAiOjE3MTIxODM2MDAsInRwYyI6InZhbnRhLXNlc3Npb24tMDAxIiwicm9sZV90eXBlIjoxLCJ1c2VyX2lkZW50aXR5IjoiV2lsbGlhbSBUcmF5bG9yIn0.fake_signature_for_demo";
 
@@ -57,33 +47,6 @@ const BASE_PARTICIPANTS: Participant[] = [
   { name: "Marcus Rivera", email: "marcus@portfolio.co", joined: false },
 ];
 
-const DOSSIER_ATTENDEES: DossierAttendee[] = [
-  {
-    name: "Sarah Chen",
-    title: "General Partner",
-    company: "Acme Ventures",
-    strength: 82,
-    lastInteraction: "3 days ago via Email",
-    matchedSignals: [
-      { text: "Mentioned Series A timing — targeting Q2 close", ago: "3 weeks ago" },
-      { text: "Shared thesis on vertical SaaS market dynamics", ago: "5 weeks ago" },
-      { text: "Agreed to co-lead with Acme's seed fund", ago: "2 months ago" },
-    ],
-    openCommitment: "Send updated cap table by end of week",
-  },
-  {
-    name: "Marcus Rivera",
-    title: "Managing Director",
-    company: "Portfolio Capital",
-    strength: 64,
-    lastInteraction: "12 days ago via Zoom",
-    matchedSignals: [
-      { text: "Discussed portfolio allocation strategy for H2", ago: "2 weeks ago" },
-      { text: "Expressed interest in $1.5–2M allocation", ago: "1 month ago" },
-    ],
-    openCommitment: "Follow up on LP approval timeline",
-  },
-];
 
 const TRANSCRIPT_LINES: TranscriptLine[] = [
   { speaker: "You", text: "Thanks for joining. Let's walk through the current term structure." },
@@ -128,49 +91,6 @@ const FOLLOW_UPS = [
   "Marcus Rivera: confirm LP approval timeline within 48 hours.",
   "You: prepare the revised cap table and closing checklist.",
 ];
-
-function DossierCard({ attendee }: { attendee: DossierAttendee }) {
-  return (
-    <article className="space-y-3 border border-border bg-card p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h3 className="font-mono text-[11px] font-bold text-foreground">{attendee.name}</h3>
-          <p className="font-mono text-[9px] text-muted-foreground">
-            {attendee.title} · {attendee.company}
-          </p>
-        </div>
-        <div className="text-right">
-          <p className="font-mono text-[10px] font-bold text-foreground">{attendee.strength} / 100</p>
-          <p className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground">Relationship</p>
-        </div>
-      </div>
-
-      <div className="h-1 w-full overflow-hidden bg-muted">
-        <div className="h-full bg-foreground" style={{ width: `${attendee.strength}%` }} />
-      </div>
-
-      <div className="flex items-center gap-1.5 font-mono text-[9px] text-muted-foreground">
-        <Clock className="h-3 w-3" />
-        <span>Last: {attendee.lastInteraction}</span>
-      </div>
-
-      <div className="space-y-2">
-        <p className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground">Matched signals</p>
-        {attendee.matchedSignals.map((signal) => (
-          <div key={`${attendee.name}-${signal.text}`} className="flex items-start justify-between gap-3">
-            <p className="font-mono text-[9px] leading-relaxed text-foreground">{signal.text}</p>
-            <span className="shrink-0 font-mono text-[8px] text-muted-foreground">{signal.ago}</span>
-          </div>
-        ))}
-      </div>
-
-      <div className="border-t border-border pt-3">
-        <p className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground">Open commitment</p>
-        <p className="mt-1 font-mono text-[10px] text-foreground">{attendee.openCommitment}</p>
-      </div>
-    </article>
-  );
-}
 
 function VideoTile({ name, active, muted }: { name: string; active: boolean; muted: boolean }) {
   return (
@@ -415,21 +335,6 @@ export default function ZoomDemo() {
           Stable walkthrough of session creation, participant join, live streaming, and signal capture.
         </p>
       </header>
-
-      <section className={`space-y-4 border border-border bg-card p-4 transition-opacity ${phase !== "idle" && phase !== "generating" ? "pointer-events-none opacity-40" : "opacity-100"}`}>
-        <div className="flex items-center gap-2">
-          <Users className="h-4 w-4 text-muted-foreground" />
-          <h2 className="font-mono text-xs uppercase tracking-wider text-foreground">Pre-meeting dossier</h2>
-        </div>
-        <p className="font-mono text-[10px] leading-relaxed text-muted-foreground">
-          Attendee intelligence compiled from recent signals so you can review context before the session begins.
-        </p>
-        <div className="grid gap-4">
-          {DOSSIER_ATTENDEES.map((attendee) => (
-            <DossierCard key={attendee.name} attendee={attendee} />
-          ))}
-        </div>
-      </section>
 
       <section className="space-y-3 border border-border bg-card p-4">
         <div className="flex items-center gap-2">
