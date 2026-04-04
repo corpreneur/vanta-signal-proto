@@ -25,7 +25,6 @@ import {
   Shield,
   Radio,
   SlidersHorizontal,
-  
   Kanban,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
@@ -60,6 +59,21 @@ const fabFiveItems = [
   { title: "Easy Actions", url: "/command", icon: Zap },
 ];
 
+/* ── Product Concepts — sub-grouped ── */
+const meetingsAndCallsItems = [
+  { title: "Meeting Intelligence", url: "/meetings", icon: Video },
+  { title: "Zoom Demo", url: "/product/zoom-demo", icon: Video },
+  { title: "Vanta Zoom", url: "/product/zoom-sdk", icon: Video },
+  { title: "Phone FMC Demo", url: "/product/phone-fmc-demo", icon: Phone },
+  { title: "Smart Embed", url: "/product/smart-embed", icon: Phone },
+];
+
+const peopleItems = [
+  { title: "Smart Contacts", url: "/contacts", icon: Users },
+  { title: "Relationship Graph", url: "/graph", icon: Network },
+];
+
+/* ── Channels — source integrations ── */
 const channelItems = [
   { title: "iMessage", url: "/product/intro", icon: MessageSquare },
   { title: "Phone", url: "/product/phone-call", icon: Phone },
@@ -68,16 +82,13 @@ const channelItems = [
   { title: "Calendar", url: "/product/calendar", icon: Calendar },
 ];
 
-const productItems = [
-  /* Meetings & Video */
-  { title: "Meeting Intelligence", url: "/meetings", icon: Video },
-  { title: "Zoom Demo", url: "/product/zoom-demo", icon: Video },
-  { title: "Vanta Zoom", url: "/product/zoom-sdk", icon: Video },
-  { title: "Phone FMC Demo", url: "/product/phone-fmc-demo", icon: Phone },
-  { title: "Smart Embed", url: "/product/smart-embed", icon: Phone },
-  /* People & Relationships */
-  { title: "Smart Contacts", url: "/contacts", icon: Users },
-  { title: "Relationship Graph", url: "/graph", icon: Network },
+/* ── Platform — architecture & processing only ── */
+const platformItems = [
+  { title: "Context Layer", url: "/product/context", icon: FileText },
+  { title: "Noise Filter", url: "/product/noise", icon: Volume2 },
+  { title: "Ontology", url: "/ontology", icon: Layers },
+  { title: "Phone FMC", url: "/phone-fmc", icon: BookOpen },
+  { title: "Architecture", url: "/architecture", icon: FileCode },
 ];
 
 const useCaseItems = [
@@ -86,31 +97,29 @@ const useCaseItems = [
   { title: "Decision Capture", url: "/decisions", icon: Gavel },
 ];
 
-const platformItems = [
-  /* Architecture & Processing */
-  { title: "Context Layer", url: "/product/context", icon: FileText },
-  { title: "Noise Filter", url: "/product/noise", icon: Volume2 },
-  { title: "Ontology", url: "/ontology", icon: Layers },
-  { title: "Architecture", url: "/architecture", icon: FileCode },
-  /* Channel Sources */
-  { title: "iMessage", url: "/product/intro", icon: MessageSquare },
-  { title: "Phone", url: "/product/phone-call", icon: Phone },
-  { title: "Phone FMC", url: "/phone-fmc", icon: BookOpen },
-  { title: "Zoom", url: "/product/meeting", icon: Video },
-  { title: "Email", url: "/product/email", icon: Mail },
-  { title: "Calendar", url: "/product/calendar", icon: Calendar },
-];
+/* ── Shared nav-link classes ── */
+const NAV_CLASS =
+  "group/nav flex items-center gap-2 px-2 py-2 pl-6 border-l-2 border-transparent font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5";
+const NAV_ACTIVE =
+  "border-l-2 border-foreground text-foreground bg-vanta-bg-elevated";
 
 interface CollapsibleNavGroupProps {
   label: string;
   items: { title: string; url: string; icon: React.ElementType }[];
   collapsed: boolean;
   currentPath: string;
-  activeClassName?: string;
 }
 
-function CollapsibleNavGroup({ label, items, collapsed, currentPath, activeClassName = "border-l-2 border-foreground text-foreground bg-vanta-bg-elevated" }: CollapsibleNavGroupProps) {
-  const hasActiveChild = items.some((item) => currentPath === item.url || currentPath.startsWith(item.url + "/"));
+function CollapsibleNavGroup({
+  label,
+  items,
+  collapsed,
+  currentPath,
+}: CollapsibleNavGroupProps) {
+  const hasActiveChild = items.some(
+    (item) =>
+      currentPath === item.url || currentPath.startsWith(item.url + "/")
+  );
 
   return (
     <Collapsible defaultOpen={hasActiveChild}>
@@ -127,8 +136,8 @@ function CollapsibleNavGroup({ label, items, collapsed, currentPath, activeClass
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={item.url}
-                      className="group/nav flex items-center gap-2 px-2 py-2 pl-6 border-l-2 border-transparent font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5"
-                      activeClassName={activeClassName}
+                      className={NAV_CLASS}
+                      activeClassName={NAV_ACTIVE}
                     >
                       <item.icon className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover/nav:scale-110" />
                       {!collapsed && <span>{item.title}</span>}
@@ -144,6 +153,16 @@ function CollapsibleNavGroup({ label, items, collapsed, currentPath, activeClass
   );
 }
 
+/* ── Inline section label ── */
+function SectionLabel({ text, collapsed }: { text: string; collapsed: boolean }) {
+  if (collapsed) return null;
+  return (
+    <p className="px-6 pt-3 pb-1 font-mono text-[9px] uppercase tracking-[0.2em] text-vanta-accent">
+      {text}
+    </p>
+  );
+}
+
 export function ProductSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
@@ -156,8 +175,16 @@ export function ProductSidebar() {
     navigate("/login");
   };
 
+  const allProductItems = [...meetingsAndCallsItems, ...peopleItems];
+  const productActive = allProductItems.some(
+    (i) => currentPath === i.url || currentPath.startsWith(i.url + "/")
+  );
+
   return (
-    <Sidebar collapsible="icon" className="border-r border-vanta-border bg-vanta-bg">
+    <Sidebar
+      collapsible="icon"
+      className="border-r border-vanta-border bg-vanta-bg"
+    >
       <SidebarHeader className="px-3 py-3 space-y-1">
         <a href="/" className="flex items-center gap-2">
           <span className="font-sans text-[17px] font-extrabold tracking-[0.2em] uppercase text-foreground">
@@ -171,7 +198,7 @@ export function ProductSidebar() {
                 to="/"
                 end
                 className="group/nav flex items-center gap-2 px-2 py-1.5 border-l-2 border-transparent font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5"
-                activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
+                activeClassName={NAV_ACTIVE}
               >
                 <LayoutDashboard className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover/nav:scale-110" />
                 {!collapsed && <span>Dashboard</span>}
@@ -197,7 +224,7 @@ export function ProductSidebar() {
                     <NavLink
                       to={item.url}
                       className="group/nav flex items-center gap-2 px-2 py-2 border-l-2 border-transparent font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5"
-                      activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
+                      activeClassName={NAV_ACTIVE}
                     >
                       <item.icon className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover/nav:scale-110" />
                       {!collapsed && <span>{item.title}</span>}
@@ -211,11 +238,75 @@ export function ProductSidebar() {
 
         <div className="mx-3 border-t border-vanta-border" />
 
-        <CollapsibleNavGroup label="Product Concepts" items={productItems} collapsed={collapsed} currentPath={currentPath} />
-        <CollapsibleNavGroup label="Platform" items={platformItems} collapsed={collapsed} currentPath={currentPath} />
+        {/* Product Concepts — with sub-labels */}
+        <Collapsible defaultOpen={productActive}>
+          <SidebarGroup>
+            <CollapsibleTrigger className="flex items-center gap-1.5 w-full px-2 py-2 font-mono text-[10px] uppercase tracking-[0.15em] text-vanta-text-low hover:text-foreground transition-colors group">
+              <ChevronRight className="h-3.5 w-3.5 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+              {!collapsed && <span>Product Concepts</span>}
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SectionLabel text="Meetings & Calls" collapsed={collapsed} />
+                  {meetingsAndCallsItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <NavLink
+                          to={item.url}
+                          className={NAV_CLASS}
+                          activeClassName={NAV_ACTIVE}
+                        >
+                          <item.icon className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover/nav:scale-110" />
+                          {!collapsed && <span>{item.title}</span>}
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                  <SectionLabel text="People" collapsed={collapsed} />
+                  {peopleItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <NavLink
+                          to={item.url}
+                          className={NAV_CLASS}
+                          activeClassName={NAV_ACTIVE}
+                        >
+                          <item.icon className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover/nav:scale-110" />
+                          {!collapsed && <span>{item.title}</span>}
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </CollapsibleContent>
+          </SidebarGroup>
+        </Collapsible>
 
-        {/* Use Cases + Cases merged */}
-        <Collapsible defaultOpen={useCaseItems.some((i) => currentPath === i.url) || currentPath.startsWith("/case/")}>
+        {/* Channels */}
+        <CollapsibleNavGroup
+          label="Channels"
+          items={channelItems}
+          collapsed={collapsed}
+          currentPath={currentPath}
+        />
+
+        {/* Platform */}
+        <CollapsibleNavGroup
+          label="Platform"
+          items={platformItems}
+          collapsed={collapsed}
+          currentPath={currentPath}
+        />
+
+        {/* Use Cases + Cases */}
+        <Collapsible
+          defaultOpen={
+            useCaseItems.some((i) => currentPath === i.url) ||
+            currentPath.startsWith("/case/")
+          }
+        >
           <SidebarGroup>
             <CollapsibleTrigger className="flex items-center gap-1.5 w-full px-2 py-2 font-mono text-[10px] uppercase tracking-[0.15em] text-vanta-text-low hover:text-foreground transition-colors group">
               <ChevronRight className="h-3.5 w-3.5 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
@@ -229,8 +320,8 @@ export function ProductSidebar() {
                       <SidebarMenuButton asChild>
                         <NavLink
                           to={item.url}
-                          className="group/nav flex items-center gap-2 px-2 py-2 pl-6 border-l-2 border-transparent font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5"
-                          activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
+                          className={NAV_CLASS}
+                          activeClassName={NAV_ACTIVE}
                         >
                           <item.icon className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover/nav:scale-110" />
                           {!collapsed && <span className="truncate">{item.title}</span>}
@@ -243,8 +334,8 @@ export function ProductSidebar() {
                       <SidebarMenuButton asChild>
                         <NavLink
                           to={`/case/${c.id}`}
-                          className="group/nav flex items-center gap-2 px-2 py-2 pl-6 border-l-2 border-transparent font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5"
-                          activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
+                          className={NAV_CLASS}
+                          activeClassName={NAV_ACTIVE}
                         >
                           <BookMarked className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover/nav:scale-110" />
                           {!collapsed && <span className="truncate">{c.name}</span>}
@@ -257,83 +348,33 @@ export function ProductSidebar() {
             </CollapsibleContent>
           </SidebarGroup>
         </Collapsible>
-        {/* Admin links — scrollable */}
+
+        {/* Admin links */}
         <div className="mx-3 border-t border-vanta-border" />
         <SidebarGroup className="py-1">
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <NavLink
-                    to="/settings"
-                    className="group/nav flex items-center gap-2 px-2 py-1.5 border-l-2 border-transparent font-mono text-[11px] uppercase tracking-wider text-vanta-text-muted hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200"
-                    activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
-                  >
-                    <Settings2 className="h-3.5 w-3.5 shrink-0" />
-                    {!collapsed && <span>Settings</span>}
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <NavLink
-                    to="/my-rules"
-                    className="group/nav flex items-center gap-2 px-2 py-1.5 border-l-2 border-transparent font-mono text-[11px] uppercase tracking-wider text-vanta-text-muted hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200"
-                    activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
-                  >
-                    <BookOpen className="h-3.5 w-3.5 shrink-0" />
-                    {!collapsed && <span>My Rules</span>}
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <NavLink
-                    to="/releases"
-                    className="group/nav flex items-center gap-2 px-2 py-1.5 border-l-2 border-transparent font-mono text-[11px] uppercase tracking-wider text-vanta-text-muted hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200"
-                    activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
-                  >
-                    <FileText className="h-3.5 w-3.5 shrink-0" />
-                    {!collapsed && <span>Release Notes</span>}
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <NavLink
-                    to="/feedback"
-                    className="group/nav flex items-center gap-2 px-2 py-1.5 border-l-2 border-transparent font-mono text-[11px] uppercase tracking-wider text-vanta-text-muted hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200"
-                    activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
-                  >
-                    <MessageSquare className="h-3.5 w-3.5 shrink-0" />
-                    {!collapsed && <span>Feedback</span>}
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <NavLink
-                    to="/sprints"
-                    className="group/nav flex items-center gap-2 px-2 py-1.5 border-l-2 border-transparent font-mono text-[11px] uppercase tracking-wider text-vanta-text-muted hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200"
-                    activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
-                  >
-                    <Kanban className="h-3.5 w-3.5 shrink-0" />
-                    {!collapsed && <span>Sprint Board</span>}
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <NavLink
-                    to="/admin"
-                    className="group/nav flex items-center gap-2 px-2 py-1.5 border-l-2 border-transparent font-mono text-[11px] uppercase tracking-wider text-vanta-text-muted hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200"
-                    activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
-                  >
-                    <Shield className="h-3.5 w-3.5 shrink-0" />
-                    {!collapsed && <span>Admin</span>}
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              {[
+                { to: "/settings", icon: Settings2, label: "Settings" },
+                { to: "/my-rules", icon: BookOpen, label: "My Rules" },
+                { to: "/releases", icon: FileText, label: "Release Notes" },
+                { to: "/feedback", icon: MessageSquare, label: "Feedback" },
+                { to: "/sprints", icon: Kanban, label: "Sprint Board" },
+                { to: "/admin", icon: Shield, label: "Admin" },
+              ].map((link) => (
+                <SidebarMenuItem key={link.to}>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to={link.to}
+                      className="group/nav flex items-center gap-2 px-2 py-1.5 border-l-2 border-transparent font-mono text-[11px] uppercase tracking-wider text-vanta-text-muted hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200"
+                      activeClassName={NAV_ACTIVE}
+                    >
+                      <link.icon className="h-3.5 w-3.5 shrink-0" />
+                      {!collapsed && <span>{link.label}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
