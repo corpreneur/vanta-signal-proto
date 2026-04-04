@@ -4,6 +4,7 @@ import {
   Mic, MonitorUp, Pen, Cloud, Eye, Zap,
 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 /* ── Types ── */
 type Phase = "idle" | "generating" | "jwt-ready" | "inviting" | "invited" | "streaming" | "detecting" | "complete";
