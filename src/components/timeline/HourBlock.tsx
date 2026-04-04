@@ -1,5 +1,6 @@
 import type { Signal } from "@/data/signals";
 import { MessageSquare, Phone, Video, Mail, StickyNote, Trash2 } from "lucide-react";
+import ZoomLaunchButton from "@/components/ZoomLaunchButton";
 
 const SOURCE_ICONS: Record<string, typeof MessageSquare> = {
   linq: MessageSquare,
