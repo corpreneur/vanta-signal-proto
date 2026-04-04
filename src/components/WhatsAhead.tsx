@@ -32,7 +32,7 @@ const fetchUpcoming = async (): Promise<Meeting[]> => {
   const cutoff = new Date(now.getTime() + 48 * 60 * 60 * 1000);
   const { data, error } = await supabase
     .from("upcoming_meetings")
-    .select("id, title, starts_at, ends_at, attendees")
+    .select("id, title, starts_at, ends_at, attendees, zoom_meeting_id")
     .gte("starts_at", now.toISOString())
     .lte("starts_at", cutoff.toISOString())
     .order("starts_at", { ascending: true })
