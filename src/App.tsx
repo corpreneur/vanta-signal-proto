@@ -143,6 +143,7 @@ const AppRoutes = () => {
       <Route path="/case-03" element={<Navigate to="/case/03" replace />} />
       <Route path="/orb-demo" element={<OrbDemo />} />
       <Route path="/product/phone-fmc-demo" element={<ProtectedRoute session={session}><ProductLayout><PhoneFMCDemo /></ProductLayout></ProtectedRoute>} />
+      <Route path="/product/smart-embed" element={<ProtectedRoute session={session}><ProductLayout><SmartEmbedConcept /></ProductLayout></ProtectedRoute>} />
       <Route path="/product/zoom-demo" element={<ProtectedRoute session={session}><ProductLayout><ZoomDemo /></ProductLayout></ProtectedRoute>} />
       <Route path="/zoom-demo" element={<Navigate to="/product/zoom-demo" replace />} />
       <Route path="*" element={<NotFound />} />
