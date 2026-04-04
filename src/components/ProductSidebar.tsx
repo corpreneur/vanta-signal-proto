@@ -215,18 +215,30 @@ export function ProductSidebar() {
         <CollapsibleNavGroup label="Product Concepts" items={productItems} collapsed={collapsed} currentPath={currentPath} />
         <CollapsibleNavGroup label="Platform" items={platformItems} collapsed={collapsed} currentPath={currentPath} />
 
-        <CollapsibleNavGroup label="Use Cases" items={useCaseItems} collapsed={collapsed} currentPath={currentPath} />
-
-        {/* Cases */}
-        <Collapsible defaultOpen={currentPath.startsWith("/case/")}>
+        {/* Use Cases + Cases merged */}
+        <Collapsible defaultOpen={useCaseItems.some((i) => currentPath === i.url) || currentPath.startsWith("/case/")}>
           <SidebarGroup>
             <CollapsibleTrigger className="flex items-center gap-1.5 w-full px-2 py-2 font-mono text-[10px] uppercase tracking-[0.15em] text-vanta-text-low hover:text-foreground transition-colors group">
               <ChevronRight className="h-3.5 w-3.5 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
-              {!collapsed && <span>Cases</span>}
+              {!collapsed && <span>Use Cases</span>}
             </CollapsibleTrigger>
             <CollapsibleContent>
               <SidebarGroupContent>
                 <SidebarMenu>
+                  {useCaseItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <NavLink
+                          to={item.url}
+                          className="group/nav flex items-center gap-2 px-2 py-2 pl-6 border-l-2 border-transparent font-mono text-[12px] uppercase tracking-wider text-vanta-text-low hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200 hover:translate-x-0.5"
+                          activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
+                        >
+                          <item.icon className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover/nav:scale-110" />
+                          {!collapsed && <span className="truncate">{item.title}</span>}
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
                   {cases.map((c) => (
                     <SidebarMenuItem key={c.id}>
                       <SidebarMenuButton asChild>
