@@ -27,6 +27,7 @@ interface TimelineViewProps {
 export default function TimelineView({ signals, onSignalClick, compact = true }: TimelineViewProps) {
   const queryClient = useQueryClient();
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(false);
   const currentHourRef = useRef<HTMLDivElement>(null);
 
   const { data: meetings = [] } = useQuery({
