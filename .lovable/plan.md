@@ -1,39 +1,56 @@
 
 
-## Plan: Add compact attendee summary strip to Zoom demo
+## Sidebar cleanup: Product Concepts + Platform reorganization
 
-### What we'll build
-
-A horizontal strip below the page header showing the meeting participants — names, roles, and a subtle signal count badge. Matches the existing "inline stat strip" pattern used on the dashboard.
-
-### Location
-
-Insert between the `<header>` block (line 436) and Step 1 (line 438) in `src/pages/ZoomDemo.tsx`.
-
-### Design
+### Current state
 
 ```text
-┌──────────────────────────────────────────────────────────┐
-│ 👤 ATTENDEES                                              │
-│ ┌─────────────┐ ┌──────────────────┐ ┌────────────────┐  │
-│ │ WT · You    │ │ SC · Sarah Chen  │ │ MR · Marcus R. │  │
-│ │ Host        │ │ GP · Acme VC  ⚡2│ │ MD · Portfolio │  │
-│ └─────────────┘ └──────────────────┘ └────────────────┘  │
-└──────────────────────────────────────────────────────────┘
+Product Concepts (7 flat items)
+  Meeting Intelligence, Zoom Demo, Vanta Zoom, Phone FMC Demo, Smart Embed,
+  Smart Contacts, Relationship Graph
+
+Platform (10 flat items)
+  Context Layer, Noise Filter, Ontology, Architecture,
+  iMessage, Phone, Phone FMC, Zoom, Email, Calendar
+
+channelItems[] — defined but NEVER RENDERED
 ```
 
-- Compact horizontal row of attendee chips with initials, name, title/company
-- Signal count badges appear after signals are detected (phase `detecting` or `complete`)
-- Uses existing monochrome + border styling, no new colors
-- Fully inline in the same file — no new components
+Problems: duplicate channel links, no sub-grouping, `channelItems` is dead code, architecture docs mixed with channel sources.
 
-### Data
+### Proposed structure
 
-Define a const array with participant metadata (name, initials, role, company) reusing existing `BASE_PARTICIPANTS` names. Render inline as a `flex flex-wrap gap-2` row of bordered chips.
+```text
+Product Concepts
+  ├─ Meetings & Calls
+  │    Meeting Intelligence, Zoom Demo, Vanta Zoom, Phone FMC Demo, Smart Embed
+  └─ People
+       Smart Contacts, Relationship Graph
 
-### File changed
+Channels (replaces the orphaned channelItems + Platform channel dupes)
+     iMessage, Phone, Zoom, Email, Calendar
 
-| File | Change |
-|------|--------|
-| `src/pages/ZoomDemo.tsx` | Add `ATTENDEE_META` const + render attendee strip between header and Step 1 |
+Platform (trimmed to architecture/processing only)
+     Context Layer, Noise Filter, Ontology, Phone FMC (case study), Architecture
+```
+
+### Changes — single file: `src/components/ProductSidebar.tsx`
+
+1. **Delete `channelItems`** array (dead code) and **remove channel entries from `platformItems`** (iMessage, Phone, Zoom, Email, Calendar).
+
+2. **Add a new "Channels" collapsible group** using the existing channel data (iMessage, Phone, Zoom, Email, Calendar). Render it between Product Concepts and Platform.
+
+3. **Keep `platformItems` as architecture-only**: Context Layer, Noise Filter, Ontology, Phone FMC (case study), Architecture.
+
+4. **Split `productItems` into visual sub-labels** inside the collapsible — add a tiny "Meetings & Calls" and "People" label within the menu (similar to how Fab Five has its accent label). No new collapsible nesting, just inline section labels for scannability.
+
+5. **No route or page changes** — only sidebar navigation arrays and rendering.
+
+### Result
+
+- 3 clean collapsible groups instead of 2 bloated ones
+- Zero duplicate links
+- Dead code removed
+- Channel sources get their own scannable section
+- Platform becomes a focused architecture/docs section
 
