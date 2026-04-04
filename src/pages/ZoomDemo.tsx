@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, type ReactNode } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Video,
   Shield,
@@ -13,13 +13,17 @@ import {
   Cloud,
   Eye,
   Zap,
+  Clock,
+  FileText,
+  Download,
+  ArrowRight,
+  UserCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import ErrorBoundary from "@/components/ErrorBoundary";
+import { Link } from "react-router-dom";
 import PreSessionDossier from "@/components/zoom-demo/PreSessionDossier";
 import VideoGrid from "@/components/zoom-demo/VideoGrid";
-import PostSessionSummary from "@/components/zoom-demo/PostSessionSummary";
 
 type Phase = "idle" | "generating" | "jwt-ready" | "inviting" | "invited" | "streaming" | "detecting" | "complete";
 
