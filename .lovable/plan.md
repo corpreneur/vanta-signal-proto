@@ -1,118 +1,77 @@
 
 
-# Smart Contacts Evolution — Implementation Plan
+# Plan: Zoom Launch Buttons + RTMS Integration
 
-## Context
+## What We're Building
 
-The spec defines Smart Contacts as **"a relationship layer built on top of a contact list, not a CRM."** The current implementation already has significant foundations: signal-derived contacts, strength scoring, contact tags, engagement sequences, relationship briefs, and a timeline view. The spec asks us to close the gaps toward a carrier-grade contact card experience.
+Two connected workstreams: (1) surface "Launch Zoom" / "Start Meeting" buttons across every relevant touchpoint in the app, and (2) wire those launches to trigger RTMS stream activation so Vanta captures live meeting intelligence automatically.
 
-## Gap Analysis: Spec vs. Current State
+## RTMS Architecture (from Zoom docs)
 
-| Spec Feature | Current State | Gap |
-|---|---|---|
-| Contact card with photo, title, company, notes | Partial — `ContactProfileHeader` has role/company/email/phone but stores in signals metadata hack | Needs a dedicated `contact_profiles` table |
-| Manual contact creation with "How we met" | `AddContactContext` exists but minimal | Add relationship type selector, source tag, duplicate detection |
-| Relationship type (Client, Prospect, Partner...) | Not implemented | New field on contact profile |
-| Pinned contacts (up to 5) | Exists on signals but not contacts-level | Add `pinned` boolean to contact profiles |
-| "Re-engage" tray (dormant 30+ days) | `CoolingAlerts` + `relationship_alerts` table exists | Wire into Contacts home as a visual tray |
-| "New People" tray (unknown callers/texters) | Not implemented | Surface recent INTRO signals as suggestions |
-| Post-call note prompt | `ContactNotes` component exists | Add post-call modal UX trigger |
-| Interaction timeline with filters | `ContactTimeline` page exists with full timeline | Add filter toggles (All/Calls/Messages/Notes) |
-| Call history summary widget | Not implemented on card | Add call stats to contact card |
-| AI-generated contact summary ("Prepare") | `relationship-brief` edge function exists | Wire "Prepare" button to existing function |
-| Search with filter chips | Basic search exists | Add relationship type + recency filter chips |
-| Duplicate merge | Not implemented | New feature |
+RTMS streams can launch three ways:
+- **Automatically** -- when a user joins/hosts a meeting
+- **On-demand** -- via REST API with meeting ID
+- **From a Zoom App** -- using `startRTMS()` in the Zoom Apps SDK
 
-## Plan
+For Vanta, the flow is: user taps "Launch Zoom" in our UI → we open `zoommtg://` deep link or `https://zoom.us/j/{id}` → a webhook fires `meeting.started` → our backend calls the RTMS REST API to start streaming → live transcript data flows via WebSocket to our edge function → signals are classified and stored in real-time.
 
-### 1. Create `contact_profiles` table
+## Surface Points for Zoom Launch Buttons
 
-New database table to persist contact data beyond signal derivation:
+### 1. WhatsAhead (Dashboard "Coming Up" section)
+Each meeting row gets a "Launch" button (Video icon) on the right side, next to the existing Brief link. Taps open the Zoom meeting via `zoom_meeting_id` from `upcoming_meetings` table or fall back to creating a new meeting.
 
-```sql
-CREATE TABLE contact_profiles (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name text NOT NULL UNIQUE,
-  display_name text,
-  photo_url text,
-  title text,
-  company text,
-  email text,
-  phone text,
-  relationship_type text DEFAULT 'personal',  -- client, prospect, partner, investor, vendor, personal
-  how_we_met text,
-  source_tag text DEFAULT 'manual',  -- manual, imessage, call, import
-  private_notes text,
-  pinned boolean DEFAULT false,
-  pinned_order integer,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-```
+### 2. Timeline HourBlock (meetings in the day view)
+Each meeting bar in the timeline gets a small Video launch icon. Clicking opens Zoom for that meeting.
 
-With RLS for authenticated users. This gives contacts a persistent identity independent of signals.
+### 3. PreMeetingBriefCard
+Add a "Join Meeting" button in the actions row alongside "Full Dossier". This is the highest-intent moment -- user is reviewing the brief right before the call.
 
-### 2. Redesign the Contacts Home (`/contacts`)
+### 4. QuickActionsGrid
+Replace the "Offers" (coming soon) slot with a "Start Zoom" action that launches a new Zoom meeting via `https://zoom.us/start/videomeeting`. Or add it as a new entry in the grid.
 
-Restructure the page layout to match the spec's action-oriented home:
+### 5. ContactProfileHeader
+Add a Video/Zoom icon to the quick-action buttons row (alongside Call, Text, Email, LinkedIn). Launches a Zoom meeting with the contact.
 
-- **Top rail**: Search bar (already exists, keep it)
-- **Pinned section**: Up to 5 starred contacts from `contact_profiles.pinned = true`, displayed as compact avatar row
-- **"Re-engage" tray**: Query contacts where `daysSinceLast > 30` and relationship_type in (client, partner, investor) — horizontal scrollable cards with one-tap Call/Message/Note
-- **"New People" tray**: Recent INTRO signals not yet in `contact_profiles` — shown as suggestion cards with one-tap save
-- **Full contact list**: Sorted by recency (default), with A-Z toggle — already exists
+### 6. Command Page -- ChannelAgnosticComms
+Already has a Zoom channel button. Verify it works; no changes needed here.
 
-### 3. Evolve `SmartContactCard` to match spec
+### 7. Signal Detail Drawer (meeting cards)
+For MEETING-type signals, add a "Rejoin" or "Open Recording" button that links to the Zoom recording or meeting URL.
 
-Update the card component to include:
+## Backend: RTMS Webhook Listener
 
-- Contact avatar with photo (from `contact_profiles.photo_url`) or initial fallback
-- Title + company from profile (not just signal-derived)
-- Relationship type badge
-- Call history summary widget: total calls, total minutes, last call date (derived from signals where `source = 'phone'`)
-- "Prepare" button that calls the existing `relationship-brief` edge function
-- Quick action strip: Call, Message, Note, Remind (consolidate existing CTAs)
-- Inline-editable notes field
+### New Edge Function: `rtms-webhook`
+Receives RTMS events from Zoom's WebSocket relay:
+- `meeting.rtms.started` -- log that stream is active
+- `meeting.rtms.stopped` -- finalize transcript
+- Transcript chunks arrive via WebSocket with speaker labels and timestamps
+- Each chunk is buffered and periodically classified using the existing Haiku triage + Sonnet detection pipeline
 
-### 4. Enhance Manual Contact Creation
+### Database Changes
+- Add `rtms_stream_id` column to `upcoming_meetings` to track active streams
+- Add `rtms_status` enum column (`idle`, `streaming`, `completed`) to `upcoming_meetings`
 
-Upgrade `AddContactContext` to a full creation flow:
+### New Edge Function: `start-rtms-stream`
+Called after user launches Zoom. Takes a `meeting_id`, calls Zoom's RTMS REST API to start the stream. Requires Zoom OAuth credentials (already partially scaffolded via the zoom-webhook function).
 
-- Add relationship type selector (Client, Prospect, Partner, Investor, Vendor, Personal)
-- Add source tag selector
-- Insert into `contact_profiles` table on save
-- Auto-duplicate detection: check name + phone match before insert
-- Fields: name, phone, email, title, company, tags, "How we met"
+## Implementation Steps
 
-### 5. Add Timeline Filters
+1. **Create a shared `ZoomLaunchButton` component** -- accepts `meetingId?`, `meetingUrl?`, `contactName?`, renders the Zoom-blue video icon button. Handles deep link logic (`zoommtg://` for native, `https://zoom.us/j/` for web). Fires a toast confirmation and optionally calls `start-rtms-stream`.
 
-On `ContactTimeline` page, add filter toggle bar:
+2. **Wire the button into all 6 surface points** listed above.
 
-- All / Calls / Messages / Notes
-- Filter signals by `source` field mapping (phone -> Calls, linq/gmail -> Messages, manual -> Notes)
+3. **Create `start-rtms-stream` edge function** -- calls Zoom REST API to initiate RTMS. Requires `ZOOM_CLIENT_ID`, `ZOOM_CLIENT_SECRET`, `ZOOM_ACCOUNT_ID` secrets.
 
-### 6. Wire "Prepare" Button
+4. **Create `rtms-webhook` edge function** -- receives streaming transcript data, buffers it, classifies in chunks, writes signals to DB in near-real-time.
 
-Add a "Prepare" button on the contact card and timeline header that:
-- Calls the existing `relationship-brief` edge function
-- Displays the 2-3 sentence AI summary in a sheet/drawer
-- Already exists as infrastructure, just needs UI wiring
+5. **Add DB migration** -- `rtms_stream_id` and `rtms_status` on `upcoming_meetings`.
 
----
-
-## Sprint 1 Priority (matching spec)
-
-1. `contact_profiles` table migration
-2. Contacts home redesign (pinned + re-engage + new people trays)
-3. SmartContactCard evolution (profile fields, call stats, prepare button)
-4. Enhanced manual creation flow
-5. Timeline filter toggles
-
-Duplicate merge and advanced search history are Sprint 2.
+6. **Update `supabase/config.toml`** -- add `[functions.rtms-webhook]` and `[functions.start-rtms-stream]` with `verify_jwt = false`.
 
 ## Technical Notes
 
-- The `contact_profiles` table decouples persistent profile data from signal-derived runtime data. The existing signal aggregation continues to power strength scores and activity metrics, while profile data (title, company, relationship type, pinned status) lives in the new table.
-- No changes to `src/integrations/supabase/client.ts` or `types.ts` — those auto-generate after migration.
-- Mobile-first, dark mode default, consistent with existing Vanta design language.
+- The `ZoomLaunchButton` component uses the existing `vanta-accent-zoom` color tokens already defined in the design system
+- RTMS requires a Zoom General App with RTMS scopes (`rtms:media:read`). The PRD already calls for submitting this app for approval
+- Until RTMS is approved, the launch buttons still work -- they just open Zoom without the live stream. The Recall.ai fallback continues to handle post-meeting processing
+- No pills. All buttons use the existing square-edged mono-font pattern
 
