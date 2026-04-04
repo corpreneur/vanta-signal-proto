@@ -74,15 +74,37 @@ export default function ZoomDemo() {
   const [detectedSignals, setDetectedSignals] = useState<DetectedSignal[]>([]);
   const [rtmsStatus, setRtmsStatus] = useState<"idle" | "connecting" | "streaming" | "completed">("idle");
 
-  /* Phase: Generate JWT */
-  const handleGenerateJwt = useCallback(() => {
+  /* Phase: Generate JWT — creates a real meeting in the DB */
+  const handleGenerateJwt = useCallback(async () => {
     setPhase("generating");
-    setSessionId(`vanta-session-${Date.now().toString(36)}`);
-    setTimeout(() => {
+    const sid = `vanta-session-${Date.now().toString(36)}`;
+    setSessionId(sid);
+    try {
+      const startsAt = new Date(Date.now() + 5 * 60_000).toISOString();
+      const { data, error } = await supabase
+        .from("upcoming_meetings")
+        .insert({
+          title: `Vanta Zoom Demo — ${sid}`,
+          starts_at: startsAt,
+          ends_at: new Date(Date.now() + 35 * 60_000).toISOString(),
+          zoom_meeting_id: sid,
+          attendees: MOCK_PARTICIPANTS.map(p => ({ name: p.name, email: p.email })),
+        })
+        .select("id")
+        .single();
+
+      if (error) throw error;
+      setMeetingDbId(data.id);
       setJwt(MOCK_JWT);
       setPhase("jwt-ready");
-      toast.success("Video SDK JWT generated");
-    }, 1800);
+      toast.success("Session created & JWT generated");
+    } catch (err) {
+      console.error("JWT generation failed:", err);
+      // Graceful fallback to mock flow
+      setJwt(MOCK_JWT);
+      setPhase("jwt-ready");
+      toast.success("Video SDK JWT generated (demo mode)");
+    }
   }, []);
 
   /* Phase: Send invites */
