@@ -1,73 +1,62 @@
 
 
-# Plan: Vanta Zoom Product Concept Page
+# Plan: Layer Three Features into Zoom Demo
 
-## What We're Building
+## What We're Adding
 
-A dedicated product concept page at `/product/zoom` that articulates the vision for Vanta's native Zoom meeting experience, built on the Zoom Video SDK (iOS). This follows the existing `ProductSignalPage` pattern used for iMessage, Phone, Email, Calendar, etc. -- and gets wired into the sidebar under the existing "Platform" or "Channels" nav groups.
+Three new sections to the existing `/zoom-demo` page that complete the meeting lifecycle: a pre-meeting dossier before the session, a live video grid during the session, and a post-session AI summary after completion.
 
-## Why Video SDK, Not Meeting SDK
+## 1. Pre-Meeting Brief Panel (before Step 1)
 
-The Zoom Video SDK is fundamentally different from the standard Zoom client integration:
-- **Session-based** (not meeting-based) -- no Zoom account required for participants
-- **Full UI control** -- Vanta owns the entire video experience, no Zoom chrome
-- **Raw data access** -- direct audio/video streams for real-time AI processing
-- **RTMS built-in** -- live transcription, speaker diarization, command channel
-- **Up to 5,000 participants** per session
-- **iOS native** via Swift/Obj-C with Metal renderer support
+A new section at the top that appears immediately on page load, showing attendee intelligence before the session starts.
 
-This means Vanta can build a fully branded, intelligence-first meeting experience where signal capture is architectural, not bolted on.
+- **Attendee dossiers** for Sarah Chen and Marcus Rivera, each showing:
+  - Relationship strength bar (e.g., 82/100)
+  - Last interaction date and channel
+  - 2-3 matched past signals (e.g., "Mentioned Series A timing — 3 weeks ago")
+  - One open commitment or action item
+- **Styling**: Same card/border pattern, with a "Dossier" step indicator (Step 0 or unnumbered header section)
+- **Behavior**: Always visible, dims once the session starts (like the existing step dimming pattern)
+- Uses mock data only — no DB queries needed
 
-## Implementation Steps
+## 2. Live Video Grid Mockup (during RTMS streaming phase)
 
-### 1. Add "zoom-sdk" product definition to `ProductSignalPage.tsx`
+A simulated participant video layout that appears alongside the transcript during the `streaming` and `detecting` phases.
 
-Add a new entry to the `PRODUCTS` record with key `"zoom-sdk"`:
+- **Grid layout**: 2x2 tiles (You, Sarah Chen, Marcus Rivera, and a "Vanta Signal" AI tile)
+- Each tile shows:
+  - Initials avatar circle with participant name below
+  - Active speaker highlight (green border pulses when their transcript line is current)
+  - Mute/unmute icon state
+  - The "Vanta Signal" tile shows a waveform animation during streaming
+- **Placement**: Above the transcript panel in Step 3, wrapped in a bordered container
+- **Responsive**: On the 393px viewport, tiles stack as a 2x2 grid with small sizing
+- Pure CSS/mock — no actual video streams
 
-- **type**: `MEETING`
-- **label**: "Vanta Zoom"
-- **icon**: `Video`
-- **tagline**: "Your meetings, your intelligence layer... a fully native Zoom experience inside Vanta."
-- **channels**: `["Zoom Video SDK (iOS)", "RTMS Live Transcription", "Command Channel"]`
-- **narrative**: 3 paragraphs covering:
-  - Why a native SDK integration matters vs. just joining Zoom links
-  - Session-based architecture: no Zoom accounts needed for guests, Vanta owns the UI
-  - Real-time intelligence: RTMS streams feed live transcription into the signal pipeline, signals are detected during the call not after
-- **howItWorks**: 5 steps:
-  1. Session Creation -- Vanta backend generates a Video SDK JWT and creates a session
-  2. Native Launch -- iOS app joins the session via Zoom Video SDK with custom Vanta UI
-  3. RTMS Stream -- Live audio/video routed through RTMS for real-time transcription with speaker attribution
-  4. Live Signal Detection -- Transcript chunks classified in real-time: decisions, commitments, action items surfaced during the call
-  5. Post-Session Intelligence -- Full transcript processed through deep analysis pipeline, meeting artifact stored with signals linked to attendee profiles
-- **signalExamples**: 3 examples showing live in-call signal detection
-- **whyItMatters**: Quote about owning the video layer = owning the intelligence layer
+## 3. Post-Session Summary Card (after Step 4 completion)
 
-### 2. Add route entry
+Replaces the current minimal "Session complete" block with a rich AI-generated meeting summary.
 
-The existing route `<Route path="product/:signalType" element={<ProductSignalPage />} />` already handles dynamic product pages. The key `"zoom-sdk"` will resolve automatically at `/product/zoom-sdk`.
+- **Meeting metadata strip**: Duration (11m 08s), participants (3), signals captured (3)
+- **Narrative summary**: 2-3 paragraph mock summary of the meeting (e.g., "Series A terms were agreed at $12M pre-money with Q3 close targeted...")
+- **Key takeaways**: Bulleted list of 3-4 items extracted from the signals
+- **Action items**: Checklist-style items with assignees (e.g., "Sarah Chen: Send updated term sheet by Friday")
+- **Attendee enrichment badge**: Shows that Sarah Chen and Marcus Rivera profiles have been updated with new signals
+- **Links**: "View full artifact" (links to `/meetings`), "Export PDF" (placeholder), and existing "Reset demo" + "Product concept" buttons
 
-### 3. Add sidebar navigation entry
+## Implementation
 
-Add `{ title: "Vanta Zoom", url: "/product/zoom-sdk", icon: Video }` to the `channelItems` or `platformItems` array in `ProductSidebar.tsx`. Place it alongside the existing Zoom entry or replace it, since this represents the evolved product concept.
+All changes are in `src/pages/ZoomDemo.tsx` only:
 
-### 4. Add iOS-specific feature callouts
-
-Extend the product definition with additional detail about iOS Video SDK capabilities:
-- HD video with virtual backgrounds
-- Multiple camera support
-- Screen sharing with annotation
-- Whiteboard collaboration
-- Cloud recording
-- Live streaming via RTMP
-- Apple Metal renderer for optimized iOS performance
-- Apple Vision Pro support (visionOS)
-
-These will render naturally through the existing `howItWorks` and `signalExamples` sections.
+1. Add mock data constants for attendee dossiers, meeting summary, and action items
+2. Add a `PreSessionDossier` section rendered before Step 1, dimmed after `jwt-ready`
+3. Add a `VideoGrid` section rendered inside Step 3 when `rtmsStatus === "streaming"` or phase is `detecting`
+4. Replace the existing "complete" block with the expanded `PostSessionSummary`
+5. No new files, no DB changes, no edge functions — all mock/simulation data
 
 ## Technical Notes
 
-- No new files needed -- this extends the existing `PRODUCTS` record in `ProductSignalPage.tsx` and adds a nav link in `ProductSidebar.tsx`
-- The `MEETING` signal type already has color tokens defined in `SIGNAL_TYPE_COLORS`
-- The page follows the exact same rendering pattern as all other product concept pages (narrative, how-it-works steps, signal examples, why-it-matters quote)
-- iOS-only positioning is captured in the narrative and channels, not as a separate UI element
+- Active speaker detection in the video grid syncs with `transcriptIndex` — the tile whose name matches the current `TRANSCRIPT_LINES[transcriptIndex].speaker` gets the highlight border
+- Post-session summary uses the same signal color tokens (`SIGNAL_COLORS`) for inline type badges
+- All new sections follow the existing mono-font, square-edge, no-pill design pattern
 
