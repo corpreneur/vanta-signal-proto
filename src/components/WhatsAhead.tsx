@@ -157,7 +157,7 @@ const WhatsAhead = () => {
                   </div>
                   <ZoomLaunchButton
                     meetingId={m.id}
-                    zoomMeetingId={(m as unknown as { zoom_meeting_id?: string }).zoom_meeting_id}
+                    zoomMeetingId={m.zoom_meeting_id}
                     variant="icon"
                     className="shrink-0"
                   />
