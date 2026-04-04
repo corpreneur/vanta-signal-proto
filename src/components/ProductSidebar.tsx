@@ -78,7 +78,6 @@ const productItems = [
   /* People & Relationships */
   { title: "Smart Contacts", url: "/contacts", icon: Users },
   { title: "Relationship Graph", url: "/graph", icon: Network },
-  { title: "My Rules", url: "/my-rules", icon: BookOpen },
 ];
 
 const useCaseItems = [
@@ -272,6 +271,18 @@ export function ProductSidebar() {
                   >
                     <Settings2 className="h-3.5 w-3.5 shrink-0" />
                     {!collapsed && <span>Settings</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink
+                    to="/my-rules"
+                    className="group/nav flex items-center gap-2 px-2 py-1.5 border-l-2 border-transparent font-mono text-[11px] uppercase tracking-wider text-vanta-text-muted hover:text-foreground hover:bg-vanta-bg-elevated transition-all duration-200"
+                    activeClassName="border-l-2 border-foreground text-foreground bg-vanta-bg-elevated"
+                  >
+                    <BookOpen className="h-3.5 w-3.5 shrink-0" />
+                    {!collapsed && <span>My Rules</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
