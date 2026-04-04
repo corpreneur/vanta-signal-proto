@@ -118,7 +118,10 @@ export default function TimelineView({ signals, onSignalClick, compact = true }:
   return (
     <section className="mb-6">
       <Motion>
-        <div className="flex items-center justify-between mb-4">
+        <button
+          onClick={() => setExpanded((prev) => !prev)}
+          className="flex w-full items-center justify-between mb-4 group"
+        >
           <div className="flex items-center gap-2">
             <Clock className="w-3.5 h-3.5 text-muted-foreground" />
             <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
@@ -128,36 +131,43 @@ export default function TimelineView({ signals, onSignalClick, compact = true }:
               {totalSignals} signals · {totalMeetings} meetings
             </span>
           </div>
-          <Link
-            to="/signals"
-            className="font-mono text-[9px] uppercase tracking-wider text-primary hover:text-foreground transition-colors flex items-center gap-1"
-          >
-            View All <ArrowRight className="w-3 h-3" />
-          </Link>
-        </div>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/signals"
+              onClick={(e) => e.stopPropagation()}
+              className="font-mono text-[9px] uppercase tracking-wider text-primary hover:text-foreground transition-colors flex items-center gap-1"
+            >
+              View All <ArrowRight className="w-3 h-3" />
+            </Link>
+            <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
+          </div>
+        </button>
       </Motion>
 
-      <div className="border border-border bg-card overflow-y-auto max-h-[520px] scrollbar-hide">
-        {hours.map((hour) => (
-          <div key={hour} ref={hour === currentHour ? currentHourRef : undefined}>
-            <HourBlock
-              hour={hour}
-              signals={signalsByHour[hour] || []}
-              meetings={meetingsByHour[hour] || []}
-              isCurrentHour={hour === currentHour}
-              onSignalClick={onSignalClick}
-              onDelete={handleDelete}
-              deletingId={deleting}
-            />
+      {expanded && (
+        <>
+          <div className="border border-border bg-card overflow-y-auto max-h-[520px] scrollbar-hide">
+            {hours.map((hour) => (
+              <div key={hour} ref={hour === currentHour ? currentHourRef : undefined}>
+                <HourBlock
+                  hour={hour}
+                  signals={signalsByHour[hour] || []}
+                  meetings={meetingsByHour[hour] || []}
+                  isCurrentHour={hour === currentHour}
+                  onSignalClick={onSignalClick}
+                  onDelete={handleDelete}
+                  deletingId={deleting}
+                />
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      {/* Now indicator label */}
-      <p className="font-mono text-[8px] text-muted-foreground/50 mt-1.5 text-center">
-        {now.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })} ·{" "}
-        {now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
-      </p>
+          <p className="font-mono text-[8px] text-muted-foreground/50 mt-1.5 text-center">
+            {now.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })} ·{" "}
+            {now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+          </p>
+        </>
+      )}
     </section>
   );
 }
