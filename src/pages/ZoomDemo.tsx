@@ -5,6 +5,9 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import PreSessionDossier from "@/components/zoom-demo/PreSessionDossier";
+import VideoGrid from "@/components/zoom-demo/VideoGrid";
+import PostSessionSummary from "@/components/zoom-demo/PostSessionSummary";
 
 /* ── Types ── */
 type Phase = "idle" | "generating" | "jwt-ready" | "inviting" | "invited" | "streaming" | "detecting" | "complete";
