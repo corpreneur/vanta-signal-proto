@@ -10,6 +10,18 @@ export interface ReleaseEntry {
 
 export const releaseNotes: ReleaseEntry[] = [
   {
+    version: "2.6.0",
+    date: "2026-04-04",
+    title: "Navigation Consolidation & Context Commander Reference",
+    changes: [
+      { type: "improvement", text: "Sidebar Product Concepts — Phone FMC Demo and Smart Embed relocated into the Meetings & Video cluster for better discoverability" },
+      { type: "improvement", text: "Use Cases consolidation — Cases (e.g. First Principles) merged into the Use Cases collapsible group, eliminating a redundant nav section" },
+      { type: "improvement", text: "My Rules promoted — moved from Product Concepts to the utility section alongside Settings for clearer separation of config vs. concepts" },
+      { type: "feature", text: "Context Commander — dedicated reference project for context engineering discipline, SPR compression, 12-Factor Agents, BMAD method, and ADRs linked as a portfolio tool" },
+      { type: "improvement", text: "Sidebar architecture streamlined to three primary groups: Product Concepts, Platform, and Use Cases with active-route highlighting" },
+    ],
+  },
+  {
     version: "2.5.0",
     date: "2026-03-21",
     title: "Sprint Completion & Full Platform Polish",
