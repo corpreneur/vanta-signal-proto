@@ -80,6 +80,12 @@ const DEMO_SIGNALS: DetectedSignal[] = [
   },
 ];
 
+const ATTENDEE_META = [
+  { name: "You", initials: "WT", role: "Host", company: "Vanta" },
+  { name: "Sarah Chen", initials: "SC", role: "GP", company: "Acme VC" },
+  { name: "Marcus Rivera", initials: "MR", role: "MD", company: "Portfolio Capital" },
+];
+
 const SUMMARY_POINTS = [
   "Series A terms locked at $12M pre-money valuation.",
   "Target close date held at Q3 with a dual-lead structure.",
@@ -434,6 +440,35 @@ export default function ZoomDemo() {
           Stable walkthrough of session creation, participant join, live streaming, and signal capture.
         </p>
       </header>
+
+      {/* Attendee summary strip */}
+      <div className="flex flex-wrap gap-2 border-b border-border pb-4">
+        <span className="flex items-center gap-1.5 self-center font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground">
+          <Users className="h-3 w-3" /> Attendees
+        </span>
+        {ATTENDEE_META.map((a) => {
+          const signalCount = (phase === "detecting" || phase === "complete")
+            ? DEMO_SIGNALS.filter((s) => s.speaker === a.name || (a.name === "You" && s.speaker === "You")).length
+            : 0;
+          return (
+            <div
+              key={a.name}
+              className="flex flex-col gap-0.5 rounded border border-border bg-card px-3 py-1.5"
+            >
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[10px] text-muted-foreground">{a.initials}</span>
+                <span className="text-xs font-medium text-foreground">{a.name}</span>
+                {signalCount > 0 && (
+                  <span className="flex items-center gap-0.5 rounded bg-foreground px-1 py-px font-mono text-[9px] font-bold text-background">
+                    <Zap className="h-2.5 w-2.5" />{signalCount}
+                  </span>
+                )}
+              </div>
+              <span className="font-mono text-[9px] text-muted-foreground">{a.role} · {a.company}</span>
+            </div>
+          );
+        })}
+      </div>
 
       {/* Step 1 — Session creation */}
       <section className="space-y-3 border border-border bg-card p-4">
