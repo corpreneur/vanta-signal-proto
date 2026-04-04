@@ -73,6 +73,8 @@ const productItems = [
   { title: "Meeting Intelligence", url: "/meetings", icon: Video },
   { title: "Zoom Demo", url: "/product/zoom-demo", icon: Video },
   { title: "Vanta Zoom", url: "/product/zoom-sdk", icon: Video },
+  { title: "Phone FMC Demo", url: "/product/phone-fmc-demo", icon: Phone },
+  { title: "Smart Embed", url: "/product/smart-embed", icon: Phone },
   /* People & Relationships */
   { title: "Smart Contacts", url: "/contacts", icon: Users },
   { title: "Relationship Graph", url: "/graph", icon: Network },
@@ -83,8 +85,6 @@ const useCaseItems = [
   { title: "Insight Engine", url: "/insights", icon: Lightbulb },
   { title: "Investment Intel", url: "/investments", icon: TrendingUp },
   { title: "Decision Capture", url: "/decisions", icon: Gavel },
-  { title: "Phone FMC Demo", url: "/product/phone-fmc-demo", icon: Phone },
-  { title: "Smart Embed", url: "/product/smart-embed", icon: Phone },
 ];
 
 const platformItems = [
