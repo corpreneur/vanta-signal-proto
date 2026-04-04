@@ -117,10 +117,30 @@ export default function ZoomDemo() {
     }, 2200);
   }, []);
 
-  /* Phase: Start RTMS */
-  const handleStartRtms = useCallback(() => {
+  /* Phase: Start RTMS — calls the real edge function */
+  const handleStartRtms = useCallback(async () => {
     setPhase("streaming");
     setRtmsStatus("connecting");
+
+    if (meetingDbId) {
+      try {
+        const { data, error } = await supabase.functions.invoke("start-rtms-stream", {
+          body: { meeting_id: meetingDbId },
+        });
+        if (error) throw error;
+        console.log("RTMS response:", data);
+
+        if (data?.status === "streaming") {
+          toast.success("RTMS stream activated");
+        } else {
+          toast("RTMS unavailable — running demo simulation", { description: data?.reason || data?.status });
+        }
+      } catch (err) {
+        console.error("RTMS start failed:", err);
+        toast("RTMS not available — simulating stream", { description: "Zoom credentials not configured" });
+      }
+    }
+
     setTimeout(() => setRtmsStatus("streaming"), 1200);
   }, []);
 
