@@ -70,6 +70,7 @@ const channelItems = [
 
 const productItems = [
   { title: "Meetings", url: "/meetings", icon: Video },
+  { title: "Zoom Demo", url: "/product/zoom-demo", icon: Video },
   { title: "Smart Contacts", url: "/contacts", icon: Users },
   { title: "Relationship Graph", url: "/graph", icon: Network },
   
@@ -89,7 +90,6 @@ const platformItems = [
   { title: "Phone", url: "/product/phone-call", icon: Phone },
   { title: "Zoom", url: "/product/meeting", icon: Video },
   { title: "Vanta Zoom", url: "/product/zoom-sdk", icon: Video },
-  { title: "Zoom Demo", url: "/zoom-demo", icon: Video },
   { title: "Email", url: "/product/email", icon: Mail },
   { title: "Calendar", url: "/product/calendar", icon: Calendar },
 ];
