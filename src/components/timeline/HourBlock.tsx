@@ -92,7 +92,8 @@ export default function HourBlock({
                 <span className="font-mono text-[10px] text-muted-foreground shrink-0">
                   {formatTime(m.starts_at)}
                 </span>
-                <span className="font-sans text-[13px] text-foreground truncate">{m.title}</span>
+                <span className="font-sans text-[13px] text-foreground truncate flex-1">{m.title}</span>
+                <ZoomLaunchButton meetingId={m.id} zoomMeetingId={m.zoom_meeting_id} variant="icon" />
               </div>
             ))}
 

@@ -154,6 +154,12 @@ const WhatsAhead = () => {
                       </span>
                     </div>
                   </div>
+                  <ZoomLaunchButton
+                    meetingId={m.id}
+                    zoomMeetingId={(m as unknown as { zoom_meeting_id?: string }).zoom_meeting_id}
+                    variant="icon"
+                    className="shrink-0"
+                  />
                   {hasCooling && (
                     <span className="flex items-center gap-1 px-2 py-0.5 font-mono text-[8px] uppercase tracking-wider text-destructive border border-destructive/20 bg-destructive/5 shrink-0">
                       <AlertTriangle className="w-3 h-3" />

@@ -26,12 +26,15 @@ export default function QuickActionsGrid() {
 
   const close = () => setOpen(null);
 
-  function handleTap(id: ActionId | "message" | "offers") {
+  function handleTap(id: ActionId | "message" | "zoom") {
     if (id === "message") {
       window.open("sms:", "_self");
       return;
     }
-    if (id === "offers") return; // Coming soon
+    if (id === "zoom") {
+      window.open("https://zoom.us/start/videomeeting", "_blank", "noopener,noreferrer");
+      return;
+    }
     setOpen(id as ActionId);
   }
 

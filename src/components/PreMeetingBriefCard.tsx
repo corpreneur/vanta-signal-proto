@@ -114,6 +114,10 @@ const PreMeetingBriefCard = ({ brief }: PreMeetingBriefCardProps) => {
 
         {/* Actions row */}
         <div className="flex items-center gap-2 flex-wrap">
+          <ZoomLaunchButton
+            meetingId={brief.meeting_id}
+            variant="compact"
+          />
           <Link
             to={`/briefing/${brief.id}`}
             className="flex items-center gap-1 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-vanta-accent-zoom border border-vanta-accent-zoom-border hover:bg-vanta-accent-zoom-faint transition-colors"
