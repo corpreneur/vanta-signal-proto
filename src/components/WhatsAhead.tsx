@@ -12,6 +12,7 @@ interface Meeting {
   starts_at: string;
   ends_at: string | null;
   attendees: unknown[];
+  zoom_meeting_id?: string | null;
 }
 
 interface CoolingAlert {
