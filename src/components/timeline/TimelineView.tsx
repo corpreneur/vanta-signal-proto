@@ -37,7 +37,7 @@ export default function TimelineView({ signals, onSignalClick, compact = true }:
       tomorrow.setDate(tomorrow.getDate() + 1);
       const { data } = await supabase
         .from("upcoming_meetings")
-        .select("id, title, starts_at, ends_at")
+        .select("id, title, starts_at, ends_at, zoom_meeting_id")
         .gte("starts_at", today.toISOString())
         .lt("starts_at", tomorrow.toISOString())
         .order("starts_at", { ascending: true });
